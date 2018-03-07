@@ -1,0 +1,2464 @@
+cls_turnon = { 
+	z_wizlvl_turnon = yes
+  	z_bardlvl_turnon = yes
+  	z_warllvl_turnon = yes
+  	z_sorclvl_turnon = yes
+  	z_clerlvl_turnon = yes
+  	z_palalvl_turnon = yes
+  	z_druilvl_turnon = yes
+  	z_fighlvl_turnon = yes
+  	z_ranglvl_turnon = yes
+ 	z_barblvl_turnon = yes
+  	z_rogulvl_turnon = yes
+  	z_assalvl_turnon = yes
+  	z_shadlvl_turnon = yes
+}
+
+z_class_xp_calc = { 
+	if = { 
+		limit = { 
+			z_wizard = yes
+		}
+		z_wizlvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_bard = yes
+		}
+		z_bardlvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_warlock = yes
+		}
+		z_warllvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_sorcerer = yes
+		}
+		z_sorclvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_cleric = yes
+		}
+		z_clerlvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_druid = yes
+		}
+		z_druilvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_paladin = yes
+		}
+		z_palalvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_paladin = yes
+		}
+		z_fighlvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_barbarian = yes
+		}
+		z_barblvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_ranger = yes
+		}
+		z_ranglvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_rogue = yes
+		}
+		z_rogulvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_shadow = yes
+		}
+		z_shadlvl_calc = yes
+	}
+	if = { 
+		limit = { 
+			z_assassin = yes
+		}
+		z_assalvl_calc = yes
+	}			
+}
+
+z_wiz_trait_remove = { 
+	remove_trait = trained_wizard
+	remove_trait = expert_wizard
+	remove_trait = master_wizard
+	remove_trait = renowned_wizard
+	remove_trait = legendary_wizard
+}
+
+z_wizlvl_turnon = {
+	if = { 
+		limit = {
+			z_wizard = yes
+			not = { 
+				has_character_flag = wizard
+			}
+		}
+		set_character_flag = wizard
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "wizlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_wizard
+				}
+				set_variable  = { which = "wizlvl" value = "1"}
+				set_variable  = { which = "wizlvlup" value = "25"}
+				set_variable  = { which = "wizlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_wizard
+				}
+				set_variable  = { which = "wizlvl" value = "5"}		
+				set_variable  = { which = "wizlvlup" value = "30"}
+				set_variable = { which = "wizlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_wizard
+				}
+				set_variable  = { which = "wizlvl" value = "10"}
+				set_variable  = { which = "wizlvlup" value = "36"}
+				set_variable  = { which = "wizlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_wizard
+				}
+				set_variable  = { which = "wizlvl" value = "15"}
+				set_variable  = { which = "wizlvlup" value = "50"}
+				set_variable  = { which = "wizlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = legendary_wizard
+						check_variable = { which = "wizlvl" value = "20"}
+					}
+				}
+				set_variable  = { which = "wizlvl" value = "20"}
+				set_variable  = { which = "wizlvlup" value = "75"}
+				set_variable  = { which = "wizlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_wizlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "wizxp" which = "wizlvlup"}
+		}
+		change_variable = { which = "wizlvl" value = 1}
+		set_variable = { which = "wizxp" value = 0}
+		multiply_variable = { which = "wizlvlup"	value = 1.1	}
+		multiply_variable = { which = "wizlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "wizlvl" value = 0} 
+			}
+			check_variable = { which = "wizxp" which = "wizlvldown"}
+		}
+		change_variable = { which = "wizlvl" value = -1}
+		set_variable = { which = "wizxp" value = 0}
+		divide_variable = { which = "wizlvlup" value = 1.1	}
+		divide_variable = { which = "wizlvldown" value = 1.1	}
+	}
+	z_wiz_trait_calc = yes
+}
+
+z_wiz_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "wizlvl" value = 20}
+		}
+		z_wiz_trait_remove = yes
+		add_trait = legendary_wizard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "wizlvl" value = 15}
+			not = {
+				check_variable = { which = "wizlvl" value = 20}	
+			}
+		}
+		z_wiz_trait_remove = yes
+		add_trait = renowned_wizard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "wizlvl" value = 10}
+			not = {
+				check_variable = { which = "wizlvl" value = 15}	
+			}
+		}
+		z_wiz_trait_remove = yes
+		add_trait = master_wizard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "wizlvl" value = 5}
+			not = {
+				check_variable = { which = "wizlvl" value = 10}	
+			}
+		}
+		z_wiz_trait_remove = yes
+		add_trait = expert_wizard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "wizlvl" value = 0}
+			not = {
+				check_variable = { which = "wizlvl" value = 5}	
+			}
+		}
+		z_wiz_trait_remove = yes
+		add_trait = trained_wizard
+	}			
+}
+
+z_bard_trait_remove = { 
+	remove_trait = trained_bard
+	remove_trait = expert_bard
+	remove_trait = master_bard
+	remove_trait = renowned_bard
+	remove_trait = legendary_bard
+}
+
+z_bardlvl_turnon = {
+	if = { 
+		limit = {
+			z_bard = yes
+			not = { 
+				has_character_flag = bard
+			}
+		}
+		set_character_flag = bard
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "bardlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_bard
+				}
+				set_variable  = { which = "bardlvl" value = "1"}
+				set_variable  = { which = "bardlvlup" value = "25"}
+				set_variable  = { which = "bardlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_bard
+				}
+				set_variable  = { which = "bardlvl" value = "5"}		
+				set_variable  = { which = "bardlvlup" value = "30"}
+				set_variable = { which = "bardlvlup" value = 30	}
+				set_variable = { which = "bardlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_bard
+				}
+				set_variable  = { which = "bardlvl" value = "10"}
+				set_variable  = { which = "bardlvlup" value = "36"}
+				set_variable  = { which = "bardlvldown" value = "-36"}
+			}
+			if = { 
+				limit = { 
+					trait = renowned_bard
+				}
+				set_variable  = { which = "bardlvl" value = "15"}
+				set_variable  = { which = "bardlvlup" value = "50"}
+				set_variable  = { which = "bardlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_bard
+				}
+				set_variable  = { which = "bardlvl" value = "20"}
+				set_variable  = { which = "bardlvlup" value = "75"}
+				set_variable  = { which = "bardlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_bardlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "bardxp" which = "bardlvlup"}
+		}
+		change_variable = { which = "bardlvl" value = 1}
+		set_variable = { which = "bardxp" value = 0}
+		multiply_variable = { which = "bardlvlup"	value = 1.1	}
+		multiply_variable = { which = "bardlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "bardlvl" value = 0} 
+			}
+			check_variable = { which = "bardxp" which = "bardlvldown"}
+		}
+		change_variable = { which = "bardlvl" value = -1}
+		set_variable = { which = "bardxp" value = 0}
+		divide_variable = { which = "bardlvlup" value = 1.1	}
+		divide_variable = { which = "bardlvldown" value = 1.1	}
+	}
+	z_bard_trait_calc = yes
+}
+
+z_bard_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "bardlvl" value = 20}
+		}
+		z_bard_trait_remove = yes
+		add_trait = legendary_bard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "bardlvl" value = 15}
+			not = {
+				check_variable = { which = "bardlvl" value = 20}	
+			}
+		}
+		z_bard_trait_remove = yes
+		add_trait = renowned_bard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "bardlvl" value = 10}
+			not = {
+				check_variable = { which = "bardlvl" value = 15}	
+			}
+		}
+		z_bard_trait_remove = yes
+		add_trait = master_bard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "bardlvl" value = 5}
+			not = {
+				check_variable = { which = "bardlvl" value = 10}	
+			}
+		}
+		z_bard_trait_remove = yes
+		add_trait = expert_bard
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "bardlvl" value = 0}
+			not = {
+				check_variable = { which = "bardlvl" value = 5}	
+			}
+		}
+		z_bard_trait_remove = yes
+		add_trait = trained_bard
+	}			
+}
+
+z_warl_trait_remove = { 
+	remove_trait = trained_warlock
+	remove_trait = expert_warlock
+	remove_trait = master_warlock
+	remove_trait = renowned_warlock
+	remove_trait = legendary_warlock
+}
+
+z_warllvl_turnon = {
+	if = { 
+		limit = {
+			z_warlock = yes
+			not = { 
+				has_character_flag = warl
+			}
+		}
+		set_character_flag = warl
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "warllvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_warlock
+				}
+				set_variable  = { which = "warllvl" value = "1"}
+				set_variable  = { which = "warllvlup" value = "25"}
+				set_variable  = { which = "warllvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_warlock
+				}
+				set_variable  = { which = "warllvl" value = "5"}		
+				set_variable  = { which = "warllvlup" value = "30"}
+				set_variable = { which = "warllvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_warlock
+				}
+				set_variable  = { which = "warllvl" value = "10"}
+				set_variable  = { which = "warllvlup" value = "36"}
+				set_variable  = { which = "warllvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_warlock
+				}
+				set_variable  = { which = "warllvl" value = "15"}
+				set_variable  = { which = "warllvlup" value = "50"}
+				set_variable  = { which = "warllvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_warlock
+				}
+				set_variable  = { which = "warllvl" value = "20"}
+				set_variable  = { which = "warllvlup" value = "75"}
+				set_variable  = { which = "warllvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_warllvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "warlxp" which = "warllvlup"}
+		}
+		change_variable = { which = "warllvl" value = 1}
+		set_variable = { which = "warlxp" value = 0}
+		multiply_variable = { which = "warllvlup"	value = 1.1	}
+		multiply_variable = { which = "warllvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "warllvl" value = 0} 
+			}
+			check_variable = { which = "warlxp" which = "warllvldown"}
+		}
+		change_variable = { which = "warllvl" value = -1}
+		set_variable = { which = "warlxp" value = 0}
+		divide_variable = { which = "warllvlup" value = 1.1	}
+		divide_variable = { which = "warllvldown" value = 1.1	}
+	}
+	z_warl_trait_calc = yes
+}
+
+z_warl_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "warllvl" value = 20}
+		}
+		z_warl_trait_remove = yes
+		add_trait = legendary_warlock
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "warllvl" value = 15}
+			not = {
+				check_variable = { which = "warllvl" value = 20}	
+			}
+		}
+		z_warl_trait_remove = yes
+		add_trait = renowned_warlock
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "warllvl" value = 10}
+			not = {
+				check_variable = { which = "warllvl" value = 15}	
+			}
+		}
+		z_warl_trait_remove = yes
+		add_trait = master_warlock
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "warllvl" value = 5}
+			not = {
+				check_variable = { which = "warllvl" value = 10}	
+			}
+		}
+		z_warl_trait_remove = yes
+		add_trait = expert_warlock
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "warllvl" value = 0}
+			not = {
+				check_variable = { which = "warllvl" value = 5}	
+			}
+		}
+		z_warl_trait_remove = yes
+		add_trait = trained_warlock
+	}			
+}
+
+z_sorc_trait_remove = { 
+	remove_trait = trained_sorcerer
+	remove_trait = expert_sorcerer
+	remove_trait = master_sorcerer
+	remove_trait = renowned_sorcerer
+	remove_trait = legendary_sorcerer
+}
+
+z_sorclvl_turnon = {
+	if = { 
+		limit = {
+			z_sorcerer = yes
+			not = { 
+				has_character_flag = sorc
+			}
+		}
+		set_character_flag = sorc
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "sorclvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_sorcerer
+				}
+				set_variable  = { which = "sorclvl" value = "1"}
+				set_variable  = { which = "sorclvlup" value = "25"}
+				set_variable  = { which = "sorclvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_sorcerer
+				}
+				set_variable  = { which = "sorclvl" value = "5"}		
+				set_variable  = { which = "sorclvlup" value = "30"}
+				set_variable = { which = "sorclvlup" value = 30	}
+				set_variable = { which = "sorclvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_sorcerer
+				}
+				set_variable  = { which = "sorclvl" value = "10"}
+				set_variable  = { which = "sorclvlup" value = "36"}
+				set_variable  = { which = "sorclvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_sorcerer
+				}
+				set_variable  = { which = "sorclvl" value = "15"}
+				set_variable  = { which = "sorclvlup" value = "50"}
+				set_variable  = { which = "sorclvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_sorcerer
+				}
+				set_variable  = { which = "sorclvl" value = "20"}
+				set_variable  = { which = "sorclvlup" value = "75"}
+				set_variable  = { which = "sorclvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_sorclvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "sorcxp" which = "sorclvlup"}
+		}
+		change_variable = { which = "sorclvl" value = 1}
+		set_variable = { which = "sorcxp" value = 0}
+		multiply_variable = { which = "sorclvlup"	value = 1.1	}
+		multiply_variable = { which = "sorclvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "sorclvl" value = 0} 
+			}
+			check_variable = { which = "sorcxp" which = "sorclvldown"}
+		}
+		change_variable = { which = "sorclvl" value = -1}
+		set_variable = { which = "sorcxp" value = 0}
+		divide_variable = { which = "sorclvlup" value = 1.1	}
+		divide_variable = { which = "sorclvldown" value = 1.1	}
+	}
+	z_sorc_trait_calc = yes
+}
+
+z_sorc_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "sorclvl" value = 20}
+		}
+		z_sorc_trait_remove = yes
+		add_trait = legendary_sorcerer
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "sorclvl" value = 15}
+			not = {
+				check_variable = { which = "sorclvl" value = 20}	
+			}
+		}
+		z_sorc_trait_remove = yes
+		add_trait = renowned_sorcerer
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "sorclvl" value = 10}
+			not = {
+				check_variable = { which = "sorclvl" value = 15}	
+			}
+		}
+		z_sorc_trait_remove = yes
+		add_trait = master_sorcerer
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "sorclvl" value = 5}
+			not = {
+				check_variable = { which = "sorclvl" value = 10}	
+			}
+		}
+		z_sorc_trait_remove = yes
+		add_trait = expert_sorcerer
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "sorclvl" value = 0}
+			not = {
+				check_variable = { which = "sorclvl" value = 5}	
+			}
+		}
+		z_sorc_trait_remove = yes
+		add_trait = trained_sorcerer
+	}			
+}
+
+z_cler_trait_remove = { 
+	remove_trait = trained_cleric
+	remove_trait = expert_cleric
+	remove_trait = master_cleric
+	remove_trait = renowned_cleric
+	remove_trait = legendary_cleric
+}
+
+z_clerlvl_turnon = {
+	if = { 
+		limit = {
+			z_cleric = yes
+			not = { 
+				has_character_flag = cler
+			}
+		}
+		set_character_flag = cler
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "clerlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_cleric
+				}
+				set_variable  = { which = "clerlvl" value = "1"}
+				set_variable  = { which = "clerlvlup" value = "25"}
+				set_variable  = { which = "clerlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_cleric
+				}
+				set_variable  = { which = "clerlvl" value = "5"}		
+				set_variable = { which = "clerlvlup" value = 30	}
+				set_variable = { which = "clerlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_cleric
+				}
+				set_variable  = { which = "clerlvl" value = "10"}
+				set_variable  = { which = "clerlvlup" value = "36"}
+				set_variable  = { which = "clerlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_cleric
+				}
+				set_variable  = { which = "clerlvl" value = "15"}
+				set_variable  = { which = "clerlvlup" value = "50"}
+				set_variable  = { which = "clerlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_cleric
+				}
+				set_variable  = { which = "clerlvl" value = "20"}
+				set_variable  = { which = "clerlvlup" value = "75"}
+				set_variable  = { which = "clerlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_clerlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "clerxp" which = "clerlvlup"}
+		}
+		change_variable = { which = "clerlvl" value = 1}
+		set_variable = { which = "clerxp" value = 0}
+		multiply_variable = { which = "clerlvlup"	value = 1.1	}
+		multiply_variable = { which = "clerlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "clerlvl" value = 0} 
+			}
+			check_variable = { which = "clerxp" which = "clerlvldown"}
+		}
+		change_variable = { which = "clerlvl" value = -1}
+		set_variable = { which = "clerxp" value = 0}
+		divide_variable = { which = "clerlvlup" value = 1.1	}
+		divide_variable = { which = "clerlvldown" value = 1.1	}
+	}
+	z_cler_trait_calc = yes
+}
+
+z_cler_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "clerlvl" value = 20}
+		}
+		z_cler_trait_remove = yes
+		add_trait = legendary_cleric
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "clerlvl" value = 15}
+			not = {
+				check_variable = { which = "clerlvl" value = 20}	
+			}
+		}
+		z_cler_trait_remove = yes
+		add_trait = renowned_cleric
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "clerlvl" value = 10}
+			not = {
+				check_variable = { which = "clerlvl" value = 15}	
+			}
+		}
+		z_cler_trait_remove = yes
+		add_trait = master_cleric
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "clerlvl" value = 5}
+			not = {
+				check_variable = { which = "clerlvl" value = 10}	
+			}
+		}
+		z_cler_trait_remove = yes
+		add_trait = expert_cleric
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "clerlvl" value = 0}
+			not = {
+				check_variable = { which = "clerlvl" value = 5}	
+			}
+		}
+		z_cler_trait_remove = yes
+		add_trait = trained_cleric
+	}			
+}
+
+z_elem_trait_remove = { 
+	remove_trait = trained_elementalist
+	remove_trait = expert_elementalist
+	remove_trait = master_elementalist
+	remove_trait = renowned_elementalist
+	remove_trait = legendary_elementalist
+}
+
+z_elemlvl_turnon = {
+	if = { 
+		limit = {
+			z_elementalist = yes
+			not = { 
+				has_character_flag = elem
+			}
+		}
+		set_character_flag = elem
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "elemlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = trained_elementalist
+						check_variable = { which = "elemlvl" value = "1"}
+						not = {
+							check_variable = { which = "elemlvl" value = "5"}
+						}
+					}
+				}
+				set_variable  = { which = "elemlvl" value = "1"}
+				set_variable  = { which = "elemlvlup" value = "25"}
+				set_variable  = { which = "elemlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = expert_elementalist
+						check_variable = { which = "elemlvl" value = "5"}
+						not = {
+							check_variable = { which = "elemlvl" value = "10"}
+						}
+					}
+				}
+				set_variable  = { which = "elemlvl" value = "5"}		
+				set_variable  = { which = "elemlvlup" value = "30"}
+				set_variable = { which = "elemlvlup" value = 30	}
+				set_variable = { which = "elemlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = master_elementalist
+						check_variable = { which = "elemlvl" value = "10"}
+						not = {
+							check_variable = { which = "elemlvl" value = "15"}
+						}
+					}
+				}
+				set_variable  = { which = "elemlvl" value = "10"}
+				set_variable  = { which = "elemlvlup" value = "36"}
+				set_variable  = { which = "elemlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = renowned_elementalist
+						check_variable = { which = "elemlvl" value = "15"}
+						not = {
+							check_variable = { which = "elemlvl" value = "20"}
+						}
+					}
+				}
+				set_variable  = { which = "elemlvl" value = "15"}
+				set_variable  = { which = "elemlvlup" value = "50"}
+				set_variable  = { which = "elemlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = legendary_elementalist
+						check_variable = { which = "elemlvl" value = "20"}
+					}
+				}
+				set_variable  = { which = "elemlvl" value = "20"}
+				set_variable  = { which = "elemlvlup" value = "75"}
+				set_variable  = { which = "elemlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_elemlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "elemxp" which = "elemlvlup"}
+		}
+		change_variable = { which = "elemlvl" value = 1}
+		set_variable = { which = "elemxp" value = 0}
+		multiply_variable = { which = "elemlvlup"	value = 1.1	}
+		multiply_variable = { which = "elemlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "elemlvl" value = 0} 
+			}
+			check_variable = { which = "elemxp" which = "elemlvldown"}
+		}
+		change_variable = { which = "elemlvl" value = -1}
+		set_variable = { which = "elemxp" value = 0}
+		divide_variable = { which = "elemlvlup" value = 1.1	}
+		divide_variable = { which = "elemlvldown" value = 1.1	}
+	}
+	z_elem_trait_calc = yes
+}
+
+z_elem_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "elemlvl" value = 20}
+		}
+		z_elem_trait_remove = yes
+		add_trait = legendary_elementalist
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "elemlvl" value = 15}
+			not = {
+				check_variable = { which = "elemlvl" value = 20}	
+			}
+		}
+		z_elem_trait_remove = yes
+		add_trait = renowned_elementalist
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "elemlvl" value = 10}
+			not = {
+				check_variable = { which = "elemlvl" value = 15}	
+			}
+		}
+		z_elem_trait_remove = yes
+		add_trait = master_elementalist
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "elemlvl" value = 5}
+			not = {
+				check_variable = { which = "elemlvl" value = 10}	
+			}
+		}
+		z_elem_trait_remove = yes
+		add_trait = expert_elementalist
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "elemlvl" value = 0}
+			not = {
+				check_variable = { which = "elemlvl" value = 5}	
+			}
+		}
+		z_elem_trait_remove = yes
+		add_trait = trained_elementalist
+	}			
+}
+
+z_pala_trait_remove = { 
+	remove_trait = trained_paladin
+	remove_trait = expert_paladin
+	remove_trait = master_paladin
+	remove_trait = renowned_paladin
+	remove_trait = legendary_paladin
+}
+
+z_palalvl_turnon = {
+	if = { 
+		limit = {
+			z_paladin = yes
+			not = { 
+				has_character_flag = pala
+			}
+		}
+		set_character_flag = pala
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "palalvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_paladin
+				}
+				set_variable  = { which = "palalvl" value = "1"}
+				set_variable  = { which = "palalvlup" value = "25"}
+				set_variable  = { which = "palalvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_paladin
+				}
+				set_variable  = { which = "palalvl" value = "5"}		
+				set_variable  = { which = "palalvlup" value = "30"}
+				set_variable = { which = "palalvlup" value = 30	}
+				set_variable = { which = "palalvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_paladin
+				}
+				set_variable  = { which = "palalvl" value = "10"}
+				set_variable  = { which = "palalvlup" value = "36"}
+				set_variable  = { which = "palalvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_paladin
+				}
+				set_variable  = { which = "palalvl" value = "15"}
+				set_variable  = { which = "palalvlup" value = "50"}
+				set_variable  = { which = "palalvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_paladin
+				}
+				set_variable  = { which = "palalvl" value = "20"}
+				set_variable  = { which = "palalvlup" value = "75"}
+				set_variable  = { which = "palalvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_palalvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "palaxp" which = "palalvlup"}
+		}
+		change_variable = { which = "palalvl" value = 1}
+		set_variable = { which = "palaxp" value = 0}
+		multiply_variable = { which = "palalvlup"	value = 1.1	}
+		multiply_variable = { which = "palalvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "palalvl" value = 0} 
+			}
+			check_variable = { which = "palaxp" which = "palalvldown"}
+		}
+		change_variable = { which = "palalvl" value = -1}
+		set_variable = { which = "palaxp" value = 0}
+		divide_variable = { which = "palalvlup" value = 1.1	}
+		divide_variable = { which = "palalvldown" value = 1.1	}
+	}
+	z_pala_trait_calc = yes
+}
+
+z_pala_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "palalvl" value = 20}
+		}
+		z_pala_trait_remove = yes
+		add_trait = legendary_paladin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "palalvl" value = 15}
+			not = {
+				check_variable = { which = "palalvl" value = 20}	
+			}
+		}
+		z_pala_trait_remove = yes
+		add_trait = renowned_paladin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "palalvl" value = 10}
+			not = {
+				check_variable = { which = "palalvl" value = 15}	
+			}
+		}
+		z_pala_trait_remove = yes
+		add_trait = master_paladin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "palalvl" value = 5}
+			not = {
+				check_variable = { which = "palalvl" value = 10}	
+			}
+		}
+		z_pala_trait_remove = yes
+		add_trait = expert_paladin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "palalvl" value = 0}
+			not = {
+				check_variable = { which = "palalvl" value = 5}	
+			}
+		}
+		z_pala_trait_remove = yes
+		add_trait = trained_paladin
+	}			
+}
+
+z_drui_trait_remove = { 
+	remove_trait = trained_druid
+	remove_trait = expert_druid
+	remove_trait = master_druid
+	remove_trait = renowned_druid
+	remove_trait = legendary_druid
+}
+
+z_druilvl_turnon = {
+	if = { 
+		limit = {
+			z_druid = yes
+			not = { 
+				has_character_flag = drui
+			}
+		}
+		set_character_flag = drui
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "druilvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_druid
+				}
+				set_variable  = { which = "druilvl" value = "1"}
+				set_variable  = { which = "druilvlup" value = "25"}
+				set_variable  = { which = "druilvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_druid
+				}
+				set_variable  = { which = "druilvl" value = "5"}		
+				set_variable  = { which = "druilvlup" value = "30"}
+				set_variable = { which = "druilvlup" value = 30	}
+				set_variable = { which = "druilvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_druid
+				}
+				set_variable  = { which = "druilvl" value = "10"}
+				set_variable  = { which = "druilvlup" value = "36"}
+				set_variable  = { which = "druilvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_druid
+				}
+				set_variable  = { which = "druilvl" value = "15"}
+				set_variable  = { which = "druilvlup" value = "50"}
+				set_variable  = { which = "druilvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_druid
+				}
+				set_variable  = { which = "druilvl" value = "20"}
+				set_variable  = { which = "druilvlup" value = "75"}
+				set_variable  = { which = "druilvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_druilvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "druixp" which = "druilvlup"}
+		}
+		change_variable = { which = "druilvl" value = 1}
+		set_variable = { which = "druixp" value = 0}
+		multiply_variable = { which = "druilvlup"	value = 1.1	}
+		multiply_variable = { which = "druilvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "druilvl" value = 0} 
+			}
+			check_variable = { which = "druixp" which = "druilvldown"}
+		}
+		change_variable = { which = "druilvl" value = -1}
+		set_variable = { which = "druixp" value = 0}
+		divide_variable = { which = "druilvlup" value = 1.1	}
+		divide_variable = { which = "druilvldown" value = 1.1	}
+	}
+	z_drui_trait_calc = yes
+}
+
+z_drui_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "druilvl" value = 20}
+		}
+		z_drui_trait_remove = yes
+		add_trait = legendary_druid
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "druilvl" value = 15}
+			not = {
+				check_variable = { which = "druilvl" value = 20}	
+			}
+		}
+		z_drui_trait_remove = yes
+		add_trait = renowned_druid
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "druilvl" value = 10}
+			not = {
+				check_variable = { which = "druilvl" value = 15}	
+			}
+		}
+		z_drui_trait_remove = yes
+		add_trait = master_druid
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "druilvl" value = 5}
+			not = {
+				check_variable = { which = "druilvl" value = 10}	
+			}
+		}
+		z_drui_trait_remove = yes
+		add_trait = expert_druid
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "druilvl" value = 0}
+			not = {
+				check_variable = { which = "druilvl" value = 5}	
+			}
+		}
+		z_drui_trait_remove = yes
+		add_trait = trained_druid
+	}			
+}
+
+z_figh_trait_remove = { 
+	remove_trait = trained_fighter
+	remove_trait = expert_fighter
+	remove_trait = master_fighter
+	remove_trait = renowned_fighter
+	remove_trait = legendary_fighter
+}
+	
+z_fighlvl_turnon = {
+	if = { 
+		limit = {
+			z_fighter = yes
+			not = { 
+				has_character_flag = figh
+			}
+		}
+		set_character_flag = figh
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "fighlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_fighter
+				}
+				set_variable  = { which = "fighlvl" value = "1"}
+				set_variable  = { which = "fighlvlup" value = "25"}
+				set_variable  = { which = "fighlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_fighter
+				}
+				set_variable  = { which = "fighlvl" value = "5"}		
+				set_variable  = { which = "fighlvlup" value = "30"}
+				set_variable = { which = "fighlvlup" value = 30	}
+				set_variable = { which = "fighlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_fighter
+				}
+				set_variable  = { which = "fighlvl" value = "10"}
+				set_variable  = { which = "fighlvlup" value = "36"}
+				set_variable  = { which = "fighlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_fighter
+				}
+				set_variable  = { which = "fighlvl" value = "15"}
+				set_variable  = { which = "fighlvlup" value = "50"}
+				set_variable  = { which = "fighlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_fighter
+				}
+				set_variable  = { which = "fighlvl" value = "20"}
+				set_variable  = { which = "fighlvlup" value = "75"}
+				set_variable  = { which = "fighlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_fighlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "fighxp" which = "fighlvlup"}
+		}
+		change_variable = { which = "fighlvl" value = 1}
+		set_variable = { which = "fighxp" value = 0}
+		multiply_variable = { which = "fighlvlup"	value = 1.1	}
+		multiply_variable = { which = "fighlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "fighlvl" value = 0} 
+			}
+			check_variable = { which = "fighxp" which = "fighlvldown"}
+		}
+		change_variable = { which = "fighlvl" value = -1}
+		set_variable = { which = "fighxp" value = 0}
+		divide_variable = { which = "fighlvlup" value = 1.1	}
+		divide_variable = { which = "fighlvldown" value = 1.1	}
+	}
+	z_figh_trait_calc = yes
+}
+
+z_figh_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "fighlvl" value = 20}
+		}
+		z_figh_trait_remove = yes
+		add_trait = legendary_fighter
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "fighlvl" value = 15}
+			not = {
+				check_variable = { which = "fighlvl" value = 20}	
+			}
+		}
+		z_figh_trait_remove = yes
+		add_trait = renowned_fighter
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "fighlvl" value = 10}
+			not = {
+				check_variable = { which = "fighlvl" value = 15}	
+			}
+		}
+		z_figh_trait_remove = yes
+		add_trait = master_fighter
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "fighlvl" value = 5}
+			not = {
+				check_variable = { which = "fighlvl" value = 10}	
+			}
+		}
+		z_figh_trait_remove = yes
+		add_trait = expert_fighter
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "fighlvl" value = 0}
+			not = {
+				check_variable = { which = "fighlvl" value = 5}	
+			}
+		}
+		z_figh_trait_remove = yes
+		add_trait = trained_fighter
+	}			
+}
+
+z_rang_trait_remove = { 
+	remove_trait = trained_ranger
+	remove_trait = expert_ranger
+	remove_trait = master_ranger
+	remove_trait = renowned_ranger
+	remove_trait = legendary_ranger
+}
+
+z_ranglvl_turnon = {
+	if = { 
+		limit = {
+			z_ranger = yes
+			not = { 
+				has_character_flag = rang
+			}
+		}
+		set_character_flag = rang
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "ranglvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_ranger
+				}
+				set_variable  = { which = "ranglvl" value = "1"}
+				set_variable  = { which = "ranglvlup" value = "25"}
+				set_variable  = { which = "ranglvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_ranger
+				}
+				set_variable  = { which = "ranglvl" value = "5"}		
+				set_variable  = { which = "ranglvlup" value = "30"}
+				set_variable = { which = "ranglvlup" value = 30	}
+				set_variable = { which = "ranglvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_ranger
+				}
+				set_variable  = { which = "ranglvl" value = "10"}
+				set_variable  = { which = "ranglvlup" value = "36"}
+				set_variable  = { which = "ranglvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_ranger
+				}
+				set_variable  = { which = "ranglvl" value = "15"}
+				set_variable  = { which = "ranglvlup" value = "50"}
+				set_variable  = { which = "ranglvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_ranger
+				}
+				set_variable  = { which = "ranglvl" value = "20"}
+				set_variable  = { which = "ranglvlup" value = "75"}
+				set_variable  = { which = "ranglvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_ranglvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "rangxp" which = "ranglvlup"}
+		}
+		change_variable = { which = "ranglvl" value = 1}
+		set_variable = { which = "rangxp" value = 0}
+		multiply_variable = { which = "ranglvlup"	value = 1.1	}
+		multiply_variable = { which = "ranglvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "ranglvl" value = 0} 
+			}
+			check_variable = { which = "rangxp" which = "ranglvldown"}
+		}
+		change_variable = { which = "ranglvl" value = -1}
+		set_variable = { which = "rangxp" value = 0}
+		divide_variable = { which = "ranglvlup" value = 1.1	}
+		divide_variable = { which = "ranglvldown" value = 1.1	}
+	}
+	z_rang_trait_calc = yes
+}
+
+z_rang_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "ranglvl" value = 20}
+		}
+		z_rang_trait_remove = yes
+		add_trait = legendary_ranger
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "ranglvl" value = 15}
+			not = {
+				check_variable = { which = "ranglvl" value = 20}	
+			}
+		}
+		z_rang_trait_remove = yes
+		add_trait = renowned_ranger
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "ranglvl" value = 10}
+			not = {
+				check_variable = { which = "ranglvl" value = 15}	
+			}
+		}
+		z_rang_trait_remove = yes
+		add_trait = master_ranger
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "ranglvl" value = 5}
+			not = {
+				check_variable = { which = "ranglvl" value = 10}	
+			}
+		}
+		z_rang_trait_remove = yes
+		add_trait = expert_ranger
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "ranglvl" value = 0}
+			not = {
+				check_variable = { which = "ranglvl" value = 5}	
+			}
+		}
+		z_rang_trait_remove = yes
+		add_trait = trained_ranger
+	}			
+}
+
+z_barb_trait_remove = { 
+	remove_trait = trained_barbarian
+	remove_trait = expert_barbarian
+	remove_trait = master_barbarian
+	remove_trait = renowned_barbarian
+	remove_trait = legendary_barbarian
+}
+
+z_barblvl_turnon = {
+	if = { 
+		limit = {
+			z_barbarian = yes
+			not = { 
+				has_character_flag = barb
+			}
+		}
+		set_character_flag = barb
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "barblvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_barbarian
+				}
+				set_variable  = { which = "barblvl" value = "1"}
+				set_variable  = { which = "barblvlup" value = "25"}
+				set_variable  = { which = "barblvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_barbarian
+				}
+				set_variable  = { which = "barblvl" value = "5"}		
+				set_variable  = { which = "barblvlup" value = "30"}
+				set_variable = { which = "barblvlup" value = 30	}
+				set_variable = { which = "barblvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_barbarian
+				}
+				set_variable  = { which = "barblvl" value = "10"}
+				set_variable  = { which = "barblvlup" value = "36"}
+				set_variable  = { which = "barblvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_barbarian
+				}
+				set_variable  = { which = "barblvl" value = "15"}
+				set_variable  = { which = "barblvlup" value = "50"}
+				set_variable  = { which = "barblvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_barbarian
+				}
+				set_variable  = { which = "barblvl" value = "20"}
+				set_variable  = { which = "barblvlup" value = "75"}
+				set_variable  = { which = "barblvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_barblvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "barbxp" which = "barblvlup"}
+		}
+		change_variable = { which = "barblvl" value = 1}
+		set_variable = { which = "barbxp" value = 0}
+		multiply_variable = { which = "barblvlup"	value = 1.1	}
+		multiply_variable = { which = "barblvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "barblvl" value = 0} 
+			}
+			check_variable = { which = "barbxp" which = "barblvldown"}
+		}
+		change_variable = { which = "barblvl" value = -1}
+		set_variable = { which = "barbxp" value = 0}
+		divide_variable = { which = "barblvlup" value = 1.1	}
+		divide_variable = { which = "barblvldown" value = 1.1	}
+	}
+	z_barb_trait_calc = yes
+}
+
+z_barb_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "barblvl" value = 20}
+		}
+		z_barb_trait_remove = yes
+		add_trait = legendary_barbarian
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "barblvl" value = 15}
+			not = {
+				check_variable = { which = "barblvl" value = 20}	
+			}
+		}
+		z_barb_trait_remove = yes
+		add_trait = renowned_barbarian
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "barblvl" value = 10}
+			not = {
+				check_variable = { which = "barblvl" value = 15}	
+			}
+		}
+		z_barb_trait_remove = yes
+		add_trait = master_barbarian
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "barblvl" value = 5}
+			not = {
+				check_variable = { which = "barblvl" value = 10}	
+			}
+		}
+		z_barb_trait_remove = yes
+		add_trait = expert_barbarian
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "barblvl" value = 0}
+			not = {
+				check_variable = { which = "barblvl" value = 5}	
+			}
+		}
+		z_barb_trait_remove = yes
+		add_trait = trained_barbarian
+	}			
+}
+
+z_mon_trait_remove = { 
+	remove_trait = trained_monk
+	remove_trait = expert_monk
+	remove_trait = master_monk
+	remove_trait = renowned_monk
+	remove_trait = legendary_monk
+}
+
+z_monlvl_turnon = {
+	if = { 
+		limit = {
+			not = { 
+				has_character_flag = mon
+			}
+		}
+		set_character_flag = mon
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "monlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = trained_monk
+						check_variable = { which = "monlvl" value = "1"}
+						not = {
+							check_variable = { which = "monlvl" value = "5"}
+						}
+					}
+				}
+				set_variable  = { which = "monlvl" value = "1"}
+				set_variable  = { which = "monlvlup" value = "25"}
+				set_variable  = { which = "monlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = expert_monk
+						check_variable = { which = "monlvl" value = "5"}
+						not = {
+							check_variable = { which = "monlvl" value = "10"}
+						}
+					}
+				}
+				set_variable  = { which = "monlvl" value = "5"}		
+				set_variable  = { which = "monlvlup" value = "30"}
+				set_variable = { which = "monlvlup" value = 30	}
+				set_variable = { which = "monlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = master_monk
+						check_variable = { which = "monlvl" value = "10"}
+						not = {
+							check_variable = { which = "monlvl" value = "15"}
+						}
+					}
+				}
+				set_variable  = { which = "monlvl" value = "10"}
+				set_variable  = { which = "monlvlup" value = "36"}
+				set_variable  = { which = "monlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = renowned_monk
+						check_variable = { which = "monlvl" value = "15"}
+						not = {
+							check_variable = { which = "monlvl" value = "20"}
+						}
+					}
+				}
+				set_variable  = { which = "monlvl" value = "15"}
+				set_variable  = { which = "monlvlup" value = "50"}
+				set_variable  = { which = "monlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = legendary_monk
+						check_variable = { which = "monlvl" value = "20"}
+					}
+				}
+				set_variable  = { which = "monlvl" value = "20"}
+				set_variable  = { which = "monlvlup" value = "75"}
+				set_variable  = { which = "monlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_monlvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "monxp" which = "monlvlup"}
+		}
+		change_variable = { which = "monlvl" value = 1}
+		set_variable = { which = "monxp" value = 0}
+		multiply_variable = { which = "monlvlup"	value = 1.1	}
+		multiply_variable = { which = "monlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "monlvl" value = 0} 
+			}
+			check_variable = { which = "monxp" which = "monlvldown"}
+		}
+		change_variable = { which = "monlvl" value = -1}
+		set_variable = { which = "monxp" value = 0}
+		divide_variable = { which = "monlvlup" value = 1.1	}
+		divide_variable = { which = "monlvldown" value = 1.1	}
+	}
+	z_mon_trait_calc = yes
+}
+
+z_mon_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "monlvl" value = 20}
+		}
+		z_mon_trait_remove = yes
+		add_trait = legendary_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monlvl" value = 15}
+			not = {
+				check_variable = { which = "monlvl" value = 20}	
+			}
+		}
+		z_mon_trait_remove = yes
+		add_trait = renowned_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monlvl" value = 10}
+			not = {
+				check_variable = { which = "monlvl" value = 15}	
+			}
+		}
+		z_mon_trait_remove = yes
+		add_trait = master_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monlvl" value = 5}
+			not = {
+				check_variable = { which = "monlvl" value = 10}	
+			}
+		}
+		z_mon_trait_remove = yes
+		add_trait = expert_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monlvl" value = 0}
+			not = {
+				check_variable = { which = "monlvl" value = 5}	
+			}
+		}
+		z_mon_trait_remove = yes
+		add_trait = trained_monk
+	}			
+}
+
+z_rogu_trait_remove = { 
+	remove_trait = trained_rogue
+	remove_trait = expert_rogue
+	remove_trait = master_rogue
+	remove_trait = renowned_rogue
+	remove_trait = legendary_rogue
+}
+
+z_rogulvl_turnon = {
+	if = { 
+		limit = {
+			z_rogue = yes
+			not = { 
+				has_character_flag = rogu
+			}
+		}
+		set_character_flag = rogu
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "rogulvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_rogue
+				}
+				set_variable  = { which = "rogulvl" value = "1"}
+				set_variable  = { which = "rogulvlup" value = "25"}
+				set_variable  = { which = "rogulvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_rogue
+				}
+				set_variable  = { which = "rogulvl" value = "5"}		
+				set_variable  = { which = "rogulvlup" value = "30"}
+				set_variable = { which = "rogulvlup" value = 30	}
+				set_variable = { which = "rogulvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_rogue
+				}
+				set_variable  = { which = "rogulvl" value = "10"}
+				set_variable  = { which = "rogulvlup" value = "36"}
+				set_variable  = { which = "rogulvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_rogue
+				}
+				set_variable  = { which = "rogulvl" value = "15"}
+				set_variable  = { which = "rogulvlup" value = "50"}
+				set_variable  = { which = "rogulvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_rogue
+				}
+				set_variable  = { which = "rogulvl" value = "20"}
+				set_variable  = { which = "rogulvlup" value = "75"}
+				set_variable  = { which = "rogulvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_rogulvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "roguxp" which = "rogulvlup"}
+		}
+		change_variable = { which = "rogulvl" value = 1}
+		set_variable = { which = "roguxp" value = 0}
+		multiply_variable = { which = "rogulvlup"	value = 1.1	}
+		multiply_variable = { which = "rogulvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "rogulvl" value = 0} 
+			}
+			check_variable = { which = "roguxp" which = "rogulvldown"}
+		}
+		change_variable = { which = "rogulvl" value = -1}
+		set_variable = { which = "roguxp" value = 0}
+		divide_variable = { which = "rogulvlup" value = 1.1	}
+		divide_variable = { which = "rogulvldown" value = 1.1	}
+	}
+	z_rogu_trait_calc = yes
+}
+
+z_rogu_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "rogulvl" value = 20}
+		}
+		z_rogu_trait_remove = yes
+		add_trait = legendary_rogue
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "rogulvl" value = 15}
+			not = {
+				check_variable = { which = "rogulvl" value = 20}	
+			}
+		}
+		z_rogu_trait_remove = yes
+		add_trait = renowned_rogue
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "rogulvl" value = 10}
+			not = {
+				check_variable = { which = "rogulvl" value = 15}	
+			}
+		}
+		z_rogu_trait_remove = yes
+		add_trait = master_rogue
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "rogulvl" value = 5}
+			not = {
+				check_variable = { which = "rogulvl" value = 10}	
+			}
+		}
+		z_rogu_trait_remove = yes
+		add_trait = expert_rogue
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "rogulvl" value = 0}
+			not = {
+				check_variable = { which = "rogulvl" value = 5}	
+			}
+		}
+		z_rogu_trait_remove = yes
+		add_trait = trained_rogue
+	}			
+}
+
+z_thie_trait_remove = { 
+	remove_trait = trained_thief
+	remove_trait = expert_thief
+	remove_trait = master_thief
+	remove_trait = renowned_thief
+	remove_trait = legendary_thief
+}
+
+z_thielvl_turnon = {
+	if = { 
+		limit = {
+			not = { 
+				has_character_flag = thie
+			}
+		}
+		set_character_flag = thie
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "thielvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = trained_thief
+						check_variable = { which = "thielvl" value = "1"}
+						not = {
+							check_variable = { which = "thielvl" value = "5"}
+						}
+					}
+				}
+				set_variable  = { which = "thielvl" value = "1"}
+				set_variable  = { which = "thielvlup" value = "25"}
+				set_variable  = { which = "thielvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = expert_thief
+						check_variable = { which = "thielvl" value = "5"}
+						not = {
+							check_variable = { which = "thielvl" value = "10"}
+						}
+					}
+				}
+				set_variable  = { which = "thielvl" value = "5"}		
+				set_variable  = { which = "thielvlup" value = "30"}
+				set_variable = { which = "thielvlup" value = 30	}
+				set_variable = { which = "thielvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = master_thief
+						check_variable = { which = "thielvl" value = "10"}
+						not = {
+							check_variable = { which = "thielvl" value = "15"}
+						}
+					}
+				}
+				set_variable  = { which = "thielvl" value = "10"}
+				set_variable  = { which = "thielvlup" value = "36"}
+				set_variable  = { which = "thielvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = renowned_thief
+						check_variable = { which = "thielvl" value = "15"}
+						not = {
+							check_variable = { which = "thielvl" value = "20"}
+						}
+					}
+				}
+				set_variable  = { which = "thielvl" value = "15"}
+				set_variable  = { which = "thielvlup" value = "50"}
+				set_variable  = { which = "thielvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = legendary_thief
+						check_variable = { which = "thielvl" value = "20"}
+					}
+				}
+				set_variable  = { which = "thielvl" value = "20"}
+				set_variable  = { which = "thielvlup" value = "75"}
+				set_variable  = { which = "thielvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_thielvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "thiexp" which = "thielvlup"}
+		}
+		change_variable = { which = "thielvl" value = 1}
+		set_variable = { which = "thiexp" value = 0}
+		multiply_variable = { which = "thielvlup"	value = 1.1	}
+		multiply_variable = { which = "thielvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "thielvl" value = 0} 
+			}
+			check_variable = { which = "thiexp" which = "thielvldown"}
+		}
+		change_variable = { which = "thielvl" value = -1}
+		set_variable = { which = "thiexp" value = 0}
+		divide_variable = { which = "thielvlup" value = 1.1	}
+		divide_variable = { which = "thielvldown" value = 1.1	}
+	}
+	z_thie_trait_calc = yes
+}
+
+z_thie_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "thielvl" value = 20}
+		}
+		z_thie_trait_remove = yes
+		add_trait = legendary_thief
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "thielvl" value = 15}
+			not = {
+				check_variable = { which = "thielvl" value = 20}	
+			}
+		}
+		z_thie_trait_remove = yes
+		add_trait = renowned_thief
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "thielvl" value = 10}
+			not = {
+				check_variable = { which = "thielvl" value = 15}	
+			}
+		}
+		z_thie_trait_remove = yes
+		add_trait = master_thief
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "thielvl" value = 5}
+			not = {
+				check_variable = { which = "thielvl" value = 10}	
+			}
+		}
+		z_thie_trait_remove = yes
+		add_trait = expert_thief
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "thielvl" value = 0}
+			not = {
+				check_variable = { which = "thielvl" value = 5}	
+			}
+		}
+		z_thie_trait_remove = yes
+		add_trait = trained_thief
+	}			
+}
+
+z_assa_trait_remove = { 
+	remove_trait = trained_assassin
+	remove_trait = expert_assassin
+	remove_trait = master_assassin
+	remove_trait = renowned_assassin
+	remove_trait = legendary_assassin
+}
+
+z_assalvl_turnon = {
+	if = { 
+		limit = {
+			z_assassin = yes
+			not = { 
+				has_character_flag = assa
+			}
+		}
+		set_character_flag = assa
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "assalvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_assassin
+				}
+				set_variable  = { which = "assalvl" value = "1"}
+				set_variable  = { which = "assalvlup" value = "25"}
+				set_variable  = { which = "assalvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_assassin
+				}
+				set_variable  = { which = "assalvl" value = "5"}		
+				set_variable  = { which = "assalvlup" value = "30"}
+				set_variable = { which = "assalvlup" value = 30	}
+				set_variable = { which = "assalvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_assassin
+				}
+				set_variable  = { which = "assalvl" value = "10"}
+				set_variable  = { which = "assalvlup" value = "36"}
+				set_variable  = { which = "assalvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_assassin
+				}
+				set_variable  = { which = "assalvl" value = "15"}
+				set_variable  = { which = "assalvlup" value = "50"}
+				set_variable  = { which = "assalvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_assassin
+				}
+				set_variable  = { which = "assalvl" value = "20"}
+				set_variable  = { which = "assalvlup" value = "75"}
+				set_variable  = { which = "assalvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_assalvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "assaxp" which = "assalvlup"}
+		}
+		change_variable = { which = "assalvl" value = 1}
+		set_variable = { which = "assaxp" value = 0}
+		multiply_variable = { which = "assalvlup"	value = 1.1	}
+		multiply_variable = { which = "assalvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "assalvl" value = 0} 
+			}
+			check_variable = { which = "assaxp" which = "assalvldown"}
+		}
+		change_variable = { which = "assalvl" value = -1}
+		set_variable = { which = "assaxp" value = 0}
+		divide_variable = { which = "assalvlup" value = 1.1	}
+		divide_variable = { which = "assalvldown" value = 1.1	}
+	}
+	z_assa_trait_calc = yes
+}
+
+z_assa_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "assalvl" value = 20}
+		}
+		z_assa_trait_remove = yes
+		add_trait = legendary_assassin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "assalvl" value = 15}
+			not = {
+				check_variable = { which = "assalvl" value = 20}	
+			}
+		}
+		z_assa_trait_remove = yes
+		add_trait = renowned_assassin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "assalvl" value = 10}
+			not = {
+				check_variable = { which = "assalvl" value = 15}	
+			}
+		}
+		z_assa_trait_remove = yes
+		add_trait = master_assassin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "assalvl" value = 5}
+			not = {
+				check_variable = { which = "assalvl" value = 10}	
+			}
+		}
+		z_assa_trait_remove = yes
+		add_trait = expert_assassin
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "assalvl" value = 0}
+			not = {
+				check_variable = { which = "assalvl" value = 5}	
+			}
+		}
+		z_assa_trait_remove = yes
+		add_trait = trained_assassin
+	}			
+}
+
+z_shad_trait_remove = { 
+	remove_trait = trained_shadow
+	remove_trait = expert_shadow
+	remove_trait = master_shadow
+	remove_trait = renowned_shadow
+	remove_trait = legendary_shadow
+}
+
+z_shadlvl_turnon = {
+	if = { 
+		limit = {
+			z_shadow = yes
+			not = { 
+				has_character_flag = shad
+			}
+		}
+		set_character_flag = shad
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "shadlvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = trained_shadow
+				}
+				set_variable  = { which = "shadlvl" value = "1"}
+				set_variable  = { which = "shadlvlup" value = "25"}
+				set_variable  = { which = "shadlvldown" value = "-25"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_shadow
+				}
+				set_variable  = { which = "shadlvl" value = "5"}		
+				set_variable  = { which = "shadlvlup" value = "30"}
+				set_variable = { which = "shadlvlup" value = 30	}
+				set_variable = { which = "shadlvldown" value = -30}
+			}
+			if = { 
+				limit = { 
+					trait = master_shadow
+				}
+				set_variable  = { which = "shadlvl" value = "10"}
+				set_variable  = { which = "shadlvlup" value = "36"}
+				set_variable  = { which = "shadlvldown" value = "-36"}
+				}
+			if = { 
+				limit = { 
+					trait = renowned_shadow
+				}
+				set_variable  = { which = "shadlvl" value = "15"}
+				set_variable  = { which = "shadlvlup" value = "50"}
+				set_variable  = { which = "shadlvldown" value = "-50"}
+			}
+			if = { 
+				limit = { 
+					trait = legendary_shadow
+				}
+				set_variable  = { which = "shadlvl" value = "20"}
+				set_variable  = { which = "shadlvlup" value = "75"}
+				set_variable  = { which = "shadlvldown" value = "-75"}
+			}
+		}
+	}
+}
+
+z_shadlvl_calc = { 
+
+	while = { 
+		limit = {
+			check_variable = { which = "shadxp" which = "shadlvlup"}
+		}
+		change_variable = { which = "shadlvl" value = 1}
+		set_variable = { which = "shadxp" value = 0}
+		multiply_variable = { which = "shadlvlup"	value = 1.1	}
+		multiply_variable = { which = "shadlvldown"	value = 1.1	}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "shadlvl" value = 0} 
+			}
+			check_variable = { which = "shadxp" which = "shadlvldown"}
+		}
+		change_variable = { which = "shadlvl" value = -1}
+		set_variable = { which = "shadxp" value = 0}
+		divide_variable = { which = "shadlvlup" value = 1.1	}
+		divide_variable = { which = "shadlvldown" value = 1.1	}
+	}
+	z_shad_trait_calc = yes
+}
+
+z_shad_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "shadlvl" value = 20}
+		}
+		z_shad_trait_remove = yes
+		add_trait = legendary_shadow
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "shadlvl" value = 15}
+			not = {
+				check_variable = { which = "shadlvl" value = 20}	
+			}
+		}
+		z_shad_trait_remove = yes
+		add_trait = renowned_shadow
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "shadlvl" value = 10}
+			not = {
+				check_variable = { which = "shadlvl" value = 15}	
+			}
+		}
+		z_shad_trait_remove = yes
+		add_trait = master_shadow
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "shadlvl" value = 5}
+			not = {
+				check_variable = { which = "shadlvl" value = 10}	
+			}
+		}
+		z_shad_trait_remove = yes
+		add_trait = expert_shadow
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "shadlvl" value = 0}
+			not = {
+				check_variable = { which = "shadlvl" value = 5}	
+			}
+		}
+		z_shad_trait_remove = yes
+		add_trait = trained_shadow
+	}			
+}

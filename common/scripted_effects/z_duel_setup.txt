@@ -1,0 +1,260 @@
+duel_setup = {
+  cls_turnon = yes
+    set_variable = { which = "can_defend" value = 1 }
+    set_variable = { which = "can_attack" value = 1 }
+    set_variable = { which = "can_flee" value = 1 }
+    set_variable = { which = "sneak_attack" value = 0 }
+    set_variable = { which = dueldmgdicebase value = 1}
+    set_variable = { which = "duel_max_hp" value = 7 }
+    set_variable = { which = "duel_att" value = 4 }
+    set_variable = { which = "duel_def" value = 4 }
+    trigger_switch = {
+        on_trigger = trait
+    }
+    # Congenital traits
+    if = { 
+    	limit = { 
+    		trait = strong 
+    	}	
+       	change_variable = { which = "duel_att" value = 2 }
+       }
+   	if = { limit = { trait = tough }
+        change_variable = { which = "duel_att" value = 1 }
+    }
+       if = { limit = { trait = robust }
+           change_variable = { which = "duel_att" value = 1 }
+       }
+       if = { limit = { trait = weak }
+           change_variable = { which = "duel_att" value = -2 }
+       }
+       if = { limit = { trait = fragile }
+           change_variable = { which = "duel_att" value = -1 }
+       }
+       if = { limit = { trait = feeble }
+           change_variable = { which = "duel_att" value = -1 }
+       }
+       if = { limit = { trait = undernourished }
+           change_variable = { which = "duel_max_hp" value = -2 }
+       }
+       if = { limit = { trait = fat }
+           change_variable = { which = "duel_def" value = -1 }
+       }
+       # Hit point bonus basing on hp
+
+       # just to be sure
+       if = {
+           limit = { NOT = {  check_variable = { which = "duel_max_hp" value = 1 } }}
+           set_variable = { which = "duel_max_hp" value  = 1 }
+       }
+
+       # Ok now here should be traits bonus but i left them for now
+       if = {
+           limit = { trait = wounded  }
+           change_variable = { which = "duel_def" value = -1 }
+           change_variable = { which = "duel_att" value = -1 }
+           set_variable = { which = "duel_max_hp" value = 3 }
+       }
+       if = {
+           limit = { trait = maimed  }
+           change_variable = { which = "duel_def" value = -2 }
+           change_variable = { which = "duel_att" value = -2 }
+           set_variable = { which = "duel_max_hp" value = 2 }
+       }
+
+
+
+        if = { limit = { trait = incapacitated }
+           set_variable = { which = "duel_def" value = 0 }
+           set_variable = { which = "duel_att" value = 0 }
+           set_variable = { which = "duel_max_hp" value = 0 }
+       }
+    duel_engine_stat_bonus = yes
+        # setting starting hit points
+    set_variable = { which = "duel_hp" which = "duel_max_hp" }
+    set_variable = { which = dueldmgdice which = dueldmgdicebase}
+
+    if = {
+      limit = {
+        has_character_modifier = z_foresight_curse_battle
+      }
+      set_variable = {which = "duel_hp" value = "1"}
+      remove_character_modifiers = { modifier = z_foresight_curse_battle amount = 1 }
+    }
+}
+
+duel_engine_stat_bonus = {
+  export_to_variable = {
+    which = martial_skill_mod
+    value = martial
+  }
+  divide_variable = { which = "martial_skill_mod" value = 10 }
+  if = {
+    limit = {
+      not = {
+        check_variable = {which = "martial_skill_mod" value = 0}
+      }
+    }
+    set_variable = { which = "martial_skill_mod" value = 0 }
+  }
+  export_to_variable = {
+    which = diplomacy_skill_mod
+    value = diplomacy
+  }
+  divide_variable = { which = "diplomacy_skill_mod" value = 10 }
+  if = {
+    limit = {
+      not = {
+        check_variable = {which = "diplomacy_skill_mod" value = 0}
+      }
+    }
+    set_variable = { which = "diplomacy_skill_mod" value = 0 }
+  }
+  export_to_variable = {
+    which = intrigue_skill_mod
+    value = intrigue
+  }
+  divide_variable = { which = "intrigue_skill_mod" value = 10 }
+  if = {
+    limit = {
+      not = {
+        check_variable = {which = "intrigue_skill_mod" value = 0}
+      }
+    }
+    set_variable = { which = "intrigue_skill_mod" value = 0 }
+  }
+  export_to_variable = {
+    which = learning_skill_mod
+    value = learning
+  }
+  divide_variable = { which = "learning_skill_mod" value = 10 }
+  if = {
+    limit = {
+      not = {
+        check_variable = {which = "diplomacy_skill_mod" value = 0}
+      }
+    }
+    set_variable = { which = "diplomacy_skill_mod" value = 0 }
+  }
+  export_to_variable = {
+    which = health_mod
+    value = health
+  }
+  change_variable = { which = "duel_max_hp" which = "health_mod" }
+}
+
+duel_engine_mounts = {
+  if = { 
+    limit = { 
+      any_artifact = {
+        artifact_type = black_dragon_mount
+        is_artifact_equipped = yes
+      }
+    }
+    change_variable = { which = "duel_def" value = 5 }
+    change_variable = { which = "duel_att" value = 5 }
+    change_variable = { which = "duel_max_hp" value = 8 }
+  }
+  
+}
+
+duel_engine_weapons = {
+  if = { 
+    limit = {
+      any_artifact = {  
+        artifact_type = sword_1
+        is_artifact_equipped = yes
+      }
+    }
+    change_variable = { which = dueldmgdicebase value = 1}
+    change_variable = { which = dmgmod value = 5}
+  }
+  if = { 
+    limit = { 
+      any_artifact = { 
+        artifact_type = sword_2
+        is_artifact_equipped = yes
+      }
+    }
+    change_variable = { which = dueldmgdicebase value = 1}
+    change_variable = { which = dmgmod value = 2}
+  }
+  if = { 
+    limit = {
+      any_artifact = { 
+        artifact_type = sword_3
+        is_artifact_equipped = yes
+      }
+    }
+    change_variable = { which = dueldmgdicebase value = 1}
+    change_variable = { which = dmgmod value = 3}
+  }
+}
+
+duel_engine_armour = {
+}
+
+duel_engine_neck = {
+}
+
+duel_engine_helm = {
+}
+duel_engine_wrist = {
+}
+duel_engine_shield = {
+
+}
+
+duel_engine_ring = {
+
+}
+
+
+duel_engine_special_menu_setup = { 
+	set_variable = { which  = "local_action_nr" value = 0 }
+    set_variable = { which = "local_action_picked" value = 1 }
+    #Actions below this point are kept within the special action menu  
+    if = { 
+        limit = { 
+            z_wizard = yes
+        }  
+        change_variable = { which = "local_action_nr" value = 1 } 
+        set_variable = { which = "local_m_action_wiz_attack_cantrip" which = "local_action_nr" } 
+    }
+    if = { 
+    	limit = { 
+            z_wizard = yes
+        } 
+       	change_variable = { which = "local_action_nr" value = 1 } 
+        set_variable = { which = "local_m_action_wiz_defend_cantrip" which = "local_action_nr" } 
+    }
+    if = { 
+        limit = { 
+        	z_cleric = yes
+        } 
+        change_variable = { which = "local_action_nr" value = 1 } 
+        set_variable = { which = "local_m_action_cle_heal_cantrip" which = "local_action_nr" } 
+    }
+    change_variable = { which = "local_action_nr" value = 1 } 
+    set_variable = { which = "local_d_action_previous_menu" which = "local_action_nr" }
+}
+
+
+duel_engine_clear_all_data = { 
+	set_variable = { which = "duel_att_mod" value = 0 }
+    set_variable = { which = "duel_def_mod" value = 0 }
+    set_variable = { which = "duel_att" value = 0 }
+    set_variable = { which = "duel_def" value = 0 }
+    set_variable = { which = "duel_dmg" value = 0 }
+    set_variable = { which = "duel_hp" value = 0 }
+    set_variable = { which = "duel_max_hp" value = 0 }
+    clr_character_flag = debug_effect_awarness
+    clr_character_flag = duel_effect_noescape
+    clr_character_flag = duel
+    clr_character_flag = noescape_duel
+    clr_character_flag = duel_action_attack
+    clr_character_flag = duel_action_defend
+    clr_character_flag = duel_action_flee
+    clr_character_flag = cleric_heal_cantrip
+    clr_character_flag = wizard_attack_cantrip
+    clr_character_flag = wizard_defend_cantrip
+}

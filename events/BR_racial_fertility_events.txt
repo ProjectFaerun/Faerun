@@ -1,0 +1,69 @@
+namespace = fertility
+
+## menopause for mortal women##
+character_event = {
+	id = fertility.0
+	title = INFERTILITY
+	desc = EVTDESCFERTILITY.0		# You have reached the age where you can no longer have children.
+	picture = "GFX_evt_plague_doctor"
+	min_age = 45
+
+	is_triggered_only = yes
+	
+	trigger = {
+		NOT = { has_character_flag = menopause }
+		age = 45
+		is_female = yes
+		NOT = {	trait = creature_drow }
+		NOT = {	trait = creature_elf }
+		NOT = {	trait = creature_dwarf }
+		NOT = {	trait = creature_half_elf }
+		NOT = { trait = creature_feyri }
+	}
+
+
+	option = {
+		name = "OK"
+		set_character_flag = menopause
+		fertility = -10.0
+	}
+
+}
+
+#on_pregnancy, the long lived sort of less fertile races get -0.1 fertility per child and a temporary 5-30 year long "recovering from child birth modifier"
+
+character_event = {
+	id = fertility.1
+	hide_window = yes
+
+
+	is_triggered_only = yes #on_pregnancy
+	
+	trigger = {
+		is_female = yes
+		OR = {
+		trait = creature_drow
+		trait = creature_elf
+		trait = creature_dwarf
+		trait = creature_half_elf
+		trait = creature_feyri
+	}
+	}
+
+
+	option = {
+		name = "OK"
+		add_character_modifier = { name = lessfertile duration = -1 stacking = yes hidden = yes }
+		if = {
+trigger_switch = {
+on_trigger = health
+		10 = { add_character_modifier = { name = recoveringfromchildbirth duration = 1825 }}
+		7 = { add_character_modifier = { name = recoveringfromchildbirth duration = 3650 }}
+		5 = { add_character_modifier = { name = recoveringfromchildbirth duration = 5475 }}
+		3 = { add_character_modifier = { name = recoveringfromchildbirth duration = 7500 }}
+		1 = { add_character_modifier = { name = recoveringfromchildbirth duration = 10950 }}
+}
+}
+}
+		
+}

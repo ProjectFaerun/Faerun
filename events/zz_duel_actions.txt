@@ -1,0 +1,627 @@
+######################################################
+# 
+# @author Arsakes <elminister@interia.pl>
+# @compatibility 2.3.0
+# @modified_on 0.4
+# @description  Warhammer mod duel action
+# @wip
+#
+#
+# Here are duel actions defined that is
+# effects of actions that player can perform during duel
+namespace = duelengine
+namespace = duelaction
+
+#
+#
+# duelaction.0 - prepare list of actions
+# duelaction.1 - clear list of actions 
+# duelaction.2 - pick action
+# duelaction.3 - resolves action (triggered from duelengine)
+#  
+# external:duelengine.4 - trigger after picking action
+# external:duelengine.5 - trigger after resolving action
+#
+# Ranges:
+# Mechanics:          0-9
+# Action definitions: 10-99
+# Report events:      100-199
+# Duel outcomes:      200-x
+#
+# The rest are action definitions!
+
+
+character_event = { 
+    id = duelaction.1
+    desc = "EVTDESC_DUELACTION_2"
+    picture = "GFX_evt_generic_duel"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+    #The Four Basic Actions of the Duel Engine
+    option = {
+        name = "ACTION_ATTACK"
+        trigger = {
+            check_variable = { which = can_attack value = 1}
+        }
+        hidden_tooltip = { 
+            set_character_flag = duel_action_attack
+            character_event = { id = duelengine.4 }
+        }
+        ai_chance = { factor = 90 }
+    }
+    option = {
+        name = "ACTION_DEFEND"
+        trigger = { 
+            check_variable = { which = can_defend value = 1}
+        }
+        hidden_tooltip = { 
+            set_character_flag = duel_action_defend
+            character_event = { id = duelengine.4 }
+        }
+        ai_chance = { factor = 1 }
+    }
+    #This action opens the special action menu
+    option = {
+        name = "ACTION_SPECIAL_ATTACK"
+        trigger = { 
+            has_special_attack = yes
+        }
+        duel_engine_special_menu_setup = yes
+        hidden_tooltip = { 
+            character_event = { id = duelaction.2 }
+        }
+        ai_chance = { factor = 0 }
+    }
+    option = {
+        name = "ACTION_FLEE"
+        trigger = { 
+            check_variable = { which = can_flee value = 1}         
+        }
+        hidden_tooltip = { 
+            set_character_flag = duel_action_flee
+            character_event = { id = duelengine.4 }
+        }
+        ai_chance = { factor = 1 }
+    }         
+}
+
+#Special Action Menu
+character_event = { 
+    id = duelaction.2
+    desc = "EVTDESC_DUELACTION_2"
+    picture = "GFX_evt_generic_duel"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+    #This code executes everytime this event is called. It takes the current action number and adds two, and sets this variable to determine the three event options that should be selectable.
+    immediate = { 
+        set_variable = { which = "local_action_picked_plus_one" which = "local_action_picked"}
+        change_variable = { which = "local_action_picked_plus_one" value = "1"}
+        set_variable = { which = "local_action_picked_plus_two" which = "local_action_picked_plus_one"}
+        change_variable = { which = "local_action_picked_plus_two" value = "1"}
+        if = { 
+            limit = { 
+                check_variable = { which = local_action_picked_plus_one which > local_action_nr} 
+            }
+            set_variable = { which = local_action_picked_plus_one value = 1}
+            set_variable = { which = local_action_picked_plus_two value = 2}
+        }
+        else_if = { 
+            limit = {
+                check_variable = { which = local_action_picked_plus_two which > local_action_nr} 
+            }
+            set_variable = { which = local_action_picked_plus_two value = 1}
+        }
+    }
+    option = {
+        name = "NEXT_ACTION"
+        if = { 
+            limit = { 
+                check_variable = { which = "local_action_picked" which >= "local_action_nr" } 
+            }
+            set_variable = { which = "local_action_picked" value = 1 } # circular menu
+            hidden_tooltip = { repeat_event = { id = duelaction.2 }}
+        }
+        else_if = {
+            limit = {  
+                check_variable = { which = "local_action_picked" which < "local_action_nr" } 
+            }
+            change_variable = { which = "local_action_picked" value = 3 }
+            if = { 
+                limit = { 
+                    check_variable = { which = "local_action_picked" which > "local_action_nr" } 
+                }
+                set_variable = { which = "local_action_picked" value = 1 } # circular menu
+            }
+            hidden_tooltip = { repeat_event = { id = duelaction.2 }}
+        }
+        ai_chance = { factor = 1 }
+    }
+    option = {
+        name = "ACTION_WIZARD_ATTACK_CANTRIP"
+        trigger = {
+            or = {
+                check_variable = { which = "local_action_picked" which == "local_m_action_wiz_attack_cantrip" } 
+                check_variable = { which = "local_action_picked_plus_one" which == "local_m_action_wiz_attack_cantrip" }
+                check_variable = { which = "local_action_picked_plus_two" which == "local_m_action_wiz_attack_cantrip" }
+            }
+        }
+        #hidden_tooltip = { 
+            z_wiz_setup = yes
+            change_variable = { which = "wizxp" value = 5}
+            set_character_flag = wizard_attack_cantrip
+            character_event = { id = duelengine.4 }
+        #}
+        ai_chance = { factor = 0 }      
+    }
+    option = {
+        name = "ACTION_WIZARD_DEFEND_CANTRIP"
+        trigger = {
+            or = {
+                check_variable = { which = "local_action_picked" which == "local_m_action_wiz_defend_cantrip" } 
+                check_variable = { which = "local_action_picked_plus_one" which == "local_m_action_wiz_defend_cantrip" }
+                check_variable = { which = "local_action_picked_plus_two" which == "local_m_action_wiz_defend_cantrip" }
+            }
+        }
+        #hidden_tooltip = { 
+            z_wiz_setup = yes
+            change_variable = { which = "wizxp" value = 5}
+            set_character_flag = wizard_defend_cantrip
+            character_event = { id = duelengine.4 }
+        #}
+        ai_chance = { factor = 0 }      
+    }
+    option = {
+        name = "ACTION_CLERIC_HEALING_CANTRIP"
+        trigger = {
+            or = {
+                check_variable = { which = "local_action_picked" which == "local_m_action_cle_heal_cantrip" } 
+                check_variable = { which = "local_action_picked_plus_one" which == "local_m_action_cle_heal_cantrip" }
+                check_variable = { which = "local_action_picked_plus_two" which == "local_m_action_cle_heal_cantrip" }
+            }
+        }   
+        #hidden_tooltip = { 
+            z_cleric_setup = yes
+            change_variable = { which = "clerxp" value = 5}           
+            set_character_flag = cleric_heal_cantrip
+            character_event = { id = duelengine.4 }
+        #}
+        ai_chance = { factor = 0 }      
+    } 
+    #This action exits the special menu, and returns to the default duel action menu.
+    option = {
+        name = "ACTION_PREVIOUS_MENU"
+        trigger = {
+            or = {
+                check_variable = { which = "local_action_picked" which == "local_d_action_previous_menu" } 
+                check_variable = { which = "local_action_picked_plus_one" which == "local_d_action_previous_menu" }
+                check_variable = { which = "local_action_picked_plus_two" which == "local_d_action_previous_menu" }
+            } 
+        }
+        hidden_tooltip = { character_event = { id = duelaction.1 }}
+        ai_chance = { factor = 0 }      
+    } 
+}
+
+
+# ACTION EFFECTS CALCULAITON 
+#
+# This events takes into consideration the action declared by both characters
+# and calculates final duel_att_mod and duel_def_mod values for the round
+# triggered from outside by duelengine.4
+# repeats itself for both characters
+character_event = {
+    id = duelaction.3
+    hide_window = yes
+    is_triggered_only = yes
+   
+    immediate = {  
+
+        # RESOLVING COOLDOWNS
+        #change_variable = { which = "duel_cooldown_block" value = -1 }
+        #change_variable = { which = "duel_cooldown_dodge" value = -1 }
+        clear_event_target = attacker
+        clear_event_target = defender
+
+
+        # DON'T TOUCH AFTER THIS POINT
+        if = {
+            limit = { root = { character = event_target:charA}}
+            log = "Resolved actions for charA (duelaction.3)"
+            event_target:charA = { save_event_target_as = defender }
+            event_target:charB = { save_event_target_as = attacker }
+            # loop this event
+            event_target:charB = { character_event = { id = duelaction.3 } }
+        }
+        if = {
+            limit = { NOT = { root = { character = event_target:charA}} }
+            # if calculations are done now is the time for reports
+            log = "Resolved actions for charB (duelaction.3)"
+            event_target:charA = { save_event_target_as = attacker }
+            event_target:charB = { save_event_target_as = defender }
+            #
+            event_target:charA = { character_event = { id = duelengine.5 } }
+        }
+    }
+}
+
+# duelaction.4 
+# here we decide which report will be triggered basing on character actions
+# and round outcome
+# ROOT = event_target:charB (always)
+# remember ALWAYS SEND THE REPORT TO CHAR A (there are reasons for that)
+# also since we use "break" instruction the order of IF statements DOES MATTER
+character_event = {
+    id = duelaction.4
+    hide_window = yes
+    is_triggered_only = yes
+    
+    immediate = {
+      # FIXME
+        event_target:charA = {
+            z_duel_round_end_effect = yes
+        }
+
+      if = { limit = { root = { character = event_target:charA}} log = "this is A" } 
+      if = { limit = { NOT = { root = { character = event_target:charA}}} log = "this is B" }
+      log = "Round finished reports are to be send"
+      # FIXME
+
+      # DUEL OUTCOME REPORTS
+      if = {
+          limit = { 
+              event_target:charB = { NOT = { check_variable = { which = "duel_hp" value = 1 }}}
+          }
+          event_target:charA = { character_event = { id = duelaction.201 }} # we have been slain
+          break = yes
+      }
+      if = {
+          limit = { 
+              event_target:charA = { NOT = { check_variable = { which = "duel_hp" value = 1 }}}
+          }
+          event_target:charA = { character_event = { id = duelaction.200 }} # enemy was slain
+          break = yes
+      }
+
+      # SPECIFIC REPORT 1
+      if = {
+          limit = { 
+              has_character_flag = duel_action_attack 
+              event_target:charB = { has_character_flag = duel_action_attack }
+          }
+          event_target:charA = { character_event = { id = duelaction.102 }}
+          break = yes
+          # trigger symetric fight report pair
+      }
+      # SPECIFIC REPORT 2 ...
+
+
+
+      # GENERIC REPORT 
+      event_target:charA = { character_event = { id = duelaction.100 }}
+    }
+}
+
+
+
+
+########################################################################
+#
+# REPORT EVENTS 
+#
+########################################################################
+# For each pair of action (enemy and yours) there is a pair of report
+# events.
+#
+# In first event from the pair ROOT = event_target:charA
+#
+# Second event may send to charA or charB
+# in first case the first event is send to B  
+# _simple right_?
+#
+
+
+# BOTH ATTACK
+# 1st char
+character_event = {
+    id = duelaction.100
+    desc = "EVTDESC_DUELACTION_100"
+    picture = "GFX_evt_duel2"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Reports were shown to both."
+       event_target:charA = { character_event = { id = duelengine.3 } } # next round
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.101 } }
+    }
+}
+# 2nd char
+character_event = {
+    id = duelaction.101
+    desc = "EVTDESC_DUELACTION_101"
+    picture = "GFX_evt_duel2"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Reports were shown to both."
+       event_target:charA = { character_event = { id = duelengine.3 } } # next round
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.100 } } # symmetric response
+    }
+}
+
+# OTHER OPTION
+# 1st char
+character_event = {
+    id = duelaction.102
+    desc = "EVTDESC_DUELACTION_102"
+    picture = "GFX_evt_duel2"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Reports were shown to both."
+       event_target:charA = { character_event = { id = duelengine.3 } } # next round
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.103 } }
+    }
+}
+# 2nd char
+character_event = {
+    id = duelaction.103
+    desc = "EVTDESC_DUELACTION_103"
+    picture = "GFX_evt_duel2"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Reports were shown to both."
+       event_target:charA = { character_event = { id = duelengine.3 } } # next round
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.102 } } # symmetric response
+    }
+}
+
+########################################################################
+#
+# OUTCOME EVENTS 
+#
+########################################################################
+#
+# Range 200- x
+#
+# Those are special kind of report events 
+# Triggered when somebody dies or something.
+# You can set them in duelaction.4 event exactly the same way u
+# set triggering of report events.
+#
+# in last the option that is last exectued please trigger
+# duelengine.6 event to clear all duel variables and flags
+
+
+# OUTCOME: DEATH OF ONE PERSON
+# 1st event (for loser)
+character_event = {
+    id = duelaction.200
+    desc = "EVTDESC_DUELACTION_200"
+    picture = "GFX_evt_duel4"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    # charB got this event
+    option = {
+		name = "OK"
+		trigger = { NOT = { root = { character = event_target:charA}} }
+		log = "Outcome report was shown to both."
+		if = {
+			limit = {
+                or = {
+				    is_invincible_trigger = yes
+                    has_character_modifier = z_foresight_blessing_battle
+                }
+			}
+			antideath_effect = yes
+			event_target:charA = { duel_engine_clear_all_data = yes } # clearing event
+			event_target:charB = { duel_engine_clear_all_data = yes } # clearing event
+			clr_character_flag = duel
+            if = { 
+                limit = { 
+                    has_character_modifier = z_foresight_blessing_battle
+                }
+                remove_character_modifier = z_foresight_blessing_battle
+            }
+			break = yes 
+		}
+       death = {
+           death_reason = death_duel
+           killer = event_target:charA
+       }
+       event_target:charA = { duel_engine_clear_all_data = yes } # clearing event
+       event_target:charB = { duel_engine_clear_all_data = yes } # clearing event
+	   clr_character_flag = duel
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+	   	if = {
+			limit = {
+				is_invincible_trigger = yes
+			}
+			antideath_effect = yes
+			event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+			event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+			clr_character_flag = duel
+			break = yes 
+		}
+       death = {
+           death_reason = death_duel
+           killer = event_target:charB
+       }
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.201 } }
+	   event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+	   clr_character_flag = duel
+    }
+}
+# 2nd char (for winner)
+character_event = {
+    id = duelaction.201
+    desc = "EVTDESC_DUELACTION_201"
+    picture = "GFX_evt_duel4"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Outcome report was shown to both."
+       event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       clr_character_flag = duel
+       #to add a reward to the duel sequence, edit the following scripted effect
+       zz_duel_reward_sequence = yes
+	   #add xp gain event, and any special event checks. 
+        #if = {
+        #   limit = { has_character_flag = greenksin_bash_head_duel }
+        #   remove_character_modifier = weak_warboss
+        #   clr_character_flag = greenksin_bash_head_duel
+        #   set_character_flag = weak_warboss_bashed_heads
+        #}
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.200 } } # symmetric response
+	   event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+	   clr_character_flag = duel
+       #to add a reward to the duel sequence, edit the following scripted effect
+       zz_duel_reward_sequence = yes
+	   #add xp gain event, and any special event checks. 
+        #if = {
+        #   limit = { has_character_flag = greenksin_bash_head_duel }
+        #   remove_character_modifier = weak_warboss
+        #   clr_character_flag = greenksin_bash_head_duel
+        #   set_character_flag = weak_warboss_bashed_heads
+        #}
+    }
+}
+
+# OUTCOME : Ran away
+#
+# The person who ran away
+character_event = {
+    id = duelaction.202
+    desc = "EVTDESC_DUELACTION_202"
+    picture = "GFX_evt_battle"
+    border = "GFX_event_normal_frame_war"
+    is_triggered_only = yes
+    
+    # charB got this event
+    option = {
+       name = "OK"
+       trigger = { NOT = { root = { character = event_target:charA}} }
+       log = "Outcome report was shown to both."
+       event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+	      clr_character_flag = duel
+    }
+    # charA got this event
+    option = {
+       name = "OK"
+       trigger = { root = { character = event_target:charA} }
+       event_target:charB = { character_event = { id = duelaction.203 } }
+	   event_target:charA = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+       event_target:charB = { character_event = { id = duelengine.6 days = 1 } } # clearing event
+	      clr_character_flag = duel
+    }
+}
+# for the winner
+character_event = {
+    id = duelaction.203
+    desc = "EVTDESC_DUELACTION_203"
+    picture = "GFX_evt_battle"
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+
+    # charB got this event
+    option = {
+        name = "OK"
+        trigger = { root = { character = event_target:charA} }
+        log = "Outcome report was shown to both."
+        event_target:charB = { character_event = { id = duelaction.202 } } # symmetric response
+        event_target:charA = { duel_engine_clear_all_data = yes } # clearing event
+        event_target:charB = { duel_engine_clear_all_data = yes } # clearing event
+        clr_character_flag = duel
+        #to add a reward to the duel sequence, edit the following scripted effect
+        zz_duel_reward_sequence = yes	   
+	    #add xp gain event, and any special event checks. 
+        #if = {
+        #   limit = { has_character_flag = greenksin_bash_head_duel }
+        #   remove_character_modifier = weak_warboss
+        #   clr_character_flag = greenksin_bash_head_duel
+        #   set_character_flag = weak_warboss_bashed_heads
+        #}
+
+    }
+    # charA got this event
+    option = {
+        name = "OK"
+        trigger = { 
+            NOT = { 
+                root = { character = event_target:charA}
+            } 
+        }
+        event_target:charA = { duel_engine_clear_all_data = yes } # clearing event
+        event_target:charB = { duel_engine_clear_all_data = yes } # clearing event
+        clr_character_flag = duel
+        #to add a reward to the duel sequence, edit the following scripted effect
+        zz_duel_reward_sequence = yes
+        #add xp gain event, and any special event checks. 
+        #if = {
+        #   limit = { has_character_flag = greenksin_bash_head_duel }
+        #   remove_character_modifier = weak_warboss
+		#	clr_character_flag = greenksin_bash_head_duel
+	    #	set_character_flag = weak_warboss_bashed_heads
+	    #}
+    }
+}
+
+
