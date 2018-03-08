@@ -9,70 +9,47 @@ duel_setup = {
     set_variable = { which = "duel_max_hp" value = 7 }
     set_variable = { which = "duel_att" value = 4 }
     set_variable = { which = "duel_def" value = 4 }
-    trigger_switch = {
-        on_trigger = trait
-    }
     # Congenital traits
-    if = { 
-    	limit = { 
-    		trait = strong 
-    	}	
-       	change_variable = { which = "duel_att" value = 2 }
-    }
-   	if = { 
-        limit = { 
-            trait = tough 
-        }
-        change_variable = { which = "duel_att" value = 1 }
-    }
-    if = { limit = { trait = robust }
-           change_variable = { which = "duel_att" value = 1 }
-       }
-       if = { limit = { trait = weak }
-           change_variable = { which = "duel_att" value = -2 }
-       }
-       if = { limit = { trait = fragile }
-           change_variable = { which = "duel_att" value = -1 }
-       }
-       if = { limit = { trait = feeble }
-           change_variable = { which = "duel_att" value = -1 }
-       }
-       if = { limit = { trait = undernourished }
-           change_variable = { which = "duel_max_hp" value = -2 }
-       }
-       if = { limit = { trait = fat }
-           change_variable = { which = "duel_def" value = -1 }
-       }
-       # Hit point bonus basing on hp
+    z_trait_duel_boost = yes
 
-       # just to be sure
-       if = {
-           limit = { NOT = {  check_variable = { which = "duel_max_hp" value = 1 } }}
-           set_variable = { which = "duel_max_hp" value  = 1 }
-       }
+
 
        # Ok now here should be traits bonus but i left them for now
-       if = {
-           limit = { trait = wounded  }
-           change_variable = { which = "duel_def" value = -1 }
-           change_variable = { which = "duel_att" value = -1 }
-           set_variable = { which = "duel_max_hp" value = 3 }
-       }
-       if = {
-           limit = { trait = maimed  }
-           change_variable = { which = "duel_def" value = -2 }
-           change_variable = { which = "duel_att" value = -2 }
-           set_variable = { which = "duel_max_hp" value = 2 }
-       }
-
-
-
-        if = { limit = { trait = incapacitated }
-           set_variable = { which = "duel_def" value = 0 }
-           set_variable = { which = "duel_att" value = 0 }
-           set_variable = { which = "duel_max_hp" value = 0 }
-       }
+    if = {
+        limit = { 
+            trait = wounded  
+        }
+        change_variable = { which = "duel_def" value = -1 }
+        change_variable = { which = "duel_att" value = -1 }
+        change_variable = { which = "duel_max_hp" value = -5 }
+    }
+    if = {
+        limit = { 
+            trait = maimed  
+        }
+           
+        change_variable = { which = "duel_def" value = -2 }
+        change_variable = { which = "duel_att" value = -2 }
+        change_variable = { which = "duel_max_hp" value = -10 }
+    }
+    if = { 
+        limit = { 
+            trait = incapacitated 
+        }
+        set_variable = { which = "duel_def" value = 0 }
+        set_variable = { which = "duel_att" value = 0 }
+        set_variable = { which = "duel_max_hp" value = 0 }
+    }
     duel_engine_stat_bonus = yes
+    #In case duel_max_hp ends up below 0
+    if = {
+        limit = { 
+            NOT = {  
+                check_variable = { which = "duel_max_hp" value = 1 } 
+            }
+        }
+        set_variable = { which = "duel_max_hp" value  = 1 }
+    }    
         # setting starting hit points
     set_variable = { which = "duel_hp" which = "duel_max_hp" }
     set_variable = { which = dueldmgdice which = dueldmgdicebase}
@@ -84,6 +61,53 @@ duel_setup = {
       set_variable = {which = "duel_hp" value = "1"}
       remove_character_modifiers = { modifier = z_foresight_curse_battle amount = 1 }
     }
+}
+
+z_trait_duel_boost = { 
+    if = { 
+        limit = { 
+            trait = strong 
+        }   
+        change_variable = { which = "duel_att" value = 2 }
+        change_variable = { which = "duel_def" value = 2 }
+        change_variable = { which = "duel_max_hp" value = 5 }
+    }
+    if = { 
+        limit = { 
+            trait = tough 
+        }
+        change_variable = { which = "duel_att" value = 1 }
+        change_variable = { which = "duel_def" value = 1 }
+        change_variable = { which = "duel_max_hp" value = 3 }
+    }
+    if = { 
+        limit = { 
+            trait = genius
+        }
+        change_variable = { which = "duel_att" value = 5 }
+        change_variable = { which = "duel_def" value = 5 }        
+    }
+    trigger_switch = {
+        on_trigger = trait
+
+        legendary_wizard = { 
+            change_variable = { which = "duel_att" value = 5 }
+            change_variable = { which = "duel_def" value = 5 }
+            change_variable = { which = "duel_max_hp" value = 10 }
+        }
+    }
+
+}
+
+
+duel_engine_stat_bonus = {
+  set_variable = { which = wizlvlmod which = wizlvl}
+  divide_variable = { which = wizlvlmod value = 5}
+  divide_variable = { which = wizlvlmod value = 1000}
+  multiply_variable = { which = wizlvlmod value = 1000}
+  change_variable = { which = "duel_def" which = wizlvlmod }
+  change_variable = { which = "duel_att" which = wizlvlmod }
+  change_variable = { which = "duel_max_hp" which = wizlvlmod }
 }
 
 duel_engine_stat_bonus = {
