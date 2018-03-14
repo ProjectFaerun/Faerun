@@ -1,4 +1,5 @@
 z_duel_turn_setup = {
+    set_variable = { which = "duel_dmg" value = 0}
     trigger_switch = { 
         on_trigger = has_character_flag
         duel_action_attack = { 
@@ -19,9 +20,6 @@ z_duel_turn_setup = {
                 change_variable = { which = "duel_att" value = 1}
             }
         }
-        cleric_heal_cantrip = { 
-            cleric_heal_spell = yes
-        }
         #barbarian_battleroar = { 
         #    barbarian_battleroar_ability = yes
         #}
@@ -31,21 +29,32 @@ z_duel_turn_setup = {
         #bard_battlesong = { 
         #    bard_battlesong_song = yes
         #}
+
     } 
     random = { 
         chance = 25
         change_variable = { which = "sp_ac" value = 1}
     }
-	clr_character_flag = duel_action_attack
+    zz_ability_flag_clear = yes
+    set_variable = { which = "action_nr" value = 0 }
+    set_variable = { which = "action_picked" value = 0 }
+        # BASIC ACTIONS
+}
+
+zz_ability_flag_clear = { 
+    clr_character_flag = duel_action_attack
     clr_character_flag = duel_action_defend
     clr_character_flag = duel_action_flee
     clr_character_flag = cleric_heal_cantrip
     clr_character_flag = wizard_attack_cantrip
     clr_character_flag = wizard_defend_cantrip
+    clr_character_flag = sorcerer_attack_cantrip
+    clr_character_flag = sorcerer_defend_cantrip
+    clr_character_flag = bard_dire_song
+    clr_character_flag = bard_embolden_song
+    clr_character_flag = warlock_doomfire_cantrip
+    clr_character_flag = warlock_doom_blast_cantrip
     clr_character_flag = duelhit
-    set_variable = { which = "action_nr" value = 0 }
-    set_variable = { which = "action_picked" value = 0 }
-        # BASIC ACTIONS
 }
 zz_duel_reward_sequence = { 
     random_list = { 
@@ -132,14 +141,57 @@ zz_duel_reward_sequence = {
 }
 
 z_duel_round_end_effect = { 
+    if = { 
+        limit = {
+            check_variable = { which = "bard_es_count" value = 1}
+        }
+        change_variable = { which = "bard_es_count" value = -1}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "bard_es_count" value == 0}
+        }
+        set_variable = { which = "bard_es_pot" value = "0"}
+    }
+    if = { 
+        limit = {
+            check_variable = { which = "bard_ds_count" value = 1}
+        }
+        change_variable = { which = "bard_ds_count" value = -1}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "bard_ds_count" value == 0}
+        }
+        set_variable = { which = "bard_ds_pot" value = "0"}
+    }
+    if = { 
+        limit = {
+            check_variable = { which = "warlock_df_count" value = 1}
+        }
+        change_variable = { which = "warlock_df_count" value = -1}
+        subtract_variable = { which = "duel_hp" which = "warlock_df_dmg"}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "warlock_df_count" value == 0}
+        }
+        set_variable = { which = "warlock_df_dmg" value = "0"}
+    }
     trigger_switch = { 
         on_trigger = has_character_flag
         cleric_heal_cantrip = { 
             cleric_heal_spell = yes
         }
+        bard_embolden_song = { 
+            bard_emboldening_song = yes
+        }
     }
 }
 
+duel_round_before_attack_effect = { 
+
+}
 duel_action_decision = { 
     event_target:attacker = { 
         trigger_switch = { 
@@ -149,6 +201,12 @@ duel_action_decision = {
             }        
             wizard_attack_cantrip = { 
                 duel_test = yes
+            }
+            sorcerer_attack_cantrip = { 
+                duel_test = yes
+            }
+            bard_dire_song = {
+                bard_dire_song = yes
             }
         }
     }
@@ -160,26 +218,20 @@ duel_test = {
         z_d20 = yes
         set_variable = { which = duel_attack_roll which = dresult}
         set_variable = { which = dmgmod value = 0}
-        if = { 
-            limit = {
-                has_instances_of_character_modifier = { modifier = magic_lore_heavens_foresight amount = 1 } 
-            }
-            change_variable = {which = "duel_attack_roll" value = "700"}
-            remove_character_modifiers = { modifier = magic_lore_heavens_foresight amount = 1 }
-        } 
+        z_duel_roll_modifier_attack = yes
         if = {
             limit = { 
                 NOT =  {
                     check_variable = { which = duel_attack_roll value = 2}
                 }
             }
-            change_variable = { which = duel_attack_roll value = -700} 
+            change_variable = { which = duel_attack_roll value = -7000} 
         }
         if = {
             limit = { 
                 check_variable = { which = duel_attack_roll value = 20}
             }
-            change_variable = { which = duel_attack_roll value = 500} 
+            change_variable = { which = duel_attack_roll value = 5000} 
         }  
         change_variable = { which = duel_attack_roll which = duel_att}
         trigger_switch = { 
@@ -189,38 +241,39 @@ duel_test = {
             wizard_attack_cantrip = { 
                 change_variable = {which = "duel_attack_roll" which = "wcl_sp"}
             }
+            sorcerer_attack_cantrip = { 
+                change_variable = {which = "duel_attack_roll" which = "scl_sp"}
+            }
         }
     }        
     event_target:defender = { 
         set_variable = { which = dnum value = 1 }
         z_d20 = yes
         set_variable = { which = duel_defend_roll which = dresult}
-        if = { 
-            limit = {
-                has_instances_of_character_modifier = { modifier = magic_lore_heavens_foresight amount = 1 } 
-            }
-            change_variable = {which = "duel_defend_roll" value = "500"}
-            remove_character_modifiers = { modifier = magic_lore_heavens_foresight amount = 1 }
-        } 
+        z_duel_roll_modifier_defend = yes
         if = {
             limit = {
                 not = { 
                     check_variable = { which = duel_defend_roll value = 2}
                 }
             }
-            change_variable = { which = duel_defend_roll value = -500} 
+            change_variable = { which = duel_defend_roll value = -5000} 
         }
         if = {
             limit = { 
                 check_variable = { which = duel_defend_roll value = 20}
             }
-            change_variable = { which = duel_defend_roll value = 500} 
+            change_variable = { which = duel_defend_roll value = 5000} 
         }        
         change_variable = { which = duel_defend_roll which = duel_def}
         trigger_switch = { 
             on_trigger = has_character_flag
             wizard_defend_cantrip = { 
                 change_variable = { which = duel_defend_roll which = wcl_sp }
+                change_variable = { which = duel_defend_roll value = 10 }
+            }
+            sorcerer_defend_cantrip = { 
+                change_variable = { which = duel_defend_roll which = scl_sp }
                 change_variable = { which = duel_defend_roll value = 10 }
             }
             duel_action_defend = { 
@@ -238,9 +291,15 @@ duel_test = {
         event_target:attacker = {
             trigger_switch = {
                 on_trigger = has_character_flag
-
                 wizard_attack_cantrip = { 
                     wizard_attack_cantrip = yes
+                    event_target:defender = { 
+                        subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
+                        set_character_flag = duelhit
+                    }
+                }
+                sorcerer_attack_cantrip = { 
+                    sorcerer_attack_cantrip = yes
                     event_target:defender = { 
                         subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
                         set_character_flag = duelhit
@@ -257,7 +316,7 @@ duel_test = {
         }          
     }
 }
-
+#Wizard Spells
 wizard_attack_cantrip = {
     event_target:attacker = {
         save_event_target_as = magic_caster
@@ -268,13 +327,14 @@ wizard_attack_cantrip = {
         z_wiz_setup = yes
     }
     set_variable = {which = "splcastlvl" value = "10"}
-    if = {
-        limit = { has_character_modifier = magic_lore_heavens_foresight }
-        change_variable = {which = "splcastlvl" value = -2}
-    }
+    spellcast_modifer = yes
     set_variable = { which = dnum value = 1}
     wizard_cast_test = yes
     magic_resist_test = yes
+    set_variable = { which = "local_spelldice" which = "wcl_sp" }
+    divide_variable = { which = local_spelldice value = 5}
+    divide_variable = { which = local_spelldice value = 1000}
+    multiply_variable = { which = local_spelldice value = 1000}
     if = { 
         limit = {
             not = { 
@@ -293,7 +353,8 @@ wizard_attack_cantrip = {
                 has_character_flag = resisted
             }
         }
-        set_variable = { which = "m_dd" value = 2 }
+        set_variable = { which = "m_dd" which = "local_spelldice" }
+        change_variable = { which = "m_dd" value = 1 }
         set_variable = { which = mgdmgmod which = wcl_sp}
         duel_mgdmg = yes
     }           
@@ -301,7 +362,215 @@ wizard_attack_cantrip = {
     clr_character_flag = spell_fail
 }
 
+#Sorcerer Spells
+sorcerer_attack_cantrip = {
+    event_target:attacker = {
+        save_event_target_as = magic_caster
+        z_sorc_setup = yes
+    }
+    event_target:defender = { 
+        save_event_target_as = magic_target
+        z_sorc_setup = yes
+    }
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    wizard_cast_test = yes
+    magic_resist_test = yes
+    set_variable = { which = "local_spelldice" which = "scl_sp" }
+    divide_variable = { which = local_spelldice value = 5}
+    divide_variable = { which = local_spelldice value = 1000}
+    multiply_variable = { which = local_spelldice value = 1000}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+            has_character_flag = resisted
+        }
+        set_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = scl_sp}
+        duel_mgdmg = yes
+    }
+    if = { 
+        limit = {
+            nor = { 
+                has_character_flag = spell_fail
+                has_character_flag = resisted
+            }
+        }
+        set_variable = { which = "m_dd" which = "local_spelldice" }
+        change_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = scl_sp}
+        duel_mgdmg = yes
+    }           
+    clr_character_flag = resisted
+    clr_character_flag = spell_fail
+}
 
+#Bard Spells 
+
+bard_dire_song = {
+    event_target:attacker = {
+        save_event_target_as = magic_caster
+        z_bard_setup = yes
+    }
+    event_target:defender = { 
+        save_event_target_as = magic_target
+        z_bard_setup = yes
+    }
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    bard_cast_test = yes
+    magic_resist_test = yes
+    if = { 
+        limit = {
+            nor = { 
+                has_character_flag = spell_fail
+                has_character_flag = resisted
+            }
+        }
+        event_target:defender = { 
+            set_variable = { which = "bard_ds_count" value = "bcl_sp" which = event_target:magic_caster }
+            change_variable = { which = "bard_ds_pot" value = "bcl_sp" which = event_target:magic_caster  }
+            divide_variable = { which = bard_ds_pot value = 10}
+            divide_variable = { which = bard_ds_pot value = 1000}
+            multiply_variable = { which = bard_ds_pot value = 1000}
+            change_variable = { which = "bard_ds_pot" value = 1 }
+            change_variable = { which = "bard_ds_count" value = 1 }
+        }
+    }           
+    clr_character_flag = resisted
+    clr_character_flag = spell_fail
+}
+
+bard_emboldening_song = {
+    save_event_target_as = magic_caster
+    z_bard_setup = yes
+    event_target:defender = { 
+        save_event_target_as = magic_target
+
+    }
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 0 }
+    set_variable = { which = dnum value = 4}
+    set_variable = { which = dnum_base which = dnum}
+    bard_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "bard_es_count" which = "bcl_sp" }
+        change_variable = { which = "bard_es_pot" which = "bcl_sp" }
+        divide_variable = { which = bard_es_pot value = 10}
+        divide_variable = { which = bard_es_pot value = 1000}
+        multiply_variable = { which = bard_es_pot value = 1000}
+        change_variable = { which = "bard_es_pot" value = 1 }  
+        change_variable = { which = "bard_es_count" value = 1 } 
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
+
+#Warlock Spells 
+warlock_doomblast_cantrip = {
+    event_target:attacker = {
+        save_event_target_as = magic_caster
+        z_warl_setup = yes
+    }
+    event_target:defender = { 
+        save_event_target_as = magic_target
+        z_warl_setup = yes
+    }
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    warlock_cast_test = yes
+    magic_resist_test = yes
+    set_variable = { which = "local_spelldice" which = "wacl_sp" }
+    divide_variable = { which = local_spelldice value = 3}
+    divide_variable = { which = local_spelldice value = 1000}
+    multiply_variable = { which = local_spelldice value = 1000}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+            has_character_flag = resisted
+        }
+        set_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = wacl_sp}
+        duel_mgdmg = yes
+    }
+    if = { 
+        limit = {
+            nor = { 
+                has_character_flag = spell_fail
+                has_character_flag = resisted
+            }
+        }
+        set_variable = { which = "m_dd" which = "local_spelldice" }
+        change_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = wacl_sp}
+        duel_mgdmg = yes
+    }           
+    clr_character_flag = resisted
+    clr_character_flag = spell_fail
+}
+
+#Warlock_doomfire
+warlock_doomfire_cantrip = {
+    event_target:attacker = {
+        save_event_target_as = magic_caster
+        z_warl_setup = yes
+    }
+    event_target:defender = { 
+        save_event_target_as = magic_target
+        z_warl_setup = yes
+    }
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    warlock_cast_test = yes
+    magic_resist_test = yes
+    set_variable = { which = "local_spelldice" which = "wacl_sp" }
+    divide_variable = { which = local_spelldice value = 3}
+    divide_variable = { which = local_spelldice value = 1000}
+    multiply_variable = { which = local_spelldice value = 1000}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+            has_character_flag = resisted
+        }
+        set_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = wacl_sp}
+        duel_mgdmg = yes
+    }
+    if = { 
+        limit = {
+            nor = { 
+                has_character_flag = spell_fail
+                has_character_flag = resisted
+            }
+        }
+        set_variable = { which = "m_dd" which = "local_spelldice" }
+        change_variable = { which = "m_dd" value = 1 }
+        set_variable = { which = mgdmgmod which = wacl_sp}
+        duel_mgdmg = yes
+    }           
+    clr_character_flag = resisted
+    clr_character_flag = spell_fail
+}
+
+#Cleric Spells
 cleric_heal_spell = {
     save_event_target_as = magic_caster
     z_cleric_setup = yes
@@ -310,21 +579,23 @@ cleric_heal_spell = {
 
     }
     set_variable = {which = "splcastlvl" value = "15"}
-    if = {
-        limit = { has_character_modifier = magic_lore_heavens_foresight }
-        change_variable = {which = "splcastlvl" value = -2}
-    }
-    set_variable = { which = dnum value = 0 }
-    set_variable = { which = dnum value = 4}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1}
     set_variable = { which = dnum_base which = dnum}
     cleric_cast_test = yes
+    set_variable = { which = "local_spelldice" which = "ccl_sp" }
+    divide_variable = { which = local_spelldice value = 5}
+    divide_variable = { which = local_spelldice value = 1000}
+    multiply_variable = { which = local_spelldice value = 1000}
     if = { 
         limit = {
             not = { 
                 has_character_flag = spell_fail
             }
         }
-        set_variable = { which = mhd value = 1 }
+        set_variable = { which = "mhd" which = "local_spelldice" }
+        change_variable = { which = mhd value = 1 }
         set_variable = { which = mghealmod which = ccl_sp}
         duel_mgheal = yes
     }           
@@ -333,12 +604,75 @@ cleric_heal_spell = {
 }
 
 
+
+
+#Fighter_Special_Attacks 
+fighter_attack = {
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    wizard_cast_test = yes
+    set_variable = { which = "local_attackdice" value = "fal_sp" }
+    divide_variable = { which = local_attackdice value = 5}
+    divide_variable = { which = local_attackdice value = 1000}
+    multiply_variable = { which = local_attackdice value = 1000}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "dueldmgdice" value = 1 }
+        set_variable = { which = atdmgmod which = fal_sp}
+        duel_dmg = yes
+    }         
+    clr_character_flag = spell_fail
+}
+
+
+#bonus_effect_calculation
+savemod_calc = { 
+    set_variable = { which = local_savemod which = savemod}        
+
+    if = { 
+        limit = { 
+            check_variable = { which = druid_bs_count value = 1}
+        }
+        set_variable = { which = local_druidbsvalue which = dcl_sp}
+        divide_variable = { which = local_druidbsvalue value = 5}
+        divide_variable = { which = local_druidbsvalue value = 1000}
+        multiply_variable = { which = local_druidbsvalue value = 1000}
+        change_variable = { which = local_druidbsvalue value = 1}
+        change_variable = {which = local_savemod which = local_druidbsvalue}
+    }
+    set_variable = { which = savemodcal which = local_savemod}
+}
+dmgmod_calc = { 
+    set_variable = { which = local_savemod which = savemod}        
+
+    if = { 
+        limit = { 
+            check_variable = { which = druid_bs_count value = 1}
+        }
+        set_variable = { which = local_druidbsvalue which = druilvl}
+        divide_variable = { which = local_druidbsvalue value = 5}
+        divide_variable = { which = local_druidbsvalue value = 1000}
+        multiply_variable = { which = local_druidbsvalue value = 1000}
+        change_variable = { which = local_druidbsvalue value = 1}
+        change_variable = {which = local_savemod which = local_druidbsvalue}
+    }
+    set_variable = { which = savemodcal which = local_savemod}
+}
+
+#Effect Application
 duel_dmg = {
     set_variable = { which = dnum which = dueldmgdice}
     z_d4 = yes
     set_variable = { which = duel_dmg which = dresult}
     change_variable = { which = duel_dmg which = dmgmod }
-    subtract_variable = { which = duel_dmg which = savemod which = event_target:defender}
+    change_variable = { which = duel_dmg which = cls_dmg_bonus }
+    event_target:defender = { savemod_calc = yes}
+    subtract_variable = { which = duel_dmg which = savemodcal which = event_target:defender}
     if = { 
         limit = { 
             not = { 
@@ -350,11 +684,12 @@ duel_dmg = {
 }
 duel_mgdmg = {
     set_variable = { which = dnum which = "m_dd"}
-    z_d3 = yes
+    z_d6 = yes
     set_variable = { which = duel_dmg which = dresult}
     change_variable = { which = duel_dmg which = mgdmgmod}
-    change_variable = { which = duel_dmg which = savemod which = event_target:defender}
-    if = { 
+    event_target:defender = { savemod_calc = yes}
+    subtract_variable = { which = duel_dmg which = savemodcal which = event_target:defender}
+     if = { 
         limit = { 
             not = { 
                 check_variable ={ which = duel_dmg value = 0}
@@ -367,8 +702,8 @@ duel_mgheal = {
     set_variable = { which = dnum which = mhd}
     z_d3 = yes
     set_variable = { which = duel_heal which = dresult}
-    set_variable = { which = mghealmod value = 0}
     change_variable = { which = duel_heal which = mghealmod}
+    change_variable = { which = duel_hp which = duel_heal}
     If = { 
         limit = {
             check_variable = { which = duel_hp which = duel_max_hp}
