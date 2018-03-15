@@ -48,6 +48,7 @@ zz_ability_flag_clear = {
     clr_character_flag = cleric_heal_cantrip
     clr_character_flag = wizard_attack_cantrip
     clr_character_flag = wizard_defend_cantrip
+    clr_character_flag = wizard_stone_skin_cantrip
     clr_character_flag = sorcerer_attack_cantrip
     clr_character_flag = sorcerer_defend_cantrip
     clr_character_flag = bard_dire_song
@@ -141,50 +142,90 @@ zz_duel_reward_sequence = {
 }
 
 z_duel_round_end_effect = { 
+    #Wizard Stone Skin
     if = { 
         limit = {
-            check_variable = { which = "bard_es_count" value = 1}
+            check_variable = { which = "wizard_ss_count" value >= 1}
+        }
+        change_variable = { which = "wizard_ss_count" value = -1}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "wizard_ss_count" value < 1}
+        }
+        set_variable = { which = "wizard_ss_count" value = "0"}
+        set_variable = { which = "wizard_ss_pot" value = "0"}
+    }
+    #Bard Emboldening Song
+    if = { 
+        limit = {
+            check_variable = { which = "bard_es_count" value >= 1}
         }
         change_variable = { which = "bard_es_count" value = -1}
     }
     if = { 
         limit =  {
-            check_variable = { which = "bard_es_count" value == 0}
+            check_variable = { which = "bard_es_count" value < 1}
         }
         set_variable = { which = "bard_es_pot" value = "0"}
+        set_variable = { which = "bard_es_count" value = "0"}
     }
+    #Bard Dire Song
     if = { 
         limit = {
-            check_variable = { which = "bard_ds_count" value = 1}
+            check_variable = { which = "bard_ds_count" value >= 1}
         }
         change_variable = { which = "bard_ds_count" value = -1}
     }
     if = { 
         limit =  {
-            check_variable = { which = "bard_ds_count" value == 0}
+            check_variable = { which = "bard_ds_count" value < 1}
         }
         set_variable = { which = "bard_ds_pot" value = "0"}
+        set_variable = { which = "bard_ds_pot" value = "0"}
     }
+    #Warlock DoomFire
     if = { 
         limit = {
-            check_variable = { which = "warlock_df_count" value = 1}
+            check_variable = { which = "warlock_df_count" value >= 1}
         }
         change_variable = { which = "warlock_df_count" value = -1}
         subtract_variable = { which = "duel_hp" which = "warlock_df_dmg"}
     }
     if = { 
         limit =  {
-            check_variable = { which = "warlock_df_count" value == 0}
+            check_variable = { which = "warlock_df_count" value < 1}
         }
         set_variable = { which = "warlock_df_dmg" value = "0"}
+        set_variable = { which = "warlock_df_count" value = "0"}
+    }
+    #Cleric Divine Blessing
+    if = { 
+        limit = {
+            check_variable = { which = "cleric_db_count" value >= 1}
+        }
+        change_variable = { which = "cleric_db_count" value = -1}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "cleric_db_count" value < 1}
+        }
+        set_variable = { which = "cleric_db_count" value = "0"}
+        set_variable = { which = "cleric_db_pot" value = "0"}
     }
     trigger_switch = { 
         on_trigger = has_character_flag
         cleric_heal_cantrip = { 
             cleric_heal_spell = yes
         }
+        cleric_divine_blessing_cantrip = { 
+            cleric_divine_blessing_spell = yes
+        }
         bard_embolden_song = { 
             bard_emboldening_song = yes
+        }
+        wizard_stone_skin_cantrip = { 
+            wizard_stone_skin_cantrip = yes
         }
     }
 }
@@ -207,6 +248,12 @@ duel_action_decision = {
             }
             bard_dire_song = {
                 bard_dire_song = yes
+            }
+            warlock_doomfire_cantrip = { 
+                duel_test = yes
+            }
+            warlock_doom_blast_cantrip = { 
+                duel_test = yes
             }
         }
     }
@@ -305,6 +352,20 @@ duel_test = {
                         set_character_flag = duelhit
                     }
                 }
+                warlock_doomfire_cantrip = { 
+                    warlock_doomfire_cantrip = yes
+                    event_target:defender = { 
+                        subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
+                        set_character_flag = duelhit
+                    }
+                }
+                warlock_doom_blast_cantrip = {
+                    warlock_doomblast_cantrip = yes 
+                    event_target:defender = { 
+                        subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
+                        set_character_flag = duelhit
+                    }
+                }
                 duel_action_attack = {
                     duel_dmg = yes  
                     event_target:defender = { 
@@ -360,6 +421,34 @@ wizard_attack_cantrip = {
     }           
     clr_character_flag = resisted
     clr_character_flag = spell_fail
+}
+
+wizard_stone_skin_cantrip = {
+    save_event_target_as = magic_caster
+    z_wiz_setup = yes
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    wizard_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "wizard_ss_count" which = "wcl_sp" }
+        set_variable = { which = "local_wizard_ss_pot" which = "wcl_sp" }
+        divide_variable = { which = local_wizard_ss_pot value = 5}
+        divide_variable = { which = local_wizard_ss_pot value = 1000}
+        multiply_variable = { which = local_wizard_ss_pot value = 1000}
+        change_variable = { which = "local_wizard_ss_pot" value = 2 }  
+        change_variable = { which = "wizard_ss_pot" which = "local_wizard_ss_pot"}
+        change_variable = { which = "wizard_ss_count" value = 1 } 
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
 }
 
 #Sorcerer Spells
@@ -432,12 +521,13 @@ bard_dire_song = {
             }
         }
         event_target:defender = { 
-            set_variable = { which = "bard_ds_count" value = "bcl_sp" which = event_target:magic_caster }
-            change_variable = { which = "bard_ds_pot" value = "bcl_sp" which = event_target:magic_caster  }
-            divide_variable = { which = bard_ds_pot value = 10}
-            divide_variable = { which = bard_ds_pot value = 1000}
-            multiply_variable = { which = bard_ds_pot value = 1000}
-            change_variable = { which = "bard_ds_pot" value = 1 }
+            set_variable = { which = "bard_ds_count" which = "bcl_sp" which = event_target:magic_caster }
+            change_variable = { which = "local_bard_ds_pot" which = "bcl_sp" which = event_target:magic_caster  }
+            divide_variable = { which = local_bard_ds_pot value = 10}
+            divide_variable = { which = local_bard_ds_pot value = 1000}
+            multiply_variable = { which = local_bard_ds_pot value = 1000}
+            change_variable = { which = "local_bard_ds_pot" value = 1 }
+            change_variable = { which = "bard_ds_pot" which = "local_bard_ds_pot"}
             change_variable = { which = "bard_ds_count" value = 1 }
         }
     }           
@@ -448,15 +538,10 @@ bard_dire_song = {
 bard_emboldening_song = {
     save_event_target_as = magic_caster
     z_bard_setup = yes
-    event_target:defender = { 
-        save_event_target_as = magic_target
-
-    }
     set_variable = {which = "splcastlvl" value = "15"}
     spellcast_modifer = yes
 
-    set_variable = { which = dnum value = 0 }
-    set_variable = { which = dnum value = 4}
+    set_variable = { which = dnum value = 1 }
     set_variable = { which = dnum_base which = dnum}
     bard_cast_test = yes
     if = { 
@@ -466,11 +551,12 @@ bard_emboldening_song = {
             }
         }
         set_variable = { which = "bard_es_count" which = "bcl_sp" }
-        change_variable = { which = "bard_es_pot" which = "bcl_sp" }
-        divide_variable = { which = bard_es_pot value = 10}
-        divide_variable = { which = bard_es_pot value = 1000}
-        multiply_variable = { which = bard_es_pot value = 1000}
-        change_variable = { which = "bard_es_pot" value = 1 }  
+        set_variable = { which = "local_bard_es_pot" which = "bcl_sp" }
+        divide_variable = { which = local_bard_es_pot value = 10}
+        divide_variable = { which = local_bard_es_pot value = 1000}
+        multiply_variable = { which = local_bard_es_pot value = 1000}
+        change_variable = { which = "local_bard_es_pot" value = 1 }  
+        change_variable = { which = "bard_es_pot" which = "local_bard_es_pot"}
         change_variable = { which = "bard_es_count" value = 1 } 
     }           
     clr_character_flag = spell_fail
@@ -540,7 +626,7 @@ warlock_doomfire_cantrip = {
     warlock_cast_test = yes
     magic_resist_test = yes
     set_variable = { which = "local_spelldice" which = "wacl_sp" }
-    divide_variable = { which = local_spelldice value = 3}
+    divide_variable = { which = local_spelldice value = 7}
     divide_variable = { which = local_spelldice value = 1000}
     multiply_variable = { which = local_spelldice value = 1000}
     if = { 
@@ -565,6 +651,16 @@ warlock_doomfire_cantrip = {
         change_variable = { which = "m_dd" value = 1 }
         set_variable = { which = mgdmgmod which = wacl_sp}
         duel_mgdmg = yes
+        event_target:defender = { 
+            set_variable = { which = "warlock_df_count" which = "wacl_sp" which = event_target:magic_caster }
+            change_variable = { which = "local_warlock_df_dmg" which = "wacl_sp" which = event_target:magic_caster  }
+            divide_variable = { which = local_warlock_df_dmg value = 10}
+            divide_variable = { which = local_warlock_df_dmg value = 1000}
+            multiply_variable = { which = local_warlock_df_dmg value = 1000}
+            change_variable = { which = "local_warlock_df_dmg" value = 1 }
+            change_variable = { which = "warlock_df_dmg" which = "local_warlock_df_dmg"}
+            change_variable = { which = "warlock_df_count" value = 1 }
+        }
     }           
     clr_character_flag = resisted
     clr_character_flag = spell_fail
@@ -604,7 +700,33 @@ cleric_heal_spell = {
 }
 
 
+cleric_divine_blessing_spell = {
+    save_event_target_as = magic_caster
+    z_bard_setup = yes
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
 
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    cleric_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "cleric_db_count" which = "ccl_sp" }
+        set_variable = { which = "local_cleric_db_pot" which = "ccl_sp" }
+        divide_variable = { which = local_cleric_db_pot value = 4}
+        divide_variable = { which = local_cleric_db_pot value = 1000}
+        multiply_variable = { which = local_cleric_db_pot value = 1000}
+        change_variable = { which = "local_cleric_db_pot" value = 1 }  
+        change_variable = { which = "cleric_db_pot" which = "local_cleric_db_pot"}
+        change_variable = { which = "cleric_db_count" value = 1 } 
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
 
 #Fighter_Special_Attacks 
 fighter_attack = {
@@ -633,20 +755,23 @@ fighter_attack = {
 #bonus_effect_calculation
 savemod_calc = { 
     set_variable = { which = local_savemod which = savemod}        
-
+    #Cleric Divine Blessing
+    if = { 
+        limit = { 
+            check_variable = { which = cleric_db_count value = 1}
+        }
+        change_variable = { which = local_savemod which = cleric_db_pot}
+    }
+    #Druid Bear Skin
     if = { 
         limit = { 
             check_variable = { which = druid_bs_count value = 1}
         }
-        set_variable = { which = local_druidbsvalue which = dcl_sp}
-        divide_variable = { which = local_druidbsvalue value = 5}
-        divide_variable = { which = local_druidbsvalue value = 1000}
-        multiply_variable = { which = local_druidbsvalue value = 1000}
-        change_variable = { which = local_druidbsvalue value = 1}
-        change_variable = {which = local_savemod which = local_druidbsvalue}
+        change_variable = { which = local_savemod which = druid_bs_pot}
     }
     set_variable = { which = savemodcal which = local_savemod}
 }
+
 dmgmod_calc = { 
     set_variable = { which = local_savemod which = savemod}        
 
