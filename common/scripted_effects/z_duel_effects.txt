@@ -1,5 +1,8 @@
 z_duel_turn_setup = {
     set_variable = { which = "duel_dmg" value = 0}
+    set_variable = { which = "dueldmgdice" which = "dueldmgdicebase" }
+    set_variable = { which = "atdmgmod" value = "0" }
+    
     trigger_switch = { 
         on_trigger = has_character_flag
         duel_action_attack = { 
@@ -58,6 +61,10 @@ zz_ability_flag_clear = {
     clr_character_flag = cleric_divine_blessing
     clr_character_flag = druid_bear_strike
     clr_character_flag = druid_bear_skin
+    clr_character_flag = druid_regrowth
+    clr_character_flag = paladin_holy_smite
+    clr_character_flag = paladin_curative
+    clr_character_flag = paladin_larger_than_life
 #    clr_character_flag =
 #    clr_character_flag =
 #    clr_character_flag =
@@ -219,6 +226,50 @@ z_duel_round_end_effect = {
         set_variable = { which = "cleric_db_count" value = "0"}
         set_variable = { which = "cleric_db_pot" value = "0"}
     }
+    #Druid Regrowth
+    if = { 
+        limit = {
+            check_variable = { which = "druid_re_count" value >= 1}
+        }
+        change_variable = { which = "druid_re_count" value = -1}
+        druid_regrowth_tick = yes
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "druid_re_count" value < 1}
+        }
+        set_variable = { which = "druid_re_count" value = "0"}
+        set_variable = { which = "druid_re_pot" value = "0"}
+    }
+    #Druid Bear Skin
+    if = { 
+        limit = {
+            check_variable = { which = "druid_bs_count" value >= 1}
+        }
+        change_variable = { which = "druid_bs_count" value = -1}
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "druid_bs_count" value < 1}
+        }
+        set_variable = { which = "druid_bs_count" value = "0"}
+        set_variable = { which = "druid_bs_pot" value = "0"}
+    }
+    #Paladin Curative
+    if = { 
+        limit = {
+            check_variable = { which = "druid_re_count" value >= 1}
+        }
+        change_variable = { which = "druid_re_count" value = -1}
+        druid_regrowth_tick = yes
+    }
+    if = { 
+        limit =  {
+            check_variable = { which = "druid_re_count" value < 1}
+        }
+        set_variable = { which = "druid_re_count" value = "0"}
+        set_variable = { which = "druid_re_pot" value = "0"}
+    }
     trigger_switch = { 
         on_trigger = has_character_flag
         cleric_heal_cantrip = { 
@@ -232,6 +283,12 @@ z_duel_round_end_effect = {
         }
         wizard_stone_skin_cantrip = { 
             wizard_stone_skin_cantrip = yes
+        }
+        druid_regrowth = { 
+            druid_regrowth_spell = yes
+        }
+        druid_bear_skin = { 
+            druid_bear_skin_spell = yes
         }
     }
 }
@@ -259,6 +316,9 @@ duel_action_decision = {
                 duel_test = yes
             }
             warlock_doom_blast_cantrip = { 
+                duel_test = yes
+            }
+            druid_bear_strike = { 
                 duel_test = yes
             }
         }
@@ -296,6 +356,9 @@ duel_test = {
             }
             sorcerer_attack_cantrip = { 
                 change_variable = {which = "duel_attack_roll" which = "scl_sp"}
+            }
+            druid_bear_strike = { 
+                change_variable = {which = "duel_attack_roll" which = "dcl_sp"}
             }
         }
     }        
@@ -367,6 +430,13 @@ duel_test = {
                 }
                 warlock_doom_blast_cantrip = {
                     warlock_doomblast_cantrip = yes 
+                    event_target:defender = { 
+                        subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
+                        set_character_flag = duelhit
+                    }
+                }
+                druid_bear_strike  = {
+                    druid_bear_strike_spell = yes 
                     event_target:defender = { 
                         subtract_variable = { which = "duel_hp" which = "duel_dmg" which = event_target:attacker } 
                         set_character_flag = duelhit
@@ -685,6 +755,7 @@ cleric_heal_spell = {
 
     set_variable = { which = dnum value = 1}
     set_variable = { which = dnum_base which = dnum}
+    set_variable = { which = "mhd" value = 0 }
     cleric_cast_test = yes
     set_variable = { which = "local_spelldice" which = "ccl_sp" }
     divide_variable = { which = local_spelldice value = 5}
@@ -699,10 +770,24 @@ cleric_heal_spell = {
         set_variable = { which = "mhd" which = "local_spelldice" }
         change_variable = { which = mhd value = 1 }
         set_variable = { which = mghealmod which = ccl_sp}
-        duel_mgheal = yes
+        cleric_heal_spell_heal_effect = yes
     }           
     clr_character_flag = spell_fail
     clr_character_flag = miscast
+}
+
+cleric_heal_spell_heal_effect = {
+    set_variable = { which = dnum which = mhd}
+    z_d6 = yes
+    set_variable = { which = duel_heal which = dresult}
+    change_variable = { which = duel_heal which = mghealmod}
+    change_variable = { which = duel_hp which = duel_heal}
+    If = { 
+        limit = {
+            check_variable = { which = duel_hp which = duel_max_hp}
+        }
+        set_variable = { which = duel_hp which = duel_max_hp}
+    }
 }
 
 
@@ -733,6 +818,237 @@ cleric_divine_blessing_spell = {
     clr_character_flag = spell_fail
     clr_character_flag = miscast
 }
+
+
+#druid Spells 
+
+#lvl 1 
+druid_bear_strike_spell = {
+    set_variable = {which = "splcastlvl" value = "17"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    druid_cast_test = yes
+    set_variable = { which = "local_attackdice" value = "dcl_sp" }
+    divide_variable = { which = local_attackdice value = 5}
+    divide_variable = { which = local_attackdice value = 1000}
+    multiply_variable = { which = local_attackdice value = 1000}
+    change_variable = { which = local_attackdice value = 1}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "dueldmgdice" which = "local_attackdice" }
+        set_variable = { which = atdmgmod which = dcl_sp}
+        duel_dmg = yes
+    }         
+    clr_character_flag = spell_fail
+}
+
+#lvl 3
+druid_regrowth_spell = {
+    save_event_target_as = magic_caster
+    z_druid_setup = yes
+    set_variable = {which = "splcastlvl" value = "20"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    druid_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "druid_re_count" which = "dcl_sp" }
+        set_variable = { which = "local_druid_re_pot" which = "dcl_sp" }
+        divide_variable = { which = local_druid_re_pot value = 5}
+        divide_variable = { which = local_druid_re_pot value = 1000}
+        multiply_variable = { which = local_druid_re_pot value = 1000}
+        change_variable = { which = "local_druid_re_pot" value = 1 }  
+        change_variable = { which = "druid_re_pot" which = "local_druid_re_pot"}
+        change_variable = { which = "druid_re_count" value = 1 } 
+        druid_regrowth_tick = yes
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
+druid_regrowth_tick = {
+    set_variable = { which = dnum which = druid_re_pot}
+    z_d3 = yes
+    set_variable = { which = duel_heal which = dresult}
+    change_variable = { which = duel_heal which = druid_re_pot}
+    change_variable = { which = duel_hp which = duel_heal}
+    If = { 
+        limit = {
+            check_variable = { which = duel_hp which = duel_max_hp}
+        }
+        set_variable = { which = duel_hp which = duel_max_hp}
+    }
+}
+
+#lvl 7
+druid_bear_skin_spell = {
+    save_event_target_as = magic_caster
+    z_druid_setup = yes
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    cleric_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "druid_bs_count" which = "dcl_sp" }
+        set_variable = { which = "local_cleric_db_pot" which = "dcl_sp" }
+        divide_variable = { which = local_druid_bs_pot value = 10}
+        divide_variable = { which = local_druid_bs_pot value = 1000}
+        multiply_variable = { which = local_druid_bs_pot value = 1000}
+        change_variable = { which = "local_druid_bs_pot" value = 2 }  
+        change_variable = { which = "druid_bs_pot" which = "local_druid_bs_pot"}
+        change_variable = { which = "druid_bs_count" value = 3 } 
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
+#Lvl 10
+druid_beastly_spell = {
+    save_event_target_as = magic_caster
+    z_druid_setup = yes
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    cleric_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "cleric_db_count" which = "ccl_sp" }
+        set_variable = { which = "local_cleric_db_pot" which = "ccl_sp" }
+        divide_variable = { which = local_cleric_db_pot value = 4}
+        divide_variable = { which = local_cleric_db_pot value = 1000}
+        multiply_variable = { which = local_cleric_db_pot value = 1000}
+        change_variable = { which = "local_cleric_db_pot" value = 1 }  
+        change_variable = { which = "cleric_db_pot" which = "local_cleric_db_pot"}
+        change_variable = { which = "cleric_db_count" value = 1 } 
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
+#Paladin Spells 
+
+paladin_holy_smite_spell = {
+    set_variable = {which = "splcastlvl" value = "10"}
+    spellcast_modifer = yes
+    set_variable = { which = dnum value = 1}
+    paladin_cast_test = yes
+    set_variable = { which = "local_attackdice" value = "pcl_sp" }
+    divide_variable = { which = local_attackdice value = 7}
+    divide_variable = { which = local_attackdice value = 1000}
+    multiply_variable = { which = local_attackdice value = 1000}
+    change_variable = { which = local_attackdice value = 1}
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "dueldmgdice" which = "local_attackdice" }
+        set_variable = { which = atdmgmod which = pcl_sp}
+        multiply_variable = { which = atdmgmod value = 2 }
+        duel_dmg = yes
+    }      
+    clr_character_flag = spell_fail
+}
+
+paladin_curative_spell = {
+    save_event_target_as = magic_caster
+    z_paladin_setup = yes
+    set_variable = {which = "splcastlvl" value = "20"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    paladin_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "paladin_cu_count" which = "pcl_sp" }
+        set_variable = { which = "local_paladin_cu_pot" which = "pcl_sp" }
+        divide_variable = { which = local_paladin_cu_pot value = 3}
+        divide_variable = { which = local_paladin_cu_pot value = 1000}
+        multiply_variable = { which = local_paladin_cu_pot value = 1000}
+        change_variable = { which = "local_paladin_cu_pot" value = 1 }  
+        change_variable = { which = "paladin_cu_pot" which = "local_paladin_cu_pot"}
+        change_variable = { which = "paladin_cu_count" value = 1 } 
+        paladin_curative_tick = yes
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
+paladin_curative_tick = {
+    set_variable = { which = dnum which = paladin_cu_pot}
+    z_d3 = yes
+    set_variable = { which = duel_heal which = dresult}
+    change_variable = { which = duel_heal which = paladin_cu_pot}
+    change_variable = {which = duel_action_attack which = duel_heal }
+    change_variable = {which = duel_action_defend which = duel_heal }
+    change_variable = { which = duel_hp which = duel_heal}
+    If = { 
+        limit = {
+            check_variable = { which = duel_hp which = duel_max_hp}
+        }
+        set_variable = { which = duel_hp which = duel_max_hp}
+    }
+}
+
+paladin_larger_than_life_spell = {
+    save_event_target_as = magic_caster
+    z_paladin_setup = yes
+    set_variable = {which = "splcastlvl" value = "15"}
+    spellcast_modifer = yes
+
+    set_variable = { which = dnum value = 1 }
+    set_variable = { which = dnum_base which = dnum}
+    paladin_cast_test = yes
+    if = { 
+        limit = {
+            not = { 
+                has_character_flag = spell_fail
+            }
+        }
+        set_variable = { which = "local_pala_ll_pot" which = "pcl_sp" }
+        divide_variable = { which = local_pala_ll_pot value = 10}
+        divide_variable = { which = local_pala_ll_pot value = 1000}
+        multiply_variable = { which = local_pala_ll_pot value = 1000}
+        change_variable = { which = "local_pala_ll_pot" value = 1 }  
+        change_variable = { which = "pala_ll_pot" which = "local_pala_ll_pot"}
+        change_variable = { which = "savemod" which = "local_pala_ll_pot"}
+        change_variable = { which = "dmgmod" which = "local_pala_ll_pot"}
+        multiply_variable = { which = local_pala_ll_pot value = 4}
+        change_variable = { which = "duel_max_hp" which = "local_pala_ll_pot"}
+    }           
+    clr_character_flag = spell_fail
+    clr_character_flag = miscast
+}
+
 
 #Fighter_Special_Attacks 
 fighter_attack = {
@@ -775,23 +1091,14 @@ savemod_calc = {
         }
         change_variable = { which = local_savemod which = druid_bs_pot}
     }
+
     set_variable = { which = savemodcal which = local_savemod}
 }
 
 dmgmod_calc = { 
     set_variable = { which = local_savemod which = savemod}        
 
-    if = { 
-        limit = { 
-            check_variable = { which = druid_bs_count value = 1}
-        }
-        set_variable = { which = local_druidbsvalue which = druilvl}
-        divide_variable = { which = local_druidbsvalue value = 5}
-        divide_variable = { which = local_druidbsvalue value = 1000}
-        multiply_variable = { which = local_druidbsvalue value = 1000}
-        change_variable = { which = local_druidbsvalue value = 1}
-        change_variable = {which = local_savemod which = local_druidbsvalue}
-    }
+
     set_variable = { which = savemodcal which = local_savemod}
 }
 
@@ -800,6 +1107,7 @@ duel_dmg = {
     set_variable = { which = dnum which = dueldmgdice}
     z_d4 = yes
     set_variable = { which = duel_dmg which = dresult}
+    change_variable = { which = duel_dmg which = atdmgmod }
     change_variable = { which = duel_dmg which = dmgmod }
     change_variable = { which = duel_dmg which = cls_dmg_bonus }
     event_target:defender = { savemod_calc = yes}
