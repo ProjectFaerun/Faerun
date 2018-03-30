@@ -1471,1026 +1471,6 @@ character_event = {
 }
 
 ###########################################
-# The cursed diamond                      #
-###########################################
-
-# Diamond is found
-character_event = {
-	id = RoI.215
-	desc = EVTDESC_RoI_215
-	picture = GFX_evt_emissary
-
-	is_triggered_only = yes
-	
-	ai = no
-	only_capable = yes
-	prisoner = no
-	
-	trigger = {
-		has_dlc = "Rajas of India"
-		NOT = {	primary_title = { tier = COUNT } }
-		NOT = { has_global_flag = cursed_diamond }
-		capital_scope = {
-			region = world_india
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	immediate = {
-		set_global_flag = cursed_diamond
-	}
-	
-	option = {
-		name = EVTOPTA_RoI_215
-		wealth = -30
-		prestige = 30
-		add_artifact = cursed_diamond_crown
-		set_character_flag = cursed_diamond_crown
-		hidden_tooltip = { character_event = { id = RoI.216 days = 60 } }  # Make a grand crown
-	}
-	option = {
-		name = EVTOPTB_RoI_215
-		add_artifact = cursed_diamond
-		new_artifact = {
-			set_creation_date = 1.1.1
-		}
-		set_character_flag = cursed_diamond
-		hidden_tooltip = { character_event = { id = RoI.221 days = 60 } } # Put it in the treasury
-	}
-	option = {
-		name = EVTOPTC_RoI_215
-		trigger = {
-			is_married = yes
-			spouse = { ai= yes }
-		}
-		spouse = {
-			add_lover = ROOT
-			add_artifact = cursed_diamond
-			new_artifact = {
-				set_creation_date = 1.1.1
-			}
-			set_character_flag = spouse_diamond
-			hidden_tooltip = { character_event = { id = RoI.225 days = 60 } } # Give it to your spouse
-		}
-	}
-	option = {
-		name = EVTOPTD_RoI_215
-		wealth = 100
-	}
-}
-
-# Diamond sparkles in crown
-character_event = {
-	id = RoI.216
-	desc = EVTDESC_RoI_216
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_216
-		prestige = 10
-		hidden_tooltip = {
-			random_list = {
-				10 = { character_event = { id = RoI.217 days = 60 } }
-				10 = { character_event = { id = RoI.218 days = 60 } }
-				10 = {
-					random_courtier = {
-						limit = {
-							ai = yes
-							is_adult = yes
-							prisoner = no
-							NOT = {
-								trait = incapable
-							}
-							is_inaccessible_trigger = no
-							NOT = { father = { character = ROOT } }
-							NOT = { mother = { character = ROOT } }
-							NOT = { spouse = { character = ROOT } }
-						}
-						character_event = { id = RoI.219 days = 60 }
-					}
-				}
-			}
-		}
-	}
-}
-
-# Thief tries to steal crown
-character_event = {
-	id = RoI.217
-	desc = EVTDESC_RoI_217
-	picture = GFX_evt_large_army
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_217
-		if = {
-			limit = { NOT = { trait = stressed } }
-			random = {
-				chance = 20
-				add_trait = stressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38282 #Notify Stressed
-					}
-				}
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Diamonds sparkles and frightens elephant
-character_event = {
-	id = RoI.218
-	desc = EVTDESC_RoI_218
-	picture = GFX_evt_india_rural_scene
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_218
-		random_courtier = {
-			limit = {
-				NOT = { trait = incapable }
-				NOT = { trait = mangled }
-				NOT = { trait = maimed }
-				immortal = no
-			}
-			random_list = {
-				70 = { add_trait = wounded }
-				25 = { 
-					if = {
-						limit = {
-							NOT = {
-								has_dlc = "Reapers"
-							}
-						}
-						add_trait = maimed
-						hidden_tooltip = {
-							character_event = { id = 38281 }
-						}
-					}
-					if = {
-						limit = {
-							has_dlc = "Reapers"
-						}
-						add_trait = mangled
-						add_trait = severely_injured
-						resolve_severely_injured_effect = yes
-						hidden_tooltip = { character_event = { id = RIP.11505 } }
-					}
-				}
-				5 = { 
-					if = {
-						limit = {
-							immortal = no
-						}
-						add_trait = incapable
-					}
-				}
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Courtier tries to murder owner of diamond
-character_event = {
-	id = RoI.219
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = RoI.220 } }
-	}
-}
-
-# Owner subjected to murder attempt
-character_event = {
-	id = RoI.220
-	desc = EVTDESC_RoI_220
-	picture = GFX_evt_bad_news
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_220
-		random = {
-			chance = 20
-			add_trait = wounded
-			hidden_tooltip = {
-				character_event = {
-					id = 38280 #Notify Wounded
-				}
-			}
-		}
-		FROM = {
-			death = {
-				death_reason = death_execution
-				killer = ROOT
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Diamond is lovely in your treasury
-character_event = {
-	id = RoI.221
-	desc = EVTDESC_RoI_221
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_221
-		prestige = 10
-		hidden_tooltip = {
-			random_list = {
-				10 = { character_event = { id = RoI.222 days = 60 } }
-				10 = { character_event = { id = RoI.223 days = 60 } }
-				10 = { character_event = { id = RoI.224 days = 60 } }
-			}
-		}
-	}
-}
-
-# Spending too much time in the treasury with the Precious... becoming troglodytic and weird
-character_event = {
-	id = RoI.222
-	desc = EVTDESC_RoI_222
-	picture = GFX_evt_lunatic
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_222
-		set_character_flag = loves_diamond
-		if = {
-			limit = { NOT = { trait = shy } }
-			add_trait = shy
-		}
-		if = {
-			limit = { NOT = { trait = greedy } }
-			random = {
-				chance = 30
-				add_trait = greedy
-				hidden_tooltip = {
-					character_event = {
-						id = 38252 #Notify Greedy
-					}
-				}
-			}
-		}
-		if = {
-			limit = { NOT = { trait = envious } }
-			random = {
-				chance = 30
-				add_trait = envious
-				hidden_tooltip = {
-					character_event = {
-						id = 38271 #Notify Envious
-					}
-				}
-			}
-		}
-		if = {
-			limit = { NOT = { trait = lunatic } }
-			random = {
-				chance = 10
-				add_trait = lunatic
-				hidden_tooltip = {
-					character_event = { id = 38304 } # notify lunatic
-				}
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Diamond is stolen from your treasury
-character_event = {
-	id = RoI.223
-	desc = EVTDESC_RoI_223
-	picture = GFX_evt_emissary
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = {
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-		}
-	}
-	
-	option = {
-		name = EVTOPTA_RoI_223
-		prestige = -30
-		if = {
-			limit = { NOT = { trait = paranoid } }
-			random = {
-				chance = 30
-				add_trait = paranoid
-				hidden_tooltip = {
-					character_event = {
-						id = 38275 #Notify Paranoid
-					}
-				}
-			}
-		}
-		if = {
-			limit = { NOT = { trait = stressed } }
-			random = {
-				chance = 10
-				add_trait = stressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38282 #Notify Stressed
-					}
-				}
-			}
-		}
-	}
-}
-
-# Worries about diamond
-character_event = {
-	id = RoI.224
-	desc = EVTDESC_RoI_224
-	picture = GFX_evt_bad_news
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_224
-		if = {
-			limit = {
-				trait = stressed
-				NOT = { trait = paranoid }
-			}
-				add_trait = paranoid
-		}
-		if = {
-			limit = {
-				NOT = { trait = stressed }
-			}
-			random = {
-				chance = 30
-				add_trait = stressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38282 #Notify Stressed
-					}
-				}
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Spouse
-character_event = {
-	id = RoI.225
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = { has_character_flag = spouse_diamond } # Still same spouse?
-			spouse = {
-				character_event = { id = RoI.226 }
-			}
-		}
-	}
-}
-
-# Spouse is happy about magnificent diamond
-character_event = {
-	id = RoI.226
-	desc = EVTDESC_RoI_226
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_226
-		spouse = {
-			prestige = 30
-		}
-		hidden_tooltip = {
-			random_list = {
-				10 = { spouse = { character_event = { id = RoI.227 days = 60 } } }
-				10 = { spouse = { character_event = { id = RoI.229 days = 60 } } }
-				10 = { spouse = { character_event = { id = RoI.231 days = 60 } } }
-			}
-		}
-	}
-}
-
-# Spouse
-character_event = {
-	id = RoI.227
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = { has_character_flag = spouse_diamond } # Still same spouse?
-			FROM = {
-				character_event = { id = RoI.228 }
-			}
-		}
-	}
-}
-
-# Spouse is robbed of diamond
-character_event = {
-	id = RoI.228
-	desc = EVTDESC_RoI_228
-	picture = GFX_evt_market
-
-	is_triggered_only = yes
-
-	immediate = {
-		spouse = {
-			unsafe_destroy_artifact = cursed_diamond
-		}
-	}
-	
-	option = {
-		name = EVTOPTA_RoI_228
-		prestige = -20
-	}
-}
-
-# Spouse
-character_event = {
-	id = RoI.229
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = { has_character_flag = spouse_diamond } # Still same spouse?
-			FROM = {
-				character_event = { id = RoI.230 }
-			}
-		}
-	}
-}
-
-# Diamond drives spouse insane
-character_event = {
-	id = RoI.230
-	desc = EVTDESC_RoI_230
-	picture = GFX_evt_lunatic
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_230
-		spouse = {
-			if = {
-				limit = { NOT = { trait = lunatic } }
-				add_trait = lunatic
-			}
-			if = {
-				limit = { trait = lunatic }
-				add_trait = possessed
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Spouse
-character_event = {
-	id = RoI.231
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = { has_character_flag = spouse_diamond } # Still same spouse?
-			FROM = {
-				character_event = { id = RoI.232 }
-			}
-		}
-	}
-}
-
-# Spouse killed by robbers but diamond retained
-character_event = {
-	id = RoI.232
-	desc = EVTDESC_RoI_232
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-
-	immediate = {
-		random_artifact = {
-			limit = {
-				artifact_type = cursed_diamond
-			}
-			transfer_artifact = {
-				from = spouse
-				to = ROOT
-			}
-		}
-	}
-	
-	option = {
-		name = EVTOPTA_RoI_232
-		spouse = {
-			death = {
-				death_reason = death_murder
-			}
-		}
-		random = {
-			chance = 20
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = {
-					id = 38288 #Notify Depressed
-				}
-			}
-		}
-		hidden_tooltip = { character_event = { id = RoI.240 } }
-	}
-}
-
-# Diamond may be cursed. What to do with it?
-character_event = {
-	id = RoI.240
-	desc = EVTDESC_RoI_240
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_240
-		trigger = {
-			NOT = { has_character_flag = loves_diamond }
-		}
-		wealth = 100
-		hidden_effect = { 
-			character_event = { id = RoI.241 days = 30 } 
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-			set_character_flag = sold_cursed_diamond
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-			set_character_flag = sold_cursed_diamond_crown
-		}
-	}
-	option = {
-		name = EVTOPTB_RoI_240
-		hidden_effect = { 
-			character_event = { id = RoI.243 days = 30 } 
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-		}
-	}
-	option = {
-		name = EVTOPTC_RoI_240
-		hidden_effect = { character_event = { id = RoI.245 days = 30 } }
-	}
-	option = {
-		name = EVTOPTD_RoI_240
-		trigger = {
-			has_character_flag = loves_diamond
-		}
-		if = {
-			limit = { 
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-		}
-		if = {
-			limit = { 
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-		}
-		death = {
-			death_reason = death_suicide
-		}
-	}
-}
-
-# Sold diamond but regrets it
-character_event = {
-	id = RoI.241
-	desc = EVTDESC_RoI_241
-	picture = GFX_evt_large_army
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_241
-		hidden_tooltip = { character_event = { id = RoI.242 } }
-	}
-	option = {
-		name = EVTOPTB_RoI_241
-	}
-}
-
-# Sends riders after buyers
-character_event = {
-	id = RoI.242
-	desc = EVTDESC_RoI_242
-	picture = GFX_evt_throne_room
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_242
-		add_character_modifier = {
-			name = the_diamond_thief
-			duration = 1800
-		}
-		if = {
-			limit = {
-				OR = {
-					has_character_flag = cursed_diamond_crown
-					has_character_flag = sold_cursed_diamond_crown
-				}
-			}
-			add_artifact = cursed_diamond_crown
-			clr_character_flag = sold_cursed_diamond_crown
-		}
-		if = {
-			limit = {
-				has_character_flag = cursed_diamond
-				has_character_flag = sold_cursed_diamond
-			}
-			add_artifact = cursed_diamond
-			clr_character_flag = sold_cursed_diamond
-		}
-		hidden_tooltip = { character_event = { id = RoI.245 days = 60 } }
-	}
-}
-
-# Threw diamond in river but regrets it
-character_event = {
-	id = RoI.243
-	desc = EVTDESC_RoI_243
-	picture = GFX_evt_bad_news
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_243
-		hidden_tooltip = { character_event = { id = RoI.244 } }
-	}
-	option = {
-		name = EVTOPTB_RoI_243
-	}
-}
-
-# Searches but cannot find diamond
-character_event = {
-	id = RoI.244
-	desc = EVTDESC_RoI_244
-	picture = GFX_evt_india_rural_scene
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_244
-		
-		if = {
-			limit = { is_ill = yes }
-			
-			random = {
-				chance = 30
-				if = {
-					limit = { NOT = { has_dlc = "Reapers" } }
-					add_trait = pneumonic
-				}
-				if = {
-					limit = { has_dlc = "Reapers" }
-					add_trait = infection
-					hidden_tooltip = { character_event = { id = RIP.11001 days = 365 random = 1095 } }
-				}		
-			}
-		}
-
-		if = {
-			limit = { is_ill = no }
-
-			random = {
-				chance = 30
-				if = { limit = { NOT = { has_dlc = "Reapers" } }
-					add_trait = ill
-				}
-				if = { limit = { has_dlc = "Reapers" }
-					add_symptom_effect = yes
-				}	
-			}
-		}
-	}
-}
-
-# Keeps diamond
-character_event = {
-	id = RoI.245
-	desc = EVTDESC_RoI_245
-	picture = GFX_evt_bad_news
-
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-		}
-		clr_character_flag = cursed_diamond
-		clr_character_flag = cursed_diamond_crown
-	}
-
-	option = {
-		name = EVTOPTA_RoI_245
-		trigger = {
-			any_spouse = {
-				NOT = { has_character_flag = spouse_diamond }
-				ai = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-		}
-		random_spouse = {
-			limit = {
-				NOT = { has_character_flag = spouse_diamond }
-				ai = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-			hidden_tooltip = { character_event = { id = RoI.246 } }
-		}
-	}
-	option = {
-		name = EVTOPTB_RoI_245
-		trigger = {
-			any_sibling = {
-				ai = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-		}
-		random_sibling = {
-			limit = {
-				ai = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-			hidden_tooltip = { character_event = { id = RoI.246 } }
-		}
-	}
-	option = {
-		name = EVTOPTC_RoI_245
-		trigger = {
-			any_courtier = {
-				ai = yes
-				is_councillor = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-		}
-		random_courtier = {
-			limit = {
-				ai = yes
-				is_councillor = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-			hidden_tooltip = { character_event = { id = RoI.246 } }
-		}
-	}
-	option = {
-		name = EVTOPTD_RoI_245
-		trigger = {
-			NOT = {
-				any_courtier = {
-					ai = yes
-					is_councillor = yes
-					at_location = ROOT
-					is_adult = yes
-					prisoner = no
-					NOT = {
-						trait = incapable
-					}
-					is_inaccessible_trigger = no
-				}
-			}
-			NOT = {
-				any_sibling = {
-					ai = yes
-					at_location = ROOT
-					is_adult = yes
-					prisoner = no
-					NOT = {
-						trait = incapable
-					}
-					is_inaccessible_trigger = no
-				}
-			}
-			NOT = {
-				any_spouse = {
-					NOT = { has_character_flag = spouse_diamond }
-					ai = yes
-					at_location = ROOT
-					is_adult = yes
-					prisoner = no
-					NOT = {
-						trait = incapable
-					}
-					is_inaccessible_trigger = no
-				}
-			}
-		}
-		random_courtier = {
-			limit = {
-				ai = yes
-				at_location = ROOT
-				is_adult = yes
-				prisoner = no
-				NOT = {
-					trait = incapable
-				}
-				is_inaccessible_trigger = no
-			}
-			hidden_tooltip = { character_event = { id = RoI.246 } }
-		}
-	}
-}
-
-# Blamed character
-character_event = {
-	id = RoI.246
-
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = RoI.247 } }
-	}
-}
-
-# Verdict - guilty or innocent?
-character_event = {
-	id = RoI.247
-	desc = EVTDESC_RoI_247
-	picture = GFX_evt_into_the_dungeon
-
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI_247
-		FROM = {
-			opinion = {
-				who = ROOT
-				modifier = insulted
-				years = 5
-			}
-		}
-	}
-	option = {
-		name = EVTOPTB_RoI_247
-		FROM = {
-			death = {
-				death_reason = death_execution
-				killer = ROOT
-			}
-		}
-	}
-}
-
-# On Death - clearing the treasury
-character_event = {
-	id = RoI.248
-
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_artifact = cursed_diamond_crown
-		has_artifact = cursed_diamond
-	}
-
-	immediate = {
-		if = {
-			limit = {
-				has_artifact = cursed_diamond
-			}
-			unsafe_destroy_artifact = cursed_diamond
-		}
-		if = {
-			limit = {
-				has_artifact = cursed_diamond_crown
-			}
-			unsafe_destroy_artifact = cursed_diamond_crown
-		}
-		save_event_target_as = cursed_diamond_parent
-		current_heir = {
-			character_event = { id = RoI.249 days = 7 }
-		}
-	}
-}
-
-# Heir finds out famous diamond has disappeared
-character_event = {
-	id = RoI.249
-	desc = EVTDESC_RoI.249
-	picture = GFX_evt_bad_news
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_RoI.249
-	}
-}
-
-###########################################
 # Thugs                                   #
 ###########################################
 
@@ -2509,7 +1489,7 @@ character_event = {
 		has_dlc = "Rajas of India"
 		NOT = { has_global_flag = thugs_global }
 		capital_scope = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 		NOT = { is_inaccessible_trigger = yes }
 	}
@@ -2518,7 +1498,7 @@ character_event = {
 		set_global_flag = thugs_global
 		random_demesne_province = {
 			limit = {
-				region = world_india
+				region = southeast_faerun_region
 			}
 			set_province_flag = thugs
 			province_event = { id = RoI.20148 }
@@ -2868,7 +1848,7 @@ character_event = {
 	trigger = {
 		has_dlc = "Rajas of India"
 		capital_scope = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 	}
 	
@@ -2910,10 +1890,7 @@ character_event = {
 		NOT = { has_character_flag = crazed_elephant }
 		capital_scope = {
 			OR = {
-				region = world_india
-				duchy = { title = d_sistan }
-				duchy = { title = d_baluchistan }
-				duchy = { title = d_kerman }
+				region = southeast_faerun_region
 			}
 		}
 	}
@@ -3038,7 +2015,7 @@ character_event = {
 		has_dharmic_religion_trigger = yes
 		has_dlc = "Rajas of India"
 		capital_scope = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 	}
 	
@@ -3088,7 +2065,7 @@ character_event = {
 		NOT = { has_global_flag = white_elephant }
 		NOT = {	primary_title = { tier = COUNT } }
 		capital_scope = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 		OR = {
 			AND = {
@@ -3101,7 +2078,7 @@ character_event = {
 					ai = yes
 					has_dharmic_religion_trigger = yes
 					capital_scope = {
-						region = world_india
+						region = southeast_faerun_region
 					}
 				}
 			}
@@ -3128,7 +2105,7 @@ character_event = {
 					ai = yes
 					has_dharmic_religion_trigger = yes
 					capital_scope = {
-						region = world_india
+						region = southeast_faerun_region
 					}
 				}
 				character_event = { id = RoI.20165 }
@@ -3642,7 +2619,7 @@ character_event = {
 	trigger = {
 		has_dlc = "Rajas of India"
 		in_command = no
-		capital_scope = { region = world_india }
+		capital_scope = { region = southeast_faerun_region }
 		NOT = { is_inaccessible_trigger = yes }
 	}
 	
@@ -3797,7 +2774,7 @@ character_event = {
 		NOT = { has_global_flag = marco_polo_persia }
 		year = 1200
 		capital_scope = {
-			region = world_persia
+			region = shining_sea_region
 		}
 	}
 	
@@ -3916,16 +2893,16 @@ character_event = {
 		NOT = { has_character_flag = crossing_indus }
 		NOT = {
 			any_realm_province = {
-				region = world_india
+				region = southeast_faerun_region
 			}
 		}
 		location = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 		any_current_enemy = {
 			primary_title = {
 				capital_scope = {
-					region = world_india
+					region = southeast_faerun_region
 				}
 			}
 		}
@@ -3970,7 +2947,7 @@ character_event = {
 	trigger = {
 		has_dlc = "Rajas of India"
 		capital_scope = {
-			region = world_india
+			region = southeast_faerun_region
 		}
 		NOT = { is_inaccessible_trigger = yes }
 	}
@@ -4075,40 +3052,6 @@ character_event = {
 	}
 }
 
-# Tolerant character making Indian friend
-character_event = {
-	id = RoI.400
-	desc = EVTDESC_RoI_400
-	picture = GFX_evt_courtiers_talking
-	border = GFX_event_normal_frame_religion
-
-	is_triggered_only = yes
-	
-	only_rulers = yes
-	only_capable = yes
-	prisoner = no
-	min_age = 16
-	
-	trigger = {
-		has_dlc = "Rajas of India"
-		trait = sympathy_indian
-		any_realm_character = {
-			religion_group = indian_group
-			NOT = { is_friend = ROOT }
-		}
-	}
-	
-	option = {
-		name = EVTOPTA_RoI_400
-		random_realm_character = {
-			limit = {
-				religion_group = indian_group
-			}
-			add_friend = ROOT
-		}
-	}
-}
-
 # Visit Nalanda University?
 character_event = {
 	id = RoI.401
@@ -4128,11 +3071,7 @@ character_event = {
 		prestige = 100
 		in_command = no
 		capital_scope = {
-			region = world_india
-		}
-		OR = {
-			has_dharmic_religion_trigger = yes
-			trait = sympathy_indian
+			region = southeast_faerun_region
 		}
 		NOT = { has_character_flag = do_not_disturb }
 		NOT = { is_inaccessible_trigger = yes }
