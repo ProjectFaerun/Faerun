@@ -48,7 +48,7 @@ character_event = {
             set_character_flag = duel_action_attack
             character_event = { id = duelengine.4 }
         }
-        ai_chance = { factor = 90 }
+        ai_chance = { factor = 3 }
     }
     option = {
         name = "ACTION_DEFEND"
@@ -71,30 +71,8 @@ character_event = {
         hidden_tooltip = { 
             character_event = { id = duelaction.2 }
         }
-        ai_chance = { factor = 0 }
+        ai_chance = { factor = 0.5 }
     }
-    option = {
-        name = "ACTION_FLEE"
-        trigger = { 
-            check_variable = { which = can_flee value = 1}         
-        }
-        hidden_tooltip = { 
-            set_character_flag = duel_action_flee
-            character_event = { id = duelengine.4 }
-        }
-        ai_chance = { factor = 1 }
-    }  
-    option = {
-        name = "ACTION_FLEE"
-        trigger = { 
-            check_variable = { which = can_flee value = 1}         
-        }
-        hidden_tooltip = { 
-            set_character_flag = duel_action_flee
-            character_event = { id = duelengine.4 }
-        }
-        ai_chance = { factor = 1 }
-    }  
     option = {
         name = "ACTION_FLEE"
         trigger = { 
@@ -1303,23 +1281,8 @@ character_event = {
           event_target:charA = { character_event = { id = duelaction.200 }} # enemy was slain
           break = yes
       }
-
-      # SPECIFIC REPORT 1
-      if = {
-          limit = { 
-              has_character_flag = duel_action_attack 
-              event_target:charB = { has_character_flag = duel_action_attack }
-          }
-          event_target:charA = { character_event = { id = duelaction.102 }}
-          break = yes
-          # trigger symetric fight report pair
-      }
-      # SPECIFIC REPORT 2 ...
-
-
-
       # GENERIC REPORT 
-      event_target:charA = { character_event = { id = duelaction.100 }}
+      event_target:charA = { character_event ={ id = duelaction.100 }}
     }
 }
 
@@ -1344,19 +1307,28 @@ character_event = {
 
 # BOTH ATTACK
 # 1st char
-character_event = {
+long_character_event ={
     id = duelaction.100
+    window = zz_duel_narrative
     desc = "EVTDESC_DUELACTION_100"
     picture = "GFX_evt_duel2"
     border = GFX_event_normal_frame_war
     is_triggered_only = yes
-
+    immediate = { 
+        event_target:charA = { 
+            save_event_target_as = attackloc
+        }
+        event_target:charB = { 
+            save_event_target_as = defendloc
+        }
+    }
     # charB got this event
     option = {
        name = "OK"
        trigger = { NOT = { root = { character = event_target:charA}} }
        log = "Reports were shown to both."
-       event_target:charA = { character_event = { id = duelengine.3 } } # next round
+       event_target:charA = { 
+        character_event = { id = duelengine.3 } } # next round
     }
     # charA got this event
     option = {
@@ -1366,14 +1338,22 @@ character_event = {
     }
 }
 # 2nd char
-character_event = {
+long_character_event = {
     id = duelaction.101
+    window = zz_duel_narrative
     desc = "EVTDESC_DUELACTION_101"
     picture = "GFX_evt_duel2"
     border = GFX_event_normal_frame_war
     is_triggered_only = yes
 
-
+    immediate = { 
+        event_target:charB = { 
+            save_event_target_as = attackloc
+        }
+        event_target:charA = { 
+            save_event_target_as = defendloc
+        }
+    }
     # charB got this event
     option = {
        name = "OK"
@@ -1389,52 +1369,6 @@ character_event = {
     }
 }
 
-# OTHER OPTION
-# 1st char
-character_event = {
-    id = duelaction.102
-    desc = "EVTDESC_DUELACTION_102"
-    picture = "GFX_evt_duel2"
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-
-    # charB got this event
-    option = {
-       name = "OK"
-       trigger = { NOT = { root = { character = event_target:charA}} }
-       log = "Reports were shown to both."
-       event_target:charA = { character_event = { id = duelengine.3 } } # next round
-    }
-    # charA got this event
-    option = {
-       name = "OK"
-       trigger = { root = { character = event_target:charA} }
-       event_target:charB = { character_event = { id = duelaction.103 } }
-    }
-}
-# 2nd char
-character_event = {
-    id = duelaction.103
-    desc = "EVTDESC_DUELACTION_103"
-    picture = "GFX_evt_duel2"
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-
-
-    # charB got this event
-    option = {
-       name = "OK"
-       trigger = { NOT = { root = { character = event_target:charA}} }
-       log = "Reports were shown to both."
-       event_target:charA = { character_event = { id = duelengine.3 } } # next round
-    }
-    # charA got this event
-    option = {
-       name = "OK"
-       trigger = { root = { character = event_target:charA} }
-       event_target:charB = { character_event = { id = duelaction.102 } } # symmetric response
-    }
-}
 
 ########################################################################
 #
