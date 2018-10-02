@@ -1,0 +1,1059 @@
+###########################################
+#
+# Holy Order Events
+#
+# ID SoA 1000-2999 is reserved
+#
+###########################################
+# Written by Henrik Fåhraeus
+###########################################
+
+namespace = SoA
+
+########################################
+# The Hashshashin
+########################################
+
+# The Grand Master demands one of your sons due to debt
+character_event = {
+	id = SoA.1400
+	hide_window = yes
+	
+	min_age = 16
+	only_playable = yes
+	religion = elven_pantheon
+	
+	trigger = {
+		religion = elven_pantheon
+		is_heretic = no
+		has_character_modifier = borrowed_from_assassins
+		NOT = { has_character_flag = sent_son_to_assassins }
+		any_child = {
+			is_female = no
+			is_adult = yes
+			is_ruler = no
+			prisoner = no
+			NOT = { trait = incapable }
+			ROOT = {
+				NOT = { 
+					current_heir = { 
+						character = PREVPREV 
+					}
+				}
+			}
+		}
+		has_dlc = "Sons of Abraham"
+		
+		NOT = { has_character_modifier = expelled_d_victorious_blade }
+		NOT = {
+			any_liege = {
+				has_character_modifier = expelled_d_victorious_blade
+			}
+		}
+	}
+	
+	mean_time_to_happen = {
+		months = 120
+	}
+	
+	immediate = {
+		random_child = {
+			limit = {
+				is_female = no
+				is_adult = yes
+				is_ruler = no
+				prisoner = no
+				NOT = { trait = incapable }
+				ROOT = {
+					NOT = { 
+						current_heir = { 
+							character = PREVPREV 
+						}
+					}
+				}
+			}
+			character_event = {
+				id = SoA.1401
+			}
+		}
+	}
+}
+
+character_event = {
+	id = SoA.1401
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		d_victorious_blade = {
+			holder_scope = {
+				character_event = {
+					id = SoA.1402
+				}
+			}
+		}
+	}
+}
+
+character_event = {
+	id = SoA.1402
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			letter_event = {
+				id = SoA.1403
+			}
+		}
+	}
+}
+
+letter_event = {
+	id = SoA.1403
+	desc = EVTDESC_SOA_1203
+	border = GFX_event_letter_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_SOA_1403 # Agree
+		
+		set_character_flag = sent_son_to_assassins
+		
+		piety = 100
+		
+		d_victorious_blade = {
+			holder_scope = {
+				FROMFROM = {
+					move_character = PREV
+					hidden_tooltip = {
+						clear_wealth = PREV
+						add_trait = disinherited
+					}
+					end_inaccessibility_effect = yes #removes in_hiding or in_seclusion
+				}
+			}
+		}
+		ai_chance = {
+			factor = 10
+		}
+	}
+	
+	option = {
+		name = EVTOPTB_SOA_1003 # Pay them back
+		wealth = -300
+		hidden_tooltip = {
+			remove_character_modifier = borrowed_from_assassins
+		}
+		FROM = {
+			wealth = 300
+		}
+
+		ai_chance = {
+			factor = 5
+			modifier = {
+				factor = 0
+				NOT = { wealth = 300 }
+			}
+		}
+	}
+	
+	option = {
+		name = EVTOPTC_SOA_1003 # Refuse
+
+		if = {
+			limit = { NOT = { has_dlc = "Mystics" } }
+			piety = -1000
+		}
+		if = {
+			limit = { has_dlc = "Mystics" }
+			piety = -200
+			set_character_flag = assassins_refused_to_pay_debt
+		}
+
+		ai_chance = {
+			factor = 3
+			modifier = {
+				factor = 2
+				NOT = { wealth = 300 }
+			}
+			modifier = {
+				factor = 2
+				trait = greedy
+			}
+			modifier = {
+				factor = 2
+				is_impious_trigger = yes
+			}
+			modifier = {
+				factor = 0
+				NOT = { has_dlc = "Mystics" }
+			}
+		}
+	}
+}
+
+# Ping event when borrowing money from the Hashshashins
+character_event = {
+	id = SoA.1410
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		wealth = -300
+		FROM = {
+			letter_event = {
+				id = SoA.1411
+			}
+		}
+	}
+}
+
+# Notification event when borrowing money from the Hashshashins
+letter_event = {
+	id = SoA.1411
+	desc = EVTDESC_SOA_1411
+	border = GFX_event_letter_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+	
+		name = EXCELLENT
+	}
+}
+
+# The Grand Master demands the right to build a castle in your demesne
+character_event = {
+	id = SoA.1420
+	hide_window = yes
+	
+	min_age = 16
+	only_playable = yes
+	religion = elven_pantheon
+	
+	trigger = {
+		religion = elven_pantheon
+		is_heretic = no
+		
+		has_character_modifier = borrowed_from_assassins
+		NOT = { has_character_flag = sent_son_to_assassins }
+		
+		any_demesne_province = {
+			has_empty_holding = yes
+		}
+		
+		d_victorious_blade = {
+			holder_scope = {
+				wealth = 300
+			}
+		}
+		has_dlc = "Sons of Abraham"
+		
+		NOT = { has_character_modifier = expelled_d_victorious_blade }
+		NOT = {
+			any_liege = {
+				has_character_modifier = expelled_d_victorious_blade
+			}
+		}
+	}
+	
+	mean_time_to_happen = {
+		months = 60
+	}
+	
+	immediate = {
+		random_demesne_province = {
+			limit = {
+				has_empty_holding = yes
+			}
+			province_event = {
+				id = SoA.1421
+			}
+		}
+	}
+}
+
+province_event = {
+	id = SoA.1421
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		d_victorious_blade = {
+			holder_scope = {
+				character_event = {
+					id = SoA.1422
+				}
+			}
+		}
+	}
+}
+
+character_event = {
+	id = SoA.1422
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			letter_event = {
+				id = SoA.1423
+			}
+		}
+	}
+}
+
+letter_event = {
+	id = SoA.1423
+	desc = EVTDESC_SOA_1223
+	border = GFX_event_letter_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_SOA_1023 # Agree
+		
+		hidden_tooltip = {
+			remove_character_modifier = borrowed_from_assassins
+			FROMFROM = {
+				province_event = { id = SoA.1424 }
+			}
+		}
+		
+		piety = 100
+
+		ai_chance = {
+			factor = 10
+		}
+	}
+	
+	option = {
+		name = EVTOPTB_SOA_1003 # Pay them back
+		wealth = -300
+		hidden_tooltip = {
+			remove_character_modifier = borrowed_from_assassins
+		}
+		FROM = {
+			wealth = 300
+		}
+
+		ai_chance = {
+			factor = 5
+			modifier = {
+				factor = 0
+				NOT = { wealth = 300 }
+			}
+		}	
+	}
+	
+	option = {
+		name = EVTOPTC_SOA_1003 # Refuse
+		
+		if = {
+			limit = { NOT = { has_dlc = "Mystics" } }
+			piety = -1000
+		}
+		if = {
+			limit = { has_dlc = "Mystics" }
+			piety = -200
+			set_character_flag = assassins_refused_to_pay_debt
+		}
+
+		ai_chance = {
+			factor = 3
+			modifier = {
+				factor = 2
+				NOT = { wealth = 300 }
+			}
+			modifier = {
+				factor = 2
+				trait = greedy
+			}
+			modifier = {
+				factor = 2
+				is_impious_trigger = yes
+			}
+			modifier = {
+				factor = 0
+				NOT = { has_dlc = "Mystics" }
+			}
+		}
+	}
+}
+
+# Castle has been erected
+province_event = {
+	id = SoA.1424
+	desc = EVTDESC_SOA_1424
+	picture = GFX_evt_castle_construction
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			wealth = -300
+		}
+	}
+	
+	option = {
+		name = EVTOPTA_SOA_1024
+		build_holding = {
+		   type = castle
+		   holder = FROMFROM
+		}
+	}
+}
+
+# The son of a ruler volunteers to join the Hashshashins
+character_event = {
+	id = SoA.1430
+	hide_window = yes
+	
+	only_men = yes
+	min_age = 16
+	max_age = 45
+	only_capable = yes
+	prisoner = no
+	religion = elven_pantheon
+	
+	trigger = {
+		religion = elven_pantheon
+		is_heretic = no
+		
+		is_ruler = no
+		
+		martial = 5
+		
+		is_title_active = d_victorious_blade
+		
+		OR = {
+			father_even_if_dead = {
+				primary_title = { higher_tier_than = BARON }
+			}
+			mother_even_if_dead = {
+				primary_title = { higher_tier_than = BARON }
+			}
+		}
+		
+		liege = {
+			holy_order = no
+			liege = {
+				holy_order = no
+			}
+		}
+		
+		has_dlc = "Sons of Abraham"
+		
+		NOT = { has_character_modifier = expelled_d_victorious_blade }
+		NOT = {
+			any_liege = {
+				has_character_modifier = expelled_d_victorious_blade
+			}
+		}
+
+		NOT = {
+			any_spouse = {
+				OR = {
+					is_landed = yes
+					AND = {
+						is_pregnant = yes
+					father_of_unborn = { character = ROOT } # Won't happen if spouse is pregnant with non-bastard child
+					}
+				}
+			}
+		}
+	}
+	
+	mean_time_to_happen = {
+		years = 100
+		modifier = {
+			factor = 0.25
+			trait = zealous
+		}
+		modifier = {
+			factor = 0.5
+			trait = celibate
+		}
+		modifier = {
+			factor = 0.5
+			trait = homosexual
+		}
+		modifier = {
+			factor = 0.7
+			trait = content
+		}
+		modifier = {
+			factor = 0.75
+			trait = chaste
+		}
+		modifier = {
+			factor = 0.75
+			NOT = { age = 25 }
+		}
+		modifier = {
+			factor = 1.5
+			trait = slothful
+		}
+		modifier = {
+			factor = 2.0
+			trait = lustful
+		}
+		modifier = {
+			factor = 2.0
+			trait = cynical
+		}
+		modifier = {
+			factor = 2.0
+			trait = hedonist
+		}
+		modifier = {
+			factor = 2.0
+			trait = ambitious
+		}
+		modifier = {
+			factor = 2.0
+			any_heir_title = {
+				always = yes
+			}
+		}
+		modifier = {
+			factor = 2.0
+			is_primary_heir = yes
+		}
+		modifier = {
+			factor = 2
+			any_spouse = {
+				reverse_opinion = { who = ROOT value = 100 }
+			}
+		}
+	}
+	
+	immediate = {
+		liege = {
+			character_event = {
+				id = SoA.1431
+			}
+		}
+	}
+}
+
+# Son or brother asks to join the Hashshashins
+character_event = {
+	id = SoA.1431
+	desc = EVTDESC_SOA_1431
+	picture = GFX_evt_moors
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_SOA_1031 # Agree
+		ai_chance = {
+			factor = 100
+		}
+		
+		if = {
+			limit = {
+				religion = FROM
+			}
+			piety = 100
+		}
+		
+		FROM = {
+			character_event = {
+				id = SoA.1432
+				tooltip = EVTTOOLTIP_SOA_1432
+			}
+		}
+	}
+	
+	option = {
+		name = EVTOPTB_SOA_1031 # Refuse
+		
+		if = {
+			limit = {
+				religion = FROM
+			}
+			piety = -100
+		}
+		
+		FROM = {
+			character_event = {
+				id = SoA.1433
+				tooltip = EVTTOOLTIP_SOA_1033
+			}
+		}
+	}
+}
+
+# Son or brother joins the Hashshashins
+character_event = {
+	id = SoA.1432
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		d_victorious_blade = {
+			holder_scope = {
+				save_event_target_as = order_target
+				ROOT = {
+					character_event = { id = SoA.2864 }
+				}
+			}
+		}
+	}
+}
+
+# Liege refuses request to join the Hashshashins
+character_event = {
+	id = SoA.1433
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		opinion = {
+			who = FROM
+			modifier = opinion_refused_request_holy_order
+		}
+	}
+}
+
+# The Grand Master requests the right to build a castle in your demesne
+character_event = {
+	id = SoA.1450
+	hide_window = yes
+	
+	min_age = 16
+	only_playable = yes
+	religion = elven_pantheon
+	
+	trigger = {
+		religion = elven_pantheon
+		is_heretic = no
+		
+		d_victorious_blade = {
+			holder_scope = {
+				wealth = 300
+				NOT = {
+					realm_size = 10
+				}
+				NOT = {
+					num_of_count_titles = 1
+				}
+			}
+		}
+		
+		any_demesne_province = {
+			has_empty_holding = yes
+			port = yes
+		}
+		
+		has_dlc = "Sons of Abraham"
+		
+		NOT = { has_character_modifier = expelled_d_victorious_blade }
+		NOT = {
+			any_liege = {
+				has_character_modifier = expelled_d_victorious_blade
+			}
+		}
+	}
+	
+	mean_time_to_happen = {
+		months = 240
+		modifier = {
+			factor = 0.5
+			d_victorious_blade = {
+				holder_scope = {
+					NOT = { demesne_size = 1 }
+				}
+			}
+		}
+		modifier = {
+			factor = 0.5
+			d_victorious_blade = {
+				holder_scope = {
+					NOT = { demesne_size = 2 }
+				}
+			}
+		}
+		modifier = {
+			factor = 2.0
+			d_victorious_blade = {
+				holder_scope = {
+					realm_size = 5
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		random_demesne_province = {
+			limit = {
+				has_empty_holding = yes
+				port = yes
+			}
+			province_event = {
+				id = SoA.1451
+			}
+		}
+	}
+}
+
+province_event = {
+	id = SoA.1451
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		d_victorious_blade = {
+			holder_scope = {
+				character_event = {
+					id = SoA.1452
+				}
+			}
+		}
+	}
+}
+
+character_event = {
+	id = SoA.1452
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			letter_event = {
+				id = SoA.1453
+			}
+		}
+	}
+}
+
+letter_event = {
+	id = SoA.1453
+	desc = EVTDESC_SOA_1253 # Reuse this
+	border = GFX_event_letter_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_SOA_1023 # Agree
+		ai_chance = {
+			factor = 100
+			modifier = {
+				factor = 0
+				has_character_modifier = expelled_d_victorious_blade
+			}
+		}
+		
+		hidden_tooltip = {
+			FROMFROM = {
+				province_event = { id = SoA.1454 }
+			}
+			remove_character_modifier = expelled_d_victorious_blade
+		}
+		
+		piety = 200
+		wealth = 100
+	}
+	
+	option = {
+		name = EVTOPTB_SOA_1031 # Refuse
+		ai_chance = {
+			factor = 20
+		}
+		
+		piety = -100
+	}
+}
+
+# Castle has been erected
+province_event = {
+	id = SoA.1454
+	desc = EVTDESC_SOA_1454
+	picture = GFX_evt_moors
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROMFROM = {
+			wealth = -300
+		}
+	}
+	
+	option = {
+		name = EVTOPTA_SOA_1024
+		build_holding = {
+		   type = castle
+		   holder = FROMFROM
+		}
+	}
+}
+
+
+# Ping event when expelling a Muslim Holy Order
+character_event = {
+	id = SoA.1460
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		any_title_under = {
+			limit = {
+				tier = BARON
+				location = {
+					owner = {
+						OR = {
+							character = FROM
+							is_liege_or_above = FROM
+						}
+					}
+				}
+			}
+			usurp_title = FROM
+		}
+		
+		if = {
+			limit = {
+				is_liege_or_above = FROM
+			}
+			set_defacto_liege = THIS
+		}
+	
+		FROM = {
+			letter_event = {
+				id = SoA.1461
+			}
+		}
+		
+		opinion = {
+			who = FROM
+			modifier = opinion_expelled_from_realm
+		}
+	}
+}
+
+# Notification event when expelling a Muslim Holy Order
+letter_event = {
+	id = SoA.1461
+	desc = EVTDESC_SOA_1461
+	border = GFX_event_letter_frame_religion
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		remove_character_modifier = donated_to_holy_order
+	}
+	
+	option = {
+		name = EVTOPTB_SOA_1061
+	}
+}
+
+# Spouse notified of divorce due to husband going off to join holy order
+character_event = {
+	id = SoA.2862
+	desc = EVTDESC_SoA_2862
+	picture = GFX_evt_melee
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	
+	option = {
+		name = ALAS
+		trigger = {
+			opinion = { who = FROMFROMFROM value = 0 }
+		}
+		tooltip = { remove_spouse = FROMFROMFROM }
+	}
+	option = {
+		name = GOOD_RIDDANCE
+		trigger = {
+			NOT = { opinion = { who = FROMFROMFROM value = 0 } }
+		}
+		tooltip = { remove_spouse = FROMFROMFROM }
+	}
+}
+
+# Spouse notified of character joining holy order
+character_event = {
+	id = SoA.2863
+	desc = EVTDESC_SoA_2863
+	picture = GFX_evt_melee
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	
+	option = {
+		name = ALAS
+		trigger = {
+			opinion = { who = FROM value = 0 }
+		}
+		tooltip = { remove_spouse = FROM }
+	}
+	option = {
+		name = GOOD_RIDDANCE
+		trigger = {
+			NOT = { opinion = { who = FROM value = 0 } }
+		}
+		tooltip = { remove_spouse = FROM }
+	}
+}
+
+# Character joining holy order effects
+character_event = {
+	id = SoA.2864
+	hide_window = yes
+
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				has_minor_title = title_commander
+			}
+			remove_title = title_commander
+		}
+		if = {
+			limit = {
+				has_minor_title = title_appointed_regent
+			}
+			remove_title = title_appointed_regent
+		}
+		if = {
+			limit = {
+				has_minor_title = title_patrician_heir
+			}
+			remove_title = title_patrician_heir
+		}
+		clear_wealth = event_target:order_target
+		spouse = {
+			remove_spouse = spouse
+			character_event = { id = SoA.2863 }
+		}
+		move_character = event_target:order_target
+		add_trait = celibate
+		end_inaccessibility_effect = yes #removes in_hiding or in_seclusion
+	}
+}
+
+# Expelling a Holy Order confirmation event
+character_event = {
+	id = SoA.2990
+	desc = "EVTDESC_SOA_2990"
+	picture = "GFX_evt_crusaders"
+	border = "GFX_event_normal_frame_religion"
+	
+	# desc = {
+		# trigger = {
+			# religion_group = christian
+		# }
+		# text = EVTDESC_SOA_2990
+		# picture = "GFX_evt_crusaders"
+	# }
+	desc = {
+		trigger = {
+			# OR = {
+				# religion_group = muslim
+				# religion_group = zoroastrian_group
+			# }
+			religion = elven_pantheon
+		}
+		text = EVTDESC_SOA_2990
+		picture = "GFX_evt_moors"
+	}
+	# desc = {
+		# trigger = {
+			# religion_group = pagan_group
+			# NOR = {
+				# religion = aztec
+				# religion = aztec_reformed
+			# }
+		# }
+		# text = EVTDESC_SOA_2990
+		# picture = "GFX_evt_vikings_arriving_oldgods"
+	# }
+	# desc = {
+		# trigger = {
+			# OR = {
+				# religion = aztec
+				# religion = aztec_reformed
+			# }
+		# }
+		# text = EVTDESC_SOA_2990
+		# picture = "GFX_evt_battle_mesoamerican"
+	# }
+	# desc = {
+		# trigger = {
+			# religion_group = jewish_group
+		# }
+		# text = EVTDESC_SOA_2990
+		# picture = "GFX_evt_synagogue"
+	# }
+	
+	title = { # Hashshashin
+		trigger = {
+			has_character_flag = expel_the_assassins_check
+		}
+		text = expel_the_assassins
+	}
+	
+	only_rulers = yes
+	
+	is_triggered_only = yes
+	
+	option = { # Hashshashin
+		trigger = {
+			has_character_flag = expel_the_assassins_check
+		}
+		name = "EVTOPTA_SOA_2990"
+		piety = -1000
+		
+		religion_authority = {
+			modifier = holy_order_expelled
+			years = 20
+		}
+		custom_tooltip = {
+			text = expelling_holy_order_event_tooltip_a
+		}
+		hidden_tooltip = {
+			d_victorious_blade = {
+				holder_scope = {
+					character_event = {
+						id = SoA.1460
+					}
+				}
+			}
+			
+			add_character_modifier = {
+				name = expelled_d_victorious_blade
+				duration = -1
+				inherit = yes
+			}
+			clr_character_flag = expel_the_assassins_check
+		}
+	}
+	option = { # Allow them to stay
+		name = "EVTOPTB_SOA_2990"
+		custom_tooltip = {
+			text = expelling_holy_order_event_tooltip_b
+		}
+		hidden_tooltip = {
+			clr_character_flag = expel_the_assassins_check
+		}
+	}
+}

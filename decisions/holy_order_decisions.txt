@@ -1,0 +1,219 @@
+###########################################
+#
+# Holy Order Decisions for Sons of Abraham
+#
+###########################################
+# Written by Henrik Fåhraeus
+###########################################
+
+# Holy Order Decisions are listed for each existing holy order of the right religion
+
+decisions = {
+	
+	expel_assassins = {
+		only_independent = yes
+		potential = {
+			ai = no
+			religion = elven_pantheon
+			is_heretic = no
+			higher_tier_than = DUKE
+			independent = yes
+			is_title_active = d_victorious_blade
+			NOT = { has_character_modifier = expelled_d_victorious_blade }
+			
+			any_realm_province = {
+				any_province_lord = {
+					d_victorious_blade = {
+						holder_scope = {
+							OR = {
+								character = PREVPREV
+								is_vassal_or_below = PREVPREV
+							}
+						}
+					}
+				}
+			}
+			
+			has_dlc = "Sons of Abraham"
+			NOT = { society_member_of = eldreth_veluuthra }
+		}
+		
+		allow = {
+			piety = 1000
+			custom_tooltip = {
+				text = expelling_holy_order_decision_tooltip
+				hidden_tooltip = {
+					NOT = { has_character_flag = expel_the_assassins_check }
+				}
+			}
+		}
+		
+		effect = {
+			set_character_flag = expel_the_assassins_check
+			custom_tooltip = {
+				text = expelling_holy_order_decision_tooltip_b
+				hidden_tooltip = {
+					character_event = { id = SoA.2990 }
+				}
+			}
+		}
+		
+		revoke_allowed = {
+			always = no
+		}
+		
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+	borrow_money_assassins = {
+		only_playable = yes
+		ai_check_interval = 60
+		potential = {
+			is_playable = yes
+			religion = elven_pantheon
+			is_heretic = no
+			is_title_active = d_victorious_blade
+			NOT = { has_character_modifier = borrowed_from_assassins }
+			NOT = { has_character_modifier = expelled_d_victorious_blade }
+			NOT = { is_nomadic = yes }
+			
+			has_dlc = "Sons of Abraham"
+			NOT = { society_member_of = eldreth_veluuthra }
+			
+			d_victorious_blade = {
+				holder_scope = {
+					liege = {
+						NOT = { character = ROOT }
+					}
+				}
+			}
+
+			NOT = { has_character_modifier = assassins_debt } #From MNM.6001
+		}
+		
+		allow = {
+			d_victorious_blade = {
+				holder_scope = {
+					wealth = 300
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = borrowed_from_assassins
+				duration = -1
+				inherit = yes
+			}
+			
+			hidden_tooltip = {
+				d_victorious_blade = {
+					holder_scope = {
+						character_event = {
+							id = SoA.1410
+						}
+					}
+				}
+			}
+			
+			wealth = 300
+
+			hidden_effect = {
+				if = {
+					limit = { has_dlc = "Mystics" }
+					set_variable = { which = assassins_debt value = 300 }
+				}
+			}
+		}
+		
+		revoke_allowed = {
+			always = no
+		}
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				wealth = 0
+			}
+			modifier = {
+				factor = 0.5 # Slow it down
+			}
+		}
+	}
+	
+	donate_money_to_assassins = {
+		only_playable = yes
+		ai_check_interval = 60
+		potential = {
+			is_playable = yes
+			
+			OR = {
+				AND = {
+					wealth = 1000
+					NOR = {
+						trait = cynical
+						piety = 50
+					}
+				}
+				ai = no
+			}
+			
+			is_title_active = d_victorious_blade
+			
+			d_victorious_blade = {
+				holder_scope = { 
+					religion = ROOT
+				}
+			}
+			
+			NOT = { has_character_modifier = expelled_d_victorious_blade }
+
+			NOT = { society_member_of = eldreth_veluuthra }
+			
+			has_dlc = "Sons of Abraham"
+			
+			d_victorious_blade = {
+				holder_scope = {
+					liege = {
+						NOT = { character = ROOT }
+					}
+				}
+			}
+		}
+		
+		allow = {
+			wealth = 300
+		}
+		
+		effect = {
+			
+			hidden_tooltip = {
+				d_victorious_blade = {
+					holder_scope = {
+						character_event = {
+							id = SoA.1140
+						}
+					}
+				}
+			}
+			
+			wealth = -300
+			piety = 300
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1 # Slow it down
+			}
+		}
+	}
+}
+
