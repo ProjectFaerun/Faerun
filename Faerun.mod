@@ -1,6 +1,7 @@
 name = "Faerun"
 path = "mod/Faerun/Faerun"
 user_dir = "Faerun"
+replace_path = "common/alternate_start"
 replace_path = "common/artifact_spawns"
 replace_path = "common/artifacts"
 replace_path = "common/bookmarks"
