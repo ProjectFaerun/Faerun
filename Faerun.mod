@@ -1,5 +1,5 @@
 name = "Faerun"
-path = "mod/Faerun/Faerun"
+path = "mod/Faerun"
 user_dir = "Faerun"
 replace_path = "common/alternate_start"
 replace_path = "common/artifact_spawns"
