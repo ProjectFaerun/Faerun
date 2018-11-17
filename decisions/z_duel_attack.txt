@@ -1,166 +1,155 @@
 targetted_decisions = {
 	duel_attack_decision = {
-		only_playable = yes
-		is_high_prio = yes
+	    only_playable = yes
+	    is_high_prio = yes
+	    diplomacy_icon = GFX_duel_decision
+	    
+	    #ai_target_filter = rivals
+		ai_check_interval = 10
+	    
+	    from_potential = {
+	        is_playable = yes
+	        is_adult = yes
+	        prisoner = no
+	        ai = no
+	        has_regent = no
+	        is_inaccessible_trigger = no
+	    }
+	    
+	    potential = {
+	    	OR = {
+		    	AND = { #Either you are adult, as well as your target...
+		        	is_adult = yes
+		    		FROM = { is_adult = yes }
+		    	}
+		    	AND = { #Or you are both children! WEIRD!
+		        	is_adult = no
+		    		FROM = { is_adult = no }
+		    	}
+	    	}
 
-		#filter = rivals
-		ai_target_filter = rivals
+	        prisoner = no
+	        NOT = { character = FROM }
+	        is_inaccessible_trigger = no
+	    }
+	    
+	    allow = {
 
-		from_potential = {
-			is_playable = yes
-			is_adult = yes
-			prisoner = no
-			has_dlc = "Way of Life"
-			zz_class = yes
-			OR = {
-				ai = no
-				AND = {
-					is_female = no
-					NOT = { trait = craven }
-					NOT = { trait = content }
-				}
-			}
-		}
-
-		potential = {
-			is_adult = yes
-			prisoner = no
-			NOT = { character = FROM }
-		}
-
-		allow = {
-			custom_tooltip = {
-				text = duel_tooltip_busy
-				hidden_tooltip = {
-					FROM = {
-						NOT = { has_character_flag = do_not_disturb }
-						NOT = { war = yes }
+            #Both are healthy
+            custom_tooltip = {
+                text = duel_tooltip_sickness
+                FROM = {
+                	NOR = { #Not in sickly in bed, but sick if well treated is okay
+                		has_character_modifier = bedridden_illness
+                		has_character_modifier = severe_illness
+						trait = incapable
 					}
-					NOT = { has_character_flag = do_not_disturb }
-					NOT = { war = yes }
-				}
-			}
-			custom_tooltip = {
-				text = duel_tooltip_valid_target
-				hidden_tooltip = {
-					is_priest = no
-				}
-			}
-			ROOT = {
-				custom_tooltip = {
-					text = duel_tooltip_sickness
-					hidden_tooltip = {
-						NOT = {
+                }
+                ROOT = {
+                    NOR = { #Not in sickly in bed, but sick if well treated is okay
+                		has_character_modifier = bedridden_illness
+                		has_character_modifier = severe_illness
+						trait = incapable
+                    }
+                }
+            }
+            
+            custom_tooltip = {
+            	text = duel_tooltip_pregnant
+                FROM = { is_pregnant = no }
+                ROOT = { is_pregnant = no }
+            }
+
+	                #Checks gender and some religious stuff... (turned this into apply_any_applicable_harsh_penalties_effect instead)
+
+	        ####### You won't want to fight someone who is badly injured, and if you are hurt yourself, you will want to wait...
+
+	        #############################################################################
+
+	        custom_tooltip = {
+	            #text = duel_tooltip_busy
+	            text = duel_tooltip_no_war
+	            hidden_tooltip = {
+	                FROM = {
+	                    #NOT = { has_character_flag = do_not_disturb }
+	                    NOT = { war = yes }
+	                }
+	                #NOT = { has_character_flag = do_not_disturb }
+	                NOT = { war = yes }
+	            }
+	        }
+	        trigger_if = { #If you do not have this as your mission target, you need to be within diplo-range...
+	        	limit = {
+	        		NOT = {
+						any_quester_targeting_this = { #FROM must have this as a quest target
+							character = FROM
 							OR = {
-								trait = incapable
-								trait = infirm
-								trait = has_aztec_disease
-								trait = has_small_pox
-								trait = has_measles
-								trait = has_bubonic_plague
-								trait = has_typhus
-								trait = has_typhoid_fever
-								trait = has_tuberculosis
-								trait = leper
-								trait = pneumonic
+								has_quest = quest_warrior_lodge_duel_honor
+								has_quest = quest_warrior_lodge_duel_deadly
 							}
 						}
 					}
-				}
-			}
-			FROM = {
-				custom_tooltip = {
-					text = duel_tooltip_sickness
-					hidden_tooltip = {
-						NOT = {
+	        	}
+	        	is_within_diplo_range = FROM # CPU HEAVY!
+	        }
+	        trigger_if = { #If you *do* have this as your mission target, it's fine regardless of range..
+	        	limit = {
+					any_quester_targeting_this = {
+						character = FROM
+						OR = {
+							has_quest = quest_warrior_lodge_duel_honor
+							has_quest = quest_warrior_lodge_duel_deadly
+						}
+					}
+	        	}
+	        	OR = {
+	        		is_within_diplo_range = FROM
+	        		custom_tooltip = {
+						text = quest_target_tt
+						any_quester_targeting_this = { #FROM must have this as a quest target
+							character = FROM
 							OR = {
-								trait = incapable
-								trait = infirm
-								trait = has_aztec_disease
-								trait = has_small_pox
-								trait = has_measles
-								trait = has_bubonic_plague
-								trait = has_typhus
-								trait = has_typhoid_fever
-								trait = has_tuberculosis
-								trait = leper
-								trait = pneumonic
+								has_quest = quest_warrior_lodge_duel_honor
+								has_quest = quest_warrior_lodge_duel_deadly
 							}
 						}
 					}
-				}
-			}
-			is_within_diplo_range = ROOT # CPU HEAVY!
-		}
-		
-		effect = {
-			if = { 
-				limit = {
-					OR = {
-						OR = { 
-							age = 50
-							not = { 
-								trait = immortal
-							}
-						}
-						trait = wounded
-						is_maimed_trigger = yes
-					}
-				}
-				custom_tooltip = { 
-					text = dishonorable_duel_tooltip
-					hidden_tooltip = {
-						FROM = {
-							any_realm_character = {
-								limit = {
-									NOT = { character = FROM }
-									OR = {
-										trait = honest
-										trait = kind
-										trait = just
-									}
-								}
-								opinion = {
-									modifier = opinion_dishonorable_duel
-									who = FROM
-									months = 36
-								}
-							}
-						}
-					}
-				}
-			}
-			FROM = {
-				if = {
-					limit = { religion = shallyan }
-					piety = -20
-					custom_tooltip = { text = jain_ahimsa_tooltip }
-				}
-			}
-			save_event_target_as = duelist_a
-			set_character_flag = duel
-			hidden_tooltip = {
-				FROM = {
-					save_event_target_as = duelist_b
-					set_character_flag = duel
-					hidden_tooltip = { character_event = { id = duelengine.1 } }
-				}
-			}
-		}
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0
-				has_character_modifier = declined_prestige_duel_timer
-			}
-			modifier = {
-				factor = 0.01
-			}
-		}
-	}		
-}	
+	        	}
+	        }
+	    }
+	    
+	    effect = {
+	    	#REQUIRED event targets for setting up duel evaluation!
+	    	FROM = { save_event_target_as = combatant_1 } #the person issuing the duel...
+	    	save_event_target_as = combatant_2 #the target of the duel...
 
-
-
-
-
+	    	apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
+	    	apply_any_applicable_harsh_penalties_effect = yes #if your target is someone 
+	        
+	        FROM = {
+	            pacifists_lose_piety_effect = yes
+	        }
+	        hidden_tooltip = {
+	            character_event = { id = HFP.10095 } #Duel evaluation (hidden) + result event as follow-up.
+	        }
+	    }
+	    
+	    revoke_allowed = {
+	        always = no
+	    }
+	    ai_will_do = {
+	        factor = 1
+	        modifier = {
+	            factor = 0
+	            has_character_modifier = declined_prestige_duel_timer #if the target has already declined a duel, AI's won't attempt to duel them while the timer is still
+	        }
+	        modifier = {
+	            factor = 0.1
+	        }
+	        modifier = {
+	            factor = 1.5
+	        	FROM = { potentially_interested_in_rivaling_root_trigger = yes }
+	        }
+	    }
+	}
+	}
