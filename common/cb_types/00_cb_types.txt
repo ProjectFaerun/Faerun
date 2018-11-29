@@ -41,10 +41,19 @@ claim = {
 
 	infamy_modifier = 0.85
 	
+	sort_priority = 1000
 	can_use_title = {
 		OR = {
 			ROOT = { is_female = no }
-			NOT = { ROOT = { OR = { religion = calishite_faith religion = muhjari } } }
+			AND = { 
+				NOT = { ROOT = { religion = calishite_faith } }
+				NOT = { ROOT = { religion = muhjari } }
+				NOT = { ROOT = { has_religion_feature = religion_patriarchal } } 
+			}
+		}
+		OR = {
+			ROOT = { is_female = yes }
+			NOT = { ROOT = { has_religion_feature = religion_matriarchal } } 
 		}
 		OR = {
 			FROM = {
@@ -77,14 +86,27 @@ claim = {
 					is_pretender = yes # Checks vs ROOT character
 					holder_scope = { has_regent = yes }
 					AND = {
-						ROOT = { OR = { is_female = no has_law = status_of_women_4 } }
-						holder_scope = { 
-							is_female = yes 
-							NOR = { 
-								has_law = status_of_women_4 
-								has_game_rule = { name = gender value = all } 
+						ROOT = { 
+							OR = { 
+								is_female = no 
+								has_law = status_of_women_4
+								has_religion_feature = religion_matriarchal
+								has_religion_feature = religion_equal
+								has_religion_feature = religion_feature_bon
 							} 
-						} 
+						}
+						holder_scope = { 
+							AND = { 
+								is_female = yes 
+								NOR = { 
+									has_religion_feature = religion_matriarchal
+									has_religion_feature = religion_equal
+									has_religion_feature = religion_feature_bon
+									has_law = status_of_women_4 
+									has_game_rule = { name = gender value = all } 
+								} 
+							} 
+						}
 					}
 					is_contested = yes # Is already being contested in some form of Claim or Succession War
 				}
@@ -105,6 +127,7 @@ claim = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -115,7 +138,6 @@ claim = {
 	}
 
 	on_success_title = {
-	
 		hidden_tooltip = {
 			ROOT = {
 				clr_character_flag = claimant_adventurer
@@ -143,6 +165,7 @@ claim = {
 		}
 		
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -151,12 +174,14 @@ claim = {
 		}
 		
 		FROM = {
+			show_scope_change = no
 			prestige = -100
 		}
 	}
 
 	on_fail_title = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 			hidden_tooltip = {
 				disband_event_forces = yes
@@ -164,6 +189,7 @@ claim = {
 			}
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
@@ -174,6 +200,7 @@ claim = {
 
 	on_reverse_demand = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -150
 			transfer_scaled_wealth = {
 				to = FROM
@@ -187,6 +214,7 @@ claim = {
 			ROOT = { imprison = FROM }
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 150
 		}
 		any_defender = {
@@ -224,9 +252,10 @@ claim = {
 	}
 
 	on_reverse_demand_title = {
-		any_claim = {
-			remove_claim = ROOT
-		}
+		#any_claim = { #Does not work.
+			#remove_claim = ROOT
+		#}
+		ROOT = { show_scope_change = no remove_claim = PREV }
 		ROOT = {
 			hidden_tooltip = {
 				disband_event_forces = yes
@@ -294,6 +323,8 @@ other_claim = {
 	allowed_to_target_tributaries = no
 
 	infamy_modifier = 0.5
+	
+	sort_priority = 900
 
 	can_use = {
 		ROOT = {
@@ -305,8 +336,17 @@ other_claim = {
 		OR = {
 			ROOT = { is_female = no }
 			AND = {
-				NOT = { ROOT = { OR = { religion = calishite_faith religion = muhjari } } }
+				NOT = { ROOT = { religion = calishite_faith } }
+				NOT = { ROOT = { religion = muhjari } }
+				NOT = { ROOT = { has_religion_feature = religion_patriarchal } }
 				NOT = { succ_law_title = { has_law = agnatic_succession } }
+			}
+		}
+		OR = {
+			ROOT = { is_female = yes }
+			AND = {
+				NOT = { ROOT = { has_religion_feature = religion_matriarchal } }
+				NOT = { succ_law_title = { has_law = enatic_succession } }
 			}
 		}
 		OR = {
@@ -347,14 +387,8 @@ other_claim = {
 					is_pretender = yes # Checks vs ROOT character
 					holder_scope = { has_regent = yes }
 					AND = {
-						ROOT = { OR = { is_female = no has_law = status_of_women_4 } }
-						holder_scope = { 
-							is_female = yes 
-							NOR = { 
-								has_law = status_of_women_4 
-								has_game_rule = { name = gender value = all } 
-							} 
-						} 
+						ROOT = { OR = { is_female = no  has_law = status_of_women_4 } }
+						holder_scope ={ AND = { is_female = yes NOR = { has_law = status_of_women_4 has_game_rule = { name = gender value = all } } } }
 					}
 					is_contested = yes # Is already being contested in some form of Claim or Succession War
 				}
@@ -391,6 +425,7 @@ other_claim = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -411,6 +446,7 @@ other_claim = {
 			}
 		}
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -418,6 +454,7 @@ other_claim = {
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
 		FROM = {
+			show_scope_change = no
 			prestige = -100
 		}
 	}
@@ -512,7 +549,6 @@ other_claim = {
 						move_character = ROOT 
 					}
 				}
-			
 				# If we were erroneously vassalized, break free
 				if = {
 					limit = {
@@ -609,15 +645,19 @@ other_claim = {
 
 	on_fail_title = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
 		FROM = {
+			show_scope_change = no
 			FROM = {
+				show_scope_change = no
 				prestige = -100
 			}
 		}
 		
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
@@ -633,10 +673,12 @@ other_claim = {
 			value = 4.0
 		}
 		ROOT = {
+			show_scope_change = no
 			prestige = -150
 			imprison = FROM
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 150
 		}
 		any_defender = {
@@ -646,9 +688,7 @@ other_claim = {
 	}
 
 	on_reverse_demand_title = {
-		any_claim = {
-			remove_claim = PREV
-		}
+		ROOT = { show_scope_change = no remove_claim = PREV }
 	}
 
 	attacker_ai_victory_worth = {
@@ -685,6 +725,7 @@ claim_on_liege = {
 
 	infamy_modifier = 0.85
 
+	sort_priority = 910
 	can_use_title = {
 		OR = {
 			FROM = {
@@ -704,13 +745,7 @@ claim_on_liege = {
 					holder_scope = { has_regent = yes }
 					AND = {
 						ROOT = { OR = { is_female = no has_law = status_of_women_4 } }
-						holder_scope = { 
-							is_female = yes 
-							NOR = { 
-								has_law = status_of_women_4 
-								has_game_rule = { name = gender value = all } 
-							} 
-						} 
+						holder_scope ={ AND = { is_female = yes NOR = { has_law = status_of_women_4 has_game_rule = { name = gender value = all } } } }
 					}
 					is_contested = yes # Is already being contested in some form of Claim or Succession War
 				}
@@ -765,6 +800,7 @@ claim_on_liege = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -1025,6 +1061,7 @@ claim_on_liege_plot = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -1219,6 +1256,7 @@ claim_on_vassal_plot = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -1326,7 +1364,8 @@ other_claim_on_liege = {
 	allowed_to_target_tributaries = no
 
 	infamy_modifier = 0.5
-
+	
+	sort_priority = 850
 	can_use_title = {
 		OR = {
 			ROOT = { is_female = no }
@@ -1352,13 +1391,7 @@ other_claim_on_liege = {
 					holder_scope = { has_regent = yes }
 					AND = {
 						ROOT = { OR = { is_female = no has_law = status_of_women_4 } }
-						holder_scope = { 
-							is_female = yes 
-							NOR = { 
-								has_law = status_of_women_4 
-								has_game_rule = { name = gender value = all } 
-							} 
-						} 
+						holder_scope ={ AND = { is_female = yes NOR = { has_law = status_of_women_4 has_game_rule = { name = gender value = all } } } }
 					}
 					is_contested = yes # Is already being contested in some form of Claim or Succession War
 				}
@@ -1420,6 +1453,7 @@ other_claim_on_liege = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -1715,6 +1749,7 @@ claim_all = {
 
 	allowed_to_target_tributaries = no
 
+	sort_priority = 1100
 	can_use = {
 		ROOT = {
 			total_claims = {
@@ -1737,7 +1772,9 @@ claim_all = {
 
 	on_add = {
 		ROOT = {
+			show_scope_change = no
 			any_claim = {
+				show_scope_change = no
 				limit = {
 					holder_scope = {
 						OR = {
@@ -1750,6 +1787,7 @@ claim_all = {
 				press_claim = ROOT
 			}
 		}
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -1761,7 +1799,9 @@ claim_all = {
 
 	on_success = {
 		ROOT = {
+			show_scope_change = no
 			any_claim = {
+				show_scope_change = no
 				limit = {
 					holder_scope = {
 						OR = {
@@ -1814,6 +1854,7 @@ claim_all = {
 			}
 		}
 		ROOT = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_attacker = {
@@ -1824,9 +1865,11 @@ claim_all = {
 
 	on_fail = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -150
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 75
 		}
 		any_defender = {
@@ -1837,12 +1880,14 @@ claim_all = {
 
 	on_reverse_demand = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 4.0
 			}
 			any_claim = {
+				show_scope_change = no
 				limit = {
 					holder_scope = {
 						OR = {
@@ -1852,7 +1897,7 @@ claim_all = {
 					}
 					ROOT = { has_strong_claim = PREV }
 				}
-				remove_claim = ROOT
+				ROOT = { show_scope_change = no remove_claim = PREV }
 			}
 			hidden_effect = {
 				# if = { #Makes China have a chance of leaving Expanionist policy...
@@ -1877,6 +1922,7 @@ claim_all = {
 			}
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 200
 			if = {
 				limit = { 
@@ -1966,6 +2012,7 @@ change_seniority_succession_law = {
 	}
 
 	on_add = {
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {  
@@ -2030,9 +2077,11 @@ change_seniority_succession_law = {
 
 	on_fail = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -100
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 50
 		}
 		any_defender = {
@@ -2055,10 +2104,12 @@ change_seniority_succession_law = {
 
 	on_reverse_demand = {
 		ROOT = {
+			show_scope_change = no
 			prestige = -200
 			prisoner = FROM
 		}
 		FROM = {
+			show_scope_change = no
 			participation_scaled_prestige = 100
 			hidden_tooltip = { 
 				if = { 
