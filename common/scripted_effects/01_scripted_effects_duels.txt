@@ -978,10 +978,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				value = 10
 			}
 			additive_modifier = {
-				duel_result_score_unfathomable_trigger = yes #Score: REALLY outmatched
-				value = 200
-			}
-			additive_modifier = {
 				is_bad_duelist_trigger = yes #Skill: bad
 				value = 20
 			}
@@ -1057,10 +1053,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				value = 10
 			}
 			additive_modifier = {
-				duel_result_score_legendary_trigger = yes #Score: REALLY outmatched
-				value = 200
-			}
-			additive_modifier = {
 				event_target:combatant_2 = { is_bad_duelist_trigger = yes } #Their Skill: bad
 				value = 20
 			}
@@ -1127,10 +1119,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 			additive_modifier = {
 				duel_result_score_the_best_trigger = yes  #Score: you did the best
 				value = 50
-			}
-			additive_modifier = {
-				duel_result_score_legendary_trigger = yes #Score: REALLY outmatched
-				value = 200
 			}
 			additive_modifier = {
 				duel_result_score_high_group_trigger = yes  #Score group: over all good (extra bonus)
@@ -1223,7 +1211,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.501 days = 7}
+					character_event = { id = HFP.501 days = 7}
 				}
 			}
 			
@@ -1261,10 +1249,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				duel_result_score_the_worst_trigger = yes  #Score: you did the worst
 				value = 50
 			}
-			additive_modifier = {
-				duel_result_score_unfathomable_trigger = yes  #Score: you did the worst
-				value = 200
-			}			
 			additive_modifier = {
 				duel_result_score_low_group_trigger = yes  #Score group: outmatched (extra malus)
 				value = 30
@@ -1349,7 +1333,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.502 days = 7}
+					character_event = { id = HFP.502 days = 7}
 				}
 			}
 			
@@ -1403,7 +1387,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.503 days = 7}
+					character_event = { id = HFP.503 days = 7}
 				}
 			}
 			
@@ -1416,6 +1400,10 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				event_target:combatant_2 = { character_event = { id = HF.12203 days = 1 } } #"I ran away and - I lost" event (special edition)
 			}
 			else = {
+				if = { #If this was a Claim Duel (tribals only)...
+					limit = { has_character_flag = claim_duel@event_target:combatant_2 }
+					set_character_flag = use_tribal_victory_pic
+				}
 				character_event = { id = HFP.10107 } #"They ran away - I won!" event
 				event_target:combatant_2 = { character_event = { id = HFP.10108 days = 1 } } #"I ran away and - I lost" event
 			}
@@ -1463,12 +1451,21 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.504 days = 7}
+					character_event = { id = HFP.504 days = 7}
 				}
 			}
 			
+			event_target:combatant_2 = {
+				if = { #If this was a Claim Duel (tribals only)...
+					limit = {
+						event_target:combatant_1 = { has_character_flag = claim_duel@event_target:combatant_2 }
+					}
+					set_character_flag = use_tribal_victory_pic
+				}
+				character_event = { id = HFP.10107 days = 1 } #"They ran away - I won" event
+			}
+			
 			character_event = { id = HFP.10108 } #"I ran away - I lost!" event
-			event_target:combatant_2 = { character_event = { id = HFP.10107 days = 1 } } #"They ran away - I won" event
 		}
 
 		5 = { #Both wounded... (attacker wins?) -- "stalemates"
@@ -1585,7 +1582,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.505 days = 7}
+					character_event = { id = HFP.505 days = 7}
 				}
 			}
 			
@@ -1679,7 +1676,7 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 					set_character_flag = notify_severely_injured
 				}
 				event_target:hero_instigating_duel = {
-					#character_event = { id = HFP.506 days = 7}
+					character_event = { id = HFP.506 days = 7}
 				}
 			}
 			
@@ -1798,9 +1795,19 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 			set_character_flag = actually_injured
 			set_character_flag = injury_kills
 
-			event_target:combatant_2 = {
-				set_character_flag = someone_died
-				character_event = { id = HF.12200 days = 1 } #"I killed the enemy!" event sent to winner...
+			if = { # To avoid this breaking in edge case MPs (where you accidentally got the same target, or they had time to die SOMEHOW...
+				limit = {
+					NOT = { event_target:combatant_2 = { is_alive = yes } }
+				}
+				clean_up_after_duel_effect = yes #Includes the "send_legendary_tombola_effect"
+				clr_XYZ_desc_flag_effect = yes
+			}
+
+			else = { # Most cases: the target definitely still lives...
+				event_target:combatant_2 = {
+					set_character_flag = someone_died
+					character_event = { id = HF.12200 days = 1 } #"I killed the enemy!" event sent to winner...
+				}
 			}
 		}
 
@@ -1825,10 +1832,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 			additive_modifier = {
 				duel_result_score_the_best_trigger = yes #Score: REALLY outmatched
 				value = 30
-			}
-			additive_modifier = {
-				duel_result_score_legendary_trigger = yes #Score: REALLY outmatched
-				value = 75
 			}
 			additive_modifier = {
 				event_target:combatant_2 = { is_bad_duelist_trigger = yes } #Their Skill: bad
@@ -1873,7 +1876,6 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				value = 5
 			}
 			
-			set_character_flag = someone_died
 
 			event_target:combatant_2 = {
 				set_character_flag = someone_died
@@ -1881,7 +1883,19 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 				set_character_flag = injury_kills
 			}
 
-			character_event = { id = HF.12200 } #"I killed the enemy!" event sent to winner...
+			if = { # To avoid this breaking in edge case MPs (where you accidentally got the same target, or they had time to die SOMEHOW...
+				limit = {
+					NOT = { event_target:combatant_2 = { is_alive = yes } }
+				}
+				clean_up_after_duel_effect = yes #Includes the "send_legendary_tombola_effect"
+				clr_XYZ_desc_flag_effect = yes
+			}
+
+			else = { # Most cases: the target definitely still lives...
+				set_character_flag = someone_died
+				character_event = { id = HF.12200 } #"I killed the enemy!" event sent to winner...
+			}
+
 		}
 		1 = { #LEGENDARY BLOODLINES: LETHAL for both...
 			trigger = {
@@ -2186,7 +2200,7 @@ apply_generic_duel_victory_effect = {
 			modifier = recent_duel_victory
 			months = 12 #also clears upon new duel!
 		}
-		#hidden_effect = { character_event = { id = 720 } } # Bring it On achievement check event
+		hidden_effect = { character_event = { id = 720 } } # Bring it On achievement check event
 	}
 }
 
@@ -2286,6 +2300,9 @@ handle_claim_duel_result_effect = {
 					custom_tooltip = {
 						text = your_claim_is_lost_attacker_tt
 						remove_claim = event_target:target_title
+						event_target:target_title = {
+							add_weak_pressed_claim = PREV
+						}
 					}
 				}
 				else = {
@@ -2293,8 +2310,13 @@ handle_claim_duel_result_effect = {
 						text = your_claims_are_lost_tt
 						event_target:combatant_2 = {
 							any_demesne_title = {
-								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
-								event_target:combatant_1 = { remove_claim = PREV }
+								limit = {
+									event_target:combatant_1 = { has_strong_claim = PREV }
+								}
+								event_target:combatant_1 = {
+									remove_claim = PREV
+									add_weak_pressed_claim = PREV
+								}
 							}
 						}
 					}
@@ -2423,8 +2445,13 @@ handle_claim_duel_result_effect = {
 						text = your_claims_are_lost_tt
 						event_target:combatant_1 = {
 							any_demesne_title = {
-								limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
-								event_target:combatant_2 = { remove_claim = PREV }
+								limit = {
+									event_target:combatant_2 = { has_strong_claim = PREV }
+								}
+								event_target:combatant_2 = {
+									remove_claim = PREV
+									add_weak_pressed_claim = PREV
+								}
 							}
 						}
 					}
@@ -2578,6 +2605,60 @@ handle_warrior_lodge_induction_effect = { #Will only affect those trying to join
 
 handle_poison_effect = { #shows tooltips, etc
 	if = {
+		limit = {
+			has_character_flag = add_duel_xp
+			OR = {
+				event_target:combatant_1 = { #if you are the person seeing the event
+					character = ROOT
+					character = PREV
+					event_target:combatant_2 = {
+						has_character_flag = defender_using_poison@event_target:combatant_1 #and they tried to poison you
+					}
+				}
+				event_target:combatant_2 = { #if you are the person seeing the event
+					character = ROOT
+					character = PREV
+					event_target:combatant_1 = {
+						has_character_flag = attacker_using_poison@event_target:combatant_2 #and they tried to poison you
+					}
+				}
+			}
+			OR = {	#and you lost
+				has_character_flag = is_defeated_attacker
+				has_character_flag = is_defeated_defender
+			}
+			NOT = { has_character_flag = someone_died }	#but no one died
+		}
+		custom_tooltip = { text = suspect_foul_play_tt }
+	}
+	else_if = {
+		limit = {
+			has_character_flag = add_duel_xp
+			OR = {
+				event_target:combatant_1 = { #if you are the person seeing the event
+					character = ROOT
+					character = PREV
+					event_target:combatant_2 = {
+						has_character_flag = defender_using_poison@event_target:combatant_1 #and they tried to poison you
+					}
+				}
+				event_target:combatant_2 = { #if you are the person seeing the event
+					character = ROOT
+					character = PREV
+					event_target:combatant_1 = {
+						has_character_flag = attacker_using_poison@event_target:combatant_2 #and they tried to poison you
+					}
+				}
+			}
+			OR = {	#and you lost
+				has_character_flag = is_defeated_attacker
+				has_character_flag = is_defeated_defender
+			}
+			has_character_flag = someone_died #and you died
+		}
+		custom_tooltip = { text = definitely_foul_play_tt }
+	}
+	else_if = {
 		limit = {
 			has_character_flag = add_duel_xp
 			OR = {
@@ -3000,7 +3081,7 @@ clr_duel_flags_effect = {
 		clr_character_flag = poison_can_fail_against@event_target:combatant_2
 		clr_character_flag = defender_using_poison@event_target:combatant_1
 		clr_character_flag = poison_can_fail_against@event_target:combatant_1
-		
+		clr_character_flag = use_tribal_victory_pic
 		### DnD Classes
 		clr_character_flag = wizardduel
 		clr_character_flag = sorcererduel
@@ -3637,9 +3718,7 @@ duel_enemy_commander_effect = {
 	    		
 				set_dueling_weapon_effect = yes
 				reset_duel_timers_effect = yes
-				event_target:combatant_1 = { 
-					character_event = { id = zz_duel.1 } #Actual Duel evaluation and result...
-				}
+				character_event = { id = HFP.10100 } #Actual Duel evaluation and result...
 				if = {
 		    		limit = { ROOT = { ai = no } }
 					log = "BATTLE EVENT: [commander_to_the_rescue.GetBestName] took a duel for [Root.GetTitledFirstName]."
@@ -3658,12 +3737,21 @@ duel_enemy_commander_effect = {
 	        set_dueling_weapon_effect = yes #You get a weapon!
 	        event_target:combatant_2 = { set_dueling_weapon_effect = yes } #and YOU get a weapon!
 	        
-	        event_target:combatant_1 = { 
-				character_event = { id = zz_duel.1 } #Actual Duel evaluation and result...
-			}
+	        #Chooses a body part for injury (if it occurs), also for loc purposes (effect handles both characters)
+	        set_potential_injury_flag_effect = yes
+
+	        #Scripted effect requiring event-targets combatant_1 & combatant_2! RAW NUMBERS...
+	        evaluate_duel_result_score_effect = yes
+
+	        #Room for extra special calculations... (based on traits, and other special circumstances?)
+	        evaluate_extra_duel_result_score_effect = yes
+
+	        #Send the correct result event (from random_list)...
+	        send_duel_result_event_effect = yes 
 		}
     }
 }
+
 #Used at the end of battle duels...
 apply_battlefield_duel_opinions_effect = {
 	if = {
