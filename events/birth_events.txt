@@ -3164,7 +3164,33 @@ character_event = {
 	id = 304
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_intrigue
-	desc = EVTDESC304
+	desc = {
+		text = EVTDESC304
+		trigger = {
+			FROMFROM = {
+				mother = {
+					NOR = {
+						has_character_modifier = adulteress
+						has_character_modifier = incestuous_adulteress
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC304_B
+		trigger = {
+			FROMFROM = {
+				mother = {
+					OR = {
+						has_character_modifier = adulteress
+						has_character_modifier = incestuous_adulteress
+					}
+				}
+			}
+		}
+	}
+	
 	
 	is_triggered_only = yes 
 
@@ -3383,17 +3409,33 @@ character_event = {
 	hide_window = yes
 	
 	trigger = {
-		mother = {
-			is_consort = yes
+		OR = {
+			mother = {
+				is_consort = yes
+			}
+			father = {
+				is_consort = yes
+			}
 		}
 	}	
 	
 	option = {
-		add_trait = child_of_consort
+		if = { 
+			limit = {
+				mother = { is_consort = yes }
+			} 
+			add_trait = child_of_consort
+		}
+		if = { 
+			limit = {
+				father = { is_consort = yes }
+			} 
+			add_trait = child_of_consort_male
+		}
 	}
 }
 
-# On-action event: Birth complications
+# On-action event: Birth complications - Pointing out that the baby receives this event, and thus he is the one that has to decide if his mother gets to die or not.
 character_event = {
 	id = 313
 	desc = OK
@@ -3412,6 +3454,12 @@ character_event = {
 				# All is well
 			}
 			10 = {
+				modifier = { #Old remedy
+					factor = 0.25
+					mother = {
+						has_character_flag = flag_mother_dark_rest 
+					}
+				}
 				add_trait = sickly
 
 				#Sickly infant treatment event
@@ -3467,8 +3515,13 @@ character_event = {
 
 	option = { # No complications
 		name = OK
+		trigger = { 
+			NOT = { 
+				mother = { trait = troubled_pregnancy }
+			} 
+		}
 		ai_chance = {
-			factor = 120
+			factor = 80
 			modifier = {
 				factor = 2.0
 				mother = {
@@ -3509,12 +3562,20 @@ character_event = {
 	}
 	option = { # Mother gets ill
 		name = OK
+		trigger = { 
+			NOT = { 
+				mother = { trait = troubled_pregnancy }
+			} 
+			NOT = { 
+				mother = { is_ill = yes }
+			} 
+		}
 		ai_chance = {
-			factor = 12
+			factor = 4
 			modifier = {
-				factor = 0
+				factor = 2
 				mother = {
-					trait = pneumonic
+					trait = hard_pregnancy
 				}
 			}
 			modifier = {
@@ -3532,24 +3593,20 @@ character_event = {
 		}
 		
 		mother = {
-			if = {
-				limit = {
-					is_ill = yes
-				}
-				character_event = { id = 316 }
-			}
-			if = {
-				limit = {
-					is_ill = no
-				}
-				character_event = { id = 315 }
-			}
+			character_event = { id = 315 }
 		}
 	}
-	option = { # Mother gets pneumonia
+	option = { # Mother has troubled pregnancy.
 		name = OK
+		trigger = { 
+			OR = { 
+				mother = { trait = troubled_pregnancy }
+				mother = { is_ill = yes }
+				mother = { check_variable = { which = troubled_pregnancy_variable value = 1 } }
+			} 
+		}
 		ai_chance = {
-			factor = 8
+			factor = 16
 			
 			modifier = {
 				factor = 2.0
@@ -3569,65 +3626,70 @@ character_event = {
 					NOT = { num_of_children = 2 }
 				}
 			}
-		}
-		
-		mother = {
-			if = {
-				limit = {
-					OR = {
-						trait = pneumonic 
-						has_epidemic = yes
-					}
-				}
-				death = {
-					death_reason = death_childbirth
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						OR = {
-							trait = pneumonic 
-							has_epidemic = yes
-						}
-					}
-				}
-				character_event = { id = 316 }
-			}
-		}
-	}
-	option = { # Mother dies
-		name = OK
-		ai_chance = {
-			factor = 2
 			modifier = {
-				factor = 2.0
+				factor = 1.5
 				mother = {
-					NOT = { health = 4.1 }
-				}
-			}
-			modifier = {
-				factor = 6.0
-				mother = {
-					NOT = { health = 3.1 }
+					check_variable = { which = troubled_pregnancy_variable value = 2 }
 				}
 			}
 			modifier = {
 				factor = 1.5
 				mother = {
-					NOT = { num_of_children = 2 }
+					check_variable = { which = troubled_pregnancy_variable value = 3 }
+				}
+			}
+			modifier = {
+				factor = 2
+				mother = {
+					check_variable = { which = troubled_pregnancy_variable value = 4 }
+				}
+			}
+			modifier = {
+				factor = 3
+				mother = {
+					check_variable = { which = troubled_pregnancy_variable value = 5 }
 				}
 			}
 		}
+		
 		mother = {
-			death = {
-				death_reason = death_childbirth
-			}
+				character_event = { id = 316 } #Troubled pregnancy gets worse.
 		}
 	}
+
+	#option = { # Mother dies - Obsolete now.
+	#	name = OK
+	#	ai_chance = {
+	#		factor = 2
+	#		modifier = {
+	#			factor = 2.0
+	#			mother = {
+	#				NOT = { health = 4.1 }
+	#			}
+	#		}
+	#		modifier = {
+	#			factor = 6.0
+	#			mother = {
+	#				NOT = { health = 3.1 }
+	#			}
+	#		}
+	#		modifier = {
+	#			factor = 1.5
+	#			mother = {
+	#				NOT = { num_of_children = 2 }
+	#			}
+	#		}
+	#	}
+	#	mother = {
+	#		death = {
+	#			death_reason = death_childbirth
+	#		}
+	#	}
+	#}
 }
 
-# On-action event: Birth complications after a stillbirth
+# On-action event: Birth complications after a stillbirth - Technically disabled. 
+# (in mother scope)
 character_event = {
 	id = 314
 	desc = OK
@@ -3642,8 +3704,21 @@ character_event = {
 	
 	option = { # No complications
 		name = OK
+		trigger = { 
+			NOT = { 
+				trait = troubled_pregnancy
+			} 
+		}
 		ai_chance = {
-			factor = 66
+			factor = 70
+			modifier = {
+				factor = 0.7
+				trait = hard_pregnancy
+			}
+			modifier = {
+				factor = 0.7
+				is_ill = yes
+			}
 			modifier = {
 				factor = 2.0
 				health = 6
@@ -3657,26 +3732,34 @@ character_event = {
 				num_of_children = 3
 			}
 			modifier = {
-				factor = 1.2
+				factor = 0.85
 				age = 20
 			}
 			modifier = {
-				factor = 1.2
+				factor = 0.85
 				age = 25
 			}
 			modifier = {
-				factor = 1.2
+				factor = 0.85
 				age = 30
 			}
 		}
 	}
 	option = { # Mother gets ill
 		name = OK
+		trigger = { 
+			NOT = { 
+				trait = troubled_pregnancy
+			} 
+			NOT = { 
+				is_ill = yes
+			} 
+		}
 		ai_chance = {
-			factor = 22
+			factor = 5
 			modifier = {
-				factor = 0
-				trait = pneumonic
+				factor = 2
+				trait = hard_pregnancy
 			}
 			modifier = {
 				factor = 2.0
@@ -3688,23 +3771,19 @@ character_event = {
 			}
 		}
 		
-		if = {
-			limit = {
-				is_ill = yes
-			}
-			character_event = { id = 315 }
-		}
-		if = {
-			limit = {
-				is_ill = no
-			}
-			character_event = { id = 314 }
-		}
+		character_event = { id = 315 }
 	}
-	option = { # Mother gets pneumonia
+	option = { # Mother has troubled pregnancy.
 		name = OK
+		trigger = { 
+			OR = { 
+				trait = troubled_pregnancy
+				is_ill = yes
+				check_variable = { which = troubled_pregnancy_variable value = 1 }
+			} 
+		}
 		ai_chance = {
-			factor = 10
+			factor = 25
 			
 			modifier = {
 				factor = 2.0
@@ -3718,52 +3797,46 @@ character_event = {
 				factor = 1.5
 				NOT = { num_of_children = 2 }
 			}
-		}
-		
-		if = {
-			limit = {
-				OR = {
-					trait = pneumonic 
-					has_epidemic = yes
-				}
-			}
-			death = {
-				death_reason = death_childbirth
-			}
-		}
-		if = {
-			limit = {
-				NOT = {
-					OR = {
-						trait = pneumonic 
-						has_epidemic = yes
-					}
-				}
-			}
-			character_event = { id = 315 }
-		}
-	}
-	option = { # Mother dies
-		name = OK
-		ai_chance = {
-			factor = 2
 			modifier = {
-				factor = 2.0
-				NOT = { health = 4.1 }
-			}
-			modifier = {
-				factor = 6.0
-				NOT = { health = 3.1 }
+				factor = 1.5
+				check_variable = { which = troubled_pregnancy_variable value = 2 }
 			}
 			modifier = {
 				factor = 1.5
-				NOT = { num_of_children = 2 }
+				check_variable = { which = troubled_pregnancy_variable value = 3 }
+			}
+			modifier = {
+				factor = 2
+				check_variable = { which = troubled_pregnancy_variable value = 4 }
+			}
+			modifier = {
+				factor = 3
+				check_variable = { which = troubled_pregnancy_variable value = 5 }
 			}
 		}
-		death = {
-			death_reason = death_childbirth
-		}
+		character_event = { id = 316 } #Troubled pregnancy gets worse.
 	}
+	#option = { # Mother dies - Obsolete, handled by troubled pregnancy events.
+	#	name = OK
+	#	ai_chance = {
+	#		factor = 2
+	#		modifier = {
+	#			factor = 2.0
+	#			NOT = { health = 4.1 }
+	#		}
+	#		modifier = {
+	#			factor = 6.0
+	#			NOT = { health = 3.1 }
+	#		}
+	#		modifier = {
+	#			factor = 1.5
+	#			NOT = { num_of_children = 2 }
+	#		}
+	#	}
+	#	death = {
+	#		death_reason = death_childbirth
+	#	}
+	#}
 }
 
 # Mother ill after giving birth
@@ -3797,68 +3870,198 @@ character_event = {
 	}
 }
 
-# Mother pneumonic after giving birth
+# Mother troubled after giving birth
 character_event = {
 	id = 316
-	desc = EVTDESC315
+	desc = {
+		text = EVTDESCA316
+		trigger = {
+			trait = troubled_pregnancy
+		}
+	}
+	desc = {
+		text = EVTDESCB316
+		trigger = { 
+			NOT = {
+				trait = troubled_pregnancy
+			}
+		}
+	}
 	picture = GFX_evt_illness
 	
 	is_triggered_only = yes
 	
-	immediate = {
-		if = {
-			limit = {
-				NOT = {
-					has_dlc = "Reapers"
-				}
-			}
-			add_trait = pneumonic
-		}
-	}
 
 	option = {
 		name = EVTOPTA315
-		if = {
-			limit = {
-				NOT = {
-					has_dlc = "Reapers"
+		if = { 
+			limit = { NOT = { trait = troubled_pregnancy } }
+			set_character_flag = troubled_pregnancy_relapse #Determines different desc for spouse
+			add_trait = troubled_pregnancy 
+		}
+		hidden_tooltip = { 
+			if = { 
+				limit = { is_married = yes } 
+				spouse = {
+					 character_event = { id = HFP.20552 } 
 				}
-			}
-			tooltip = {
-				add_trait = pneumonic
 			}
 		}
-		if = {
-			limit = {
-				has_dlc = "Reapers"
-			}
-			custom_tooltip = {
-				text = add_symptom_tooltip
-				hidden_tooltip = {
-					random_list = {
-						10 = {
-							modifier = {
-								factor = 0
-								trait = cough
-							}
-							character_event = { id = RIP.5000 }
-						}
-						10 = {
-							modifier = {
-								factor = 0
-								trait = fever
-							}
-							character_event = { id = RIP.5001 }
-						}
-						10 = {
-							modifier = {
-								factor = 0
-								trait = chest_pain
-							}				
-							character_event = { id = RIP.5005 }
-						}
-					}
+		hidden_tooltip = { 
+			random_list = { 
+				30 = { character_event = { id = HFP.20541 days = 12 random = 5 } } #fever
+				15 = { character_event = { id = HFP.20542 days = 12 random = 5 } } #hair loss
+				20 = { character_event = { id = HFP.20543 days = 12 random = 5 } } #blood
+				10 = { 
+
+				modifier = { 
+					factor = 0.7
+					persistent_event_target:pregnancy_mother_physician_per = { NOT = { learning = 5 } }
 				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_mother_physician_per = { NOT = { learning = 10 } }
+				}
+				modifier = { 
+					factor = 0.9
+					persistent_event_target:pregnancy_mother_physician_per = { trait = slow }
+				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_mother_physician_per = { trait = imbecile }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_mother_physician_per = { trait = scholar }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_mother_physician_per = { trait = physician }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_mother_physician_per = { trait = quick }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_mother_physician_per = { trait = genius }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_mother_physician_per = { learning = 10 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_mother_physician_per = { learning = 15 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_mother_physician_per = { learning = 20 }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_mother_physician_per = { learning = 25 }
+				}
+				modifier = { 
+					factor = 0.7
+					persistent_event_target:pregnancy_spouse_physician_per = { NOT = { learning = 5 } }
+				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_spouse_physician_per = { NOT = { learning = 10 } }
+				}
+				modifier = { 
+					factor = 0.9
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = slow }
+				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = imbecile }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = scholar }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = physician }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = quick }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_spouse_physician_per = { trait = genius }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_spouse_physician_per = { learning = 10 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_spouse_physician_per = { learning = 15 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_spouse_physician_per = { learning = 20 }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_spouse_physician_per = { learning = 25 }
+				}
+				modifier = { 
+					factor = 0.7
+					persistent_event_target:pregnancy_regent_physician_per = { NOT = { learning = 5 } }
+				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_regent_physician_per = { NOT = { learning = 10 } }
+				}
+				modifier = { 
+					factor = 0.9
+					persistent_event_target:pregnancy_regent_physician_per = { trait = slow }
+				}
+				modifier = { 
+					factor = 0.8
+					persistent_event_target:pregnancy_regent_physician_per = { trait = imbecile }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_regent_physician_per = { trait = scholar }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_regent_physician_per = { trait = physician }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_regent_physician_per = { trait = quick }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_regent_physician_per = { trait = genius }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_regent_physician_per = { learning = 10 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_regent_physician_per = { learning = 15 }
+				}
+				modifier = { 
+					factor = 1.25
+					persistent_event_target:pregnancy_regent_physician_per = { learning = 20 }
+				}
+				modifier = { 
+					factor = 1.5
+					persistent_event_target:pregnancy_regent_physician_per = { learning = 25 }
+				}
+					character_event = { id = HFP.20544 days = 12 random = 5 } } #recovers completely
+				20 = { character_event = { id = HFP.20545 days = 12 random = 5 } } #recovers weakened
+				2 = { character_event = { id = HFP.20546 days = 12 random = 5 } } #remains infirm
+				3 = { character_event = { id = HFP.20547 days = 12 random = 5 } } #DEATH
 			}
 		}
 	}
