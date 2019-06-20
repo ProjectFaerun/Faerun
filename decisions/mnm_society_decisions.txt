@@ -776,6 +776,7 @@ society_decisions = {
 	}
 
 	assassins_drug_effect = {
+		ai_check_interval = 36
 		
 		potential = {
 			has_dlc = "Mystics"
@@ -808,7 +809,7 @@ targeted_decisions = {
 	assassins_recruit = {
 		ai_target_filter = realm
 		is_in_society = yes # Note - Only works for targeted_decisions. For non-targeted decisions you can use "society_decisions"
-		ai_check_interval = 12
+		ai_check_interval = 24
 
 		from_potential = {
 			is_adult = yes
@@ -945,7 +946,7 @@ targeted_decisions = {
 		only_playable = yes
 		
 		ai_target_filter = realm
-		ai_check_interval = 12
+		ai_check_interval = 60
 
 		from_potential = {
 			has_dlc = "Conclave"
@@ -1070,7 +1071,7 @@ targeted_decisions = {
 		
 		ai_target_filter = realm
 		ai_target_filter = rivals
-		ai_check_interval = 12
+		ai_check_interval = 24
 
 		from_potential = {
 			is_playable = yes
@@ -1169,9 +1170,9 @@ targeted_decisions = {
 		only_playable = yes
 		
 		ai_target_filter = realm
+		ai = no
 
 		from_potential = {
-			ai = no
 			is_playable = yes
 			is_adult = yes
 			prisoner = no
@@ -1210,6 +1211,92 @@ targeted_decisions = {
 		ai_will_do = { 
 			factor = 0
 		}
+	}
+	#Action: (Mission only: Train Protege)
+	train_assassin_protege = {
+	    only_playable = yes
+	    is_high_prio = yes
+		ai_check_interval = 36
+	    
+	    from_potential = {
+    		has_dlc = "Mystics"
+	        is_playable = yes
+	        is_adult = yes
+	        prisoner = no
+			society_member_of = eldreth_veluuthra
+	        has_regent = no
+	        is_inaccessible_trigger = no
+	        has_quest = quest_the_assassins_protege
+	        NOT = { has_character_flag = training_protege }
+	    }
+	    
+	    potential = {
+        	NOT = { character = FROM }
+	        prisoner = no
+	        #is_child_of = FROM
+	    }
+	    
+	    allow = {
+	    	host = { character = FROM } #must be in your court...?
+		    age = 12
+			NOT = { age = 21 }
+		    is_ruler = no
+			is_abroad = no
+			is_married = no
+			#NOT = { any_spouse = { is_landed = yes } }
+
+	    	trigger_if = {
+	    		limit = { #can't be in a society already...
+	    			is_in_society = yes
+	    		}
+		    	is_in_society = no
+	    	}
+
+	        is_inaccessible_trigger = no
+
+	        custom_tooltip = {
+	            text = characters_are_not_busy_tt
+	            hidden_tooltip = {
+	                FROM = {
+	                    NOT = { has_character_flag = do_not_disturb }
+	                    NOT = { war = yes }
+	                }
+	                NOT = { has_character_flag = do_not_disturb }
+	                NOT = { war = yes }
+	            }
+	        }
+	        trigger_if = {
+	        	limit = { NOT = { is_within_diplo_range = FROM } }
+	        	is_within_diplo_range = FROM # CPU HEAVY!
+	        }
+	    }
+	    
+	    effect = {
+	    	save_event_target_as = assassin_protege
+	    	
+	    	FROM = {
+	    		set_character_flag = is_using_train_protege_decision
+	    		character_event = { id = MNM.6250 }
+	    	}
+	    }
+	    
+	    revoke_allowed = {
+	        always = no
+	    }
+	    ai_will_do = {
+	        factor = 1
+	        modifier = {
+	            factor = 0
+	            #if the target has already recruited someone
+	            any_child = {
+	            	same_society_as = ROOT
+	            }
+
+	        }
+	        modifier = {
+	            factor = 0.3
+	        }
+	    }
 	}
 }
 
@@ -2700,183 +2787,15 @@ targeted_decisions = {
 		# }
 	# }
 
-	search_for_artifact = {
-		only_playable = yes
-		
-		ai_target_filter = court
-		ai_check_interval = 12
-
-		from_potential = {
-			is_ruler = yes
-			prisoner = no
-			is_inaccessible_trigger = no
-			OR = {
-				has_character_modifier = relic_rumor_major
-				has_character_modifier = relic_rumor_medium
-				has_character_modifier = relic_rumor_minor
-			}
-			OR = {
-				ai = no
-				NOT = { any_courtier_or_vassal = { has_character_flag = relic_hunter } }
-			}
-		}
-
-		potential = {
-			is_councillor = yes
-			liege = { character = FROM }
-			NOT = { trait = incapable }
-			prisoner = no
-			is_inaccessible_trigger = no
-			NOT = { has_character_flag = relic_hunter }
-		}
-
-		allow = {
-			custom_tooltip = {
-				text = search_for_artifact_allow_tt
-				is_councillor = yes
-				liege = { character = FROM }
-			}
-		}
-
-		effect = {
-			if = {
-				limit = { FROM = { any_courtier_or_vassal = { has_character_flag = relic_hunter } } }
-				custom_tooltip = {
-					text = search_for_artifact_effect_replace_tt
-					FROM = {
-						random_courtier_or_vassal = { 
-							limit = { has_character_flag = relic_hunter } 
-							clr_character_flag = relic_hunter
-						}
-					}
-				}
-			}
-			custom_tooltip = {
-				text = search_for_artifact_effect_tt
-				set_character_flag = relic_hunter
-				save_event_target_as = relic_hunter
-				FROM = { save_event_target_as = relic_ruler }
-				character_event = { id = MNM.9007 days = 30 } # The looping evaluation for progress increase/decrease begins...
-			}
-			if = {
-				limit = { FROM = { check_variable = { which = relic_score value = 1 } } }
-				custom_tooltip = {
-					text = search_for_artifact_effect_progress_tt
-					hidden_effect = { FROM = { multiply_variable = { which = relic_score value = 0.75 } } }
-				}
-			}
-			FROM = { add_artifact_search_payment_effect = yes }
-			custom_tooltip = {
-				text = outcome_will_depend_on_roots_skill_tt
-			}
-		}
-
-		revoke_allowed = { always = no }
-
-		ai_will_do = {
-			factor = 0.01
-			modifier = {
-				OR = {
-					diplomacy = 14
-					martial = 14
-					stewardship = 14
-					intrigue = 14
-					learning = 14
-				}
-				factor = 10
-			}
-			modifier = {
-				OR = {
-					is_friend = FROM
-					reverse_opinion = { who = FROM value = 30 }
-				}
-				factor = 10
-			}
-			modifier = {
-				FROM = { NOT = { wealth = 50 } }
-				factor = 0
-			}
-			modifier = {
-				ai = no
-				factor = 0
-			}
-		}
-	}
-
-	stop_artifact_search = {
-		only_playable = yes
-		
-		ai_target_filter = court
-		ai_check_interval = 12
-
-		from_potential = {
-			is_ruler = yes
-			prisoner = no
-			OR = {
-				has_character_modifier = relic_rumor_major
-				has_character_modifier = relic_rumor_medium
-				has_character_modifier = relic_rumor_minor
-			}
-			is_inaccessible_trigger = no
-			OR = {
-				has_character_modifier = pays_for_artifact_hunt_minor
-				has_character_modifier = pays_for_artifact_hunt_medium
-				has_character_modifier = pays_for_artifact_hunt_major
-			}
-		}
-
-		potential = {
-			has_character_flag = relic_hunter
-		}
-
-		effect = {
-			custom_tooltip = {
-				text = stop_artifact_search_effect_tt
-				hidden_effect = { 
-					FROM = {
-						if = {
-							limit = { has_character_modifier = pays_for_artifact_hunt_minor }
-							remove_character_modifier = pays_for_artifact_hunt_minor
-						}
-						if = {
-							limit = { has_character_modifier = pays_for_artifact_hunt_medium }
-							remove_character_modifier = pays_for_artifact_hunt_medium
-						}
-						if = {
-							limit = { has_character_modifier = pays_for_artifact_hunt_major }
-							remove_character_modifier = pays_for_artifact_hunt_major
-						}
-					}
-				}
-				hidden_effect = {
-					clr_character_flag = relic_hunter
-				}
-			}
-		}
-
-		revoke_allowed = { always = no }
-
-		ai_will_do = {
-			factor = 0.1
-			modifier = {
-				factor = 0
-				wealth = -100
-			}
-			modifier = {
-				factor = 0
-				check_variable = { which = relic_score value = -2 }
-			}
-		}
-	}
 	
 	decision_abduct = {
 		filter = all
 		ai_target_filter = realm
 		
 		only_playable = yes
+		ai = no
 		
 		from_potential = {
-			ai = no
 			OR = {
 				is_devil_worshiper_trigger = yes
 				society_member_of = eldreth_veluuthra
@@ -2963,7 +2882,7 @@ targeted_decisions = {
 			if = {
 				limit = {
 					NOT = {
-						is_landed = yes
+						is_ruler = yes
 					}
 				}
 				FROM = {
@@ -2972,10 +2891,8 @@ targeted_decisions = {
 			}
 			if = {
 				limit = {
-					is_landed = yes
-					NOT = {
-						higher_tier_than = BARON
-					}
+					is_ruler = yes
+					lower_tier_than = COUNT
 				}
 				FROM = {
 					detract_society_currency_minor_effect = yes
@@ -3024,9 +2941,9 @@ targeted_decisions = {
 	stop_abduct_decision = {
 		filter = self
 		ai_target_filter = self
+		ai = no
 	
 		potential = {
-			ai = no
 			OR = {
 				is_devil_worshiper_trigger = yes
 				society_member_of = eldreth_veluuthra
@@ -3061,9 +2978,9 @@ targeted_decisions = {
 	stop_abduct_decision_target = {
 		filter = all
 		ai_target_filter = realm
+		ai = no
 	
 		from_potential = {
-			ai = no
 			OR = {
 				is_devil_worshiper_trigger = yes
 				society_member_of = eldreth_veluuthra
@@ -3101,7 +3018,7 @@ targeted_decisions = {
 decisions = {
 	employ_a_smith = {
 		only_playable = yes
-		ai_check_interval = 12
+		ai_check_interval = 36
 		potential = {
 			OR = {
 				has_dlc = "Mystics"
@@ -3119,6 +3036,16 @@ decisions = {
 			}
 			is_landed = yes
 			is_lowborn = no
+			
+			# Block player from action if they have already gotten all of the artifacts which they can obtain from this action
+			NAND = {
+				have_all_armorsmith_artifacts_all_flags_trigger = yes
+				have_all_weaponsmith_artifacts_all_flags_trigger = yes
+				have_duplicate_goldsmith_artifacts_flag_okay_trigger = yes
+				have_duplicate_goldsmith_artifacts_flag_good_trigger = yes 
+				have_duplicate_goldsmith_artifacts_flag_expensive_trigger = yes
+				have_duplicate_goldsmith_artifacts_flag_amazing_trigger = yes 
+			} 
 		}
 		allow = {
 			hidden_trigger = {
@@ -3128,36 +3055,7 @@ decisions = {
 				}
 			}
 			is_inaccessible_trigger = no
-			OR = {
-				AND = {
-					custom_tooltip = {
-						text = employ_a_smith_no_weapons_tt
-						NOT = { any_artifact = { has_artifact_flag = combat_weapon } }
-					}
-					custom_tooltip = {
-						text = has_marshal_tt
-						hidden_tooltip = {
-							job_marshal = { always = yes }
-						}
-					}
-				}
-				AND = {
-					custom_tooltip = {
-						text = employ_a_smith_no_armor_tt
-						NOT = { any_artifact = { has_artifact_flag = armor_set } }
-					}
-	    			custom_tooltip = {
-						text = has_marshal_tt
-						hidden_tooltip = {
-							job_marshal = { always = yes }
-						}
-					}
-				}
-				custom_tooltip = {
-					text = employ_a_smith_no_crowns_tt
-					NOT = { any_artifact = { has_artifact_flag = crown_jewel } }
-				}
-			}
+			
 			custom_tooltip = {
 				text = employ_a_smith_cooldown_tt
 				hidden_trigger = {
@@ -3203,6 +3101,12 @@ decisions = {
 			modifier = {
 				factor = 0.1
 				trait = content
+			}
+			modifier = {
+				factor = 0
+				any_artifact = { has_artifact_flag = combat_weapon }
+				any_artifact = { has_artifact_flag = armor_set }
+				any_artifact = { has_artifact_flag = crown_jewel }
 			}
 		}
 	}
