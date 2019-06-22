@@ -1,12 +1,13 @@
-targeted_decisions = {
+targetted_decisions = {
+	
 	convert_to_liege_religion = {
 		only_playable = yes
 		
 		filter = self
 		ai_target_filter = self
+		ai = no
 		
 		potential = {
-			ai = no
 			is_playable = yes
 			liege = {
 				NOT = { character = ROOT }
@@ -186,6 +187,7 @@ targeted_decisions = {
 		
 		filter = liege
 		ai_target_filter = liege
+		ai_check_interval = 60
 		
 		from_potential = {
 			ai = no
@@ -272,6 +274,7 @@ targeted_decisions = {
 		
 		filter = liege
 		ai_target_filter = liege
+		ai_check_interval = 60
 		
 		from_potential = {
 			is_playable = yes
@@ -303,6 +306,7 @@ targeted_decisions = {
 		
 		filter = self
 		ai_target_filter = self
+		ai_check_interval = 60
 		
 		potential = {
 			is_playable = yes
@@ -330,6 +334,7 @@ targeted_decisions = {
 	
 	convert_to_local_culture = {
 		only_playable = yes
+		ai_check_interval = 24
 		
 		filter = self
 		ai_target_filter = self
@@ -502,9 +507,9 @@ targeted_decisions = {
 		
 		filter = self
 		ai_target_filter = self
+		ai = no
 		
 		potential = {
-			ai = no
 			is_playable = yes
 			is_nomadic = no
 			capital_scope = {
@@ -546,13 +551,13 @@ targeted_decisions = {
 				AND = {
 					prestige = 500
 					capital_scope = {
-						religion_group = ROOT
+						true_religion_group = ROOT
 					}
 				}
 				AND = {
 					prestige = 1000
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 			}
@@ -659,7 +664,7 @@ targeted_decisions = {
 			if = {
 				limit = {
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				prestige = -1000
@@ -667,7 +672,7 @@ targeted_decisions = {
 			if = {
 				limit = {
 					capital_scope = {
-						religion_group = ROOT
+						true_religion_group = ROOT
 					}
 				}
 				prestige = -500
@@ -681,7 +686,7 @@ targeted_decisions = {
 					religion_group = christian
 					NOT = { trait = sympathy_christendom }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -694,7 +699,7 @@ targeted_decisions = {
 					religion_group = muslim
 					NOT = { trait = sympathy_islam }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -707,7 +712,7 @@ targeted_decisions = {
 					religion_group = pagan_group
 					NOT = { trait = sympathy_pagans }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -720,7 +725,7 @@ targeted_decisions = {
 					religion_group = zoroastrian_group
 					NOT = { trait = sympathy_zoroastrianism }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -733,7 +738,7 @@ targeted_decisions = {
 					religion_group = jewish_group
 					NOT = { trait = sympathy_judaism }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -746,7 +751,7 @@ targeted_decisions = {
 					religion_group = indian_group
 					NOT = { trait = sympathy_indian }
 					capital_scope = {
-						NOT = { religion_group = ROOT }
+						NOT = { true_religion_group = ROOT }
 					}
 				}
 				random = {
@@ -779,9 +784,9 @@ targeted_decisions = {
 		
 		filter = self
 		ai_target_filter = self
+		ai = no
 		
 		potential = {
-			ai = no
 			is_playable = yes
 			independent = yes
 			controls_religion = no
@@ -926,11 +931,12 @@ targeted_decisions = {
 		}
 	}
 	
-	convert_to_reformed = { # FIXME
+	convert_to_reformed = {
 		only_playable = yes
 		
 		filter = self
 		ai_target_filter = self
+		ai_check_interval = 60
 		
 		potential = {
 			is_playable = yes
@@ -1059,6 +1065,7 @@ targeted_decisions = {
 		only_playable = yes
 		filter = home_court
 		ai_target_filter = home_court
+		ai_check_interval = 60
 	
 		from_potential = {
 			ai = no
@@ -1317,7 +1324,7 @@ decisions = {
 	# Weak or unreformed religions are allowed to convert to the attacker's religion when under Holy War
 	convert_to_attacker_religion = {
 		only_playable = yes
-		ai_check_interval = 6
+		ai_check_interval = 18
 		
 		is_high_prio = yes
 		
@@ -1333,6 +1340,7 @@ decisions = {
 				is_nomadic = yes
 			}
 			controls_religion = no
+			NOT = { has_character_modifier = baptism_request_cooldown }
 			
 			war = yes
 			any_war = {
@@ -1347,6 +1355,7 @@ decisions = {
 				}
 				OR = {
 					using_cb = crusade
+					using_cb = new_crusade
 					using_cb = religious
 					using_cb = muslim_invasion
 					using_cb = buddhist_holy_war
@@ -1362,9 +1371,6 @@ decisions = {
 		effect = {
 			prestige = -500
 			piety = 100
-			religion_authority = {
-				modifier = ruler_converted_from
-			}
 			
 			hidden_tooltip = {
 				any_war = {
@@ -1380,6 +1386,7 @@ decisions = {
 						}
 						OR = {
 							using_cb = crusade
+							using_cb = new_crusade
 							using_cb = religious
 							using_cb = muslim_invasion
 							using_cb = buddhist_holy_war
@@ -1391,72 +1398,135 @@ decisions = {
 					}
 				}
 			}
-			
+
+			#If possible, perform mass baptism.
 			if = {
-				limit = { event_target:enemy_attacker = { NOT = { religion_group = ROOT } } }
-				if = {
-					limit = { religion_group = pagan_group }
-					add_trait = sympathy_pagans
-				}
-				
-				if = {
-					limit = { religion_group = zoroastrian_group }
-					add_trait = sympathy_zoroastrianism
-				}
-				
-				if = {
-					limit = { religion_group = christian }
-					add_trait = sympathy_christendom
-				}
-				
-				if = {
-					limit = { religion_group = muslim }
-					add_trait = sympathy_islam
-				}
-				
-				if = {
-					limit = { religion_group = jewish_group }
-					add_trait = sympathy_judaism
-				}
-				
-				if = {
-					limit = { religion_group = indian_group }
-					add_trait = sympathy_indian
-				}
-			}
-			
-			event_target:enemy_attacker = {
-				hidden_tooltip = {
-					letter_event = { id = 62800 }
-					ROOT = {
-						any_courtier = {
-							limit = {
-								religion = ROOT
-								employer = { character = ROOT }
-							}
-							religion = PREVPREV
-						}
-						any_vassal = {
-							limit = {
-								is_playable = no
-								religion = ROOT
-							}
-							religion = PREVPREV
-						}
-						capital_scope = {
-							if = {
-								limit = { religion = ROOT }
-								religion = PREVPREV
-							}
+				limit = { 
+					has_dlc = "Holy Fury"
+					is_tribal = yes
+					religion_group = pagan_group 
+					higher_real_tier_than = count 		
+					NOT = { trait = incapable }
+					NOT = { is_reformed_religion = yes }
+					NOT = { has_character_flag = flag_converting_baptism }
+					NOT = { has_character_modifier = baptism_request_cooldown } 
+					independent = yes 
+					prisoner = no
+					has_regent = no
+					primary_title = { 
+						OR = { 
+							has_law = tribal_organization_2 
+							has_law = tribal_organization_3 
+							has_law = tribal_organization_4 
+						} 
+					}
+					any_war = {
+						using_cb = new_crusade 
+						defender = { character = ROOT }
+						attacker = { #Special case.
+							religion = good_human_pantheon 
+							NOT = { has_character_flag = flag_sponsoring_baptism }
 						}
 					}
 				}
-				reverse_religion = ROOT 
+				hidden_effect = {
+					add_character_modifier = {
+						name = baptism_request_cooldown
+						months = 1
+						hidden = yes
+					}
+					event_target:enemy_attacker = {
+						add_character_modifier = {
+							name = baptism_request_cooldown
+							months = 1
+							hidden = yes
+						}
+					}
+					opinion = {
+						modifier = opinion_baptism_sponsor_target
+						years = 20
+						who = event_target:enemy_attacker
+						origin_description = EVTTOOLTIPHFA20005
+					}
+					event_target:enemy_attacker = {
+						opinion = {
+							modifier = opinion_baptism_sponsor_target
+							years = 20
+							who = ROOT
+							origin_description = EVTTOOLTIPHFB20005
+						}
+					}
+				}
+				event_target:enemy_attacker = { show_scope_change = no letter_event = { id = HF.20000 tooltip = tooltip_mass_convert_during_crusade } }
 			}
-			
-			hidden_tooltip = {
+			else = {
+				if = {
+					limit = { event_target:enemy_attacker = { NOT = { religion_group = ROOT } } }
+					if = {
+						limit = { religion_group = pagan_group }
+						add_trait = sympathy_pagans
+					}
+					
+					if = {
+						limit = { religion_group = zoroastrian_group }
+						add_trait = sympathy_zoroastrianism
+					}
+					
+					if = {
+						limit = { religion_group = christian }
+						add_trait = sympathy_christendom
+					}
+					
+					if = {
+						limit = { religion_group = muslim }
+						add_trait = sympathy_islam
+					}
+					
+					if = {
+						limit = { religion_group = jewish_group }
+						add_trait = sympathy_judaism
+					}
+					
+					if = {
+						limit = { religion_group = indian_group }
+						add_trait = sympathy_indian
+					}
+				}
+				event_target:enemy_attacker = {
+					hidden_tooltip = {
+						letter_event = { id = 62800 }
+						ROOT = {
+							any_courtier = {
+								limit = {
+									religion = ROOT
+									employer = { character = ROOT }
+								}
+								religion = PREVPREV
+							}
+							any_vassal = {
+								limit = {
+									is_playable = no
+									religion = ROOT
+								}
+								religion = PREVPREV
+							}
+							capital_scope = {
+								if = {
+									limit = { religion = ROOT }
+									religion = PREVPREV
+								}
+							}
+						}
+					}
+					hidden_tooltip = {
+						religion_authority = {
+							modifier = ruler_converted_to
+						}
+					}
+					reverse_religion = ROOT 
+				}
 				religion_authority = {
-					modifier = ruler_converted_to
+					modifier = ruler_converted_from
 				}
 			}
 		}
@@ -1489,6 +1559,7 @@ decisions = {
 						}
 						OR = {
 							using_cb = crusade
+							using_cb = new_crusade
 							using_cb = religious
 							using_cb = muslim_invasion
 							using_cb = buddhist_holy_war
@@ -1519,6 +1590,7 @@ decisions = {
 					}
 					OR = {
 						using_cb = crusade
+						using_cb = new_crusade
 						using_cb = religious
 						using_cb = muslim_invasion
 						using_cb = buddhist_holy_war
