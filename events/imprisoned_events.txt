@@ -349,6 +349,11 @@ character_event = {
 				prisoner = yes
 			}
 		}
+		FROM = { 
+			lose_weight_medium_effect = yes
+			weight_trait_check_effect = yes
+		}
+
 		ai_chance = { factor = 34 }
 		reverse_opinion = {
 			who = FROM
@@ -407,6 +412,10 @@ character_event = {
 			FROM = {
 				prisoner = yes
 			}
+		}
+		FROM = { 
+			lose_weight_medium_effect = yes
+			weight_trait_check_effect = yes
 		}
 		ai_chance = { 
 			factor = 33 
@@ -663,11 +672,7 @@ character_event = {
 			limit = { NOT = { religion = jain } }
 			piety = -10
 		}
-		if = {
-			limit = { religion = jain }
-			piety = -30
-			custom_tooltip = { text = jain_ahimsa_tooltip }
-		}
+		pacifists_lose_piety_effect = yes
 		random_courtier = {
 			limit = {
 				age = 14
@@ -717,6 +722,8 @@ character_event = {
 	option = {
 		name = "EVTOPTA50011"
 		
+		lose_weight_small_effect = yes
+		weight_trait_check_effect = yes
 		add_character_modifier = { 
 			name = tortured
 			duration = 60
@@ -800,16 +807,201 @@ character_event = {
 # Ruler is notified of the capture of an enemy commander
 character_event = {
 	id = 50020
+	title = captured_in_battle
 	desc = "EVTDESC50020"
 	picture = "GFX_evt_battle"
 	border = GFX_event_normal_frame_war
 	
 	is_triggered_only = yes
+
+	portrait = event_target:captured_commander
 	
+	immediate = {
+    	event_target:captured_commander = { save_event_target_as = kinslayer_target }
+    }
+
+	# Warrior Lodge members only option...
 	option = {
-		name = "EVTOPTA50020"
+		name = EVTOPTC50020 #[He/She]'ll make a good sacrifice to [HighGodName]
+		tooltip_info_custom = available_due_to_warrior_lodge
+		custom_tooltip = { text = EVTOPTC50020_TT }
+		if = { 
+			limit = { event_target:captured_commander = { prisoner = yes } }
+			add_kinslayer_trait_effect = yes
+
+			if = { # If you already have three instances of this modifier...
+			limit = {
+				has_instances_of_character_modifier = {
+					modifier = sacrificed_prisoner
+					amount = 3
+				}
+			}
+			hidden_effect = { # Do some hidden removal and adding, in order to refresh the final date of the modifier...
+				remove_character_modifier = sacrificed_prisoner #Removes all instances
+					add_character_modifier = {
+						name = sacrificed_prisoner #Add 1st
+						duration = 1000
+						stacking = yes
+					}
+					add_character_modifier = { #Add 2nd
+						name = sacrificed_prisoner
+						duration = 1000
+						stacking = yes
+					}
+				}
+				add_character_modifier = { #Add 3rd
+					name = sacrificed_prisoner
+					duration = 1000
+					stacking = yes
+				}
+			}
+			else = { #If you don't have three instances, just add one...
+				add_character_modifier = {
+					name = sacrificed_prisoner
+					duration = 1000
+					stacking = yes
+				}
+			}
+
+			hidden_effect = {
+				event_target:captured_commander = { character_event = { id = 50021 } }
+				if = {
+					limit = {
+						OR = {
+							has_religion_feature = religion_ritual_sacrifice
+							religion = toteteohuan
+							religion = toteteohuan_reformed
+						}
+					}
+					if = { #A foreign religious head is also quite good.
+						limit = {
+							event_target:captured_commander = {
+								NOT = { religion = ROOT }
+								controls_religion = yes
+							}
+						}
+						change_variable = { which = burned_hearts_points value = 2 }
+					}
+					if = { #A foreign emperor is also well accepted.
+						limit = {
+							event_target:captured_commander = {
+								NOT = { religion = ROOT } 
+								higher_tier_than = KING
+							}
+						}
+						change_variable = { which = burned_hearts_points value = 2 }
+					}
+					bloodthirsty_tiered_traits_effect = yes
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				event_target:captured_commander = { is_rival = ROOT }
+			}
+			modifier = {
+				factor = 0.01
+				trait = kind
+			}
+			modifier = {
+				factor = 1.5
+				is_evil_trigger = yes
+			}
+		}
+
+		trigger = {
+			has_dlc = "Holy Fury"
+			is_member_of_any_warrior_lodge_trigger = yes
+			has_religion_matching_joined_warrior_lodge_trigger = yes
+		}
+	}
+
+	# Regular options...
+	option = {
+		name = "EVTOPTA50020" #Perfect!
+		ai_chance = { factor = 10 }
+		trigger = { event_target:captured_commander = { NOT = { is_rival = ROOT } } }
+	}
+	option = {
+		name = EVTOPTB50020 #My rival, no less? Great!
+		ai_chance = { factor = 10 }
+		trigger = { event_target:captured_commander = { is_rival = ROOT } }
 	}
 }
+
+#Prisoner receives event informing that enemy_liege has decided to sacrifice you to the gods instead of simply taking you prisoner. Shiiiit.
+character_event = {
+	id = 50021
+	title = sacrificed_in_battle
+	desc = "EVTDESC50021"
+	picture = "GFX_evt_battle"
+	border = GFX_event_normal_frame_war
+	
+	is_triggered_only = yes
+
+	immediate = {
+		save_event_target_as = sacrificed
+		if = {
+			limit = { multiplayer = yes } #insta-death in MP
+			death = {
+				death_reason = death_sacrificed
+				killer = FROM
+			}
+		}
+	}
+	
+	option = {
+		name = {
+			text = EVTOPTA50021 #I can't believe this is how it ends
+			trigger = { NOT = { same_society_as = FROM } }
+		}
+		name = {
+			text = EVTOPTB50021 #Noo..! For [society], why?
+			trigger = { same_society_as = FROM }
+		}
+		tooltip = {
+			FROM = {
+				show_scope_change = no
+				add_character_modifier = {
+					name = sacrificed_prisoner
+					duration = 1000
+					stacking = yes
+				}
+			}
+		}
+		if = {
+			limit = { multiplayer = no }
+			death = {
+				death_reason = death_sacrificed
+				killer = event_target:enemy_liege
+			}
+		}
+		if = { #if not independent: Add notification sent to this character's liege
+			limit = {
+				independent = non
+			}
+			character_event = { id = 50022 }
+		}
+	}
+}
+
+character_event = {
+	id = 50022
+	desc = EVTDESC50022
+	picture = GFX_evt_magic_ritual
+	
+	notification = yes
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA50022
+	}
+}
+
 
 ###############################################
 
@@ -819,14 +1011,14 @@ character_event = {
 	desc = "EVTDESC50025"
 	picture = GFX_evt_emissary
 	
-	only_rulers = yes
+	only_playable = yes
 	min_age = 16
 	capable_only = yes
 	prisoner = no
 	war = no
+	in_command = no
 	
 	trigger = {
-		in_command = no
 		is_abroad = no
 		independent = no
 		liege = {
@@ -852,7 +1044,7 @@ character_event = {
 	option = {
 		name = "EVTOPTA50025"
 		liege = {
-			random_realm_lord = {
+			any_realm_lord = {
 				limit = {
 					host = {
 						character = PREV
@@ -860,6 +1052,10 @@ character_event = {
 					prisoner = yes
 					is_friend = ROOT
 				}
+				score_value = { #Prioritizes selecting an interesting courtier...
+		            value = 10
+		            interesting_courtier_selection_score = yes
+		        }
 				hidden_tooltip = {
 					add_character_modifier = {
 						name = petition_release_prisoner_timer
@@ -880,17 +1076,18 @@ character_event = {
 	option = {
 		name = "EVTOPTB50025"
 		liege = {
-			random_realm_lord = {
+			any_realm_lord = {
 				limit = {
 					host = {
 						character = PREV
 					}
 					prisoner = yes
-					OR = {
-						opinion = { who = ROOT value = 25 }
-						reverse_opinion = { who = ROOT value = 25 }
-					}
+					is_friend = ROOT
 				}
+				score_value = { #Prioritizes selecting an interesting courtier...
+		            value = 10
+		            interesting_courtier_selection_score = yes
+		        }
 				opinion = {
 					modifier = opinion_disgruntled
 					who = ROOT
