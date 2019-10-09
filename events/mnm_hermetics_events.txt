@@ -32,7 +32,7 @@ character_event = {
     	if = { #Find a non-prisoner member
     		limit = { FROM = { leader = { prisoner = yes } } }
     		FROM = {
-    			random_society_member = {
+    			any_society_member = {
     				limit = { 
     					society_member_of = emerald_enclave 
     					society_rank == 4
@@ -41,7 +41,7 @@ character_event = {
     				character_event = { id = MNM.101 }
     				break = yes
     			}
-    			random_society_member = {
+    			any_society_member = {
     				limit = { 
     					society_member_of = emerald_enclave 
     					society_rank == 3
@@ -50,7 +50,7 @@ character_event = {
     				character_event = { id = MNM.101 }
     				break = yes
     			}
-    			random_society_member = {
+    			any_society_member = {
     				limit = { 
     					society_member_of = emerald_enclave 
     					society_rank == 2
@@ -59,7 +59,7 @@ character_event = {
     				character_event = { id = MNM.101 }
     				break = yes
     			}
-    			random_society_member = {
+    			any_society_member = {
     				limit = { 
     					society_member_of = emerald_enclave 
     					society_rank == 1
@@ -136,7 +136,7 @@ character_event = {
     	random_list = {
     		20 = { #International society member
     			society = {
-    				random_society_member = {
+    				any_society_member = {
     					limit = { 	
 							NOT = { character = ROOT }
 							prisoner = no
@@ -160,7 +160,7 @@ character_event = {
     				}
     			}
     			society = {
-    				random_society_member = {
+    				any_society_member = {
     					limit = { 	
     						NOT = { character = ROOT }
     						prisoner = no
@@ -1242,7 +1242,12 @@ character_event = {
 	
 	immediate = {
 		hidden_effect = {
-			random_courtier = {
+			any_courtier = {
+				score_value = { #Prioritizes selecting an interesting courtier...
+		            value = 10
+		            interesting_courtier_selection_score = yes
+		            prev_dislikes_this_score = yes
+		        }
 				save_event_target_as = sacrifice_for_science
 			}
 		}
@@ -1709,6 +1714,10 @@ society_quest_event = {
     desc = EVTDESC_MNM_1418
 
     is_triggered_only = yes
+
+    trigger = { 
+		is_alive = yes 
+	}
    
     option = {
 		name = ACCEPT
@@ -4211,6 +4220,7 @@ character_event = { # You see something in the water and react well or poorly to
 					character_event = { id = MNM.1227 days = 1500 random = 300 }
 				}
 			}
+			remove_character_modifier = scrying_cooldown
 		}
     	clr_character_flag = desc_variation_A_flag
 		clr_character_flag = desc_variation_B_flag
@@ -4224,6 +4234,7 @@ character_event = { # You see something in the water and react well or poorly to
 
 character_event = { # Gain a leadership trait (fired from on_combat_pulse)
     id = MNM.1202
+    title = the_battle_at_location
     picture = GFX_evt_battle
     border = GFX_event_normal_frame_war
     is_triggered_only = yes
@@ -4240,37 +4251,6 @@ character_event = { # Gain a leadership trait (fired from on_combat_pulse)
 		has_battle_omen_modifier_trigger = yes
     }
 
-    weight_multiplier = {
-		days = 1
-		modifier = {
-			factor = 2.5
-			has_character_modifier = good_battle_omen
-		}
-		modifier = {
-			factor = 1.5
-			trait = brave
-		}
-		modifier = {
-			factor = 0.5
-			trait = craven
-		}
-		modifier = {
-			trait = genius
-			factor = 1.5
-		}
-		modifier = {
-			OR = {
-				trait = quick
-				trait = shrewd
-			}
-			factor = 1.2
-		}
-		modifier = {
-			factor = 0.9
-			has_character_modifier = bad_battle_omen
-		}
-	}
-
 	desc = {
     	trigger = { has_character_modifier = good_battle_omen }
     	text = EVTDESC_MNM_1202_A
@@ -4281,6 +4261,7 @@ character_event = { # Gain a leadership trait (fired from on_combat_pulse)
     }
     
 	immediate = {
+		disallow_new_battle_events_effect = yes
 		random_list = {
 			10 = {
 				trigger = { NOT = { trait = experimenter } }
@@ -4325,11 +4306,13 @@ character_event = { # Gain a leadership trait (fired from on_combat_pulse)
 		clr_character_flag = gain_direct_leader
 		clr_character_flag = gain_unyielding_leader
 		clr_character_flag = gain_inspiring_leader
+		allow_new_battle_events_effect = yes
 	}
 }
 
 character_event = { # Fight goes badly (fired from on_combat_pulse)
     id = MNM.1203
+    title = the_battle_at_location
     picture = GFX_evt_battle
     border = GFX_event_normal_frame_war
     is_triggered_only = yes
@@ -4340,17 +4323,9 @@ character_event = { # Fight goes badly (fired from on_combat_pulse)
     	has_battle_omen_modifier_trigger = yes
     }
 
-    weight_multiplier = {
-		days = 1
-		modifier = {
-			factor = 2
-			has_character_modifier = bad_battle_omen
-		}
-		modifier = {
-			factor = 0.9
-			has_character_modifier = good_battle_omen
-		}
-	}
+    immediate = {
+    	disallow_new_battle_events_effect = yes
+    }
 
     desc = {
     	trigger = { has_character_modifier = bad_battle_omen }
@@ -4406,6 +4381,7 @@ character_event = { # Fight goes badly (fired from on_combat_pulse)
 			}
 		}
 		remove_scrying_omen_modifiers_effect = yes
+		allow_new_battle_events_effect = yes
 	}
 }
 
@@ -4961,6 +4937,13 @@ character_event = { # scrying vision result: Cat/Dog death
         	text = EVTOPTA_MNM_1214_dog
         	trigger = { has_character_flag = dog_death_omen }
         }
+        name = {
+        	text = EVTOPTA_MNM_1214_other
+        	trigger = {
+        		NOT = { has_character_flag = cat_death_omen }
+        		NOT = { has_character_flag = dog_death_omen }
+        	}
+        }
 
     	upgrade_seer_modifier_effect = yes
 
@@ -4974,6 +4957,13 @@ character_event = { # scrying vision result: Cat/Dog death
         name = {
         	text = EVTOPTB_MNM_1214_dog
         	trigger = { has_character_flag = dog_death_omen }
+        }
+        name = {
+        	text = EVTOPTB_MNM_1214_other
+        	trigger = {
+        		NOT = { has_character_flag = cat_death_omen }
+        		NOT = { has_character_flag = dog_death_omen }
+        	}
         }
 
         downgrade_seer_modifier_effect = yes
@@ -5381,8 +5371,13 @@ character_event = { # FALLBACK (delayed event): Something good happens
 				if = {
 					limit = { any_courtier = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } }
 
-					random_courtier = {
+					any_courtier = {
 						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } 
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 						save_event_target_as = envisioned_friend
 					}
 				}
@@ -5410,8 +5405,13 @@ character_event = { # FALLBACK (delayed event): Something good happens
 				if = {
 					limit = { any_courtier = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } }
 
-					random_courtier = {
+					any_courtier = {
 						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } 
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 						save_event_target_as = envisioned_friend
 					}
 				}
@@ -5611,8 +5611,13 @@ character_event = { # FALLBACK (delayed event): Something bad happens
 				if = {
 					limit = { any_courtier = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } }
 
-					random_courtier = {
-						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } 
+					any_courtier = {
+						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes }
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_dislikes_this_score = yes
+				        }
 						save_event_target_as = envisioned_rival
 					}
 				}
@@ -5641,8 +5646,13 @@ character_event = { # FALLBACK (delayed event): Something bad happens
 				if = {
 					limit = { any_courtier = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } }
 
-					random_courtier = {
-						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes } 
+					any_courtier = {
+						limit = { NOR = { is_friend = ROOT is_rival = ROOT is_lover = ROOT } is_adult = yes }
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_dislikes_this_score = yes
+				        }
 						save_event_target_as = envisioned_rival
 					}
 				}
@@ -6172,101 +6182,206 @@ character_event = { # Child contemplates their destiny - is this what they want?
     }
 
     immediate = {
-    	random_courtier = {
+    	any_courtier = {
 			limit = { is_adult = yes prisoner = no }
 			save_event_target_as = inspiring_adult
+			score_value = { #Prioritizes selecting an interesting courtier...
+	            value = 10
+	            interesting_courtier_selection_score = yes
+	            prev_likes_this_score = yes
+	        }
 		}
     	if = { limit = { has_guardian = yes }
 	    	trigger_switch = { # finds an appropriate inspiring adult...
 	    		on_trigger = has_character_flag
 				destined_steward = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15 is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15 has_education_stewardship_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15 has_education_stewardship_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_fighter = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15 is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15 has_education_martial_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15 has_education_martial_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_diplomat = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15 is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15 has_education_diplomacy_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15 has_education_diplomacy_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_schemer = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15 is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15 has_education_intrigue_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15 has_education_intrigue_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_scholar = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 is_guardian = ROOT }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 has_education_learning_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 has_education_learning_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 	    	}
@@ -6275,93 +6390,193 @@ character_event = { # Child contemplates their destiny - is this what they want?
 	    	trigger_switch = { # finds an appropriate inspiring adult...
 	    		on_trigger = has_character_flag
 				destined_steward = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15 }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15 has_education_stewardship_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no stewardship = 15  has_education_stewardship_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_fighter = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15 }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15 has_education_martial_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no martial = 15  has_education_martial_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_diplomat = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15 }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15 has_education_diplomacy_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no diplomacy = 15  has_education_diplomacy_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_schemer = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15 }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15 has_education_intrigue_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no intrigue = 15  has_education_intrigue_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 				destined_scholar = {
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 has_education_learning_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
-					random_courtier = {
+					any_courtier = {
 						limit = { is_adult = yes prisoner = no learning = 15 has_education_learning_trigger = yes has_top_tier_education_trait_trigger = yes }
 						save_event_target_as = inspiring_adult
+						score_value = { #Prioritizes selecting an interesting courtier...
+				            value = 10
+				            interesting_courtier_selection_score = yes
+				            prev_likes_this_score = yes
+				        }
 					}
 				}
 	    	}
@@ -6585,41 +6800,51 @@ character_event = { # Destiny fulfilled (for horoscope_child)
 			destined_steward = {
 				if = { limit = { has_education_stewardship_trigger = yes }
 					upgrade_education_effect = yes
+					set_character_flag = upgraded_stewardship
 				}
 				if = { limit = { has_education_stewardship_trigger = no }
 					change_stewardship = 1
+					set_character_flag = stewardship_1
 				}
 			}
 			destined_fighter = {
 				if = { limit = { has_education_martial_trigger = yes }
 					upgrade_education_effect = yes
+					set_character_flag = upgraded_martial
 				}
 				if = { limit = { has_education_martial_trigger = no }
 					change_martial = 1
+					set_character_flag = martial_1
 				}
 			}
 			destined_diplomat = {
 				if = { limit = { has_education_diplomacy_trigger = yes }
 					upgrade_education_effect = yes
+					set_character_flag = upgraded_diplomacy
 				}
 				if = { limit = { has_education_diplomacy_trigger = no }
 					change_diplomacy = 1
+					set_character_flag = diplomacy_1
 				}
 			}
 			destined_schemer = {
 				if = { limit = { has_education_intrigue_trigger = yes }
 					upgrade_education_effect = yes
+					set_character_flag = upgraded_intrigue
 				}
 				if = { limit = { has_education_intrigue_trigger = no }
 					change_intrigue = 1
+					set_character_flag = intrigue_1
 				}
 			}
 			destined_scholar = {
 				if = { limit = { has_education_learning_trigger = yes }
 					upgrade_education_effect = yes
+					set_character_flag = upgraded_learning
 				}
 				if = { limit = { has_education_learning_trigger = no }
 					change_learning = 1
+					set_character_flag = learning_1
 				}
 			}
 		}
@@ -6632,41 +6857,51 @@ character_event = { # Destiny fulfilled (for horoscope_child)
 			destined_steward = {
 				if = { limit = { has_education_stewardship_trigger = yes }
 					change_stewardship = 2
+					set_character_flag = stewardship_2
 				}
 				if = { limit = { has_education_stewardship_trigger = no }
 					change_stewardship = 1
+					set_character_flag = stewardship_1
 				}
 			}
 			destined_fighter = {
 				if = { limit = { has_education_martial_trigger = yes }
 					change_martial = 2
+					set_character_flag = martial_2
 				}
 				if = { limit = { has_education_martial_trigger = no }
 					change_martial = 1
+					set_character_flag = martial_1
 				}
 			}
 			destined_diplomat = {
 				if = { limit = { has_education_diplomacy_trigger = yes }
 					change_diplomacy = 2
+					set_character_flag = diplomacy_2
 				}
 				if = { limit = { has_education_diplomacy_trigger = no }
 					change_diplomacy = 1
+					set_character_flag = diplomacy_1
 				}
 			}
 			destined_schemer = {
 				if = { limit = { has_education_intrigue_trigger = yes }
 					change_intrigue = 2
+					set_character_flag = intrigue_2
 				}
 				if = { limit = { has_education_intrigue_trigger = no }
 					change_intrigue = 1
+					set_character_flag = intrigue_1
 				}
 			}
 			destined_scholar = {
 				if = { limit = { has_education_learning_trigger = yes }
 					change_learning = 2
+					set_character_flag = learning_2
 				}
 				if = { limit = { has_education_learning_trigger = no }
 					change_learning = 1
+					set_character_flag = learning_1
 				}
 			}
 		}
@@ -6679,6 +6914,24 @@ character_event = { # Destiny fulfilled (for horoscope_child)
 	    		character_event = { id = MNM.1265 }
 	    	}
     		clean_up_horoscope_effect = yes
+    		if = {
+    			limit = { event_target:horoscope_maker = { NOT = { is_alive = yes } } }
+    			clr_character_flag = martial_1
+    			clr_character_flag = martial_2
+    			clr_character_flag = diplomacy_1
+    			clr_character_flag = diplomacy_2
+    			clr_character_flag = stewardship_1
+    			clr_character_flag = stewardship_2
+    			clr_character_flag = intrigue_1
+    			clr_character_flag = intrigue_2
+    			clr_character_flag = learning_1
+    			clr_character_flag = learning_2
+    			clr_character_flag = upgraded_martial
+    			clr_character_flag = upgraded_diplomacy
+    			clr_character_flag = upgraded_stewardship
+    			clr_character_flag = upgraded_intrigue
+    			clr_character_flag = upgraded_learning
+    		}
     	}
     }
 }
@@ -6743,8 +6996,49 @@ character_event = { #Final follow-up for parent
 
     option = {      
         name = fina_horoscope_outcome_for_parent_opt
+
+		event_target:horoscope_child = { #to show effects achieved for kid...
+			show_scope_change = no
+	        trigger_switch = {
+	        	on_trigger = has_character_flag
+	        	martial_1 = { custom_tooltip = { text = improved_martial_1_tt } }
+    			martial_2 = { custom_tooltip = { text = improved_martial_2_tt } }
+    			diplomacy_1 = { custom_tooltip = { text = improved_diplo_1_tt } }
+    			diplomacy_2 = { custom_tooltip = { text = improved_diplo_2_tt } }
+    			stewardship_1 = { custom_tooltip = { text = improved_stew_1_tt } }
+    			stewardship_2 = { custom_tooltip = { text = improved_stew_2_tt } }
+    			intrigue_1 = { custom_tooltip = { text = improved_int_1_tt } }
+    			intrigue_2 = { custom_tooltip = { text = improved_int_2_tt } }
+    			learning_1 = { custom_tooltip = { text = improved_learn_1_tt } }
+    			learning_2 = { custom_tooltip = { text = improved_learn_2_tt } }
+    			upgraded_martial = { custom_tooltip = { text = upgraded_martial_tt } }
+    			upgraded_diplomacy = { custom_tooltip = { text = upgraded_diplo_tt } }
+    			upgraded_stewardship = { custom_tooltip = { text = upgraded_stew_tt } }
+    			upgraded_intrigue = { custom_tooltip = { text = upgraded_int_tt } }
+    			upgraded_learning = { custom_tooltip = { text = upgraded_learn_tt } }
+	        }
+        }
+
         clr_character_flag = child_fulfilled_destiny_flag
         clr_character_flag = child_avoided_destiny_flag
+
+        event_target:horoscope_child = {
+        	clr_character_flag = martial_1
+			clr_character_flag = martial_2
+			clr_character_flag = diplomacy_1
+			clr_character_flag = diplomacy_2
+			clr_character_flag = stewardship_1
+			clr_character_flag = stewardship_2
+			clr_character_flag = intrigue_1
+			clr_character_flag = intrigue_2
+			clr_character_flag = learning_1
+			clr_character_flag = learning_2
+			clr_character_flag = upgraded_martial
+			clr_character_flag = upgraded_diplomacy
+			clr_character_flag = upgraded_stewardship
+			clr_character_flag = upgraded_intrigue
+			clr_character_flag = upgraded_learning
+        }
     }
 }
 
@@ -7181,7 +7475,7 @@ character_event = {
 			}
         }
 
-		hidden_effect = { FROMFROM = { character_event = { id = MNM.1402 } } }
+		hidden_effect = { FROM = { character_event = { id = MNM.1402 } } }
 
 		ai_chance = {
 			factor = 50
@@ -7197,7 +7491,7 @@ character_event = {
         custom_tooltip = { text = EVTOPTB_MNM_1401_TT }
 
         reverse_opinion = {
-        	who = FROMFROM
+        	who = FROM
         	modifier = opinion_ungrateful
         }
         #Does not give follow-up because if a player recieves this, the sender is a courtier
@@ -7209,7 +7503,7 @@ character_event = {
 				factor = 3
 			}
 			modifier = {
-				liege = { character = FROMFROM } #A player will always get a yes
+				liege = { character = FROM } #A player will always get a yes
 				factor = 0
 			}
 		}
@@ -7223,8 +7517,6 @@ character_event = {
     desc = EVTDESC_MNM_1402
     picture = GFX_evt_experiment
     border = GFX_event_normal_frame_religion
-
-    hide_from = yes
 
     is_triggered_only = yes
     
@@ -8620,19 +8912,19 @@ character_event = {
         hidden_effect = {
         	if = { 
         		limit = { event_target:arguer_1 = { character = event_target:great_minds_guest_1 } }
-        		clear_event_target = event_target:great_minds_guest_1
+        		clear_event_target = great_minds_guest_1
         	}
         	if = { 
         		limit = { event_target:arguer_1 = { character = event_target:great_minds_guest_2 } }
-        		clear_event_target = event_target:great_minds_guest_2
+        		clear_event_target = great_minds_guest_2
         	}
         	if = { 
         		limit = { event_target:arguer_1 = { character = event_target:great_minds_guest_3 } }
-        		clear_event_target = event_target:great_minds_guest_3
+        		clear_event_target = great_minds_guest_3
         	}
         	if = { 
         		limit = { event_target:arguer_1 = { character = event_target:great_minds_guest_4 } }
-        		clear_event_target = event_target:great_minds_guest_4
+        		clear_event_target = great_minds_guest_4
         	}
 
         	hidden_effect = { character_event = { id = MNM.1480 } } #Handles scandals
@@ -8651,19 +8943,19 @@ character_event = {
         hidden_effect = {
         	if = { 
         		limit = { event_target:arguer_2 = { character = event_target:great_minds_guest_1 } }
-        		clear_event_target = event_target:great_minds_guest_1
+        		clear_event_target = great_minds_guest_1
         	}
         	if = { 
         		limit = { event_target:arguer_2 = { character = event_target:great_minds_guest_2 } }
-        		clear_event_target = event_target:great_minds_guest_2
+        		clear_event_target = great_minds_guest_2
         	}
         	if = { 
         		limit = { event_target:arguer_2 = { character = event_target:great_minds_guest_3 } }
-        		clear_event_target = event_target:great_minds_guest_3
+        		clear_event_target = great_minds_guest_3
         	}
         	if = { 
         		limit = { event_target:arguer_2 = { character = event_target:great_minds_guest_4 } }
-        		clear_event_target = event_target:great_minds_guest_4
+        		clear_event_target = great_minds_guest_4
         	}
 
         	hidden_effect = { character_event = { id = MNM.1480 } } #Handles scandals
@@ -11829,6 +12121,13 @@ character_event = { #quest ping
 	hide_window = yes
 	
 	is_triggered_only = yes
+
+	trigger = {
+		FROM = {
+			is_alive = yes
+			is_in_society = yes
+		}
+	}
 	
 	immediate = {
 		FROM = { character_event = { id = MNM.1802 } }
@@ -12854,7 +13153,15 @@ character_event = {
     }
 
     immediate = {
-    	liege = { 
+    	any_player = { 
+	    	limit = { 
+				ROOT = { 
+					has_opinion_modifier = { 
+						who = PREV
+						modifier = opinion_hermetic_apprentice 
+					}
+				}
+			}
     		character_event = { id = MNM.1416 }
     		if = {
     			limit = { has_character_flag = apprentice_hermetic_gathering }
@@ -15202,11 +15509,8 @@ character_event = { # progress event tombola
 			30 = { # Neglect interacting with your spouse
 				trigger = {
 					NOT = { event_target:hermetic_collaborator = { is_married = ROOT } }
-				}
-				modifier = {
-					factor = 0
-					NOT = {
-						any_spouse = { always = yes }
+					any_spouse = {
+						prisoner = no
 					}
 				}
 				
@@ -15455,8 +15759,11 @@ character_event = { # Progress - Neglect interacting with your spouse
 	
 	is_triggered_only = yes
 	
+	portrait = event_target:target_spouse
+	
 	immediate = {
 		random_spouse = {
+			limit = { prisoner = no }
 			save_event_target_as = target_spouse
 		}
 	}
@@ -15571,7 +15878,7 @@ character_event = { # Progress - Neglect interacting with your spouse
 		event_target:target_spouse = {
 			opinion = {
 				who = ROOT
-				modifier = opinion_out_of_touch_mild
+				modifier = opinion_relieved
 				years = 10
 			}
 		}
@@ -15949,17 +16256,27 @@ character_event = { # Progress - Absent-mindedness in meetings
 	is_triggered_only = yes
 	
 	immediate = {
-		random_courtier_or_vassal = {
+		any_courtier_or_vassal = {
 			limit = {
 				has_job_title = yes
 			}
+			score_value = { #Prioritizes selecting an interesting courtier...
+	            value = 10
+	            interesting_courtier_selection_score = yes
+	            prev_dislikes_this_score = yes
+	        }
 			save_event_target_as = councillor1
 		}
-		random_courtier_or_vassal = {
+		any_courtier_or_vassal = {
 			limit = {
 				has_job_title = yes
 				NOT = { character = event_target:councillor1 }
 			}
+			score_value = { #Prioritizes selecting an interesting courtier...
+	            value = 10
+	            interesting_courtier_selection_score = yes
+	            prev_likes_this_score = yes
+	        }
 			save_event_target_as = councillor2
 		}
 	}
