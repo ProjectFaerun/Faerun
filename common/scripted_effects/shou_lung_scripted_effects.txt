@@ -1,0 +1,1392 @@
+#Grace effects
+add_grace_trivial_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 100
+	}
+}
+
+add_grace_minor_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 200
+	}
+}
+
+add_grace_medium_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 300
+	}	
+}
+
+add_grace_major_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 500
+	}
+}
+
+add_grace_massive_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 1000
+	}
+}
+
+add_grace_super_huge_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = 2000
+	}
+}
+
+detract_grace_trivial_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -100
+	}
+}
+
+detract_grace_minor_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -200
+	}
+}
+
+detract_grace_medium_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -300
+	}
+}
+
+detract_grace_major_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -500
+	}
+}
+
+detract_grace_massive_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -1000
+	}
+}
+
+detract_grace_super_huge_effect = {
+	add_offmap_currency = {
+		offmap = shou_lung
+		value = -2000
+	}
+}
+
+set_shou_lung_boon_cd_effect = {  #added via tribute to shou_lung decisions... Always one year.
+	add_character_modifier = {
+		hidden = yes
+		name = jd_shou_lung_boon_cd
+		days = 365 #If this is changed, edit  shou_lung_offmap_boon_decisions_enabled_trigger_cd_tt
+	}
+}
+
+set_shou_lung_tribute_cd_effect = { #added via tribute to shou_lung decisions... Always one year.
+	add_character_modifier = {
+		hidden = yes
+		name = jd_shou_lung_tribute_cd
+		days = 365
+	}
+}
+
+leave_court_for_shou_lung_effect = { # NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to shou_lung, a killer needs to be set (eg: "killer = ROOT")
+	custom_tooltip = {
+		text = will_leave_for_shou_lung_tt
+	}
+	set_character_flag = ignore_refund
+	hidden_effect = { death = { death_reason = death_went_to_shou_lung } }
+}
+
+return_to_shou_lung_effect = { # NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to shou_lung, a killer needs to be set (eg: "killer = ROOT")
+	custom_tooltip = {
+		text = will_return_to_shou_lung_tt
+	}
+	set_character_flag = ignore_refund
+	hidden_effect = { death = { death_reason = death_went_back_to_shou_lung } }
+}
+
+# Utilizes shou_lung_war_minimum_commander_martial variable on the current scope to spawn characters with at least that amount of martial skill.
+shou_lung_spawn_commander_effect = {
+	create_random_soldier = {
+		random_traits = yes
+		religion = liege
+		culture = liege
+		dynasty = none
+		female = no
+		age = 28
+	}
+	new_character = {
+		unsafe_give_minor_title = title_commander
+		
+		set_variable = {
+			which = shou_lung_war_minimum_commander_martial
+			which = PREV
+		}
+		if = {
+			limit = {
+				NOT = { trait = brilliant_strategist }
+			}
+			remove_trait = misguided_warrior
+			remove_trait = tough_soldier
+			remove_trait = skilled_tactician
+			add_trait = skilled_tactician
+			# Make sure they have a tier 3 or tier 4 education
+		}
+		random_list = { # Give a chance to get Chinese commander traits
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = master_of_flame }
+				}
+				add_trait = master_of_flame
+			}
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = logistics_expert }
+				}
+				add_trait = logistics_expert
+			}
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = levy_coordinator }
+				}
+				add_trait = levy_coordinator
+			}
+			30 = {
+				trigger = {
+					can_have_more_leadership_traits = yes
+					NOT = { trait = sapper }
+				}
+				add_trait = sapper
+			}
+			90 = {}
+		}
+		while = { # Increase the martial skill with base or martial traits until the minimum is reached
+			limit = {
+				NOT = {
+					martial = shou_lung_war_minimum_commander_martial
+				}
+			}
+			random_list = {
+				40 = {
+					change_martial = 1
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = strong
+							trait = robust
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = strong
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = strong
+							trait = robust
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = robust
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = shrewd
+							trait = genius
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = shrewd
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = duelist
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = hunter
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = strategist
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = duelist
+							trait = hunter
+							trait = strategist
+							trait = architect
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = architect
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = diligent
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = diligent
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = brave
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = brave
+				}
+				5 = {
+					trigger = { 
+						NOR = { 
+							trait = ambitious
+							calc_true_if = {
+								amount = 3
+								trait = strong 
+								trait = robust 
+								trait = shrewd 
+								trait = duelist 
+								trait = hunter 
+								trait = strategist 
+								trait = architect 
+								trait = diligent 
+								trait = brave 
+								trait = ambitious
+							}
+						}
+					}
+					add_trait = ambitious
+				}
+			}
+		}
+	}
+}
+
+shou_lung_war_spawn_troops_effect = {
+	# Requires the current things to function properly:
+	# event_target:spawn_province
+	# variable: shou_lung_war_troop_quality
+	# variable: shou_lung_war_troop_quantity
+	while = {
+		limit = {
+			check_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 1
+			}
+		}
+		change_variable = {	
+			which = shou_lung_war_troop_quantity
+			value = -1
+		}
+		
+		random_list = { # Not really random but decent flow control
+			10 = {
+				trigger = {
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 2
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 168 168 }
+						light_infantry = { 284 284 }
+						heavy_infantry = { 0 0 }
+						pikemen = { 0 0 }
+						light_cavalry = { 41 41 }
+						knights = { 0 0 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 2
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 3
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 148 148 }
+						light_infantry = { 264 264 }
+						heavy_infantry = { 0 0 }
+						pikemen = { 0 0 }
+						light_cavalry = { 81 81 }
+						knights = { 0 0 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 3
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 4
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 144 144 }
+						light_infantry = { 221 221 }
+						heavy_infantry = { 49 49 }
+						pikemen = { 0 0 }
+						light_cavalry = { 79 79 }
+						knights = { 0 0 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 4
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 5
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 144 144 }
+						light_infantry = { 203 203 }
+						heavy_infantry = { 66 66 }
+						pikemen = { 19 19 }
+						light_cavalry = { 61 61 }
+						knights = { 0 0 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 5
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 6
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 136 136 }
+						light_infantry = { 134 134 }
+						heavy_infantry = { 102 102 }
+						pikemen = { 41 41 }
+						light_cavalry = { 80 80 }
+						knights = { 0 0 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 6
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 7
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 122 122 }
+						light_infantry = { 71 71 }
+						heavy_infantry = { 85 85 }
+						pikemen = { 78 78 }
+						light_cavalry = { 113 113 }
+						knights = { 24 24 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 7
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 107 107 }
+						light_infantry = { 22 22 }
+						heavy_infantry = { 106 106 }
+						pikemen = { 96 96 }
+						light_cavalry = { 111 111 }
+						knights = { 51 51 }
+					}
+					#attrition = 1
+					disband_on_peace = yes
+					merge = yes
+				}
+			}
+		}
+	}
+}
+
+shou_lung_war_spawn_troops_no_disband_effect = {
+	# Requires the current things to function properly:
+	# event_target:spawn_province
+	# variable: shou_lung_war_troop_quality
+	# variable: shou_lung_war_troop_quantity
+	while = {
+		limit = {
+			check_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 1
+			}
+		}
+		change_variable = {	
+			which = shou_lung_war_troop_quantity
+			value = -1
+		}
+		
+		random_list = { # Not really random but decent flow control
+			10 = {
+				trigger = {
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 2
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 168 168 }
+						light_infantry = { 284 284 }
+						heavy_infantry = { 0 0 }
+						pikemen = { 0 0 }
+						light_cavalry = { 41 41 }
+						knights = { 0 0 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 2
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 3
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 148 148 }
+						light_infantry = { 264 264 }
+						heavy_infantry = { 0 0 }
+						pikemen = { 0 0 }
+						light_cavalry = { 81 81 }
+						knights = { 0 0 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 3
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 4
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 144 144 }
+						light_infantry = { 221 221 }
+						heavy_infantry = { 49 49 }
+						pikemen = { 0 0 }
+						light_cavalry = { 79 79 }
+						knights = { 0 0 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 4
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 5
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 144 144 }
+						light_infantry = { 203 203 }
+						heavy_infantry = { 66 66 }
+						pikemen = { 19 19 }
+						light_cavalry = { 61 61 }
+						knights = { 0 0 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 5
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 6
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 136 136 }
+						light_infantry = { 134 134 }
+						heavy_infantry = { 102 102 }
+						pikemen = { 41 41 }
+						light_cavalry = { 80 80 }
+						knights = { 0 0 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 6
+					}
+					NOT = {
+						check_variable = {
+							which = shou_lung_war_troop_quality
+							value = 7
+						}
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 122 122 }
+						light_infantry = { 71 71 }
+						heavy_infantry = { 85 85 }
+						pikemen = { 78 78 }
+						light_cavalry = { 113 113 }
+						knights = { 24 24 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+			10 = {
+				trigger = {
+					check_variable = {
+						which = shou_lung_war_troop_quality
+						value = 7
+					}
+				}
+				spawn_unit = {
+					owner = THIS
+					province = event_target:spawn_province
+					home = event_target:spawn_province
+					troops = {
+						archers = { 107 107 }
+						light_infantry = { 22 22 }
+						heavy_infantry = { 106 106 }
+						pikemen = { 96 96 }
+						light_cavalry = { 111 111 }
+						knights = { 51 51 }
+					}
+					attrition = 0.1
+					disband_on_peace = no
+					merge = yes
+				}
+			}
+		}
+	}
+}
+
+shou_lung_war_modify_variables_by_status_effect = {
+	# variable: shou_lung_war_troop_quality
+	# variable: shou_lung_war_troop_quantity
+	# variable: shou_lung_war_minimum_commander_martial
+	# variable: shou_lung_war_target_match_mult
+	
+	random_list = {
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_stable }
+			}
+			change_variable = { which = shou_lung_war_troop_quality value = 1 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = 3 }
+		}
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_unrest }
+			}
+			change_variable = { which = shou_lung_war_troop_quantity value = -6 }
+			change_variable = { which = shou_lung_war_target_match_mult value = -0.15 }
+		}
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_civil_war }
+			}
+			change_variable = { which = shou_lung_war_troop_quantity value = -6 }
+			change_variable = { which = shou_lung_war_target_match_mult value = -0.25 }
+			change_variable = { which = shou_lung_war_troop_quality value = -1 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = -6 }
+		}
+		1 = {
+			trigger = {
+				OR = {
+					shou_lung = { has_status = shou_lung_tu_lung_invasion }
+					shou_lung = { has_status = shou_lung_tuigan_invasion }
+				}
+			}
+			change_variable = { which = shou_lung_war_troop_quantity value = -7 }
+			change_variable = { which = shou_lung_war_target_match_mult value = -0.4 }
+			change_variable = { which = shou_lung_war_troop_quality value = -1 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = -2 }
+		}
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_famine }
+			}
+			change_variable = { which = shou_lung_war_troop_quantity value = -4 }
+			change_variable = { which = shou_lung_war_target_match_mult value = -0.30 }
+			change_variable = { which = shou_lung_war_troop_quality value = -2 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = -2 }
+		}
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_plague }
+			}
+			change_variable = { which = shou_lung_war_troop_quantity value = -6 }
+			change_variable = { which = shou_lung_war_target_match_mult value = -0.35 }
+			change_variable = { which = shou_lung_war_troop_quality value = -1 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = -4 }
+		}
+		1 = {
+			trigger = {
+				shou_lung = { has_status = shou_lung_golden_age }
+			}
+			change_variable = { which = shou_lung_war_target_match_mult value = 0.65 }
+			change_variable = { which = shou_lung_war_troop_quality value = 2 }
+			change_variable = { which = shou_lung_war_minimum_commander_martial value = 5 }
+		}
+	}
+}
+
+
+#Checks whether the Emperor likes target and shows tooltips (used in event JD.10010)
+check_likes_or_dislikes_THIS_effect = {
+ 	if = {  #If the current Emperor LIKES target
+        limit = {
+            is_liked_by_shou_lung_trigger = yes
+        }
+        shou_lung = {
+			show_scope_change = no
+            custom_tooltip = { text = emperor_likes_THIS_tt }
+        }
+    }
+
+    if = { #If the current Emperor DISLIKES target
+        limit = {
+           is_disliked_by_shou_lung_trigger = yes
+        }
+        shou_lung = {
+			show_scope_change = no
+			custom_tooltip = { text = emperor_dislikes_THIS_tt }
+        }
+    }
+
+    if = { #If the current Emperor LIKES *and* DISLIKES target
+        limit = {
+            is_liked_and_disliked_by_shou_lung = yes
+        }
+        shou_lung = {
+			show_scope_change = no
+            custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
+        }
+    }
+}
+
+print_shou_lung_status_update_effect = {
+	log = "----------------"
+	log = "shou_lung Logging:"
+	log = "shou_lung's status of [This.GetPrevStatus] ended after [global_temp_status_years.GetValue] years."
+	log = "shou_lung's new status is [This.GetStatus]."
+	log = "----------------"
+	set_variable = {
+		which = global_temp_status_years
+		value = 0
+	}
+	random_list = {
+		10 = {
+			trigger = {
+				has_status = shou_lung_stable
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_stable
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_unrest
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_unrest
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_civil_war
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_civil_war
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_tuigan_invasion
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_tuigan_invasion
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_tu_lung_invasion
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_tu_lung_invasion
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_famine
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_famine
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_plague
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_plague
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_golden_age
+				NOT = { has_policy = shou_lung_expansionist }
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_golden_age
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_status = shou_lung_golden_age
+				has_policy = shou_lung_expansionist
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_golden_age_expansionist
+				value = 1
+			}
+		}
+	}
+}
+
+print_shou_lung_policy_update_effect = {
+	log = "----------------"
+	log = "shou_lung Logging:"
+	log = "shou_lung's policy of [This.GetPrevPolicy] ended after [global_temp_policy_years.GetValue] years."
+	log = "shou_lung's new policy is [This.GetPolicy]."
+	log = "----------------"
+	set_variable = {
+		which = global_temp_policy_years
+		value = 0
+	}
+	random_list = {
+		10 = {
+			trigger = {
+				has_policy = shou_lung_open
+			}
+		}
+		10 = {
+			trigger = {
+				has_policy = shou_lung_isolationist
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_isolationist_policy
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				has_policy = shou_lung_expansionist
+			}
+			change_variable = {
+				which = global_amount_of_times_shou_lung_expansionist_policy
+				value = 1
+			}
+		}
+	}
+}
+
+
+shou_lung_war_modify_variables_by_century_effect = {
+	random_list = {
+		10 = {
+			trigger = {
+				year = 700
+				NOT = { year = 800 }
+			}
+		}
+		10 = {
+			trigger = {
+				year = 800
+				NOT = { year = 900 }
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 2
+			}
+		}
+		10 = {
+			trigger = {
+				year = 900
+				NOT = { year = 1000 }
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 3
+			}
+		}
+		10 = {
+			trigger = {
+				year = 1000
+				NOT = { year = 1100 }
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 4
+			}
+		}
+		10 = {
+			trigger = {
+				year = 1100
+				NOT = { year = 1200 }
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 5
+			}
+			change_variable = {
+				which = shou_lung_war_target_match_mult
+				value = 0.05
+			}
+		}
+		10 = {
+			trigger = {
+				year = 1200
+				NOT = { year = 1300 }
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 7
+			}
+			change_variable = {
+				which = shou_lung_war_target_match_mult
+				value = 0.05
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quality
+				value = 1
+			}
+		}
+		10 = {
+			trigger = {
+				year = 1300
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quantity
+				value = 8
+			}
+			change_variable = {
+				which = shou_lung_war_target_match_mult
+				value = 0.05
+			}
+			change_variable = {
+				which = shou_lung_war_troop_quality
+				value = 1
+			}
+		}
+	}
+}
+
+print_shou_lung_ruler_update_effect = {
+	log = "----------------"
+	log = "Ruler of shou_lung died at the age of [From.GetAgeYears]."
+	log = "New Ruler of shou_lung is [Root.GetBestName] ([From.GetCulture], From.GetReligion])."
+	log = "----------------"
+}
+
+abort_kow_tow_effect = {
+	if = {
+		limit = {
+			NOT = { has_character_flag = kow_tow_hide_abort_notification }
+		}
+		character_event = { id = JD.32299 }
+	}
+	clear_delayed_event = { id = JD.32005 }
+	clear_delayed_event = { id = JD.32200 }
+	clear_delayed_event = { id = JD.32113 }
+	clear_delayed_event = { id = JD.32111 }
+	clear_delayed_event = { id = JD.32210 }
+	clear_delayed_event = { id = JD.32290 }
+	clr_character_flag = went_on_kow_tow_pilgrimage
+	clean_up_after_kow_tow_effect = yes
+}
+
+return_to_travel_tombola_effect = {
+	hidden_effect = {
+		event_target:kow_tow_traveler = {
+			subtract_variable = {
+				which = shou_lung_kow_tow_travel_events
+				value = 1
+			}
+			character_event = {
+				id = JD.32005
+				days = 90
+				random = 60
+			}
+		}
+	}
+}
+
+return_to_shou_lung_tombola_effect = {
+	hidden_effect = {
+		event_target:kow_tow_traveler = {
+			subtract_variable = {
+				which = shou_lung_kow_tow_travel_events
+				value = 1
+			}
+			character_event = {
+				id = JD.32210
+				days = 70
+				random = 30
+			}
+		}
+	}
+}
+
+clean_up_after_kow_tow_effect = {
+	remove_trait = kow_tow_travels
+	clr_character_flag = do_not_disturb
+	
+	clr_character_flag = read_the_guanzi
+	clr_character_flag = missed_loved_one
+	clr_character_flag = met_mercenaries
+	clr_character_flag = met_traveling_merchant
+	clr_character_flag = visited_market
+	clr_character_flag = kow_tow_invited_by_local_lord
+	clr_character_flag = kow_tow_heavy_rain
+	clr_character_flag = kow_tow_played_go
+	clr_character_flag = kow_tow_hide_abort_notification
+	clr_character_flag = kow_tow_visited_temple
+}
+
+add_shou_lung_artifact_effect = { #Used in event JD.15016 (possible to use elsewhere!)
+	hidden_effect = {
+		random_list = {
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_artwork } } }
+				add_artifact = shou_lung_artwork
+				new_artifact = {
+					set_name = shou_lung_artwork_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_calligraphy } } }
+				add_artifact = shou_lung_calligraphy
+				new_artifact = {
+					set_name = shou_lung_calligraphy_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_sculpture } } }
+				add_artifact = shou_lung_sculpture
+				new_artifact = {
+					set_name = shou_lung_sculpture_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_ceremonial_robes } } }
+				add_artifact = shou_lung_ceremonial_robes
+			}
+			10 = {
+				shou_lung = {
+					offmap_prev_ruler = {
+						save_event_target_as = prev_emperor
+					}
+				}
+				add_artifact = shou_lung_prev_emperor_sculpture
+				new_artifact = {
+					set_name = shou_lung_figurine_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_arm_protector } } }
+				add_artifact = shou_lung_arm_protector
+				new_artifact = {
+					set_name = shou_lung_arm_protector_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_serpent_spear } } }
+				add_artifact = shou_lung_serpent_spear
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_ji } } }
+				add_artifact = shou_lung_ji
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_crossbow } } }
+				add_artifact = shou_lung_crossbow
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_bronze_sculpture } } }
+				add_artifact = shou_lung_bronze_sculpture
+				new_artifact = {
+					set_name = shou_lung_bronze_sculpture_name 
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_book_health } } }
+				add_artifact = shou_lung_book_health
+				new_artifact = {
+					set_name = shou_lung_book_health_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_book_law } } }
+				add_artifact = shou_lung_book_law
+				new_artifact = {
+					set_name = shou_lung_book_law_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_book_history } } }
+				add_artifact = shou_lung_book_history
+				new_artifact = {
+					set_name = shou_lung_book_history_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_book_economy } } }
+				add_artifact = shou_lung_book_economy
+				new_artifact = {
+					set_name = shou_lung_book_economy_name
+				}
+			}
+			1 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_painting_of_glitterhoof } } }
+				add_artifact = shou_lung_painting_of_glitterhoof
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_tapestry } } }
+				random_independent_ruler = {
+					limit = {
+						any_realm_province = {
+							trade_route = silk_road
+						}
+					}
+					random_realm_province = {
+						limit = {
+							trade_route = silk_road
+						}
+						save_event_target_as = tapestry_target
+					}
+				}
+				add_artifact = shou_lung_tapestry
+				new_artifact = {
+					set_name = shou_lung_tapestry_name
+				}
+			}
+			10 = {
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_tapestry_grand } } }
+				add_artifact = shou_lung_tapestry_grand
+				new_artifact = {
+					set_name = shou_lung_tapestry_grand_name
+				}
+				trigger = { ROOT = { NOT = { has_artifact = shou_lung_tapestry_grand } } }
+			}
+		}
+		new_artifact = {
+			save_event_target_as = shou_lung_artifact
+		}
+	}
+}

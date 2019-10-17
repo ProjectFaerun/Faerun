@@ -1,0 +1,451 @@
+###shou_lung TRIGGERS###
+
+#Grace triggers
+has_shou_lung_grace_trivial_trigger = {
+	has_offmap_currency = { offmap = shou_lung value = 10 }
+}
+has_shou_lung_grace_minor_trigger = {
+	has_offmap_currency = { offmap = shou_lung value = 50 }
+}
+has_shou_lung_grace_medium_trigger = {
+	has_offmap_currency = { offmap = shou_lung value = 150 }
+}
+has_shou_lung_grace_major_trigger = {
+	has_offmap_currency = { offmap = shou_lung value = 500 }
+}
+has_shou_lung_grace_massive_trigger = { 
+	has_offmap_currency = { offmap = shou_lung value = 1000 }
+}
+
+
+#Always put this at the end of your triggers!
+shou_lung_diplo_interaction_trigger = { 
+	shou_lung = {
+		governor = { 
+			NOT = { war_with = PREVPREV } 
+			is_within_diplo_range = PREVPREV
+		}
+		NOT = { has_policy = shou_lung_isolationist }
+	}
+	conditional_tooltip = { 
+		trigger = { government = celestial_government }
+		custom_tooltip = { 
+			text = shou_lung_offmap_decisions_pretender_emperor_tt
+			always = no
+		}
+	}
+}
+
+shou_lung_is_suffering_trigger = {
+	shou_lung = {
+		OR = {
+			has_status = shou_lung_unrest
+			has_status = shou_lung_civil_war
+			has_status = shou_lung_famine
+			has_status = shou_lung_plague
+			has_status = shou_lung_tuigan_invasion
+			has_status = shou_lung_tu_lung_invasion
+		}
+	}
+}
+
+shou_lung_is_fine_trigger = { #"fine", read like "fiii-iine", i.e. shou_lung is currently treating the world as their oyster
+	shou_lung = {
+		OR = {
+			has_status = shou_lung_golden_age
+			has_status = shou_lung_stable
+		}
+		OR = {
+			has_policy = shou_lung_open
+			has_policy = shou_lung_expansionist
+		}
+	}
+}
+
+shou_lung_is_stable_open_trigger = {
+	shou_lung = {
+		has_status = shou_lung_stable
+		has_policy = shou_lung_open
+	}
+}
+shou_lung_is_stable_expansionist_trigger = {
+	shou_lung = {
+		has_status = shou_lung_stable
+		has_policy = shou_lung_expansionist
+	}
+}
+shou_lung_is_golden_age_open_trigger = {
+	shou_lung = {
+		has_status = shou_lung_golden_age
+		has_policy = shou_lung_open
+	}
+}
+shou_lung_is_golden_age_expansionist_trigger = {
+	shou_lung = {
+		has_status = shou_lung_golden_age
+		has_policy = shou_lung_expansionist
+	}
+}
+
+
+#Found in the 00_offmap_powers file... and the conditions for the decisions
+shou_lung_offmap_boon_decisions_enabled_trigger = {
+	shou_lung_offmap_decisions_enabled_trigger = yes
+	custom_tooltip = {
+		text = shou_lung_offmap_boon_decisions_enabled_trigger_cd_tt #From is player character
+		FROM = { NOT = { has_character_modifier = jd_shou_lung_boon_cd } } #boon cooldown, which is set in each decision (one year!)...
+	}
+}
+
+#Found in the 00_offmap_powers file... and the conditions for the decisions, use custom tooltip for that decisions cooldown modifier
+shou_lung_offmap_tribute_decisions_enabled_trigger = {
+	shou_lung_offmap_decisions_enabled_trigger = yes
+}
+
+#What goes into the two triggers above...
+shou_lung_offmap_decisions_enabled_trigger = { 
+	shou_lung = {
+		NOT = { has_policy = shou_lung_isolationist }
+		custom_tooltip = {
+			text = shou_lung_offmap_decisions_enabled_trigger_war_tt #"Is at peace with §Y[From.GetTitledFirstName]§!"
+			NOT = { governor = { war_with = FROM } }
+		}
+		governor = {
+			show_scope_change = no
+			is_within_diplo_range = FROM
+			hidden_trigger  = { NOT = { character = FROM } } #Governor cannot use boon/tributes decisions
+		}
+	}
+	custom_tooltip = {
+		text = shou_lung_offmap_boon_decisions_enabled_trigger_raiding_tt
+		FROM = {
+			NOR = {
+				has_character_modifier = shou_lung_raid_active
+				has_character_modifier = shou_lung_raid_grace_cd
+			}
+		}
+	}
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+	conditional_tooltip = { 
+		trigger = { FROM = { primary_title = { has_title_flag = rebel_general_title } } }
+		custom_tooltip = { 
+			text = shou_lung_offmap_decisions_pretender_emperor_tt
+			always = no
+		}
+	}
+	conditional_tooltip = { 
+		trigger = { FROM = { has_character_modifier = failed_invasion_of_shou_lung } }
+		custom_tooltip = { 
+			text = shou_lung_offmap_decisions_failed_invasion_tt
+			always = no
+		}
+	}
+}
+
+#Found in the 00_offmap_powers file... and the conditions for the force open shou_lung decision
+shou_lung_offmap_hostile_decisions_enabled_trigger = {
+	shou_lung = {
+		custom_tooltip = {
+			text = shou_lung_offmap_decisions_enabled_trigger_war_tt #"Is at peace with §Y[From.GetTitledFirstName]§!"
+			NOT = { governor = { war_with = FROM } }
+		}
+		governor = {
+			show_scope_change = no
+			is_within_diplo_range = FROM
+			hidden_trigger  = { NOT = { character = FROM } } #Governor cannot use boon/tributes decisions
+		}
+		offmap_ruler = {
+			NOT = { dynasty = FROM }
+		}
+	}
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+}
+
+#Used with Sending Tribute characters to shou_lung...
+local_third_party_score_low_trigger = {
+	NOT = { check_variable = { which = local_third_party_score value = 91 } }
+}
+local_third_party_score_medium_trigger = {
+	check_variable = { which = local_third_party_score value = 91 }
+	NOT = { check_variable = { which = local_third_party_score value = 141 } }
+}
+local_third_party_score_great_trigger = {
+	check_variable = { which = local_third_party_score value = 141 }
+}
+
+# For checking the shou_lung Emperor's likes & dislikes
+is_liked_by_shou_lung_trigger = {
+	liked_by_offmap = {
+        type = shou_lung
+    }
+    NOT = {
+        disliked_by_offmap = {
+            type = shou_lung
+        }
+    }
+    shou_lung = {
+        show_scope_change = no
+        custom_tooltip = { text = emperor_likes_THIS_tt }
+    }
+}
+
+is_disliked_by_shou_lung_trigger = {
+	disliked_by_offmap = {
+        type = shou_lung
+    }
+    NOT = {
+		liked_by_offmap = {
+            type = shou_lung
+        }
+    }
+    shou_lung = {
+        show_scope_change = no
+        custom_tooltip = { text = emperor_dislikes_THIS_tt }
+    }
+}
+
+is_liked_and_disliked_by_shou_lung = {
+    disliked_by_offmap = {
+        type = shou_lung
+    }
+    liked_by_offmap = {
+        type = shou_lung
+    }
+    shou_lung = {
+        show_scope_change = no
+        custom_tooltip = { text = emperor_has_ambiguous_feelings_of_THIS_tt }
+    }
+}
+
+#Used in the invasion script...
+valid_shou_lung_target = {
+	NOT = { character = ROOT }
+	NOT = { has_character_modifier = peace_deal_with_shou_lung }
+	NOT = { has_character_flag = defeated_shou_lung }
+	NOT = {	is_tributary = { suzerain = ROOT } }
+	in_revolt = no
+	is_within_diplo_range = ROOT
+	is_landed = yes
+	higher_tier_than = BARON
+	NOT = { primary_title = { has_title_flag = rebel_general_title } } #uses special cb to target
+	NOT = { shou_lung = { offmap_ruler = { dynasty = PREVPREV } } }
+}
+
+valid_shou_lung_target_location = {
+	OR = {
+		any_realm_province = { region = custom_shou_lung_invasion_target_region }
+		any_neighbor_independent_ruler = {
+			has_landed_title = e_shou_lung_west_governor
+		}
+	}
+}
+
+valid_shou_lung_target_location_tributary_chain = {
+	OR = {
+		#any_realm_province = { region = custom_shou_lung_invasion_target_region }
+		any_neighbor_independent_ruler = {
+			has_landed_title = e_shou_lung_west_governor
+		}
+		any_neighbor_independent_ruler = {
+			is_tributary = yes
+			suzerain = {
+				has_landed_title = e_shou_lung_west_governor
+			}
+		}
+	}
+}
+
+# JADE DRAGON
+# EMPEROR LIKES & DISLIKES
+likes_concubines = {
+	context = concubine # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+likes_eunuchs = {
+	context = eunuch # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+	trait = eunuch
+}
+likes_wealth = {
+	context = wealth # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+likes_tributaries = {
+	context = tributary # Not a trigger, but used by the 'liked_by_offmap' & 'disliked_by_offmap' triggers
+}
+likes_chondathan_group = {
+	culture_group = chondathan_group
+}
+likes_coldlander_group = {
+	culture_group = coldlander_group
+}
+likes_dwarf_group = {
+	culture_group = dwarf_group
+}
+likes_elf_group = {
+	culture_group = elf_group
+}
+likes_gnome_group = {
+	culture_group = gnome_group
+}
+likes_halfling_group = {
+	culture_group = halfling_group
+}
+likes_illuskan_group = {
+	culture_group = illuskan_group
+}
+likes_imaskari_group = {
+	culture_group = imaskari_group
+}
+likes_kara_turan_group = {
+	culture_group = kara_turan_group
+}
+likes_katashakan_group = {
+	culture_group = katashakan_group
+}
+likes_lapal_group = {
+	culture_group = lapal_group
+}
+likes_maztican_group = {
+	culture_group = maztican_group
+}
+likes_mulan_group = {
+	culture_group = mulan_group
+}
+likes_narfelli_group = {
+	culture_group = narfelli_group
+}
+likes_netherese_group = {
+	culture_group = netherese_group
+}
+likes_orc_group = {
+	culture_group = orc_group
+}
+likes_outsiders = {
+	is_native_outsider = yes
+}
+likes_raum_group = {
+	culture_group = raum_group
+}
+likes_shaaran_group = {
+	culture_group = shaaran_group
+}
+likes_tethyrian_group = {
+	culture_group = tethyrian_group
+}
+likes_taan_group = {
+	culture_group = taan_group
+}
+likes_turami_group = {
+	culture_group = turami_group
+}
+likes_uluik_group = {
+	culture_group = uluik_group
+}
+likes_zakharan = {
+	culture_group = zakharan_group
+}
+likes_good_human_pantheon_group = {
+	religion_group = good_human_pantheon_group
+}
+likes_evil_human_pantheon_group = {
+	religion_group = evil_human_pantheon_group
+}
+likes_zakharan_group = {
+	religion_group = zakharan_group
+}
+likes_karaturan_group = {
+	religion_group = karaturan_group
+}
+likes_elven_pantheon_group = {
+	religion_group = elven_pantheon_group
+}
+likes_drow_pantheon = {
+	religion_group = drow_pantheon
+}
+likes_dwarven_pantheon_group = {
+	religion_group = dwarven_pantheon_group
+}
+likes_giant_pantheon_group = {
+	religion_group = giant_pantheon_group
+}
+likes_goblin_pantheon_group = {
+	religion_group = goblin_pantheon_group
+}
+likes_orc_pantheon_group = {
+	religion_group = orc_pantheon_group
+}
+likes_monster_group = {
+	religion_group = monster_group
+}
+likes_draconic_group = {
+	religion_group = draconic_group
+}
+likes_pagan_group = {
+	religion_group = pagan_group
+}
+
+#silk_road_trade_post_trigger = {
+#		text = silk_road_province_desc
+#		hidden_tooltip = {
+#			OR = {
+#				province_id = 1491
+#				province_id = 1498
+#				province_id = 1478
+#				province_id = 1359
+#				province_id = 1365
+#				province_id = 1448
+#				province_id = 1440
+#				province_id = 1439
+#				province_id = 678
+#				province_id = 764
+#				province_id = 802
+#				province_id = 596
+#				province_id = 667
+#				province_id = 693
+#				province_id = 649
+#				province_id = 646
+#				province_id = 641
+#				province_id = 630
+#				province_id = 1180
+#				province_id = 1297
+#				province_id = 1127
+#				province_id = 1220
+#				province_id = 1114
+#				province_id = 1221
+#				province_id = 1446
+#				province_id = 868
+#				province_id = 719
+#				province_id = 1338
+#				province_id = 1369
+#				province_id = 858
+#				province_id = 903
+#				province_id = 1185
+#				province_id = 1129
+#				province_id = 1318
+#				province_id = 1297
+#				province_id = 1163
+#				province_id = 1154
+#				province_id = 1151
+#				province_id = 1481
+#				province_id = 1115
+#				province_id = 1288
+#				province_id = 796
+#				province_id = 1362
+#				province_id = 728
+#				province_id = 774
+#				province_id = 620
+#				province_id = 622
+#				province_id = 775
+#				province_id = 775
+#				province_id = 633
+#				province_id = 664
+#				province_id = 644
+#			}
+#		}
+#	}
+#}
+
+courtier_from_shou_lung_trigger = {
+	custom_tooltip = {
+		text = courtier_from_shou_lung_trigger_tt
+		has_character_flag = originated_from_shou_lung_court
+	}
+}
