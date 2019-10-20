@@ -76,7 +76,13 @@ z_cls_turnon = {
 			z_assassin = yes
 		}
 		z_assalvl_turnon = yes
-	}			
+	}
+	if = { 
+		limit = { 
+			z_monk = yes
+		}
+		z_monklvl_turnon = yes
+	}	
 }
 
 
@@ -158,7 +164,13 @@ z_class_xp_calc = {
 			z_assassin = yes
 		}
 		z_assalvl_calc = yes
-	}			
+	}
+	if = { 
+		limit = { 
+			z_monk = yes
+		}
+		z_monklvl_calc = yes
+	}	
 }
 
 z_wiz_trait_remove = { 
@@ -2858,5 +2870,212 @@ z_shad_trait_calc = {
 		}
 		z_shad_trait_remove = yes
 		add_trait = shadow
+	}			
+}
+
+z_monk_trait_remove = { 
+	remove_trait = monk
+	remove_trait = trained_monk
+	remove_trait = journeyman_monk
+	remove_trait = expert_monk
+	remove_trait = master_monk
+	remove_trait = renowned_monk
+	remove_trait = legendary_monk
+}
+
+z_monklvl_turnon = {
+	if = { 
+		limit = {
+			z_monk = yes
+			not = { 
+				has_character_flag = monk
+			}
+		}
+		set_character_flag = monk
+		if = {
+			limit = { 
+				not = { 
+					check_variable = { which = "monklvl" value = "1"}
+				}
+			}
+			if = { 
+				limit = { 
+					trait = monk
+				}
+				set_variable  = { which = "monklvl" value = "1"}
+				set_variable  = { which = "monklvlup" value = "40"}
+				set_variable  = { which = "monklvldown" value = "-40"}
+			}
+			if = { 
+				limit = { 
+					trait = trained_monk
+				}
+				set_variable  = { which = "monklvl" value = "5"}		
+				set_variable  = { which = "monklvlup" value = "59"}
+				set_variable = { which = "monklvldown" value = -59}
+			}
+			if = { 
+				limit = { 
+					trait = journeyman_monk
+				}
+				set_variable  = { which = "monklvl" value = "10"}
+				set_variable  = { which = "monklvlup" value = "95"}
+				set_variable  = { which = "monklvldown" value = "-95"}
+			}
+			if = { 
+				limit = { 
+					trait = expert_monk
+				}
+				set_variable  = { which = "monklvl" value = "15"}
+				set_variable  = { which = "monklvlup" value = "152"}
+				set_variable  = { which = "monklvldown" value = "-152"}
+				}
+			if = { 
+				limit = { 
+					trait = master_monk
+				}
+				set_variable  = { which = "monklvl" value = "20"}
+				set_variable  = { which = "monklvlup" value = "245"}
+				set_variable  = { which = "monklvldown" value = "-245"}
+			}
+			if = { 
+				limit = { 
+					trait = renowned_bard
+				}
+				set_variable  = { which = "monklvl" value = "25"}
+				set_variable  = { which = "monklvlup" value = "393"}
+				set_variable  = { which = "monklvldown" value = "-393"}
+			}
+			if = { 
+				limit = { 
+					OR = { 
+						trait = legendary_monk
+						check_variable = { which = "monklvl" value = "30"}
+					}
+				}
+				set_variable  = { which = "monklvl" value = "30"}
+				set_variable  = { which = "monklvlup" value = "634"}
+				set_variable  = { which = "monklvldown" value = "-634"}
+			}
+		}
+	}
+}
+
+z_monklvl_calc = { 
+	while = { 
+		limit = {
+			check_variable = { which = "monkxp" which = "monklvlup"}
+		}
+		change_variable = { which = "monklvl" value = 1}
+		set_variable = { which = "monkxp" value = 0}
+		multiply_variable = { which = "monklvlup"	value = 1.1	}
+		multiply_variable = { which = "monklvldown"	value = 1.1	}
+		if = { 
+			limit = {
+				check_variable = { which = "monklvlup" value > 100000}
+			}
+			set_variable = { which = "monklvlup" value = 100000}
+		}
+		if = { 
+			limit = {
+				check_variable = { which = "monklvldown" value < -100000}
+			}
+			set_variable = { which = "monklvldown" value = -100000}
+		}
+	}
+	while = { 
+		limit = {
+			not = {
+				check_variable = { which = "monklvl" value = 0} 
+			}
+			check_variable = { which = "monkxp" which = "monklvldown"}
+		}
+		change_variable = { which = "monklvl" value = -1}
+		set_variable = { which = "monkxp" value = 0}
+		divide_variable = { which = "monklvlup" value = 1.1	}
+		divide_variable = { which = "monklvldown" value = 1.1	}
+		if = { 
+			limit = {
+				check_variable = { which = "monklvlup" value > 100000}
+			}
+			set_variable = { which = "monklvlup" value = 100000}
+		}
+		if = { 
+			limit = {
+				check_variable = { which = "monklvldown" value < -100000}
+			}
+			set_variable = { which = "monklvldown" value = -100000}
+		}
+	}
+	z_monk_trait_calc = yes
+}
+
+z_monk_trait_calc = { 
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 30}
+		}
+		z_monk_trait_remove = yes
+		add_trait = legendary_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 25}
+			not = {
+				check_variable = { which = "monklvl" value = 30}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = renowned_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 20}
+			not = {
+				check_variable = { which = "monklvl" value = 25}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = master_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 15}
+			not = {
+				check_variable = { which = "monklvl" value = 20}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = expert_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 10}
+			not = {
+				check_variable = { which = "monklvl" value = 15}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = journeyman_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 5}
+			not = {
+				check_variable = { which = "monklvl" value = 10}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = trained_monk
+	}
+	if = { 
+		limit = { 
+			check_variable = { which = "monklvl" value = 0}
+			not = {
+				check_variable = { which = "monklvl" value = 5}	
+			}
+		}
+		z_monk_trait_remove = yes
+		add_trait = monk
 	}			
 }
