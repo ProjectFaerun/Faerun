@@ -53,6 +53,13 @@ character_event = {
 		add_kinslayer_trait_effect = yes
 		
 		event_target:target_victim = {
+			any_spouse = { 
+				opinion = {
+					who = ROOT
+					modifier = opinion_spouse_slayer
+					months = 60
+				}
+			}
 			any_liege = {
 				if = {
 					limit = {
@@ -76,14 +83,6 @@ character_event = {
 						who = ROOT
 						modifier = opinion_dishonorable
 						months = 60
-					}
-					if = {
-						limit = { ROOT = { any_spouse = { character = PREV } } }
-						opinion = {
-							who = ROOT
-							modifier = opinion_spouse_slayer
-							months = 60
-						}
 					}
 				}
 			}
@@ -739,31 +738,18 @@ character_event = {
 	is_triggered_only = yes 
 	
 	immediate = {
+		any_spouse = {
+			opinion = {
+				who = FROM
+				modifier = opinion_spouse_slayer
+				months = 60
+			}
+		}
 		FROM = {
 			ROOT = { save_event_target_as = kinslayer_target }
 			add_kinslayer_trait_effect = yes
-			if = {
-				limit = { 
-					any_spouse = { character = ROOT }
-				}
-				
-				#set_character_flag = achievement_spouse_killer #Moved to on_death to also cover undiscovered murder plots.
-				
-				spouse = {
-					any_dynasty_member = {
-						limit = {
-							is_alive = yes
-							NOT = { character = FROM }
-						}
-						opinion = {
-							who = FROM
-							modifier = opinion_spouse_slayer
-							months = 60
-						}
-					}
-				}
-			}
-		}
+		}			
+		#set_character_flag = achievement_spouse_killer #Moved to on_death to also cover undiscovered murder plots.
 	}
 
 	option = {
@@ -4401,7 +4387,18 @@ character_event = {
 # on_forced_consort
 character_event = {
 	id = 660
-	desc = EVTDESC660
+	desc = { 
+		text = EVTDESC660
+		trigger = {
+			is_female = yes
+		}
+	}
+	desc = { 
+		text = EVTDESC660_B
+		trigger = {
+			is_female = no
+		}
+	}
 	picture = GFX_evt_scandal
 	
 	is_triggered_only = yes 
@@ -4427,7 +4424,18 @@ character_event = {
 	}
 	
 	option = {
-		name = "EVTOPTA660"
+		name = { 
+			text = EVTOPTA660
+			trigger = {
+				is_female = yes
+			}
+		}
+		name = { 
+			text = EVTOPTA660
+			trigger = {
+				is_female = no
+			}
+		}
 		opinion = {
 			who = FROM
 			modifier = opinion_forced_consort
@@ -4455,11 +4463,39 @@ character_event = {
 
 character_event = {
 	id = 662
-	desc = "EVTDESC662"
+	desc = { 
+		text = EVTDESC662_B
+		trigger = {
+			is_female = yes
+		}
+	}
+	desc = { 
+		text = EVTDESC662
+		trigger = {
+			is_female = no
+		}
+	}
 	picture = GFX_evt_scandal
 	
 	is_triggered_only = yes 
 	
+	option = {
+		name = "EVTOPTB662"
+		trigger = {
+			NOR = {
+				is_rival = FROMFROM
+				num_of_rivals = 3
+			}
+		}
+		add_rival = FROMFROM
+		hidden_tooltip = {
+			opinion = {	
+				who = FROM
+				modifier = opinion_abducted_spouse
+				months = 1200
+			}
+		}
+	}
 	option = {
 		name = "EVTOPTA662"
 		opinion = {
@@ -4480,9 +4516,6 @@ character_event = {
 narrative_event = {
 	id = 670
 	title = "EVTNAME670"
-	desc = "EVTDESC670"
-	picture = GFX_evt_heretic
-	border = "GFX_event_narrative_frame_religion"	
 	desc = {
 		trigger = {
 			has_dlc = "Holy Fury" 
@@ -4512,8 +4545,6 @@ narrative_event = {
 		trigger = { 
 			ROOT = { 
 				OR = { 
-					religion = hellenic_pagan
-					religion = hellenic_pagan_reformed
 					religion = nogari
 					religion = nogari_reformed
 				}
@@ -4525,8 +4556,6 @@ narrative_event = {
 		trigger = { 
 			ROOT = { 
 				OR = { 
-					religion = west_african_pagan
-					religion = west_african_pagan_reformed
 					religion = ubtao_worship
 					religion = ubtao_reformed
 				}
@@ -4538,10 +4567,6 @@ narrative_event = {
 		trigger = { 
 			ROOT = { 
 				NOR = { 
-					religion = hellenic_pagan
-					religion = hellenic_pagan_reformed
-					religion = west_african_pagan
-					religion = west_african_pagan_reformed
 					religion = nogari
 					religion = nogari_reformed
 					religion = ubtao_worship
@@ -4563,15 +4588,15 @@ narrative_event = {
 	immediate = {
 		hidden_tooltip = {
 			# Put a bit here to take MA away from Chaunteans if Earthmother is reformed
-			if = {
-				limit = { #If religion being reformed is western paganism, other western pagan are emboldened, facilitating a chain reaction of reformation.
-					ROOT = { 
-						NOR = { 
-							religion = nogari_reformed
-							religion = teoteteohuan_reformed
-						} 
-					}
+		if = {
+			limit = { #If religion being reformed is western paganism, other western pagan are emboldened, facilitating a chain reaction of reformation.
+				ROOT = { 
+					NOR = { 
+						religion = nogari_reformed
+						religion = teoteteohuan_reformed
+					} 
 				}
+			}
 				if = { 
 					limit = { ROOT = { NOT = { religion = ubtao_reformed } } }
 					random_playable_ruler = { 
