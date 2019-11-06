@@ -5088,11 +5088,199 @@ narrative_event = {
 				portrait = [Root.GetID]
 			}
 		}
+		hidden_tooltip = {
+			if = {
+				limit = { 
+					ROOT = { has_religion_feature = religion_matriarchal }
+				}
+				ROOT = { 
+					any_demesne_title = { 
+						add_law = {
+							law = enatic_succession
+							cooldown = no
+							opinion_effect = no
+						}
+						add_law = {
+							law = status_of_women_4
+							cooldown = no
+							opinion_effect = no
+						}
+					} 
+					recalc_succession = yes
+				} 
+			}
+			if = {
+				limit = { 
+					ROOT = { has_religion_feature = religion_patriarchal }
+				}
+				ROOT = { 
+					any_demesne_title = { 
+						add_law = {
+							law = agnatic_succession
+							cooldown = no
+							opinion_effect = no
+						}
+						add_law = {
+							law = status_of_women_0
+							cooldown = no
+							opinion_effect = no
+						}
+					} 
+					recalc_succession = yes
+				} 
+			}
+			if = {
+				limit = { 
+					ROOT = {
+						OR = { 
+							has_religion_feature = religion_equal 
+							has_religion_feature = religion_feature_ulutiuan
+						}
+					}
+				}
+				ROOT = { 
+					any_demesne_title = { 
+						add_law = {
+							law = true_cognatic_succession
+							cooldown = no
+							opinion_effect = no
+						}
+						add_law = {
+							law = status_of_women_4
+							cooldown = no
+							opinion_effect = no
+						}
+					} 
+					recalc_succession = yes
+				} 
+			}
+			ROOT = {
+				if = {
+					limit = { 
+						has_religion_feature = religion_matriarchal 
+					}
+					any_close_relative = { 
+					limit = { is_female = no }
+						opinion = { 
+							who = ROOT 
+							modifier = bad_succ_law_change
+							years = 100
+						}
+					}
+					any_close_relative = { 
+						limit = { is_female = yes }
+						opinion = { 
+							who = ROOT 
+							modifier = good_succ_law_change
+							years = 100
+						}
+					}
+				}
+				if = {
+					limit = { 
+						has_religion_feature = religion_patriarchal 
+					}
+					any_close_relative = { 
+						limit = { is_female = yes }
+						opinion = { 
+							who = ROOT 
+							modifier = bad_succ_law_change
+							years = 100
+						}
+					}
+					any_close_relative = { 
+						limit = { is_female = no }
+						opinion = { 
+							who = ROOT 
+							modifier = good_succ_law_change
+							years = 100
+						}
+					}
+				}
+			}
+		}
 	}
 	option = {
 		name = "EVTOPTB670" # Rulers of the old Faith - Accept
 		trigger = {
 			is_heresy_of = ROOT # The old religion has become a heresy of the Reformed one
+		}
+		if = {
+			limit = { #Offer chance to switch the vassals' succession laws.
+				ROOT = { has_religion_feature = religion_no_leader }
+				ai = yes
+			}		
+			hidden_tooltip = {  
+				character_event = { id = HF.23016 days = 20 random = 20 }
+			}
+		}
+		if = {
+			limit = { #Offer chance to switch the vassals' succession laws.
+				ROOT = { has_religion_feature = religion_matriarchal }
+			}
+			custom_tooltip = { text = tooltip_HF23014_A }
+			hidden_tooltip = { 
+				any_demesne_title = { 
+					add_law = {
+						law = enatic_succession
+						cooldown = no
+						opinion_effect = no
+					}
+					add_law = {
+						law = status_of_women_4
+						cooldown = no
+						opinion_effect = no
+					}
+				} 
+				recalc_succession = yes
+			} 
+		}
+		if = {
+			limit = { #Offer chance to switch the vassals' succession laws.
+				ROOT = { has_religion_feature = religion_patriarchal }
+			}
+			custom_tooltip = { text = tooltip_HF23015_A }
+			hidden_tooltip = { 
+				any_demesne_title = { 
+					add_law = {
+						law = agnatic_succession
+						cooldown = no
+						opinion_effect = no
+					}
+					add_law = {
+						law = status_of_women_0
+						cooldown = no
+						opinion_effect = no
+					}
+				} 
+				recalc_succession = yes
+			} 
+		}
+		if = {
+			limit = { #Offer chance to switch the vassals' succession laws.
+				ROOT = {
+					OR = { 
+						has_religion_feature = religion_equal 
+						has_religion_feature = religion_feature_ulutiuan
+					}
+				}
+			}
+			custom_tooltip = { text = tooltip_HF23016_A }
+			hidden_tooltip = { 
+				any_demesne_title = { 
+					add_law = {
+						law = true_cognatic_succession
+						cooldown = no
+						opinion_effect = no
+					}
+					add_law = {
+						law = status_of_women_4
+						cooldown = no
+						opinion_effect = no
+					}
+				} 
+				recalc_succession = yes
+			} 
 		}
 		if = {
 			limit = { ai = no }
@@ -5139,6 +5327,13 @@ narrative_event = {
 				}
 				religion = ROOT
 			}
+			any_dynasty_member = {
+				limit = {
+					is_heresy_of = ROOT
+					is_playable = no
+				}
+				religion = ROOT
+			}
 			any_vassal = {
 				limit = {
 					is_playable = no
@@ -5168,10 +5363,7 @@ narrative_event = {
 		}
 		ai_chance = {
 			factor = 50
-			# modifier = {
-				# factor = 0
-				# has_landed_title = d_jomsvikings
-			# }
+			post_reformation_ruler_conversion_score = yes
 		}
 		tooltip = { religion = THIS }
 	}
@@ -5225,6 +5417,9 @@ character_event = {
 		top_liege = {
 			in_revolt = no
 		}
+	}
+	immediate = {
+		sound_effect = pagan_reformation
 	}
 	
 	option = {
@@ -5746,55 +5941,7 @@ character_event = {
 	}
 }
 
-# Crusade/Jihad is invalidated 
-narrative_event = {
-
-	# ROOT is the target title
-	# new_character is the Enemy
-	# FROM is the Pope/Caliph
-	
-	id = 534
-	title = "EVTNAME534"
-	picture = "GFX_evt_battle"
-	border = "GFX_event_narrative_frame_religion"
-	
-	desc = {
-		picture = GFX_evt_battle
-		text = EVTDESC534_converted
-		trigger = { 
-			new_character = { religion = FROM }
-		}
-	}
-	desc = {
-		picture = GFX_evt_battle
-		text = EVTDESC534_coup
-		trigger = { 
-			new_character = { NOT = { religion = FROM } }
-		}
-	}
-	
-	major = yes
-	
-	only_rulers = yes
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = "EVTOPTA620"
-		trigger = {
-			religion_group = FROM
-		}
-	}
-	
-	option = {
-		name = "EVTOPTB620"
-		trigger = {
-			NOT = {
-				religion_group = FROM
-			}
-		}
-	}
-}
+# Crusade/Jihad is invalidated - removed for Faerun
 
 # ASK_TO_JOIN_AMBITION_INTERACTION_ACCEPT_EVENT =
 diploresponse_event = {
@@ -5998,5 +6145,77 @@ character_event = {
 	
 	immediate = {
 		remove_trait = in_hiding
+	}
+}
+
+character_event = {
+	id = 687
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = {
+			ai = no
+		}
+		is_shattered_world = yes
+		has_character_flag = great_conqueror
+	}
+	immediate = {
+		FROM = {
+			set_character_flag = achievement_not_so_great
+		}
+	}
+}
+
+character_event = {
+	id = 688
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		ai = no
+		is_shattered_world = yes
+		FROM = { 
+			has_character_flag = great_conqueror
+		}
+	}
+	immediate = {
+		set_character_flag = achievement_not_so_great
+	}
+}
+
+
+# Scripted default elective token setup
+character_event = {
+	id = 689
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	only_rulers = yes
+	
+	immediate = {
+		any_demesne_title = {
+			if = {
+				limit = {
+					has_law = succ_elective_gavelkind
+				}
+				elective_voting_rules = elective_gavelkind
+			}
+			else_if = {
+				limit = {
+					has_law = succ_tanistry
+				}
+				elective_voting_rules = tanistry
+			}
+			else_if = {
+				limit = {
+					has_law = succ_feudal_elective
+				}
+				elective_voting_rules = feudal_elective
+			}
+		}
 	}
 }
