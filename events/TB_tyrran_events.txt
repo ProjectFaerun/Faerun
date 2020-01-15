@@ -37,3 +37,351 @@ character_event = {
 		add_trait = blinded
 	}
 }
+
+character_event = {
+	id = tyrevents.3
+	desc = TYREVT.3 # Part of being a Tyrran is to regularly confess your failings to the church, so that you may be judged in the eyes of your god. And thus you do so, receiving absolution, or admonishment should the situation demand it, for your acts.
+	picture = GFX_evt_bishop
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		trigger = {
+			NOT = { trait = proud }
+		}
+		name = TYREVT.3a # It feels good to confess from time to time.
+		if = {
+			limit = {
+				trait = stressed
+			}
+			random = {
+				chance = 20
+				remove_trait = stressed
+			}
+		}
+		if = {
+			limit = {
+				trait = depressed
+			}
+			random = {
+				chance = 5
+				remove_trait = depressed
+			}
+		}
+	}
+	
+	option = {
+		trigger = {
+			trait = proud
+		}
+		name = TYREVT.3b # If anything, I should be judging them.
+		if = {
+			limit = {
+				trait = stressed
+			}
+			random = {
+				chance = 5
+				remove_trait = stressed
+			}
+		}
+		if = {
+			limit = {
+				trait = depressed
+			}
+			random = {
+				chance = 1
+				remove_trait = depressed
+			}
+		}
+	}
+}
+
+character_event = {
+	id = tyrevents.4
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	weight_multiplier = {
+		days = 1
+		
+		modifier = {
+			factor = 2
+			trait = humble
+		}
+		modifier = {
+			factor = 0.5
+			trait = proud
+		}
+	}
+	
+	trigger = {
+		NOR = {
+			trait = patron_bane
+			trait = patron_bhaal
+			trait = patron_mask
+			trait = patron_talona
+			trait = patron_talos
+			trait = patron_tyr
+			religion = church_of_cyric
+		}
+		ai = yes
+		OR = {
+			liege = {
+				trait = patron_tyr
+				ai = no
+				NOT = { is_rival = PREV }
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = opinion_denied_advice }
+					}
+				}
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = tb_good_advice }
+					}
+				}
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = tb_bad_advice }
+					}
+				}
+			}
+			host = {
+				trait = patron_tyr
+				ai = no
+				NOT = { is_rival = PREV }
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = opinion_denied_advice }
+					}
+				}
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = tb_good_advice }
+					}
+				}
+				NOT = {
+					PREV = {
+						has_opinion_modifier = { who = PREV modifier = tb_bad_advice }
+					}
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				liege = {
+					trait = patron_tyr
+					ai = no
+					NOT = { is_rival = ROOT }
+				}
+			}
+			liege = { character_event = tyrevents.5 }
+		}
+		else = {
+			host = { character_event = tyrevents.5 }
+		}
+	}
+}
+
+character_event = {
+	id = tyrevents.5
+	desc = TYREVT.5 # [FROM.GetBestName] has approached you with a request. [FROM.GetSheHe] seems to have doubts of a legal nature and, given that you are one of Tyr's faithful, has decided to ask you about them. You consider your answer...
+	picture = GFX_evt_courtiers_talking
+	border = GFX_event_normal_frame_diplomacy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = TYREVT.5a # Give [FROM.GetHerHim] the advice [FROM.GetSheHe] seeks as best you can.
+		hidden_tooltip = {
+			random_list = {
+				1 = {
+					modifier = {
+						factor = 2
+						learning = 8
+						NOT = { learning = 12 }
+					}
+					modifier = {
+						factor = 3
+						learning = 12
+						NOT = { learning = 20 }
+					}
+					modifier = {
+						factor = 5
+						learning = 20
+					}
+					modifier = {
+						factor = 2
+						trait = diligent
+					}
+					modifier = {
+						factor = 2.5
+						trait = scholar
+					}
+					repeat_event = { id = tyrevents.6 days = 10 random = 10 }
+				}
+				1 = {
+					modifier = {
+						factor = 3
+						learn = 5
+						NOT = { learning = 8 }
+					}
+					modifier = {
+						factor = 5
+						learning = 1
+						NOT = { learning = 5 }
+					}
+					modifier = {
+						factor = 10
+						NOT = { learning = 1 }
+					}
+					modifier = {
+						factor = 2
+						trait = slothful
+					}
+					modifier = {
+						factor = 5
+						trait = slow
+					}
+					repeat_event = { id = tyrevents.7 days = 10 random = 10 }
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = TYREVT.5b # Refuse to help.
+		FROM = {
+			opinion = {
+				modifier = opinion_denied_advice
+				who = ROOT
+				years = 3
+			}
+		}
+	}
+}
+
+character_event = {
+	id = tyrevents.6
+	desc = TYREVT.6 # [FROM.GetBestName] has returned to you and thanked you for the legal advise you gave [FROM.GetHerHim] earlier.
+	picture = GFX_evt_courtiers_talking
+	border = GFX_event_normal_frame_diplomacy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = TYREVT.6a # It was my pleasure.
+		FROM = {
+			opinion = {
+				modifier = tb_good_advice
+				who = ROOT
+				years = 3
+			}
+		}
+	}
+}
+
+character_event = {
+	id = tyrevents.7
+	desc = TYREVT.7 # [FROM.GetBestName] has returned to you is not happy at all! Turns out the legal advice you gave [FROM.GetHerHim] was wrong and ended up causing [FROM.GetHerHim] quite a bit of grief.
+	picture = GFX_evt_courtiers_talking
+	border = GFX_event_normal_frame_diplomacy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = TYREVT.7a # Whoops.
+		FROM = {
+			opinion = {
+				modifier = tb_good_advice
+				who = ROOT
+				years = 3
+			}
+		}
+	}
+}
+
+character_event = {
+	id = tyrevents.8
+	desc = TYREVT.8 # As part of your faith, you are required to read the Innumerable Edicts, a compilation of all laws and regulations of the Tyrran Church. The text, however, is incredibly dry and dense and you feel as though you won't be able to force yourself to finish it.
+	picture = GFX_evt_library
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	weight_multiplier = {
+		days = 1
+		
+		modifier = {
+			factor = 2
+			trait = scholar
+		}
+		modifier = {
+			factor = 2
+			trait = zealous
+		}
+		modifier = {
+			factor = 1.5
+			trait = diligent
+		}
+		modifier = {
+			factor = 0.2
+			trait = slothful
+		}
+		modifier = {
+			factor = 0.5
+			trait = cynical
+		}
+		modifier = {
+			factor = 0.2
+			trait = slow
+		}
+		modifier = {
+			factor = 0.4
+			trait = dull
+		}
+	}
+	
+	trigger = {
+		NOT = { has_character_modifier = tyr_ie_timer }
+		trait = patron_tyr
+	}
+	
+	option = {
+		name = TYREVT.8a # I must persist!
+		piety = 25
+		add_character_modifier = { name = tyr_ie_timer years = 2 hidden = yes }
+		add_character_modifier = { name = tyr_innumerable_edicts years = 1 }
+		random = {
+			chance = 20
+			add_trait = zealous
+		}
+		random = {
+			chance = 15
+			add_trait = stressed
+		}
+		random = {
+			chance = 15
+			add_trait = scholar
+		}
+	}
+	
+	option = {
+		name = TYREVT.8b # I'd rather be doing something else.
+		piety = -25
+		add_character_modifier = { name = tyr_ie_timer years = 2 hidden = yes }
+		random = {
+			chance = 20
+			add_trait = cynical
+		}
+		random = {
+			chance = 30
+			add_trait = slothful
+		}
+	}
+}
