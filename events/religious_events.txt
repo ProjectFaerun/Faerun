@@ -712,10 +712,10 @@ character_event = {
 	
 	trigger = {
 		controls_religion = yes
-		# OR = {
-			# religion = catholic
-			# religion = fraticelli
-		# }
+		OR = {
+			religion = untheric_faith
+			religion = mulhorandi_faith
+		}
 		
 		religion_authority = 0.20
 
@@ -725,9 +725,8 @@ character_event = {
 			NOT = { has_character_flag = pope_dislikes_heathen_employed }
 			any_courtier = {
 				prisoner = no
-				OR = {
-					religion_group = muslim
-					religion_group = pagan_group
+				NOT = {
+					religion_group = good_human_pantheon_group
 				}
 				OR = {
 					has_job_title = job_chancellor
@@ -759,9 +758,8 @@ character_event = {
 
 				any_courtier = {
 					prisoner = no
-					OR = {
-						religion_group = muslim
-						religion_group = pagan_group
+					NOT = {
+						religion_group = good_human_pantheon_group
 					}
 					OR = {
 						has_job_title = job_chancellor
@@ -800,9 +798,8 @@ character_event = {
 		random_courtier = {
 			limit = {
 				prisoner = no
-				OR = {
-					religion_group = muslim
-					religion_group = pagan_group
+				NOT = {
+					religion_group = good_human_pantheon_group
 				}
 				OR = {
 					has_job_title = job_chancellor
@@ -901,256 +898,6 @@ character_event = {
 	
 	option = {
 		name = "EVTOPTA39244" 
-		prestige = -10
-	}
-}
-
-#Orthodox variant
-
-#The Patriarch asks a ruler that they should not have heathens employed
-character_event = {
-	id = 39260
-	desc = "EVTDESC39260"	
-	picture = GFX_evt_heretic
-	border = GFX_event_normal_frame_religion
-
-	only_playable = yes
-	min_age = 16
-	only_capable = yes
-	prisoner = no
-	only_men = yes
-	religion = orthodox
-	war = no
-	
-	trigger = {
-		controls_religion = yes
-		religion_authority = 0.20
-
-		any_playable_ruler = {
-			religion = orthodox
-			rightful_religious_head = ROOT
-			NOT = { has_character_flag = patriarch_dislikes_heathen_employed }
-			any_courtier = {
-				prisoner = no
-				OR = {
-					religion_group = muslim
-					religion_group = pagan_group
-				}
-				OR = {
-					has_job_title = job_chancellor
-					has_job_title = job_marshal
-					has_job_title = job_treasurer
-					has_job_title = job_spymaster
-					has_job_title = job_spiritual
-				} 
-			}
-		}
-	}
-	
-	mean_time_to_happen = {
-		months = 50
-		modifier = {
-			factor = 0.25
-			trait = zealous
-		}
-	}
-
-	option = {
-		name = "EVTOPTA39260"	#ask them
-		ai_chance = {	factor = 100 }
-		random_playable_ruler = {
-			limit = {
-				religion = orthodox
-				rightful_religious_head = ROOT
-				NOT = { has_character_flag = patriarch_dislikes_heathen_employed }
-
-				any_courtier = {
-					prisoner = no
-					OR = {
-						religion_group = muslim
-						religion_group = pagan_group
-					}
-					OR = {
-						has_job_title = job_chancellor
-						has_job_title = job_marshal
-						has_job_title = job_treasurer
-						has_job_title = job_spymaster
-						has_job_title = job_spiritual
-					} 
-				}
-			}
-			character_event = { id = 39261 days = 14 tooltip = EVTTOOLTIP39261 }
-			set_character_flag = patriarch_dislikes_heathen_employed
-		}
-	}
-
-	option = {
-		name = "EVTOPTB39260"	#ignore it.
-		ai_chance = {	factor = 0 }
-		religion_authority = {
-			modifier = head_of_religion_neglect
-			years = 10
-		}
-	}
-}
-
-#Demands is coming on us about
-character_event = {
-	id = 39261
-	desc = "EVTDESC39261"
-	picture = GFX_evt_throne_room
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		random_courtier = {
-			limit = {
-				prisoner = no
-				OR = {
-					religion_group = muslim
-					religion_group = pagan_group
-				}
-				OR = {
-					has_job_title = job_chancellor
-					has_job_title = job_marshal
-					has_job_title = job_treasurer
-					has_job_title = job_spymaster
-					has_job_title = job_spiritual
-				} 
-			}
-			set_character_flag = heathen_to_target
-		}
-	}
-	
-	
-	option = {
-		name = "EVTOPTA39261" #banish
-		ai_chance = {
-			factor = 2
-		}
-		random_courtier = {
-			limit = { has_character_flag = heathen_to_target }
-			clr_character_flag = heathen_to_target
-			banish = yes
-		}
-		
-		FROM = {
-			opinion = {
-				modifier = pope_heathen_removal_approve
-				who = ROOT
-				years = 5
-			}
-		}
-
-		hidden_tooltip = {
-			FROM = {  character_event = { id = 39262 days = 1   } }
-		}	
-		clr_character_flag = patriarch_dislikes_heathen_employed
-	}
-	option = {
-		name = "EVTOPTB39261"	#imprison
-		tooltip_info = intrigue
-		trigger = {
-			realm_intrigue = 15
-		}
-		random_courtier = {
-			limit = { has_character_flag = heathen_to_target }
-			clr_character_flag = heathen_to_target
-			imprison = yes
-		}
-		FROM = {
-			opinion = {
-				modifier = pope_heathen_removal_approve_2
-				who = ROOT
-				years = 5
-			}
-		}
-		hidden_tooltip = {
-			FROM = {  character_event = { id = 39263 days = 1  } }
-		}	
-		clr_character_flag = patriarch_dislikes_heathen_employed
-	}
-	option = {
-		name = "EVTOPTC39261"	#Ignore the Patriarch
-		ai_chance = {
-			factor = 1
-			modifier = {
-				factor =  0
-				NOT = {
-					trait = cynical
-				}
-			}
-		}
-		FROM = {
-			opinion = {
-				modifier = opinion_ignore_patriarch_request
-				who = ROOT
-				years = 5
-			}
-		}
-		
-		
-		random_courtier = {
-			limit = { has_character_flag = heathen_to_target }
-			clr_character_flag = heathen_to_target
-			
-			opinion = {
-				modifier = opinion_defended_me
-				who = ROOT
-				years = 5
-			}
-
-		}
-		piety = -50
-		
-		hidden_tooltip = {
-			FROM = {  character_event = { id = 39264 days = 1 } }
-		}
-	}
-}
-
-#they banished the heathen
-character_event = {
-	id = 39262
-	desc = "EVTDESC39262"
-	picture = GFX_evt_emissary
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = "GLORY_TO_HIGHGOD" 
-		prestige = 10
-	}
-}
-
-#they imprisoned the heathen
-character_event = {
-	id = 39263
-	desc = "EVTDESC39263"
-	picture = GFX_evt_into_the_dungeon
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = "GLORY_TO_HIGHGOD" 
-		prestige = 5
-	}
-}
-
-#they ignored us
-character_event = {
-	id = 39264
-	desc = "EVTDESC39264"	
-	picture = GFX_evt_spymaster
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = "EVTOPTA39264" 
 		prestige = -10
 	}
 }
