@@ -1,0 +1,3476 @@
+namespace = tbxp
+
+#Explanation of variables and flag for future editing!
+#<class>_init flag: to prevent xp from being reset on multiclassing
+#<class>_xp variable: how much xp for that particular class a character has
+#xp_init flag: to prevent tbxp.2 from firing multiple times per year for a single character in event of multiclassing
+#<class>lvlX flag: used to display the proper trait in the notification event on level-up
+
+character_event = {
+	id = tbxp.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		z_has_class = yes
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				NOT = { has_character_flag = assassin_init }
+				z_assassin = yes
+			}
+			set_variable = { which = assassin_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = barbarian_init }
+				z_barbarian= yes
+			}
+			set_variable = { which = barbarian_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = bard_init }
+				z_bard = yes
+			}
+			set_variable = { which = bard_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = cleric_init }
+				z_cleric = yes
+			}
+			set_variable = { which = cleric_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = druid_init }
+				z_druid = yes
+			}
+			set_variable = { which = druid_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = fighter_init }
+				z_fighter = yes
+			}
+			set_variable = { which = fighter_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = monk_init }
+				z_monk = yes
+			}
+			set_variable = { which = monk_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = paladin_init }
+				z_paladin = yes
+			}
+			set_variable = { which = paladin_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = ranger_init }
+				z_ranger = yes
+			}
+			set_variable = { which = ranger_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = rogue_init }
+				z_rogue = yes
+			}
+			set_variable = { which = rogue_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = shadow_init }
+				z_shadow = yes
+			}
+			set_variable = { which = shadow_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = sorcerer_init }
+				z_sorcerer = yes
+			}
+			set_variable = { which = sorcerer_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = warlock_init }
+				z_warlock = yes
+			}
+			set_variable = { which = warlock_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = wizard_init }
+				z_wizard = yes
+			}
+			set_variable = { which = wizard_xp value = 0 }
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = xp_init }
+			}
+			character_event = { id = tbxp.2 years = 1 }
+		}
+		set_character_flag = xp_init
+	}
+}
+
+character_event = {
+	id = tbxp.2
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		#Assassin block
+		if = {
+			limit = {
+				z_assassin = yes
+				NOT = { trait = legendary_assassin }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = assassin_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = assassin_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = assassin_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = assassin_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = assassin_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = assassin_xp value = 3 }
+			}
+			#Extra xp for having the ambition
+			if = {
+				limit = {
+					has_ambition = obj_cls_assassin
+				}
+				change_variable = { which = assassin_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 100 }
+						}
+						remove_trait = assassin
+						add_trait = trained_assassin
+						subtract_variable = { which = assassin_xp value = 100 }
+						set_character_flag = assassinlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 140 }
+						}
+						remove_trait = assassin
+						add_trait = trained_assassin
+						subtract_variable = { which = assassin_xp value = 140 }
+						set_character_flag = assassinlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 250 }
+						}
+						remove_trait = trained_assassin
+						add_trait = journeyman_assassin
+						subtract_variable = { which = assassin_xp value = 250 }
+						set_character_flag = assassinlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 350 }
+						}
+						remove_trait = trained_assassin
+						add_trait = journeyman_assassin
+						subtract_variable = { which = assassin_xp value = 350 }
+						set_character_flag = assassinlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 450 }
+						}
+						remove_trait = journeyman_assassin
+						add_trait = expert_assassin
+						subtract_variable = { which = assassin_xp value = 450 }
+						set_character_flag = assassinlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 630 }
+						}
+						remove_trait = journeyman_assassin
+						add_trait = expert_assassin
+						subtract_variable = { which = assassin_xp value = 630 }
+						set_character_flag = assassinlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 800 }
+						}
+						remove_trait = expert_assassin
+						add_trait = master_assassin
+						subtract_variable = { which = assassin_xp value = 800 }
+						set_character_flag = assassinlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 1120 }
+						}
+						remove_trait = expert_assassin
+						add_trait = master_assassin
+						subtract_variable = { which = assassin_xp value = 1120 }
+						set_character_flag = assassinlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 1200 }
+						}
+						remove_trait = master_assassin
+						add_trait = renowned_assassin
+						subtract_variable = { which = assassin_xp value = 1200 }
+						set_character_flag = assassinlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 1680 }
+						}
+						remove_trait = master_assassin
+						add_trait = renowned_assassin
+						subtract_variable = { which = assassin_xp value = 1680 }
+						set_character_flag = assassinlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_assassin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = assassin_xp value >= 2000 }
+						}
+						remove_trait = renowned_assassin
+						add_trait = legendary_assassin
+						subtract_variable = { which = assassin_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = assassinlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = assassin_xp value >= 2800 }
+						}
+						remove_trait = renowned_assassin
+						add_trait = legendary_assassin
+						subtract_variable = { which = assassin_xp value = 2800 }
+						set_character_flag = assassinlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Barbarian block
+		if = {
+			limit = {
+				z_barbarian = yes
+				NOT = { trait = legendary_barbarian }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = barbarian_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = barbarian_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = barbarian_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = barbarian_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = barbarian_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = barbarian_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_barbarian
+				}
+				change_variable = { which = barbarian_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 100 }
+						}
+						remove_trait = barbarian
+						add_trait = trained_barbarian
+						subtract_variable = { which = barbarian_xp value = 100 }
+						set_character_flag = barbarianlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 140 }
+						}
+						remove_trait = barbarian
+						add_trait = trained_barbarian
+						subtract_variable = { which = barbarian_xp value = 140 }
+						set_character_flag = barbarianlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 250 }
+						}
+						remove_trait = trained_barbarian
+						add_trait = journeyman_barbarian
+						subtract_variable = { which = barbarian_xp value = 250 }
+						set_character_flag = barbarianlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 350 }
+						}
+						remove_trait = trained_barbarian
+						add_trait = journeyman_barbarian
+						subtract_variable = { which = barbarian_xp value = 350 }
+						set_character_flag = barbarianlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 450 }
+						}
+						remove_trait = journeyman_barbarian
+						add_trait = expert_barbarian
+						subtract_variable = { which = barbarian_xp value = 450 }
+						set_character_flag = barbarianlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 630 }
+						}
+						remove_trait = journeyman_barbarian
+						add_trait = expert_barbarian
+						subtract_variable = { which = barbarian_xp value = 630 }
+						set_character_flag = barbarianlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 800 }
+						}
+						remove_trait = expert_barbarian
+						add_trait = master_barbarian
+						subtract_variable = { which = barbarian_xp value = 800 }
+						set_character_flag = barbarianlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 1120 }
+						}
+						remove_trait = expert_barbarian
+						add_trait = master_barbarian
+						subtract_variable = { which = barbarian_xp value = 1120 }
+						set_character_flag = barbarianlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 1200 }
+						}
+						remove_trait = master_barbarian
+						add_trait = renowned_barbarian
+						subtract_variable = { which = barbarian_xp value = 1200 }
+						set_character_flag = barbarianlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 1680 }
+						}
+						remove_trait = master_barbarian
+						add_trait = renowned_barbarian
+						subtract_variable = { which = barbarian_xp value = 1680 }
+						set_character_flag = barbarianlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_barbarian = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = barbarian_xp value >= 2000 }
+						}
+						remove_trait = renowned_barbarian
+						add_trait = legendary_barbarian
+						subtract_variable = { which = barbarian_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = barbarianlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = barbarian_xp value >= 2800 }
+						}
+						remove_trait = renowned_barbarian
+						add_trait = legendary_barbarian
+						subtract_variable = { which = barbarian_xp value = 2800 }
+						set_character_flag = barbarianlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Bard block
+		if = {
+			limit = {
+				z_bard = yes
+				NOT = { trait = legendary_bard }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = bard_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = bard_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = bard_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = bard_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = bard_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = bard_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_bard
+				}
+				change_variable = { which = bard_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 100 }
+						}
+						remove_trait = bard
+						add_trait = trained_bard
+						subtract_variable = { which = bard_xp value = 100 }
+						set_character_flag = bardlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 140 }
+						}
+						remove_trait = bard
+						add_trait = trained_bard
+						subtract_variable = { which = bard_xp value = 140 }
+						set_character_flag = bardlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 250 }
+						}
+						remove_trait = trained_bard
+						add_trait = journeyman_bard
+						subtract_variable = { which = bard_xp value = 250 }
+						set_character_flag = bardlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 350 }
+						}
+						remove_trait = trained_bard
+						add_trait = journeyman_bard
+						subtract_variable = { which = bard_xp value = 350 }
+						set_character_flag = bardlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 450 }
+						}
+						remove_trait = journeyman_bard
+						add_trait = expert_bard
+						subtract_variable = { which = bard_xp value = 450 }
+						set_character_flag = bardlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 630 }
+						}
+						remove_trait = journeyman_bard
+						add_trait = expert_bard
+						subtract_variable = { which = bard_xp value = 630 }
+						set_character_flag = bardlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 800 }
+						}
+						remove_trait = expert_bard
+						add_trait = master_bard
+						subtract_variable = { which = bard_xp value = 800 }
+						set_character_flag = bardlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 1120 }
+						}
+						remove_trait = expert_bard
+						add_trait = master_bard
+						subtract_variable = { which = bard_xp value = 1120 }
+						set_character_flag = bardlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 1200 }
+						}
+						remove_trait = master_bard
+						add_trait = renowned_bard
+						subtract_variable = { which = bard_xp value = 1200 }
+						set_character_flag = bardlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 1680 }
+						}
+						remove_trait = master_bard
+						add_trait = renowned_bard
+						subtract_variable = { which = bard_xp value = 1680 }
+						set_character_flag = bardlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_bard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = bard_xp value >= 2000 }
+						}
+						remove_trait = renowned_bard
+						add_trait = legendary_bard
+						subtract_variable = { which = bard_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = bardlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = bard_xp value >= 2800 }
+						}
+						remove_trait = renowned_bard
+						add_trait = legendary_bard
+						subtract_variable = { which = bard_xp value = 2800 }
+						set_character_flag = bardlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Cleric block
+		if = {
+			limit = {
+				z_cleric = yes
+				NOT = { trait = legendary_cleric }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = cleric_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = cleric_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = cleric_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = cleric_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = cleric_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = cleric_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_cleric
+				}
+				change_variable = { which = cleric_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 100 }
+						}
+						remove_trait = cleric
+						add_trait = trained_cleric
+						subtract_variable = { which = cleric_xp value = 100 }
+						set_character_flag = clericlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 140 }
+						}
+						remove_trait = cleric
+						add_trait = trained_cleric
+						subtract_variable = { which = cleric_xp value = 140 }
+						set_character_flag = clericlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 250 }
+						}
+						remove_trait = trained_cleric
+						add_trait = journeyman_cleric
+						subtract_variable = { which = cleric_xp value = 250 }
+						set_character_flag = clericlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 350 }
+						}
+						remove_trait = trained_cleric
+						add_trait = journeyman_cleric
+						subtract_variable = { which = cleric_xp value = 350 }
+						set_character_flag = clericlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 450 }
+						}
+						remove_trait = journeyman_cleric
+						add_trait = expert_cleric
+						subtract_variable = { which = cleric_xp value = 450 }
+						set_character_flag = clericlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 630 }
+						}
+						remove_trait = journeyman_cleric
+						add_trait = expert_cleric
+						subtract_variable = { which = cleric_xp value = 630 }
+						set_character_flag = clericlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 800 }
+						}
+						remove_trait = expert_cleric
+						add_trait = master_cleric
+						subtract_variable = { which = cleric_xp value = 800 }
+						set_character_flag = clericlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 1120 }
+						}
+						remove_trait = expert_cleric
+						add_trait = master_cleric
+						subtract_variable = { which = cleric_xp value = 1120 }
+						set_character_flag = clericlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 1200 }
+						}
+						remove_trait = master_cleric
+						add_trait = renowned_cleric
+						subtract_variable = { which = cleric_xp value = 1200 }
+						set_character_flag = clericlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 1680 }
+						}
+						remove_trait = master_cleric
+						add_trait = renowned_cleric
+						subtract_variable = { which = cleric_xp value = 1680 }
+						set_character_flag = clericlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_cleric = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = cleric_xp value >= 2000 }
+						}
+						remove_trait = renowned_cleric
+						add_trait = legendary_cleric
+						subtract_variable = { which = cleric_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = clericlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = cleric_xp value >= 2800 }
+						}
+						remove_trait = renowned_cleric
+						add_trait = legendary_cleric
+						subtract_variable = { which = cleric_xp value = 2800 }
+						set_character_flag = clericlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Druid block
+		if = {
+			limit = {
+				z_druid = yes
+				NOT = { trait = legendary_druid }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = druid_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = druid_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = druid_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = druid_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = druid_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = druid_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_druid
+				}
+				change_variable = { which = druid_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 100 }
+						}
+						remove_trait = druid
+						add_trait = trained_druid
+						subtract_variable = { which = druid_xp value = 100 }
+						set_character_flag = druidlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 140 }
+						}
+						remove_trait = druid
+						add_trait = trained_druid
+						subtract_variable = { which = druid_xp value = 140 }
+						set_character_flag = druidlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 250 }
+						}
+						remove_trait = trained_druid
+						add_trait = journeyman_druid
+						subtract_variable = { which = druid_xp value = 250 }
+						set_character_flag = druidlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 350 }
+						}
+						remove_trait = trained_druid
+						add_trait = journeyman_druid
+						subtract_variable = { which = druid_xp value = 350 }
+						set_character_flag = druidlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 450 }
+						}
+						remove_trait = journeyman_druid
+						add_trait = expert_druid
+						subtract_variable = { which = druid_xp value = 450 }
+						set_character_flag = druidlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 630 }
+						}
+						remove_trait = journeyman_druid
+						add_trait = expert_druid
+						subtract_variable = { which = druid_xp value = 630 }
+						set_character_flag = druidlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 800 }
+						}
+						remove_trait = expert_druid
+						add_trait = master_druid
+						subtract_variable = { which = druid_xp value = 800 }
+						set_character_flag = druidlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 1120 }
+						}
+						remove_trait = expert_druid
+						add_trait = master_druid
+						subtract_variable = { which = druid_xp value = 1120 }
+						set_character_flag = druidlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 1200 }
+						}
+						remove_trait = master_druid
+						add_trait = renowned_druid
+						subtract_variable = { which = druid_xp value = 1200 }
+						set_character_flag = druidlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 1680 }
+						}
+						remove_trait = master_druid
+						add_trait = renowned_druid
+						subtract_variable = { which = druid_xp value = 1680 }
+						set_character_flag = druidlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_druid = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = druid_xp value >= 2000 }
+						}
+						remove_trait = renowned_druid
+						add_trait = legendary_druid
+						subtract_variable = { which = druid_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = druidlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = druid_xp value >= 2800 }
+						}
+						remove_trait = renowned_druid
+						add_trait = legendary_druid
+						subtract_variable = { which = druid_xp value = 2800 }
+						set_character_flag = druidlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Fighter block
+		if = {
+			limit = {
+				z_fighter = yes
+				NOT = { trait = legendary_fighter }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = fighter_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = fighter_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = fighter_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = fighter_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = fighter_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = fighter_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_fighter
+				}
+				change_variable = { which = fighter_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 100 }
+						}
+						remove_trait = fighter
+						add_trait = trained_fighter
+						subtract_variable = { which = fighter_xp value = 100 }
+						set_character_flag = fighterlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 140 }
+						}
+						remove_trait = fighter
+						add_trait = trained_fighter
+						subtract_variable = { which = fighter_xp value = 140 }
+						set_character_flag = fighterlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 250 }
+						}
+						remove_trait = trained_fighter
+						add_trait = journeyman_fighter
+						subtract_variable = { which = fighter_xp value = 250 }
+						set_character_flag = fighterlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 350 }
+						}
+						remove_trait = trained_fighter
+						add_trait = journeyman_fighter
+						subtract_variable = { which = fighter_xp value = 350 }
+						set_character_flag = fighterlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 450 }
+						}
+						remove_trait = journeyman_fighter
+						add_trait = expert_fighter
+						subtract_variable = { which = fighter_xp value = 450 }
+						set_character_flag = fighterlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 630 }
+						}
+						remove_trait = journeyman_fighter
+						add_trait = expert_fighter
+						subtract_variable = { which = fighter_xp value = 630 }
+						set_character_flag = fighterlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 800 }
+						}
+						remove_trait = expert_fighter
+						add_trait = master_fighter
+						subtract_variable = { which = fighter_xp value = 800 }
+						set_character_flag = fighterlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 1120 }
+						}
+						remove_trait = expert_fighter
+						add_trait = master_fighter
+						subtract_variable = { which = fighter_xp value = 1120 }
+						set_character_flag = fighterlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 1200 }
+						}
+						remove_trait = master_fighter
+						add_trait = renowned_fighter
+						subtract_variable = { which = fighter_xp value = 1200 }
+						set_character_flag = fighterlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 1680 }
+						}
+						remove_trait = master_fighter
+						add_trait = renowned_fighter
+						subtract_variable = { which = fighter_xp value = 1680 }
+						set_character_flag = fighterlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_fighter = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = fighter_xp value >= 2000 }
+						}
+						remove_trait = renowned_fighter
+						add_trait = legendary_fighter
+						subtract_variable = { which = fighter_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = fighterlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = fighter_xp value >= 2800 }
+						}
+						remove_trait = renowned_fighter
+						add_trait = legendary_fighter
+						subtract_variable = { which = fighter_xp value = 2800 }
+						set_character_flag = fighterlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Monk block
+		if = {
+			limit = {
+				z_monk = yes
+				NOT = { trait = legendary_monk }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = monk_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = monk_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = monk_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = monk_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = monk_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = monk_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_monk
+				}
+				change_variable = { which = monk_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 100 }
+						}
+						remove_trait = monk
+						add_trait = trained_monk
+						subtract_variable = { which = monk_xp value = 100 }
+						set_character_flag = monklvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 140 }
+						}
+						remove_trait = monk
+						add_trait = trained_monk
+						subtract_variable = { which = monk_xp value = 140 }
+						set_character_flag = monklvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 250 }
+						}
+						remove_trait = trained_monk
+						add_trait = journeyman_monk
+						subtract_variable = { which = monk_xp value = 250 }
+						set_character_flag = monklvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 350 }
+						}
+						remove_trait = trained_monk
+						add_trait = journeyman_monk
+						subtract_variable = { which = monk_xp value = 350 }
+						set_character_flag = monklvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 450 }
+						}
+						remove_trait = journeyman_monk
+						add_trait = expert_monk
+						subtract_variable = { which = monk_xp value = 450 }
+						set_character_flag = monklvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 630 }
+						}
+						remove_trait = journeyman_monk
+						add_trait = expert_monk
+						subtract_variable = { which = monk_xp value = 630 }
+						set_character_flag = monklvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 800 }
+						}
+						remove_trait = expert_monk
+						add_trait = master_monk
+						subtract_variable = { which = monk_xp value = 800 }
+						set_character_flag = monklvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 1120 }
+						}
+						remove_trait = expert_monk
+						add_trait = master_monk
+						subtract_variable = { which = monk_xp value = 1120 }
+						set_character_flag = monklvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 1200 }
+						}
+						remove_trait = master_monk
+						add_trait = renowned_monk
+						subtract_variable = { which = monk_xp value = 1200 }
+						set_character_flag = monklvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 1680 }
+						}
+						remove_trait = master_monk
+						add_trait = renowned_monk
+						subtract_variable = { which = monk_xp value = 1680 }
+						set_character_flag = monklvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_monk = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = monk_xp value >= 2000 }
+						}
+						remove_trait = renowned_monk
+						add_trait = legendary_monk
+						subtract_variable = { which = monk_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = monklvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = monk_xp value >= 2800 }
+						}
+						remove_trait = renowned_monk
+						add_trait = legendary_monk
+						subtract_variable = { which = monk_xp value = 2800 }
+						set_character_flag = monklvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Paladin block
+		if = {
+			limit = {
+				z_paladin = yes
+				NOT = { trait = legendary_paladin }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = paladin_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = paladin_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = paladin_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = paladin_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = paladin_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = paladin_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_paladin
+				}
+				change_variable = { which = paladin_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 100 }
+						}
+						remove_trait = paladin
+						add_trait = trained_paladin
+						subtract_variable = { which = paladin_xp value = 100 }
+						set_character_flag = paladinlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 140 }
+						}
+						remove_trait = paladin
+						add_trait = trained_paladin
+						subtract_variable = { which = paladin_xp value = 140 }
+						set_character_flag = paladinlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 250 }
+						}
+						remove_trait = trained_paladin
+						add_trait = journeyman_paladin
+						subtract_variable = { which = paladin_xp value = 250 }
+						set_character_flag = paladinlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 350 }
+						}
+						remove_trait = trained_paladin
+						add_trait = journeyman_paladin
+						subtract_variable = { which = paladin_xp value = 350 }
+						set_character_flag = paladinlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 450 }
+						}
+						remove_trait = journeyman_paladin
+						add_trait = expert_paladin
+						subtract_variable = { which = paladin_xp value = 450 }
+						set_character_flag = paladinlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 630 }
+						}
+						remove_trait = journeyman_paladin
+						add_trait = expert_paladin
+						subtract_variable = { which = paladin_xp value = 630 }
+						set_character_flag = paladinlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 800 }
+						}
+						remove_trait = expert_paladin
+						add_trait = master_paladin
+						subtract_variable = { which = paladin_xp value = 800 }
+						set_character_flag = paladinlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 1120 }
+						}
+						remove_trait = expert_paladin
+						add_trait = master_paladin
+						subtract_variable = { which = paladin_xp value = 1120 }
+						set_character_flag = paladinlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 1200 }
+						}
+						remove_trait = master_paladin
+						add_trait = renowned_paladin
+						subtract_variable = { which = paladin_xp value = 1200 }
+						set_character_flag = paladinlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 1680 }
+						}
+						remove_trait = master_paladin
+						add_trait = renowned_paladin
+						subtract_variable = { which = paladin_xp value = 1680 }
+						set_character_flag = paladinlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_paladin = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = paladin_xp value >= 2000 }
+						}
+						remove_trait = renowned_paladin
+						add_trait = legendary_paladin
+						subtract_variable = { which = paladin_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = paladinlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = paladin_xp value >= 2800 }
+						}
+						remove_trait = renowned_paladin
+						add_trait = legendary_paladin
+						subtract_variable = { which = paladin_xp value = 2800 }
+						set_character_flag = paladinlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Ranger block
+		if = {
+			limit = {
+				z_ranger = yes
+				NOT = { trait = legendary_ranger }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = ranger_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = ranger_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = ranger_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = ranger_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = ranger_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = ranger_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_ranger
+				}
+				change_variable = { which = ranger_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 100 }
+						}
+						remove_trait = ranger
+						add_trait = trained_ranger
+						subtract_variable = { which = ranger_xp value = 100 }
+						set_character_flag = rangerlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 140 }
+						}
+						remove_trait = ranger
+						add_trait = trained_ranger
+						subtract_variable = { which = ranger_xp value = 140 }
+						set_character_flag = rangerlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 250 }
+						}
+						remove_trait = trained_ranger
+						add_trait = journeyman_ranger
+						subtract_variable = { which = ranger_xp value = 250 }
+						set_character_flag = rangerlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 350 }
+						}
+						remove_trait = trained_ranger
+						add_trait = journeyman_ranger
+						subtract_variable = { which = ranger_xp value = 350 }
+						set_character_flag = rangerlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 450 }
+						}
+						remove_trait = journeyman_ranger
+						add_trait = expert_ranger
+						subtract_variable = { which = ranger_xp value = 450 }
+						set_character_flag = rangerlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 630 }
+						}
+						remove_trait = journeyman_ranger
+						add_trait = expert_ranger
+						subtract_variable = { which = ranger_xp value = 630 }
+						set_character_flag = rangerlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 800 }
+						}
+						remove_trait = expert_ranger
+						add_trait = master_ranger
+						subtract_variable = { which = ranger_xp value = 800 }
+						set_character_flag = rangerlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 1120 }
+						}
+						remove_trait = expert_ranger
+						add_trait = master_ranger
+						subtract_variable = { which = ranger_xp value = 1120 }
+						set_character_flag = rangerlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 1200 }
+						}
+						remove_trait = master_ranger
+						add_trait = renowned_ranger
+						subtract_variable = { which = ranger_xp value = 1200 }
+						set_character_flag = rangerlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 1680 }
+						}
+						remove_trait = master_ranger
+						add_trait = renowned_ranger
+						subtract_variable = { which = ranger_xp value = 1680 }
+						set_character_flag = rangerlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_ranger = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = ranger_xp value >= 2000 }
+						}
+						remove_trait = renowned_ranger
+						add_trait = legendary_ranger
+						subtract_variable = { which = ranger_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = rangerlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = ranger_xp value >= 2800 }
+						}
+						remove_trait = renowned_ranger
+						add_trait = legendary_ranger
+						subtract_variable = { which = ranger_xp value = 2800 }
+						set_character_flag = rangerlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Rogue block
+		if = {
+			limit = {
+				z_rogue = yes
+				NOT = { trait = legendary_rogue }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = rogue_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = rogue_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = rogue_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = rogue_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = rogue_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = rogue_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_rogue
+				}
+				change_variable = { which = rogue_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 100 }
+						}
+						remove_trait = rogue
+						add_trait = trained_rogue
+						subtract_variable = { which = rogue_xp value = 100 }
+						set_character_flag = roguelvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 140 }
+						}
+						remove_trait = rogue
+						add_trait = trained_rogue
+						subtract_variable = { which = rogue_xp value = 140 }
+						set_character_flag = roguelvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 250 }
+						}
+						remove_trait = trained_rogue
+						add_trait = journeyman_rogue
+						subtract_variable = { which = rogue_xp value = 250 }
+						set_character_flag = roguelvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 350 }
+						}
+						remove_trait = trained_rogue
+						add_trait = journeyman_rogue
+						subtract_variable = { which = rogue_xp value = 350 }
+						set_character_flag = roguelvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 450 }
+						}
+						remove_trait = journeyman_rogue
+						add_trait = expert_rogue
+						subtract_variable = { which = rogue_xp value = 450 }
+						set_character_flag = roguelvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 630 }
+						}
+						remove_trait = journeyman_rogue
+						add_trait = expert_rogue
+						subtract_variable = { which = rogue_xp value = 630 }
+						set_character_flag = roguelvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 800 }
+						}
+						remove_trait = expert_rogue
+						add_trait = master_rogue
+						subtract_variable = { which = rogue_xp value = 800 }
+						set_character_flag = roguelvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 1120 }
+						}
+						remove_trait = expert_rogue
+						add_trait = master_rogue
+						subtract_variable = { which = rogue_xp value = 1120 }
+						set_character_flag = roguelvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 1200 }
+						}
+						remove_trait = master_rogue
+						add_trait = renowned_rogue
+						subtract_variable = { which = rogue_xp value = 1200 }
+						set_character_flag = roguelvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 1680 }
+						}
+						remove_trait = master_rogue
+						add_trait = renowned_rogue
+						subtract_variable = { which = rogue_xp value = 1680 }
+						set_character_flag = roguelvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_rogue = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = rogue_xp value >= 2000 }
+						}
+						remove_trait = renowned_rogue
+						add_trait = legendary_rogue
+						subtract_variable = { which = rogue_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = roguelvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = rogue_xp value >= 2800 }
+						}
+						remove_trait = renowned_rogue
+						add_trait = legendary_rogue
+						subtract_variable = { which = rogue_xp value = 2800 }
+						set_character_flag = roguelvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Shadow block
+		if = {
+			limit = {
+				z_shadow = yes
+				NOT = { trait = legendary_shadow }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = shadow_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = shadow_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = shadow_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = shadow_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = shadow_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = shadow_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_shadow
+				}
+				change_variable = { which = shadow_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 100 }
+						}
+						remove_trait = shadow
+						add_trait = trained_shadow
+						subtract_variable = { which = shadow_xp value = 100 }
+						set_character_flag = shadowlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 140 }
+						}
+						remove_trait = shadow
+						add_trait = trained_shadow
+						subtract_variable = { which = shadow_xp value = 140 }
+						set_character_flag = shadowlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 250 }
+						}
+						remove_trait = trained_shadow
+						add_trait = journeyman_shadow
+						subtract_variable = { which = shadow_xp value = 250 }
+						set_character_flag = shadowlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 350 }
+						}
+						remove_trait = trained_shadow
+						add_trait = journeyman_shadow
+						subtract_variable = { which = shadow_xp value = 350 }
+						set_character_flag = shadowlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 450 }
+						}
+						remove_trait = journeyman_shadow
+						add_trait = expert_shadow
+						subtract_variable = { which = shadow_xp value = 450 }
+						set_character_flag = shadowlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 630 }
+						}
+						remove_trait = journeyman_shadow
+						add_trait = expert_shadow
+						subtract_variable = { which = shadow_xp value = 630 }
+						set_character_flag = shadowlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 800 }
+						}
+						remove_trait = expert_shadow
+						add_trait = master_shadow
+						subtract_variable = { which = shadow_xp value = 800 }
+						set_character_flag = shadowlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 1120 }
+						}
+						remove_trait = expert_shadow
+						add_trait = master_shadow
+						subtract_variable = { which = shadow_xp value = 1120 }
+						set_character_flag = shadowlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 1200 }
+						}
+						remove_trait = master_shadow
+						add_trait = renowned_shadow
+						subtract_variable = { which = shadow_xp value = 1200 }
+						set_character_flag = shadowlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 1680 }
+						}
+						remove_trait = master_shadow
+						add_trait = renowned_shadow
+						subtract_variable = { which = shadow_xp value = 1680 }
+						set_character_flag = shadowlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_shadow = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = shadow_xp value >= 2000 }
+						}
+						remove_trait = renowned_shadow
+						add_trait = legendary_shadow
+						subtract_variable = { which = shadow_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = shadowlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = shadow_xp value >= 2800 }
+						}
+						remove_trait = renowned_shadow
+						add_trait = legendary_shadow
+						subtract_variable = { which = shadow_xp value = 2800 }
+						set_character_flag = shadowlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Sorcerer block
+		if = {
+			limit = {
+				z_sorcerer = yes
+				NOT = { trait = legendary_sorcerer }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = sorcerer_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = sorcerer_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = sorcerer_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = sorcerer_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = sorcerer_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = sorcerer_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_sorcerer
+				}
+				change_variable = { which = sorcerer_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 100 }
+						}
+						remove_trait = sorcerer
+						add_trait = trained_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 100 }
+						set_character_flag = sorcererlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 140 }
+						}
+						remove_trait = sorcerer
+						add_trait = trained_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 140 }
+						set_character_flag = sorcererlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 250 }
+						}
+						remove_trait = trained_sorcerer
+						add_trait = journeyman_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 250 }
+						set_character_flag = sorcererlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 350 }
+						}
+						remove_trait = trained_sorcerer
+						add_trait = journeyman_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 350 }
+						set_character_flag = sorcererlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 450 }
+						}
+						remove_trait = journeyman_sorcerer
+						add_trait = expert_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 450 }
+						set_character_flag = sorcererlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 630 }
+						}
+						remove_trait = journeyman_sorcerer
+						add_trait = expert_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 630 }
+						set_character_flag = sorcererlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 800 }
+						}
+						remove_trait = expert_sorcerer
+						add_trait = master_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 800 }
+						set_character_flag = sorcererlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 1120 }
+						}
+						remove_trait = expert_sorcerer
+						add_trait = master_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 1120 }
+						set_character_flag = sorcererlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 1200 }
+						}
+						remove_trait = master_sorcerer
+						add_trait = renowned_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 1200 }
+						set_character_flag = sorcererlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 1680 }
+						}
+						remove_trait = master_sorcerer
+						add_trait = renowned_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 1680 }
+						set_character_flag = sorcererlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_sorcerer = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = sorcerer_xp value >= 2000 }
+						}
+						remove_trait = renowned_sorcerer
+						add_trait = legendary_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = sorcererlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = sorcerer_xp value >= 2800 }
+						}
+						remove_trait = renowned_sorcerer
+						add_trait = legendary_sorcerer
+						subtract_variable = { which = sorcerer_xp value = 2800 }
+						set_character_flag = sorcererlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Warlock block
+		if = {
+			limit = {
+				z_warlock = yes
+				NOT = { trait = legendary_warlock }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = warlock_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = warlock_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = warlock_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = warlock_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = warlock_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = warlock_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_warlock
+				}
+				change_variable = { which = warlock_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 100 }
+						}
+						remove_trait = warlock
+						add_trait = trained_warlock
+						subtract_variable = { which = warlock_xp value = 100 }
+						set_character_flag = warlocklvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 140 }
+						}
+						remove_trait = warlock
+						add_trait = trained_warlock
+						subtract_variable = { which = warlock_xp value = 140 }
+						set_character_flag = warlocklvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 250 }
+						}
+						remove_trait = trained_warlock
+						add_trait = journeyman_warlock
+						subtract_variable = { which = warlock_xp value = 250 }
+						set_character_flag = warlocklvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 350 }
+						}
+						remove_trait = trained_warlock
+						add_trait = journeyman_warlock
+						subtract_variable = { which = warlock_xp value = 350 }
+						set_character_flag = warlocklvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 450 }
+						}
+						remove_trait = journeyman_warlock
+						add_trait = expert_warlock
+						subtract_variable = { which = warlock_xp value = 450 }
+						set_character_flag = warlocklvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 630 }
+						}
+						remove_trait = journeyman_warlock
+						add_trait = expert_warlock
+						subtract_variable = { which = warlock_xp value = 630 }
+						set_character_flag = warlocklvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 800 }
+						}
+						remove_trait = expert_warlock
+						add_trait = master_warlock
+						subtract_variable = { which = warlock_xp value = 800 }
+						set_character_flag = warlocklvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 1120 }
+						}
+						remove_trait = expert_warlock
+						add_trait = master_warlock
+						subtract_variable = { which = warlock_xp value = 1120 }
+						set_character_flag = warlocklvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 1200 }
+						}
+						remove_trait = master_warlock
+						add_trait = renowned_warlock
+						subtract_variable = { which = warlock_xp value = 1200 }
+						set_character_flag = warlocklvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 1680 }
+						}
+						remove_trait = master_warlock
+						add_trait = renowned_warlock
+						subtract_variable = { which = warlock_xp value = 1680 }
+						set_character_flag = warlocklvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_warlock = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = warlock_xp value >= 2000 }
+						}
+						remove_trait = renowned_warlock
+						add_trait = legendary_warlock
+						subtract_variable = { which = warlock_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = warlocklvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = warlock_xp value >= 2800 }
+						}
+						remove_trait = renowned_warlock
+						add_trait = legendary_warlock
+						subtract_variable = { which = warlock_xp value = 2800 }
+						set_character_flag = warlocklvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		#Wizard block
+		if = {
+			limit = {
+				z_wizard = yes
+				NOT = { trait = legendary_wizard }
+			}
+			#Add guaranteed yearly xp
+			change_variable = { which = wizard_xp value = 10 }
+			#Below is a chance to gain more points
+			random = {
+				chance = 50
+				change_variable = { which = wizard_xp value = 1 }
+			}
+			random = {
+				chance = 50
+				change_variable = { which = wizard_xp value = 1 }
+			}
+			random = {
+				chance = 40
+				change_variable = { which = wizard_xp value = 1 }
+			}
+			random = {
+				chance = 20
+				change_variable = { which = wizard_xp value = 3 }
+			}
+			random = {
+				chance = 10
+				change_variable = { which = wizard_xp value = 3 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_wizard
+				}
+				change_variable = { which = wizard_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 100 }
+						}
+						remove_trait = wizard
+						add_trait = trained_wizard
+						subtract_variable = { which = wizard_xp value = 100 }
+						set_character_flag = wizardlvl1
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 140 }
+						}
+						remove_trait = wizard
+						add_trait = trained_wizard
+						subtract_variable = { which = wizard_xp value = 140 }
+						set_character_flag = wizardlvl1
+						character_event = { id = tbxp.3 }
+					}
+				}
+				trained_wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 250 }
+						}
+						remove_trait = trained_wizard
+						add_trait = journeyman_wizard
+						subtract_variable = { which = wizard_xp value = 250 }
+						set_character_flag = wizardlvl2
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 350 }
+						}
+						remove_trait = trained_wizard
+						add_trait = journeyman_wizard
+						subtract_variable = { which = wizard_xp value = 350 }
+						set_character_flag = wizardlvl2
+						character_event = { id = tbxp.3 }
+					}
+				}
+				journeyman_wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 450 }
+						}
+						remove_trait = journeyman_wizard
+						add_trait = expert_wizard
+						subtract_variable = { which = wizard_xp value = 450 }
+						set_character_flag = wizardlvl3
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 630 }
+						}
+						remove_trait = journeyman_wizard
+						add_trait = expert_wizard
+						subtract_variable = { which = wizard_xp value = 630 }
+						set_character_flag = wizardlvl3
+						character_event = { id = tbxp.3 }
+					}
+				}
+				expert_wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 800 }
+						}
+						remove_trait = expert_wizard
+						add_trait = master_wizard
+						subtract_variable = { which = wizard_xp value = 800 }
+						set_character_flag = wizardlvl4
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 1120 }
+						}
+						remove_trait = expert_wizard
+						add_trait = master_wizard
+						subtract_variable = { which = wizard_xp value = 1120 }
+						set_character_flag = wizardlvl4
+						character_event = { id = tbxp.3 }
+					}
+				}
+				master_wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 1200 }
+						}
+						remove_trait = master_wizard
+						add_trait = renowned_wizard
+						subtract_variable = { which = wizard_xp value = 1200 }
+						set_character_flag = wizardlvl5
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 1680 }
+						}
+						remove_trait = master_wizard
+						add_trait = renowned_wizard
+						subtract_variable = { which = wizard_xp value = 1680 }
+						set_character_flag = wizardlvl5
+						character_event = { id = tbxp.3 }
+					}
+				}
+				renowned_wizard = {
+					if = {
+						limit = {
+							z_multiclass = no
+							check_variable = { which = wizard_xp value >= 2000 }
+						}
+						remove_trait = renowned_wizard
+						add_trait = legendary_wizard
+						subtract_variable = { which = wizard_xp value = 2000 }
+						clr_character_flag = xp_init
+						set_character_flag = wizardlvl6
+						character_event = { id = tbxp.3 }
+					}
+					if = {
+						limit = {
+							z_multiclass = yes
+							check_variable = { which = wizard_xp value >= 2800 }
+						}
+						remove_trait = renowned_wizard
+						add_trait = legendary_wizard
+						subtract_variable = { which = wizard_xp value = 2800 }
+						set_character_flag = wizardlvl6
+						character_event = { id = tbxp.3 }
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_character_flag = xp_init
+			}
+			character_event = { id = tbxp.2 years = 1 }
+		}
+	}
+}
+
+character_event = {
+	id = tbxp.3
+	desc = TBXP.3.DESC
+	picture = GFX_evt_battle
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = TBXP.3.OPT
+		#This is just for show
+		#Assassins
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl1
+			}
+			add_trait = trained_assassin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl2
+			}
+			add_trait = journeyman_assassin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl3
+			}
+			add_trait = expert_assassin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl4
+			}
+			add_trait = master_assassin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl5
+			}
+			add_trait = renowned_assassin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = assassinlvl6
+			}
+			add_trait = legendary_assassin
+		}
+		#Bards
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl1
+			}
+			add_trait = trained_bard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl2
+			}
+			add_trait = journeyman_bard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl3
+			}
+			add_trait = expert_bard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl4
+			}
+			add_trait = master_bard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl5
+			}
+			add_trait = renowned_bard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = bardlvl6
+			}
+			add_trait = legendary_bard
+		}
+		#Barbarians
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl1
+			}
+			add_trait = trained_barbarian
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl2
+			}
+			add_trait = journeyman_barbarian
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl3
+			}
+			add_trait = expert_barbarian
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl4
+			}
+			add_trait = master_barbarian
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl5
+			}
+			add_trait = renowned_barbarian
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = barbarianlvl6
+			}
+			add_trait = legendary_barbarian
+		}
+		#Clerics
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl1
+			}
+			add_trait = trained_cleric
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl2
+			}
+			add_trait = journeyman_cleric
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl3
+			}
+			add_trait = expert_cleric
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl4
+			}
+			add_trait = master_cleric
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl5
+			}
+			add_trait = renowned_cleric
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = clericlvl6
+			}
+			add_trait = legendary_cleric
+		}
+		#Druids
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl1
+			}
+			add_trait = trained_druid
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl2
+			}
+			add_trait = journeyman_druid
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl3
+			}
+			add_trait = expert_druid
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl4
+			}
+			add_trait = master_druid
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl5
+			}
+			add_trait = renowned_druid
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = druidlvl6
+			}
+			add_trait = legendary_druid
+		}
+		#Fighters
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl1
+			}
+			add_trait = trained_fighter
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl2
+			}
+			add_trait = journeyman_fighter
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl3
+			}
+			add_trait = expert_fighter
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl4
+			}
+			add_trait = master_fighter
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl5
+			}
+			add_trait = renowned_fighter
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = fighterlvl6
+			}
+			add_trait = legendary_fighter
+		}
+		#Monks
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl1
+			}
+			add_trait = trained_monk
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl2
+			}
+			add_trait = journeyman_monk
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl3
+			}
+			add_trait = expert_monk
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl4
+			}
+			add_trait = master_monk
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl5
+			}
+			add_trait = renowned_monk
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = monklvl6
+			}
+			add_trait = legendary_monk
+		}
+		#Paladins
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl1
+			}
+			add_trait = trained_paladin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl2
+			}
+			add_trait = journeyman_paladin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl3
+			}
+			add_trait = expert_paladin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl4
+			}
+			add_trait = master_paladin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl5
+			}
+			add_trait = renowned_paladin
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = paladinlvl6
+			}
+			add_trait = legendary_paladin
+		}
+		#Rangers
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl1
+			}
+			add_trait = trained_ranger
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl2
+			}
+			add_trait = journeyman_ranger
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl3
+			}
+			add_trait = expert_ranger
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl4
+			}
+			add_trait = master_ranger
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl5
+			}
+			add_trait = renowned_ranger
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = rangerlvl6
+			}
+			add_trait = legendary_ranger
+		}
+		#Rogues
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl1
+			}
+			add_trait = trained_rogue
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl2
+			}
+			add_trait = journeyman_rogue
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl3
+			}
+			add_trait = expert_rogue
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl4
+			}
+			add_trait = master_rogue
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl5
+			}
+			add_trait = renowned_rogue
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = roguelvl6
+			}
+			add_trait = legendary_rogue
+		}
+		#Shadows
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl1
+			}
+			add_trait = trained_shadow
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl2
+			}
+			add_trait = journeyman_shadow
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl3
+			}
+			add_trait = expert_shadow
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl4
+			}
+			add_trait = master_shadow
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl5
+			}
+			add_trait = renowned_shadow
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = shadowlvl6
+			}
+			add_trait = legendary_shadow
+		}
+		#Sorcerers
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl1
+			}
+			add_trait = trained_sorcerer
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl2
+			}
+			add_trait = journeyman_sorcerer
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl3
+			}
+			add_trait = expert_sorcerer
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl4
+			}
+			add_trait = master_sorcerer
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl5
+			}
+			add_trait = renowned_sorcerer
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = sorcererlvl6
+			}
+			add_trait = legendary_sorcerer
+		}
+		#Warlock
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl1
+			}
+			add_trait = trained_warlock
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl2
+			}
+			add_trait = journeyman_warlock
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl3
+			}
+			add_trait = expert_warlock
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl4
+			}
+			add_trait = master_warlock
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl5
+			}
+			add_trait = renowned_warlock
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = warlocklvl6
+			}
+			add_trait = legendary_warlock
+		}
+		#Wizards
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl1
+			}
+			add_trait = trained_wizard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl2
+			}
+			add_trait = journeyman_wizard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl3
+			}
+			add_trait = expert_wizard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl4
+			}
+			add_trait = master_wizard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl5
+			}
+			add_trait = renowned_wizard
+		}
+		conditional_tooltip = {
+			trigger = {
+				has_character_flag = wizardlvl6
+			}
+			add_trait = legendary_wizard
+		}
+		clr_flags_with_prefix = assassinlvl
+		clr_flags_with_prefix = barbarianlvl
+		clr_flags_with_prefix = bardlvl
+		clr_flags_with_prefix = clericlvl
+		clr_flags_with_prefix = druidlvl
+		clr_flags_with_prefix = fighterlvl
+		clr_flags_with_prefix = monklvl
+		clr_flags_with_prefix = paladinlvl
+		clr_flags_with_prefix = rangerlvl
+		clr_flags_with_prefix = roguelvl
+		clr_flags_with_prefix = shadowlvl
+		clr_flags_with_prefix = sorcererlvl
+		clr_flags_with_prefix = warlocklvl
+		clr_flags_with_prefix = wizardlvl
+	}
+}
+
+#xp for winning battle
+character_event = {
+	id = tbxp.4
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		z_has_class = yes
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				z_assassin = yes
+			}
+			change_variable = { which = assassin_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_barbarian = yes
+			}
+			change_variable = { which = barbari_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_bard = yes
+			}
+			change_variable = { which = bard_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_cleric = yes
+			}
+			change_variable = { which = cleric_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_druid = yes
+			}
+			change_variable = { which = druid_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_fighter = yes
+			}
+			change_variable = { which = fighter_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_monk = yes
+			}
+			change_variable = { which = monk_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_paladin = yes
+			}
+			change_variable = { which = paladin_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_ranger = yes
+			}
+			change_variable = { which = ranger_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_rogue = yes
+			}
+			change_variable = { which = rogue_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_shadow = yes
+			}
+			change_variable = { which = shadow_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_sorcerer = yes
+			}
+			change_variable = { which = sorcerer_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_warlock = yes
+			}
+			change_variable = { which = warlock_xp value = 15 }
+		}
+		if = {
+			limit = {
+				z_wizard = yes
+			}
+			change_variable = { which = wizard_xp value = 15 }
+		}
+	}
+}
+
+#xp for winning battle
+character_event = {
+	id = tbxp.5
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		z_has_class = yes
+	}
+	
+	immediate = {
+		if = {
+			limit = {
+				z_assassin = yes
+			}
+			change_variable = { which = assassin_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_barbarian = yes
+			}
+			change_variable = { which = barbari_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_bard = yes
+			}
+			change_variable = { which = bard_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_cleric = yes
+			}
+			change_variable = { which = cleric_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_druid = yes
+			}
+			change_variable = { which = druid_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_fighter = yes
+			}
+			change_variable = { which = fighter_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_monk = yes
+			}
+			change_variable = { which = monk_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_paladin = yes
+			}
+			change_variable = { which = paladin_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_ranger = yes
+			}
+			change_variable = { which = ranger_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_rogue = yes
+			}
+			change_variable = { which = rogue_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_shadow = yes
+			}
+			change_variable = { which = shadow_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_sorcerer = yes
+			}
+			change_variable = { which = sorcerer_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_warlock = yes
+			}
+			change_variable = { which = warlock_xp value = 10 }
+		}
+		if = {
+			limit = {
+				z_wizard = yes
+			}
+			change_variable = { which = wizard_xp value = 10 }
+		}
+	}
+}
