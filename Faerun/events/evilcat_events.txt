@@ -3,17 +3,242 @@ namespace = evilcat
 character_event = { #disease immune remove disease
 	id = evilcat.100
 	desc = EVTDESC_TOG_7015
-	border = GFX_event_normal_frame_religion
-	picture = GFX_evt_danse_macabre
 	hide_window = yes
 	is_triggered_only = yes
+
 	
 	trigger = {
 		has_disease_trigger = yes
 	}
 
 	option = {
-		name = EVTOPTA_RIP_30233
 		remove_disease_trait_effect = yes	
+	}
+}
+character_event = { #human player event for no compatibility pairings
+	id = evilcat.200
+	ai = no
+	picture = GFX_evt_pregnancy
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes #on_pregnancy
+	
+	desc = {
+		text = evilcatlocprego200desca
+		trigger = { #The father is alive and a spouse
+			is_married = yes		
+			father_of_unborn = {
+				is_alive = yes
+				any_spouse = { character = ROOT }
+			}
+		}
+	}
+	desc = {
+		text = evilcatlocprego200descb
+		trigger = { #The father is dead and a spouse
+			is_married = no
+			father_of_unborn = {
+				is_alive = no
+				ROOT = {
+					any_spouse_even_if_dead = {
+						character = PREVPREV
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = evilcatlocprego200desce
+		trigger = { #Not married, but is consort
+			is_married = no
+			NOT = { num_of_consorts = 2 }
+			NOT = {
+				father_of_unborn = {
+					is_alive = no
+					ROOT = {
+						any_spouse_even_if_dead = {
+							character = PREVPREV
+						}
+					}
+				}
+			}
+		}
+	}
+	desc = { 
+		text = evilcatlocprego200descc
+		trigger = { #Not married, and multiple consorts
+			is_married = no
+			num_of_consorts = 2
+			NOT = {
+				father_of_unborn = {
+					is_alive = no
+					ROOT = {
+						any_spouse_even_if_dead = {
+							character = PREVPREV
+						}
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = evilcatlocprego200descd
+		trigger = { #The father is your alive lover
+			#is_married = yes		
+			father_of_unborn = {
+				is_consort = no
+				is_alive = yes
+				NOR = {
+					any_spouse_even_if_dead = {
+						character = ROOT
+					}	
+					any_consort = {
+						character = ROOT
+						is_senior_consort_party = yes
+					}
+				}
+			}
+		}
+	}
+	desc = {
+		text = evilcatlocprego200desce
+		trigger = { #The father is your dead former lover
+			#is_married = yes		
+			father_of_unborn = {
+				is_consort = no
+				is_alive = no
+				NOR = {
+					any_spouse_even_if_dead = {
+						character = ROOT
+					}	
+					any_consort = {
+						character = ROOT
+						is_senior_consort_party = yes
+					}
+				}
+			}
+		}
+	}
+	
+	trigger = {
+		evilcat_is_mismatched_father = yes
+		father_of_unborn = {
+			OR = {
+				AND = { #The father is alive and a spouse
+					is_alive = yes
+					any_spouse = { character = ROOT }
+				}
+				AND = { #The father is dead and a spouse
+					is_alive = no
+					ROOT = {
+						any_spouse_even_if_dead = {
+							character = PREVPREV
+						}
+					}
+				}
+				any_lover = {
+					character = ROOT
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		cancel_pregnancy = yes
+	}
+	
+	option = {
+		name = OK
+		if = {
+			limit = { #The father is alive and a spouse 
+				is_married = yes		
+				father_of_unborn = {
+					is_alive = yes
+					any_spouse = { character = ROOT }
+				}
+			}
+			set_can_grant_divorce = yes #religious head should allow them to divorce
+		}
+	}
+}
+character_event = { #ai version of the event for no compatibility pairings
+	id = evilcat.201
+	ai = yes
+	hide_window = yes
+	is_triggered_only = yes #on_pregnancy
+	desc = evilcatlocbugevent
+	
+	trigger = {
+		evilcat_is_mismatched_father = yes
+		father_of_unborn = {
+			OR = {
+				AND = { #The father is alive and a spouse
+					is_alive = yes
+					any_spouse = { character = ROOT }
+				}
+				AND = { #The father is dead and a spouse
+					is_alive = no
+					ROOT = {
+						any_spouse_even_if_dead = {
+							character = PREVPREV
+						}
+					}
+				}
+				any_consort = {
+					character = ROOT
+					is_senior_consort_party = yes
+				}
+				any_lover = {
+					character = ROOT
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		cancel_pregnancy = yes
+	}
+	
+	option = { #ends marriages and consorts
+		name = OK
+		if = {
+			limit = { #The father is alive and a spouse 
+				is_married = yes		
+				father_of_unborn = {
+					is_alive = yes
+					any_spouse = { character = ROOT }
+				}
+			}
+			remove_spouse = spouse
+		}
+		if = {
+			limit = { #The father is alive and a consort
+				is_married = yes		
+				father_of_unborn = {
+					is_alive = yes
+					any_consort = { character = ROOT }
+				}
+			}
+			father_of_unborn = {remove_consort = ROOT}
+		}
+	}
+}
+character_event = { #ai version of the event for no compatibility marriage
+	id = evilcat.300
+	ai = yes
+	hide_window = yes
+	is_triggered_only = yes #on_marriage
+	desc = evilcatlocbugevent
+	
+	trigger = {
+		evilcat_is_mismatched_spouse = yes
+	}
+	
+	immediate = {
+		remove_spouse = spouse
+	}
+	
+	option = {
+		name = OK
 	}
 }
