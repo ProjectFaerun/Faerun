@@ -1,0 +1,240 @@
+namespace = WAR_HELP_OFFERS
+
+# Hidden initial event
+character_event = {
+  id = WAR_HELP_OFFERS.1
+
+  only_rulers = yes
+  prisoner = no
+  min_age = 16
+  capable_only = yes
+  war = yes
+
+  hide_window = yes
+  is_triggered_only = yes
+
+  trigger = {
+    OR = {
+      is_primary_war_attacker = yes
+      is_primary_war_defender = yes
+    }
+    is_inaccessible_trigger = no
+    NOT = {
+      has_character_flag = war_help_offered
+    }
+  }
+
+  immediate = {
+    set_character_flag = war_help_offered
+    character_event = { id = WAR_HELP_OFFERS.2 years = 5 }
+    if = {
+      limit = {
+        OR = {
+          religion_group = evil_human_pantheon_group
+          religion_group = giant_pantheon_group
+          religion_group = goblin_pantheon_group
+        }
+      }
+      character_event = { id = WAR_HELP_OFFERS.3 }
+    }
+    else_if = {
+      limit = { religion_group = drow_pantheon }
+      character_event = { id = WAR_HELP_OFFERS.4 }
+    }
+    else_if = {
+      limit = { religion_group = orc_pantheon_group }
+      character_event = { id = WAR_HELP_OFFERS.5 }
+    }
+    else = {
+      character_event = { id = WAR_HELP_OFFERS.6 }
+    }
+  }
+
+  option = { name = OK }
+}
+
+character_event = {
+  id = WAR_HELP_OFFERS.2
+
+  hide_window = yes
+  is_triggered_only = yes
+
+  immediate = {
+    clr_character_flag = war_help_offered
+  }
+
+  option = { name = OK }
+}
+
+# Hobgoblin mercenaries
+character_event = {
+  id = WAR_HELP_OFFERS.3
+  desc = WAR_HELP_OFFERS.3.desc
+  picture = GFX_evt_carnage
+	border = GFX_event_normal_frame_war
+
+  is_triggered_only = yes
+
+  option = {
+    name = WAR_HELP_OFFERS.hire_them
+    wealth = -50
+    capital_scope = {
+      ROOT = {
+        spawn_unit = {
+          province = PREV
+          home = PREV
+          owner = THIS
+          troops = {
+            heavy_infantry = { 300 300 }
+          }
+          maintenance_multiplier = 0.5
+          reinforces = yes
+          disband_on_peace = yes
+        }
+      }
+    }
+
+    ai_chance = {
+      factor = 0
+      modifier = {
+        factor = 20
+        wealth = 100
+      }
+    }
+  }
+
+  option = {
+    name = WAR_HELP_OFFERS.no_need
+
+    ai_chance = {
+      factor = 10
+    }
+  }
+}
+
+# Arm a contingent of slaves
+character_event = {
+  id = WAR_HELP_OFFERS.4
+  desc = WAR_HELP_OFFERS.4.desc
+  picture = GFX_evt_drow
+	border = GFX_event_normal_frame_war
+
+  is_triggered_only = yes
+
+  option = {
+    name = WAR_HELP_OFFERS.hire_them
+    wealth = -50
+    capital_scope = {
+      ROOT = {
+        spawn_unit = {
+          province = PREV
+          home = PREV
+          owner = THIS
+          troops = {
+            light_infantry = { 1000 1000 }
+          }
+          maintenance_multiplier = 0
+        }
+      }
+    }
+
+    ai_chance = {
+      factor = 0
+      modifier = {
+        factor = 20
+        wealth = 100
+      }
+    }
+  }
+
+  option = {
+    name = WAR_HELP_OFFERS.no_need
+
+    ai_chance = {
+      factor = 10
+    }
+  }
+}
+
+# Ilneval cleric
+character_event = {
+  id = WAR_HELP_OFFERS.5
+  desc = WAR_HELP_OFFERS.5.desc
+  picture = GFX_evt_orc_pantheon
+	border = GFX_event_normal_frame_war
+
+  is_triggered_only = yes
+
+  option = {
+    name = WAR_HELP_OFFERS.5.a
+    capital_scope = {
+      ROOT = {
+        spawn_unit = {
+          province = PREV
+          home = PREV
+          owner = THIS
+          troops = {
+            light_infantry = { 100 100 }
+            archers = { 50 50 }
+          }
+          maintenance_multiplier = 0
+          disband_on_peace = yes
+        }
+      }
+    }
+  }
+
+  option = {
+    name = WAR_HELP_OFFERS.5.b
+    add_character_modifier = {
+      name = blessed_by_ilneval
+      years = 1
+    }
+  }
+}
+
+# Adventurers offer to help
+character_event = {
+  id = WAR_HELP_OFFERS.6
+  desc = WAR_HELP_OFFERS.6.desc
+  picture = GFX_evt_adventurers_4
+	border = GFX_event_normal_frame_war
+
+  is_triggered_only = yes
+
+  immediate = {
+    create_character = {
+      random_traits = yes
+      dynasty = none
+      religion = ROOT
+      culture = random
+      female = random
+      age = 47
+      trait = adventurer
+      trait = brave
+      trait = brilliant_strategist
+      trait = inspiring_leader
+    }
+    new_character = {
+      set_character_flag = special_marshal
+      save_event_target_as = adventurer_volunteer
+    }
+  }
+
+  option = {
+    name = WAR_HELP_OFFERS.6.a
+  }
+
+  option = {
+    name = WAR_HELP_OFFERS.no_need
+    prestige = 10
+    hidden_tooltip = {
+      event_target:adventurer_volunteer = {
+        any_artifact = { destroy_artifact = yes }
+        death = {
+          death_reason = death_missing
+        }
+      }
+    }
+  }
+}
