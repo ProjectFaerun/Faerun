@@ -663,13 +663,13 @@ conquest_of_evil = {
 	truce_days = 3800
 	infamy_modifier = 4
 	sort_priority = 600
-	hostile_against_others = yes
 	is_permanent = yes
-	check_all_titles = yes # if permanent, setting this to true will check against all of someones titles, including vassal held titles
-	press_claim = yes
+	is_holy_war = yes
+	hostile_against_others = yes
+	check_de_jure_tier = DUKE # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character. Only valid if is_permanent = yes
 	can_ask_to_join_war = no
-	allowed_to_target_tributaries = yes
-	#allowed_to_target_suzerains = yes - this seems to not be used in game anymore
+	allowed_to_target_tributaries = no
+	
 	
 	can_use_gui = {
 		ROOT = {
@@ -677,6 +677,7 @@ conquest_of_evil = {
 				trait = ambitious
 				trait = cruel
 				trait = zealous
+				trait = arbitrary
 				#AND = {
 				#	religion_group = evil_human_pantheon_group
 				#	
@@ -684,14 +685,6 @@ conquest_of_evil = {
 			}
 			prestige = 500
 			NOT = { has_character_modifier = true_villain_modifier }
-			#OR = { will reactive when we get an ambition going for this
-			#	religion_group = evil_human_pantheon_group
-			#	piety = 250
-			#}
-			OR = {
-				religion_group = evil_human_pantheon_group
-				religion_group = drow_pantheon
-			}
 			NOT = { trait = patron_eilistraee }
 		}
 	}
@@ -717,20 +710,22 @@ conquest_of_evil = {
 			}
 		}
 	}
-	
+
 	can_use = {
 		FROM = {
 			NOT = { culture = monster }
 		}
 		ROOT = {
-			NOT = { culture = monster }
-			NOT = { is_liege_or_above = FROM }
+			OR = {
+				religion_group = evil_human_pantheon_group
+				religion_group = drow_pantheon
+			}
 			NOT = { pacifist = yes }
+			NOT = { same_realm = FROM }
 			mercenary = no
-			is_nomadic = no # Use the 'pagan_county_conquest' CB instead
 		}
 	}
-		
+	
 	can_use_title = {
 		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
 		ROOT = {
@@ -792,78 +787,123 @@ conquest_of_evil = {
 			}
 		}
 	}
-	
+
 	is_valid = {
 		ROOT = {
 			NOT = { pacifist = yes }
 			NOT = { same_realm = FROM }
 		}
 	}
-	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
+	
+	on_success = {
+		any_attacker = {
+			limit = { NOT = { character = ROOT } }
+			hidden_tooltip = { 
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+				if = {
+					limit = {
+						uses_decadence = yes
+					}
+					participation_scaled_decadence = -10
+				}
+				hidden_tooltip = {
+					if = {
+						limit = {
+							has_ambition = obj_strengthen_religion
+						}
+						change_variable = { which = strengthen_religion value = 1 }
+					}
+				}
 			}
 		}
+		
+		ROOT = {
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 50
+			if = {
+				limit = {
+					uses_decadence = yes
+				}
+				participation_scaled_decadence = -10
+			}
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_ambition = obj_strengthen_religion
+					}
+					change_variable = { which = strengthen_religion value = 1 }
+				}
+			}
+		}
+		FROM = {
+			if = {
+				limit = {
+					NOT = {
+						has_character_modifier = known_satanist
+					}
+				}
+				religion_authority = {
+					modifier = lost_holy_war
+					years = 20
+				}		
+			}
+		}
+		FROM = { show_scope_change = no piety = -100 }
+		FROM = { show_scope_change = no prestige = -50 }
 	}
 
 	on_success_title = {
-		custom_tooltip = {
-			text = religious_cb_succ_tip
-			hidden_tooltip = {		
-				ROOT = {
-					add_character_modifier = { name = true_villain_modifier years = 10 }
-					IF = {
-						limit = {
-							NOT = {
-								trait = cruel
+			custom_tooltip = {
+				text = religious_cb_succ_tip
+				hidden_tooltip = {
+					ROOT = {
+						add_character_modifier = { name = true_villain_modifier years = 10 }
+						if = {
+							limit = {
+								NOT = {
+									trait = cruel
+								}
 							}
+							add_trait = cruel
 						}
-						add_trait = cruel
-					}
-					vassalize_or_take_under_title = {
-						title = PREVPREV
-						enemy = FROM
-						same_religion = yes # Only vassalize rulers of my religion
-						is_religious = yes
-						type = holy_war
+						vassalize_or_take_under_title = {
+							title = PREV
+							enemy = FROM
+							same_religion = yes # Only vassalize rulers of my religion
+							is_religious = yes
+							type = holy_war
+						}
 					}
 				}
 			}
 		}
 	}
 
-	on_fail_title = {
+	on_fail = {
 		ROOT = {
-			prestige = -300
-			piety = -300
-		}
-		any_defender = {
-			limit = { character = FROM }
-			participation_scaled_prestige = 50
-			participation_scaled_piety = 50
-		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 50 }
-			hidden_tooltip = { participation_scaled_piety = 50 }
+			show_scope_change = no
+			piety = -50 
+			prestige = -100
 		}
 	}
 
 	on_reverse_demand = {
 		ROOT = {
-			prestige = -500
-			piety = -500
+			show_scope_change = no
 			transfer_scaled_wealth = {
 				to = FROM
-				value = 3.0
+				value = 4.0
 			}
+			piety = -75
+			prestige = -150
 		}
 		FROM = {
-			participation_scaled_piety = 100
+			participation_scaled_piety = 200
 			participation_scaled_prestige = 100
 			if = {
 				limit = {
@@ -873,14 +913,25 @@ conquest_of_evil = {
 			}
 		}
 		any_defender = {
-			limit = { character = FROM }
-			participation_scaled_prestige = 100
-			participation_scaled_piety = 100
-		}
-		any_defender = {
 			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 100 }
-			hidden_tooltip = { participation_scaled_piety = 100 }
+			hidden_tooltip = { 
+				participation_scaled_piety = 200
+				participation_scaled_prestige = 100
+				if = {
+					limit = {
+						uses_decadence = yes
+					}
+					participation_scaled_decadence = -10
+				}
+				hidden_tooltip = {
+					if = {
+						limit = {
+							has_ambition = obj_strengthen_religion
+						}
+						change_variable = { which = strengthen_religion value = 1 }
+					}
+				}
+			}
 		}
 		any_attacker = {
 			limit = {
@@ -892,7 +943,21 @@ conquest_of_evil = {
 					}
 				}
 			}
-			participation_scaled_decadence = 10
+			participation_scaled_decadence = 20
+		}
+		any_attacker = {
+			limit = {
+				NOT = { character = ROOT }
+				uses_decadence = yes
+				NOT = {
+					any_liege = {
+						dynasty = PREV
+					}
+				}
+			}
+			hidden_tooltip = { 
+				participation_scaled_decadence = 20
+			}
 		}
 		ROOT = { 
 			religion_authority = {
@@ -915,7 +980,7 @@ conquest_of_evil = {
 			}
 		}
 	}
-	
+
 	attacker_ai_victory_worth = {
 		factor = -1 # always accept
 	}
@@ -932,7 +997,7 @@ conquest_of_evil = {
 		factor = 100
 	}
 	
-ai_will_do = { 
+	ai_will_do = {
 		factor = 1
 		
 		modifier = {
