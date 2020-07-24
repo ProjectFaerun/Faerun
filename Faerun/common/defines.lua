@@ -1,4 +1,4 @@
-NDefines = {
+﻿NDefines = {
 
 NDiplomacy = {
 	BREAK_TRUCE_PRESTIGE_PERC_COST = 0.5,		-- Percent of current prestige lost before the base prestige cost (below)
@@ -1836,7 +1836,7 @@ NRulerDesigner =
 	COST_MORALE_OFFENCE = 50.0,
 	COST_MORALE_DEFENCE = 50.0,
 	COST_DEFENCE = 50.0,
-	MAX_AGE = 50
+	MAX_AGE = 150
 },
 
 NLearningScenario =
