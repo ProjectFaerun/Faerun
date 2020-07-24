@@ -1,4 +1,4 @@
-﻿NDefines = {
+NDefines = {
 
 NDiplomacy = {
 	BREAK_TRUCE_PRESTIGE_PERC_COST = 0.5,		-- Percent of current prestige lost before the base prestige cost (below)
