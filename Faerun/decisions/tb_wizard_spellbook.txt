@@ -1,10 +1,13 @@
-#Small explanation as for how wizard spellcasting works:
+#Small explanation as for how wizard spellcasting works: wizards have a number of spell-slots, level dependent. Each spell costs one slot of the same category
 
 decisions = {
-	
+
+#Universal spells
+
 	comprehend_languages = {
 		ai_check_interval = 12
 		potential = {
+			z_wizard = yes
 			OR = {
 				AND = {
 					ai = yes
@@ -17,6 +20,7 @@ decisions = {
 			}
 		}
 		allow = {
+			NOT = { has_character_modifier = comprehend_languages_mod }
 			custom_tooltip = {
 				text = HASSPELLSLOTS
 				hidden_tooltip = {
@@ -26,7 +30,7 @@ decisions = {
 								trait = wizard
 								trait = trained_wizard
 							}
-							NOT = { check_variable = { wizminor = 3 } }
+							NOT = { check_variable = { which = wizminor value = 3 } }
 						}
 						AND = {
 							OR = {
@@ -36,7 +40,7 @@ decisions = {
 								trait = renowned_wizard
 								trait = legendary_wizard
 							}
-							NOT = { change_variable = { wizminor = 4 } }
+							NOT = { check_variable = { which = wizminor value = 4 } }
 						}
 					}
 				}
@@ -59,6 +63,62 @@ decisions = {
 				factor = 5
 				NOT = { diplomacy = 5 }
 			}
+		}
+	}
+	
+	dispel = {
+		ai_check_interval = 30
+		potential = {
+			z_wizard = yes
+			NOT = { trait = wizard }
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				text = HASBADSPELL
+				hidden_tooltip = {
+					has_bad_spell_effect = yes
+				}
+			}
+			custom_tooltip = {
+				text = HASSPELLSLOTS
+				hidden_tooltip = {
+					OR = {
+						AND = {
+							trait = trained_wizard
+							NOT = { check_variable = { which = wizmedium value = 1 } }
+						}
+						AND = {
+							OR = {
+								trait = journeyman_wizard
+								trait = expert_wizard
+							}
+							NOT = { check_variable = { which = wizmedium value = 2 } }
+						}
+						AND = {
+							OR = {
+								trait = master_wizard
+								trait = renowned_wizard
+							}
+							NOT = { check_variable = { which = wizmedium value = 3 } }
+						}
+						AND = {
+							trait = legendary_wizard
+							NOT = { check_variable = { which = wizmedium value = 4 } }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			dispel_minor_magic
+			hidden_tooltip = { change_variable = { which = wizmedium value = 1 } }
+		}
+		ai_will_do = {
+			factor = 0.1
 		}
 	}
 	
