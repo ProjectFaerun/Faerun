@@ -122,11 +122,139 @@ decisions = {
 		}
 	}
 	
+	disrupt_undead = {
+		ai_check_interval = 5
+		potential = {
+			z_wizard = yes
+			NOT = { trait = wizard }
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			enemy = {
+				OR = {
+					trait = undead
+					trait = lich
+					trait = baelnorn
+					trait = vampire
+					trait = vampire_spawn
+					any_controlled_unit = {
+						troops = {
+							who = undead
+							value > 0
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HASSPELLSLOTS
+				hidden_tooltip = {
+					OR = {
+						AND = {
+							trait = trained_wizard
+							NOT = { check_variable = { which = wizmedium value = 1 } }
+						}
+						AND = {
+							OR = {
+								trait = journeyman_wizard
+								trait = expert_wizard
+							}
+							NOT = { check_variable = { which = wizmedium value = 2 } }
+						}
+						AND = {
+							OR = {
+								trait = master_wizard
+								trait = renowned_wizard
+							}
+							NOT = { check_variable = { which = wizmedium value = 3 } }
+						}
+						AND = {
+							trait = legendary_wizard
+							NOT = { check_variable = { which = wizmedium value = 4 } }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			if = {
+				limit = {
+					enemy = {
+						any_controlled_unit = {
+							troops = {
+								who = undead
+								value > 0
+							}
+						}
+					}
+				}
+				enemy = {
+					random_controlled_unit = {
+						limit = {
+							troops = {
+								who = undead
+								value > 0
+							}
+						}
+						damage_unit = {
+							type = undead
+							percentage = 33
+						}
+						random = {
+							chance = 33
+							damage_unit = {
+								type = undead
+								percentage = 33
+							}
+						}
+						random = {
+							chance = 33
+							damage_unit = {
+								type = undead
+								percentage = 33
+							}
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					enemy = {
+						ai = no
+					}
+				}
+				enemy = {
+					character_event = { id = spellaux.3 }
+				}
+			}
+			enemy = {
+				spell_resistance_check = yes
+				if = {
+					limit = {
+						NOT = { has_character_modifier = disrupt_undead_mod }
+					}
+					add_character_modifier = {
+						name = disrupt_undead_mod
+						months = 2
+					}
+					opinion = {
+						modifier = cast_spell_on_me
+						who = FROM
+						years = 1
+					}
+				}
+			}
+		}
+	}
+	
 }
 
 targeted_decisions = {
 	
-	cantrip_friends = { # This will be a player-only spell because the AI can't really deal with the strategy
+	spell_friends = { # This will be a player-only spell because the AI can't really deal with the strategy
 		filter = realm
 		ai_target_filter = none # So the AI will never see this
 		only_playable = yes
@@ -141,13 +269,28 @@ targeted_decisions = {
 		}
 		
 		allow = {
-			custom_tooltip = {
-				text = CANTRIP_ON_COOLDOWN
-				hidden_tooltip = {
-					NOT = {
-						had_character_flag = {
-							flag = spell_friends_cooldown
-							months = 1
+			FROM = {
+				custom_tooltip = {
+					text = HASSPELLSLOTS
+					hidden_tooltip = {
+						OR = {
+							AND = {
+								OR = {
+									trait = wizard
+									trait = trained_wizard
+								}
+								NOT = { check_variable = { which = wizminor value = 3 } }
+							}
+							AND = {
+								OR = {
+									trait = journeyman_wizard
+									trait = expert_wizard
+									trait = master_wizard
+									trait = renowned_wizard
+									trait = legendary_wizard
+								}
+								NOT = { check_variable = { which = wizminor value = 4 } }
+							}
 						}
 					}
 				}
@@ -167,6 +310,8 @@ targeted_decisions = {
 		}
 		
 		effect = {
+			FROM = { set_character_flag = spell_friends_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizminor value = 1 } } }
 			spell_resistance_check = yes
 			opinion = {
 				modifier = friends_spell
