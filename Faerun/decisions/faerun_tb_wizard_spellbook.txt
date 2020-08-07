@@ -3,80 +3,18 @@
 decisions = {
 
 #Universal spells
-
-	comprehend_languages = {
-		ai_check_interval = 12
-		potential = {
-			z_wizard = yes
-			OR = {
-				AND = {
-					ai = yes
-					OR = {
-						has_job_title = job_chancellor
-						is_ruler = yes
-					}
-				}
-				has_character_flag = wiz_spellbook_open
-			}
-		}
-		allow = {
-			NOT = { has_character_modifier = comprehend_languages_mod }
-			custom_tooltip = {
-				text = HASSPELLSLOTS
-				hidden_tooltip = {
-					OR = {
-						AND = {
-							OR = {
-								trait = wizard
-								trait = trained_wizard
-							}
-							NOT = { check_variable = { which = wizminor value = 3 } }
-						}
-						AND = {
-							OR = {
-								trait = journeyman_wizard
-								trait = expert_wizard
-								trait = master_wizard
-								trait = renowned_wizard
-								trait = legendary_wizard
-							}
-							NOT = { check_variable = { which = wizminor value = 4 } }
-						}
-					}
-				}
-			}
-		}
-		effect = {
-			add_character_modifier = {
-				name = comprehend_languages_mod
-				months = 3
-			}
-			hidden_tooltip = { change_variable = { which = wizminor value = 1 } }
-		}
-		ai_will_do = {
-			factor = 0.1
-			modifier = {
-				factor = 0.1
-				diplomacy = 10 # Don't really need it
-			}
-			modifier = {
-				factor = 5
-				NOT = { diplomacy = 5 }
-			}
-		}
-	}
 	
 	dispel = {
 		ai_check_interval = 30
 		potential = {
 			z_wizard = yes
-			NOT = { trait = wizard }
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HASBADSPELL
 				hidden_tooltip = {
@@ -84,38 +22,37 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HASSPELLSLOTS
+				text = HAS10SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizmedium value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
-						AND = {
-							trait = trained_wizard
-							NOT = { check_variable = { which = wizmedium value = 1 } }
-						}
-						AND = {
-							OR = {
-								trait = journeyman_wizard
-								trait = expert_wizard
-							}
-							NOT = { check_variable = { which = wizmedium value = 2 } }
-						}
-						AND = {
-							OR = {
-								trait = master_wizard
-								trait = renowned_wizard
-							}
-							NOT = { check_variable = { which = wizmedium value = 3 } }
-						}
-						AND = {
-							trait = legendary_wizard
-							NOT = { check_variable = { which = wizmedium value = 4 } }
-						}
+						NOT = { has_character_flag = spell_dispel_cooldown }
+						had_character_flag = { flag = spell_dispel_cooldown months = 1 }
 					}
 				}
 			}
 		}
 		effect = {
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } }
+			set_character_flag = spell_dispel_cooldown
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
 			dispel_minor_magic = yes
-			hidden_tooltip = { change_variable = { which = wizmedium value = 1 } }
 		}
 		ai_will_do = {
 			factor = 0.1
@@ -126,19 +63,46 @@ decisions = {
 		ai_check_interval = 5
 		potential = {
 			z_wizard = yes
-			NOT = { trait = wizard }
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizmedium value = 15 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_disrupt_undead_cooldown }
+						had_character_flag = { flag = spell_disrupt_undead_cooldown months = 1 }
+					}
+				}
+			}
 			in_battle = yes
 			enemy = {
 				OR = {
 					trait = undead
 					trait = lich
-					trait = baelnorn
+					trait = lich_baelnorn
 					trait = vampire
 					trait = vampire_spawn
 					any_controlled_unit = {
@@ -149,37 +113,22 @@ decisions = {
 					}
 				}
 			}
-			custom_tooltip = {
-				text = HASSPELLSLOTS
-				hidden_tooltip = {
-					OR = {
-						AND = {
-							trait = trained_wizard
-							NOT = { check_variable = { which = wizmedium value = 1 } }
-						}
-						AND = {
-							OR = {
-								trait = journeyman_wizard
-								trait = expert_wizard
-							}
-							NOT = { check_variable = { which = wizmedium value = 2 } }
-						}
-						AND = {
-							OR = {
-								trait = master_wizard
-								trait = renowned_wizard
-							}
-							NOT = { check_variable = { which = wizmedium value = 3 } }
-						}
-						AND = {
-							trait = legendary_wizard
-							NOT = { check_variable = { which = wizmedium value = 4 } }
-						}
+		}
+		effect = {
+			change_variable = { which = wizspellpoints value = -15 }
+			set_character_flag = spell_disrupt_undead_cooldown
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
 					}
 				}
 			}
-		}
-		effect = {
 			if = {
 				limit = {
 					enemy = {
@@ -250,47 +199,1172 @@ decisions = {
 		}
 	}
 	
+	spell_banish_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_longevity = {
+		potential = {
+			z_wizard = yes
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+			NOT = { has_character_modifier = wiz_necromancy }
+			NOR = {
+				trait = creature_drow
+				trait = creature_elf
+				trait = creature_feyri
+				trait = creature_eladrin
+				trait = creature_treant
+				trait = undead
+				trait = lich
+				trait = vampire
+				trait = vampire_spawn
+				trait = lich_baelnorn
+				trait = creature_sarrukh
+				trait = creature_naga
+				trait = creature_monster
+				trait = creature_beholder
+				trait = creature_devil
+				trait = creature_daemon
+				trait = creature_demon
+				trait = creature_angel
+				trait = creature_genie
+				trait = longevity
+			}
+		}
+		
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			scaled_wealth = { value = 0.2 min = 100 }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS25SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizmedium value = 25 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_longevity_cooldown }
+						had_character_flag = { flag = spell_longevity_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		
+		effect = {
+			scaled_wealth = { value = -0.2 min = 100 }
+			set_character_flag = spell_longevity_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -25 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			random = {
+				chance = 75
+				add_trait = longevity
+			}
+		}
+	}
+
+#Abjuration spells
+	
+	alustriels_mantle = {
+		ai_check_interval = 4
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_alustriels_mantle
+			}
+			OR = {
+				ai = yes
+				had_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { trait = alustriels_mantle_trait }
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_alustriels_mantle_cooldown }
+						had_character_flag = { flag = spell_alustriels_mantle_cooldown months = 1 }
+					}
+				}
+			}
+			in_battle = yes
+		}
+		effect = {
+			set_character_flag = spell_alustriels_mantle_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -7 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_trait = alustriels_mantle_trait
+			character_event = { id = spellaux.6 months = 1 }
+		}
+		ai_will_do = {
+			factor = 0.7
+		}
+	}
+	
+	nezrams_amethyst_aura = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_nezrams_amethyst_aura
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = spell_nezrams_amethyst_aura_mod }
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_nezrams_amethyst_aura_cooldown }
+						had_character_flag = { flag = spell_nezrams_amethyst_aura_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_nezrams_amethyst_aura_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -7 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_character_modifier = {
+				name = nezrams_amethyst_aura_mod
+				months = 3
+			}
+		}
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.1
+				health = 10 # Don't really need it
+			}
+			modifier = {
+				factor = 5
+				NOT = { health = 5 }
+			}
+		}
+	}
+	
+	spell_remove_disease_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_remove_disease
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_mantle = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_mantle
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = spell_mantle_mod }
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS10SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_mantle_cooldown }
+						had_character_flag = { flag = spell_mantle_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_mantle_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_character_modifier = {
+				name = spell_mantle_mod
+				months = 3
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 10
+				in_battle = yes
+				enemy = {
+					OR = {
+						z_wizard = yes
+						z_sorcerer = yes
+						z_warlock = yes
+						z_paladin = yez
+						z_ranger = yez
+						z_cleric = yes
+						z_bard = yes
+					}
+				}
+			}
+		}
+	}
+	
+	planar_binding = {
+		ai_check_interval = 24
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_planar_binding
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 20 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_planar_binding_cooldown }
+						had_character_flag = { flag = spell_planar_binding_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_planar_binding_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -20 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			custom_tooltip = {
+				text = OUTSIDERSUMMONED
+				hidden_tooltip = {
+					random_list = {
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_angel
+								random_traits = yes
+								religion = good_human_pantheon
+								culture = angel
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 300
+								female = random
+								trait = creature_genie
+								random_traits = yes
+								religion = ten_thousand_gods
+								culture = jann
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_devil
+								random_traits = yes
+								religion = infernal
+								culture = baatezu
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_demon
+								random_traits = yes
+								religion = abyssal_cult
+								culture = tanarri
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_daemon
+								random_traits = yes
+								religion = evil_human_pantheon
+								culture = yugoloth
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+					}
+					new_character = {
+						opinion = {
+							modifier = planar_binding_mod
+							who = ROOT
+							duration = -1
+						}
+						if = {
+							limit = {
+								trait = creature_devil
+							}
+							random_list = {
+								65 = {
+									set_graphical_culture = cornugon
+								}
+								20 = {
+									add_trait = greater_fiend
+								}
+								10 = {
+									set_graphical_culture = gelugon
+									add_trait = greater_fiend
+								}
+								5 = {
+									set_graphical_culture = tiefling
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								trait = creature_demon
+							}
+							random_list = {
+								65 = {
+									# do nothing - vrock gfx is correct
+								}
+								20 = {
+									set_graphical_culture = succubus
+								}
+								10 = {
+									set_graphical_culture = nalfeshnee
+									add_trait = greater_fiend
+								}
+								10 = {
+									set_graphical_culture = succubus
+									add_trait = greater_fiend # marilith
+								}						
+								2 = {
+									set_graphical_culture = baatezu # balors look a lot like pit fiends
+									add_trait = greater_fiend
+								}
+								2 = {
+									set_graphical_culture = yugoloth # or nycaloths
+									add_trait = greater_fiend
+								}
+								2 = {
+									set_graphical_culture = cambion
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 0
+				has_full_court = yes
+			}
+		}
+	}
+	
+	burn_path_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_burn_path
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+#Divination spells
+
+	comprehend_languages = {
+		ai_check_interval = 12
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_divination
+				has_character_flag = knows_spell_comprehend_languages
+			}
+			OR = {
+				AND = {
+					ai = yes
+					OR = {
+						has_job_title = job_chancellor
+						is_ruler = yes
+					}
+				}
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = comprehend_languages_mod }
+			custom_tooltip = {
+				text = HAS5SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 5 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_comprehend_languages_cooldown }
+						had_character_flag = { flag = spell_comprehend_languages_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_comprehend_languages_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -5 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_character_modifier = {
+				name = comprehend_languages_mod
+				months = 3
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0.1
+				diplomacy = 10 # Don't really need it
+			}
+			modifier = {
+				factor = 5
+				NOT = { diplomacy = 5 }
+			}
+		}
+	}
+
+#Enchantment spells
+
+	spell_charm_person_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_enchantment
+				has_character_flag = knows_spell_charm_person
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
 }
 
 targeted_decisions = {
+
+#Universal spells
+
+	spell_banish = {
+		ai_check_interval = 4
+		filter = rivals
+		ai_target_filter = rivals
+		
+		from_potential = {
+			z_wizard = yes
+		}
+		
+		potential = {
+			OR = {
+				trait = creature_angel
+				trait = creature_demon
+				trait = creature_devil
+				trait = creature_daemon
+			}
+		}
+		
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				at_location = ROOT
+				custom_tooltip = {
+					text = JOURNEYMANWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_wizard
+							trait = expert_wizard
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_banish_cooldown }
+							had_character_flag = { flag = spell_banish_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		
+		effect = {
+			FROM = { set_character_flag = spell_banish_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			spell_resistance_check = yes
+			death = { death_reason = death_banished_spell killer = FROM }
+			if = {
+				limit = {
+					ai = no
+				}
+				FROM = {
+					ROOT = {
+						character_event = { id = spellaux.5 }
+					}
+				}
+			}
+			opinion = {
+				modifier = cast_spell_on_me
+				who = FROM
+				years = 1
+			}
+		}
+	}
+
+#Abjuration spells
 	
-	spell_friends = { # This will be a player-only spell because the AI can't really deal with the strategy
-		filter = realm
+	spell_remove_disease_character = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_remove_disease
+			}
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_wizard
+							trait = expert_wizard
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ONEDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						random_list = {
+							40 = {
+								modifier = {
+									NOT = { trait = flu }
+									factor = 0
+								}
+								remove_trait = flu
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = dysentery }
+									factor = 0
+								}
+								remove_trait = dysentery
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = rabies }
+									factor = 0
+								}
+								remove_trait = rabies
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = has_measles }
+									factor = 0
+								}
+								remove_trait = has_measles
+							}
+							40 = {
+								modifier = {
+									NOT = {
+										trait = food_poisoning
+									}
+									factor = 0
+								}
+								remove_trait = food_poisoning
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = gout }
+									factor = 0
+								}
+								remove_trait = gout
+							}
+							40 = {
+								modifier = {
+									NOT = { trait = scurvy }
+									factor = 0
+								}
+								remove_trait = scurvy
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = lovers_pox }
+									factor = 0
+								}
+								remove_trait = lovers_pox
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = cancer }
+									factor = 0
+								}
+								remove_trait = cancer
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = pneumonic }
+									factor = 0
+								}
+								remove_trait = pneumonic
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = syphilitic }
+									factor = 0
+								}
+								remove_trait = syphilitic
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = leper }
+									factor = 0
+								}
+								remove_trait = leper
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_tuberculosis}
+									factor = 0
+								}
+								remove_trait = has_tuberculosis
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_aztec_disease}
+									factor = 0
+								}
+								remove_trait = has_aztec_disease
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_small_pox}
+									factor = 0
+								}
+								remove_trait = has_small_pox
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_bubonic_plague}
+									factor = 0
+								}
+								remove_trait = has_bubonic_plague
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhus}
+									factor = 0
+								}
+								remove_trait = has_typhus
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhoid_fever}
+									factor = 0
+								}
+								remove_trait = has_typhoid_fever
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.1
+				trait = patron_talona
+			}
+		}
+	}
+	
+	burn_path = {
+		ai_check_interval = 4
+		filter = rival
+		ai_target_filter = rival
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_remove_disease
+			}
+		}
+		potential = {
+			OR = {
+				z_wizard = yes
+				z_sorcerer = yes
+				z_warlock = yes
+				z_bard = yes
+			}
+		}
+		allow = {
+			FROM = {
+				at_location = ROOT
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_burn_path_cooldown }
+							had_character_flag = { flag = spell_burn_path_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_burn_path_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -15 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			spell_resistance_check = yes
+			add_character_modifier = {
+				name = burn_path_mod
+				months = 2
+			}
+			if = {
+				limit = {
+					ai = no
+				}
+				repeat_event = { id = spellaux.12 }
+			}
+			opinion = {
+				modifier = cast_spell_on_me
+				who = FROM
+				years = 1
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+
+#Enchantment spells
+
+	spell_charm_person = { # This will be a player-only spell because the AI can't really deal with the strategy
+		filter = all
 		ai_target_filter = none # So the AI will never see this
 		only_playable = yes
 		
 		from_potential = {
 			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_enchantment
+				has_character_flag = knows_spell_charm_person
+			}
 			ai = no
 		}
 		
 		potential = {
-			always = yes
+			ai = yes
+			OR = {
+				is_ruler = yes
+				same_realm = yes
+			}
 		}
 		
 		allow = {
 			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				NOT = { is_foe = ROOT }
 				custom_tooltip = {
-					text = HASSPELLSLOTS
+					text = HAS5SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 5 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
 					hidden_tooltip = {
 						OR = {
-							AND = {
-								OR = {
-									trait = wizard
-									trait = trained_wizard
-								}
-								NOT = { check_variable = { which = wizminor value = 3 } }
-							}
-							AND = {
-								OR = {
-									trait = journeyman_wizard
-									trait = expert_wizard
-									trait = master_wizard
-									trait = renowned_wizard
-									trait = legendary_wizard
-								}
-								NOT = { check_variable = { which = wizminor value = 4 } }
-							}
+							NOT = { has_character_flag = spell_charm_person_cooldown }
+							had_character_flag = { flag = spell_charm_person_cooldown months = 1 }
 						}
 					}
 				}
@@ -298,23 +1372,37 @@ targeted_decisions = {
 			NOT = {
 				has_opinion_modifier = {
 					who = FROM
-					name = friends_spell
+					name = charm_person_spell
 				}
 			}
 			NOT = {
 				has_opinion_modifier = {
 					who = FROM
-					name = friends_spell_after
+					name = charm_person_spell_after
 				}
 			}
 		}
 		
 		effect = {
-			FROM = { set_character_flag = spell_friends_cooldown }
-			FROM = { hidden_tooltip = { change_variable = { which = wizminor value = 1 } } }
+			FROM = { set_character_flag = spell_charm_person_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -5 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
 			spell_resistance_check = yes
 			opinion = {
-				modifier = friends_spell
+				modifier = charm_person_spell
 				who = FROM
 				months = 3
 			}
@@ -322,4 +1410,192 @@ targeted_decisions = {
 		}
 	}
 	
+}
+
+settlement_decisions = {
+
+#Abjuration spells
+	
+	spell_remove_disease_prov = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_abjuration
+				has_character_flag = knows_spell_remove_disease
+			}
+		}
+		potential = {
+			has_disease = yes
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_wizard
+							trait = expert_wizard
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					reduce_disease = 1.0 # *should* remove it completely
+					hidden_tooltip = {
+						if = {
+							limit = {
+								location = {
+									holder_scope = {
+										NOT = { character = FROM }
+									}
+								}
+							}
+							location = {
+								holder_scope = {
+									opinion = {
+										modifier = cured_my_lands
+										who = FROM
+										years = 5
+									}
+									if = {
+										limit = {
+											ai = no
+										}
+										repeat_event = { id = spellaux.9 }
+									}
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								location = {
+									holder_scope = {
+										ai = no
+										character = FROM
+									}
+								}
+							}
+							location = {
+								FROM = { character_event = { id = spellaux.10 } }
+							}
+						}
+					}
+				}
+				1 = {
+					FROM = {
+						if = {
+							limit = {
+								ai = no
+							}
+							character_event = { id = spellaux.11 }
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				location = {
+					holder_scope = {
+						character = ROOT
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.1
+				trait = patron_talona
+			}
+		}
+	}
+
 }
