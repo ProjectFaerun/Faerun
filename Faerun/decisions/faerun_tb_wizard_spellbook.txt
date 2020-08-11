@@ -304,7 +304,7 @@ decisions = {
 		}
 	}
 
-#Abjuration spells
+# Abjuration spells
 	
 	alustriels_mantle = {
 		ai_check_interval = 4
@@ -1046,6 +1046,645 @@ decisions = {
 		
 		ai_will_do = {
 			factor = 0 # Just to be sure
+		}
+	}
+
+#Conjuration spells
+
+	mordekainens_faithful_hound = {
+		ai_check_interval = 12
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_mordekainens_faithful_hound
+			}
+			OR = {
+				AND = {
+					ai = yes
+					OR = {
+						has_job_title = job_spymaster
+						is_ruler = yes
+					}
+				}
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = mordekainens_faithful_hound_mod }
+			custom_tooltip = {
+				text = HAS5SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 5 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_mordekainens_faithful_hound_cooldown }
+						had_character_flag = { flag = spell_mordekainens_faithful_hound_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_mordekainens_faithful_hound_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -5 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_character_modifier = {
+				name = mordekainens_faithful_hound_mod
+				months = 2
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0.5
+				intrigue = 15 # Don't really need it
+			}
+			modifier = {
+				factor = 2
+				NOT = { intrigue = 5 }
+			}
+		}
+	}
+	
+	spell_find_familiar = {
+		ai_check_interval = 12
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_find_familiar
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_artifact = wiz_familiar_artf }
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_find_familiar_cooldown }
+						had_character_flag = { flag = spell_find_familiar_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_find_familiar_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -7 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_artifact = wiz_familiar_artf
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+
+	spell_summon_lesser_demons = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_summon_lesser_demons
+			}
+			OR = {
+				AND = {
+					ai = yes
+					is_ruler = yes
+				}
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			war = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_lesser_demons }
+				}
+			}
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_summon_lesser_demons_cooldown }
+						had_character_flag = { flag = spell_summon_lesser_demons_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_summon_lesser_demons_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -15 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			spawn_unit = {
+				province = closest_to_capital
+				earmark = wiz_lesser_demons
+				troops = {
+					archers = { 300 300 }
+					light_infantry = { 700 700 }
+					heavy_infantry = { 100 100 }
+					cannot_inherit = yes
+					attrition = 0.4
+					maintenance_multiplier = 0.1
+					can_toggle_looting = no
+					reinforces = no
+				}
+			}
+			hidden_tooltip = { character_event = { id = spellaux.19 months = 5 } }
+		}
+	}
+	
+	spell_conjure_elementals = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_conjure_elementals
+			}
+			OR = {
+				AND = {
+					ai = yes
+					is_ruler = yes
+				}
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			war = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_elementals }
+				}
+			}
+			custom_tooltip = {
+				text = HAS12SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 12 }
+				}
+			}
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_conjure_elementals_cooldown }
+						had_character_flag = { flag = spell_conjure_elementals_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_conjure_elementals_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -12 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			spawn_unit = {
+				province = closest_to_capital
+				earmark = wiz_elementals
+				troops = {
+					elemental_troops = { 600 600 }
+					cannot_inherit = yes
+					attrition = 0
+					maintenance_multiplier = 0
+					can_toggle_looting = no
+					reinforces = no
+				}
+			}
+			hidden_tooltip = { character_event = { id = spellaux.20 months = 5 } }
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	greater_planar_binding = {
+		ai_check_interval = 24
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_greater_planar_binding
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 25 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_greater_planar_binding_cooldown }
+						had_character_flag = { flag = spell_greater_planar_binding_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_greater_planar_binding_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -25 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			custom_tooltip = {
+				text = OUTSIDERSUMMONED
+				hidden_tooltip = {
+					random_list = {
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_angel
+								attributes = {
+									diplomacy = 8
+									martial = 8
+									stewardship = 8
+									intrigue = 8
+									learning = 8
+								}
+								random_traits = yes
+								religion = good_human_pantheon
+								culture = angel
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 300
+								female = random
+								trait = creature_genie
+								attributes = {
+									diplomacy = 8
+									martial = 8
+									stewardship = 8
+									intrigue = 8
+									learning = 8
+								}
+								random_traits = yes
+								religion = ten_thousand_gods
+								culture = jann
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_devil
+								attributes = {
+									diplomacy = 8
+									martial = 8
+									stewardship = 8
+									intrigue = 8
+									learning = 8
+								}
+								random_traits = yes
+								religion = infernal
+								culture = baatezu
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_demon
+								attributes = {
+									diplomacy = 8
+									martial = 8
+									stewardship = 8
+									intrigue = 8
+									learning = 8
+								}
+								random_traits = yes
+								religion = abyssal_cult
+								culture = tanarri
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+						1 = {
+							create_character = {
+								age = 1000
+								female = random
+								trait = creature_daemon
+								attributes = {
+									diplomacy = 8
+									martial = 8
+									stewardship = 8
+									intrigue = 8
+									learning = 8
+								}
+								random_traits = yes
+								religion = evil_human_pantheon
+								culture = yugoloth
+								dynasty = none
+								immortal_age = 30
+							}
+						}
+					}
+					new_character = {
+						opinion = {
+							modifier = planar_binding_mod
+							who = ROOT
+							duration = -1
+						}
+						if = {
+							limit = {
+								trait = creature_devil
+							}
+							random_list = {
+								65 = {
+									set_graphical_culture = cornugon
+								}
+								20 = {
+									add_trait = greater_fiend
+								}
+								10 = {
+									set_graphical_culture = gelugon
+									add_trait = greater_fiend
+								}
+								5 = {
+									set_graphical_culture = tiefling
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								trait = creature_demon
+							}
+							random_list = {
+								65 = {
+									# do nothing - vrock gfx is correct
+								}
+								20 = {
+									set_graphical_culture = succubus
+								}
+								10 = {
+									set_graphical_culture = nalfeshnee
+									add_trait = greater_fiend
+								}
+								10 = {
+									set_graphical_culture = succubus
+									add_trait = greater_fiend # marilith
+								}						
+								2 = {
+									set_graphical_culture = baatezu # balors look a lot like pit fiends
+									add_trait = greater_fiend
+								}
+								2 = {
+									set_graphical_culture = yugoloth # or nycaloths
+									add_trait = greater_fiend
+								}
+								2 = {
+									set_graphical_culture = cambion
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 0
+				has_full_court = yes
+			}
+		}
+	}
+	
+	incendiary_cloud = {
+		ai_check_interval = 7
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_conjuration
+				has_character_flag = knows_spell_incendiary_cloud
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS17SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 17 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_incendiary_cloud_cooldown }
+						had_character_flag = { flag = spell_incendiary_cloud_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_incendiary_cloud_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -17 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						enemy = {
+							random_army = {
+								troops = { value >= 600 }
+							}
+						}
+					}
+					enemy = {
+						random_army = {
+							limit = {
+								troops = { value >= 600 }
+							}
+							damage_unit = { percentage = 0.15 } # Might be too much
+							break = yes
+						}
+					}
+				}
+				enemy = {
+					random_army = {
+						damage_unit = { percentage = 0.15 } # Might be too much
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
 		}
 	}
 
