@@ -176,7 +176,7 @@ decisions = {
 					}
 				}
 				enemy = {
-					character_event = { id = spellaux.3 }
+					repeat_event = { id = spellaux.3 }
 				}
 			}
 			enemy = {
@@ -196,6 +196,9 @@ decisions = {
 					}
 				}
 			}
+		}
+		ai_will_do = {
+			factor = 0.5
 		}
 	}
 	
@@ -2217,6 +2220,470 @@ decisions = {
 			factor = 0 # Just to be sure
 		}
 	}
+
+# Evocation spells
+
+	spell_fireball = {
+		ai_check_interval = 7
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_fireball
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_fireball_cooldown }
+						had_character_flag = { flag = spell_fireball_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_fireball_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -7 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.24 }
+						break = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						enemy = {
+							ai = no
+						}
+					}
+					enemy = {
+						repeat_event = { id = spellaux.3 }
+					}
+				}
+				if = {
+					limit = {
+						enemy = {
+							random_army = {
+								troops = { value >= 600 }
+							}
+						}
+					}
+					enemy = {
+						random_army = {
+							limit = {
+								troops = { value >= 600 }
+							}
+							damage_unit = { percentage = 0.05 }
+							break = yes
+						}
+					}
+				}
+				enemy = {
+					random_army = {
+						damage_unit = { percentage = 0.05 }
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	spell_magic_missile_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_magic_missile
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_lightning_bolt = {
+		ai_check_interval = 5
+		potential = {
+			z_wizard = yes
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_lightning_bolt
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_lightning_bolt_cooldown }
+						had_character_flag = { flag = spell_lightning_bolt_cooldown months = 1 }
+					}
+				}
+			}
+			in_battle = yes
+			enemy = {
+				is_alive = yes # Just to make sure that there *is* a leader
+			}
+		}
+		effect = {
+			change_variable = { which = wizspellpoints value = -15 }
+			set_character_flag = spell_lightning_bolt_cooldown
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			enemy = {
+				random_list = {
+					10 = {
+						modifier = {
+							factor = 0
+							has_injury_trigger = yes
+						}
+						set_character_flag = lightning_wound
+					}
+					5 = {
+						modifier = {
+							factor = 0
+							OR = {
+								trait = maimed
+								AND = {
+									trait = one_eyed
+									trait = one_handed 
+									trait = one_legged 
+									trait = disfigured 
+									trait = mangled
+								}
+							}
+						}
+						set_character_flag = lightning_maim
+					}
+					1 = {
+						set_character_flag = lightning_death
+					}
+				}
+				repeat_event = { id = spellaux.25 }
+			}
+			if = {
+				limit = {
+					enemy = {
+						ai = no
+					}
+				}
+				enemy = {
+					repeat_event = { id = spellaux.3 }
+				}
+			}
+			enemy = {
+				spell_resistance_check = yes
+				if = {
+					limit = {
+						NOT = { has_character_modifier = disrupt_undead_mod }
+					}
+					add_character_modifier = {
+						name = disrupt_undead_mod
+						months = 2
+					}
+					opinion = {
+						modifier = cast_spell_on_me
+						who = ROOT
+						years = 1
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+	
+	spell_wall_of_stone_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_wall_of_stone
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	chain_lightning = {
+		ai_check_interval = 7
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_chain_lightning
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS17SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 17 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_chain_lightning_cooldown }
+						had_character_flag = { flag = spell_chain_lightning_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_chain_lightning_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -17 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						enemy = {
+							random_army = {
+								troops = { value >= 600 }
+							}
+						}
+					}
+					enemy = {
+						random_army = {
+							limit = {
+								troops = { value >= 600 }
+							}
+							damage_unit = { percentage = 0.15 } # Might be too much
+							break = yes
+						}
+					}
+				}
+				enemy = {
+					random_army = {
+						damage_unit = { percentage = 0.15 } # Might be too much
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	maddening_darkness = {
+		ai_check_interval = 7
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_maddening_darkness
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS17SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 17 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_maddening_darkness_cooldown }
+						had_character_flag = { flag = spell_maddening_darkness_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_maddening_darkness_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -17 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						enemy = {
+							random_army = {
+								troops = { value >= 600 }
+							}
+						}
+					}
+					enemy = {
+						random_army = {
+							limit = {
+								troops = { value >= 600 }
+							}
+							damage_unit_morale = { percentage = 0.15 } # Might be too much
+							break = yes
+						}
+					}
+				}
+				enemy = {
+					random_army = {
+						damage_unit_morale = { percentage = 0.15 } # Might be too much
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
 	
 }
 
@@ -3524,6 +3991,99 @@ targeted_decisions = {
 			factor = 0.5
 		}
 	}
+
+# Evocation spells
+	
+	spell_magic_missile = {
+		ai_check_interval = 10
+		filter = rivals
+		ai_target_filter = rivals
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_magic_missile
+			}
+		}
+		potential = {
+			at_location = FROM
+		}
+		allow = {
+			FROM = {
+				at_location = ROOT
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_magic_missile_cooldown }
+							had_character_flag = { flag = spell_magic_missile_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_magic_missile_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			spell_resistance_check = yes
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						has_injury_trigger = yes
+					}
+					set_character_flag = magicmissile_wound
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = maimed
+							AND = {
+								trait = one_eyed
+								trait = one_handed 
+								trait = one_legged 
+								trait = disfigured 
+								trait = mangled
+							}
+						}
+					}
+					set_character_flag = magicmissile_maim
+				}
+			}
+			repeat_event = { id = spellaux.23 }
+			opinion = {
+				modifier = cast_spell_on_me
+				who = FROM
+				years = 1
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
 	
 }
 
@@ -3812,4 +4372,96 @@ settlement_decisions = {
 		}
 	}
 
+	spell_wall_of_stone = {
+		ai_check_interval = 24
+		filter = realm_owned
+		ai_target_filter = realm_owned
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_wall_of_stone
+			}
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			location = {
+				has_siege = yes
+				NOT = { has_province_modifier = spell_wall_of_stone_mod }
+			}
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_wizard
+							trait = expert_wizard
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_wall_of_stone_cooldown }
+							had_character_flag = { flag = spell_wall_of_stone_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_wall_of_stone_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = spell_wall_of_stone_mod
+					months = 4
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				FROM = { trait = diligent }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+		}
+	}
+	
 }
