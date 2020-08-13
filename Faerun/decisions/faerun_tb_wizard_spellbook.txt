@@ -134,7 +134,7 @@ decisions = {
 					enemy = {
 						any_controlled_unit = {
 							troops = {
-								who = undead
+								who = undead_troops
 								value > 0
 							}
 						}
@@ -144,25 +144,25 @@ decisions = {
 					random_controlled_unit = {
 						limit = {
 							troops = {
-								who = undead
+								who = undead_troops
 								value > 0
 							}
 						}
 						damage_unit = {
-							type = undead
+							type = undead_troops
 							percentage = 33
 						}
 						random = {
 							chance = 33
 							damage_unit = {
-								type = undead
+								type = undead_troops
 								percentage = 33
 							}
 						}
 						random = {
 							chance = 33
 							damage_unit = {
-								type = undead
+								type = undead_troops
 								percentage = 33
 							}
 						}
@@ -1279,6 +1279,7 @@ decisions = {
 			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
+				has_character_modifier = wiz_wild
 				has_character_flag = knows_spell_conjure_elementals
 			}
 			OR = {
@@ -2190,6 +2191,7 @@ decisions = {
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
+				has_character_modifier = wiz_wild
 				has_character_flag = knows_spell_mordekainens_involuntary_wizardry
 			}
 		}
@@ -2239,6 +2241,7 @@ decisions = {
 			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
+				has_character_modifier = wiz_wild
 				has_character_flag = knows_spell_fireball
 			}
 			OR = {
@@ -3095,7 +3098,181 @@ decisions = {
 			factor = 0 # Just to be sure
 		}
 	}
+
+#Necromancy spells
 	
+	spell_animate_dead = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_conjure_elementals
+			}
+			OR = {
+				AND = {
+					ai = yes
+					is_ruler = yes
+				}
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			war = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_animate_dead }
+				}
+			}
+			custom_tooltip = {
+				text = HAS12SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_animate_dead_cooldown }
+						had_character_flag = { flag = spell_animate_dead_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_animate_dead_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			spawn_unit = {
+				province = closest_to_capital
+				earmark = wiz_animate_dead
+				troops = {
+					undead_troops = { 500 500 }
+					cannot_inherit = yes
+					attrition = 0
+					maintenance_multiplier = 0
+					can_toggle_looting = no
+					reinforces = no
+				}
+			}
+			hidden_tooltip = { character_event = { id = spellaux.37 months = 5 } }
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	spell_false_life = {
+		ai_check_interval = 10
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_false_life
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = spell_false_Life_mod }
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_false_life_cooldown }
+						had_character_flag = { flag = spell_false_life_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_false_life_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -7 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_character_modifier = {
+				name = spell_false_life_mod
+				months = 3
+			}
+		}
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.1
+				health = 10 # Don't really need it
+			}
+			modifier = {
+				factor = 5
+				NOT = { health = 5 }
+			}
+		}
+	}
+	
+	bestow_curse_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_bestow_curse
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
 }
 
 targeted_decisions = {
@@ -4104,16 +4281,16 @@ targeted_decisions = {
 			repeat_event = { id = spellaux.20 }
 			repeat_event = { id = spellaux.21 days = 90 }
 		}
-	}
-	ai_will_do = {
-		factor = 0.3
-		modifier = {
-			factor = 0.1
-			FROM = { trait = kind }
-		}
-		modifier = {
-			factor = 5
-			FROM = { trait = cruel }
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 5
+				FROM = { trait = cruel }
+			}
 		}
 	}
 	
@@ -4196,25 +4373,25 @@ targeted_decisions = {
 			spell_resistance_check = yes
 			add_rival = FROM
 		}
-	}
-	ai_will_do = {
-		factor = 0.1
-		modifier = {
-			factor = 0
-			FROM = {
-				opinion = {
-					who = ROOT
-					value >= 25 }
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0
+				FROM = {
+					opinion = {
+						who = ROOT
+						value >= 25 }
+					}
 				}
 			}
-		}
-		modifier = {
-			factor = 0.1
-			FROM = { trait = kind }
-		}
-		modifier = {
-			factor = 5
-			FROM = { trait = cruel }
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 5
+				FROM = { trait = cruel }
+			}
 		}
 	}
 	
@@ -4228,6 +4405,7 @@ targeted_decisions = {
 			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_enchantment
+				has_character_modifier = wiz_wild
 				has_character_flag = knows_spell_mordekainens_involuntary_wizardry
 			}
 		}
@@ -4291,29 +4469,29 @@ targeted_decisions = {
 			spell_resistance_check = yes
 			character_event = { id = spellaux.22 }
 		}
-	}
-	ai_will_do = {
-		factor = 0.1
-		modifier = {
-			factor = 0
-			FROM = {
-				opinion = {
-					who = ROOT
-					value >= 25 }
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0
+				FROM = {
+					opinion = {
+						who = ROOT
+						value >= 25 }
+					}
 				}
 			}
-		}
-		modifier = {
-			factor = 5
-			is_rival = FROM
-		}
-		modifier = {
-			factor = 0.1
-			FROM = { trait = kind }
-		}
-		modifier = {
-			factor = 5
-			FROM = { trait = cruel }
+			modifier = {
+				factor = 5
+				is_rival = FROM
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 5
+				FROM = { trait = cruel }
+			}
 		}
 	}
 	
@@ -4684,16 +4862,16 @@ targeted_decisions = {
 			repeat_event = { id = spellaux.35 }
 			repeat_event = { id = spellaux.36 days = 90 }
 		}
-	}
-	ai_will_do = {
-		factor = 0.3
-		modifier = {
-			factor = 0.1
-			FROM = { trait = kind }
-		}
-		modifier = {
-			factor = 5
-			FROM = { trait = cruel }
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 5
+				FROM = { trait = cruel }
+			}
 		}
 	}
 
@@ -4716,7 +4894,7 @@ settlement_decisions = {
 			}
 		}
 		potential = {
-			has_disease = yes
+			location = { has_disease = yes }
 		}
 		allow = {
 			FROM = {
@@ -4769,7 +4947,7 @@ settlement_decisions = {
 			}
 			random_list = {
 				1 = {
-					reduce_disease = 1.0 # *should* remove it completely
+					reduce_disease = 100.0 # *should* remove it completely
 					hidden_tooltip = {
 						if = {
 							limit = {
@@ -5072,6 +5250,131 @@ settlement_decisions = {
 			modifier = {
 				factor = 0.5
 				FROM = { trait = slothful }
+			}
+		}
+	}
+	
+	
+	spell_animate_dead_prov = {
+		ai_check_interval = 10
+		filter = realm_owned
+		ai_target_filter = realm_owned
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_animate_dead
+			}
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			location = {
+				NOT = { has_province_modifier = empty_graves_mod }
+			}
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS12SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 12 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_animate_dead_cooldown }
+							had_character_flag = { flag = spell_animate_dead_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_animate_dead_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -12 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			location = {
+				spawn_unit = {
+					province = THIS
+					home = THIS
+					owner = FROM
+					troops = {
+						undead_troops = { 100 100 }
+						scaled_by_biggest_garrison = 1
+						cannot_inherit = yes
+						attrition = 0.1
+						can_toggle_looting = no
+						reinforces = no
+					}
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = empty_graves_mod
+					years = 3
+				}
+				if = {
+					limit = {
+						NOT = { 
+							has_province_modifier = undead_province
+						}
+					}
+					add_province_modifier = {
+						name = raised_dead_in_prov
+						years = 3
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+				FROM = { NOT = { wealth = 100 } }
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = diligent }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_velsharoon }
+			}
+			modifier = {
+				factor = 20
+				FROM = { 
+					OR = {
+						trait = undead
+						trait = vampire
+						trait = vampire_spawn
+						trait = lich
+					}
+				}
 			}
 		}
 	}
