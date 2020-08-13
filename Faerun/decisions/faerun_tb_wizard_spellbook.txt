@@ -4380,7 +4380,7 @@ targeted_decisions = {
 				FROM = {
 					opinion = {
 						who = ROOT
-						value >= 25 }
+						value >= 25
 					}
 				}
 			}
@@ -4871,6 +4871,111 @@ targeted_decisions = {
 			modifier = {
 				factor = 5
 				FROM = { trait = cruel }
+			}
+		}
+	}
+
+#Necromancy spells
+
+	bestow_curse = {
+		ai_check_interval = 5
+		filter = rivals
+		ai_target_filter = rivals
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_bestow_curse
+			}
+		}
+		
+		potential = {
+			OR = {
+				location = {
+					any_character = {
+						is_foe = FROM
+					}
+				}
+				location = {
+					any_neighbor_province = {
+						any_character = {
+							is_foe = FROM
+						}
+					}
+				}
+			}
+		}
+		
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = bestow_curse_mod }
+				NOT = { has_character_modifier = burn_path_mod }
+				NOT = { is_foe = ROOT }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_wizard
+							trait = expert_wizard
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_bestow_curse_cooldown }
+							had_character_flag = { flag = spell_bestow_curse_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		
+		effect = {
+			FROM = { set_character_flag = spell_bestow_curse_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -15 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			spell_resistance_check = yes
+			repeat_event = { id = spellaux.38 }
+			opinion = {
+				modifier = cast_spell_on_me
+				who = FROM
+				years = 1
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
 			}
 		}
 	}
