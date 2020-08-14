@@ -141,7 +141,7 @@ decisions = {
 					}
 				}
 				enemy = {
-					random_controlled_unit = {
+					combat = {
 						limit = {
 							troops = {
 								who = undead_troops
@@ -1664,27 +1664,9 @@ decisions = {
 						repeat_event = { id = spellaux.30 }
 					}
 				}
-				if = {
-					limit = {
-						enemy = {
-							random_army = {
-								troops = { value >= 600 }
-							}
-						}
-					}
-					enemy = {
-						random_army = {
-							limit = {
-								troops = { value >= 600 }
-							}
-							damage_unit = { percentage = 0.15 } # Might be too much
-							break = yes
-						}
-					}
-				}
 				enemy = {
-					random_army = {
-						damage_unit = { percentage = 0.15 } # Might be too much
+					combat = {
+						damage_unit = { percentage = 0.15 } # Might be too much?
 					}
 				}
 			}
@@ -2294,26 +2276,8 @@ decisions = {
 						repeat_event = { id = spellaux.24 }
 					}
 				}
-				if = {
-					limit = {
-						enemy = {
-							random_army = {
-								troops = { value >= 600 }
-							}
-						}
-					}
-					enemy = {
-						random_army = {
-							limit = {
-								troops = { value >= 600 }
-							}
-							damage_unit = { percentage = 0.05 }
-							break = yes
-						}
-					}
-				}
 				enemy = {
-					random_army = {
+					combat = {
 						damage_unit = { percentage = 0.05 }
 					}
 				}
@@ -2574,26 +2538,8 @@ decisions = {
 						repeat_event = { id = spellaux.31 }
 					}
 				}
-				if = {
-					limit = {
-						enemy = {
-							random_army = {
-								troops = { value >= 600 }
-							}
-						}
-					}
-					enemy = {
-						random_army = {
-							limit = {
-								troops = { value >= 600 }
-							}
-							damage_unit = { percentage = 0.15 } # Might be too much
-							break = yes
-						}
-					}
-				}
 				enemy = {
-					random_army = {
+					combat = {
 						damage_unit = { percentage = 0.15 } # Might be too much
 					}
 				}
@@ -2680,26 +2626,8 @@ decisions = {
 						repeat_event = { id = spellaux.32 }
 					}
 				}
-				if = {
-					limit = {
-						enemy = {
-							random_army = {
-								troops = { value >= 600 }
-							}
-						}
-					}
-					enemy = {
-						random_army = {
-							limit = {
-								troops = { value >= 600 }
-							}
-							damage_unit_morale = { percentage = 0.15 } # Might be too much
-							break = yes
-						}
-					}
-				}
 				enemy = {
-					random_army = {
+					combat = {
 						damage_unit_morale = { percentage = 0.15 } # Might be too much
 					}
 				}
@@ -3037,26 +2965,8 @@ decisions = {
 						repeat_event = { id = spellaux.34 }
 					}
 				}
-				if = {
-					limit = {
-						enemy = {
-							random_army = {
-								troops = { value >= 600 }
-							}
-						}
-					}
-					enemy = {
-						random_army = {
-							limit = {
-								troops = { value >= 600 }
-							}
-							damage_unit_morale = { percentage = 0.15 } # Might be too much
-							break = yes
-						}
-					}
-				}
 				enemy = {
-					random_army = {
+					combat = {
 						damage_unit_morale = { percentage = 0.15 } # Might be too much
 					}
 				}
@@ -3270,6 +3180,502 @@ decisions = {
 		
 		ai_will_do = {
 			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_create_undead = {
+		ai_check_interval = 24
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_create_undead
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = JOURNEYMANWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_wizard
+						trait = expert_wizard
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 20 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_create_undead_cooldown }
+						had_character_flag = { flag = spell_create_undead_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_create_undead_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -20 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			custom_tooltip = {
+				text = UNDEADSUMMONED
+				hidden_tooltip = {
+					location = {
+						create_character = {
+							age = 100
+							female = random
+							random_traits = yes
+							trait = undead
+							religion = ROOT
+							culture = THIS
+							dynasty = none
+							immortal_age = 30
+						}
+					}
+					new_character = {
+						character_event = { id = z_character_trait.1 }
+						opinion = {
+							modifier = planar_binding_mod
+							who = ROOT
+							duration = -1
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 0
+				has_full_court = yes
+			}
+		}
+	}
+	
+	spell_blight_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_blight
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_clone = {
+		ai_check_interval = 50
+		potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_clone
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+			NOR = {
+				trait = avatar
+				trait = creature_demon
+				trait = creature_devil
+				trait = creature_daemon
+				trait = creature_angel
+				trait = creature_genie
+			}
+		}
+		allow = {
+			scaled_wealth = { value = 0.1 min = 50 }
+			NOT = { has_injury_trigger = yes }
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS30SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 30 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_clone_cooldown }
+						had_character_flag = { flag = spell_clone_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			scaled_wealth = { value = -0.1 min = 50 }
+			set_character_flag = spell_clone_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -30 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 15
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			add_trait_wounded_effect = yes
+			create_character = {
+				age = 20
+				random_traits = no
+				employer = ROOT
+				religion = ROOT
+				culture = ROOT
+				dynasty = ROOT
+				health = ROOT
+				fertility = ROOT
+				dna = ROOT
+				recalc_succession = yes
+			}
+			export_to_variable = {
+				which = global_clone_diplomacy
+				value = diplomacy
+			}
+			export_to_variable = {
+				which = global_clone_martial
+				value = martial
+			}
+			export_to_variable = {
+				which = global_clone_stewardship
+				value =	stewardship
+			}
+			export_to_variable = {
+				which = global_clone_intrigue
+				value = intrigue
+			}
+			export_to_variable = {
+				which = global_clone_learning
+				value =	learning
+			}
+			new_character = {
+				add_trait = is_clone
+				if = {
+					limit = {
+						ROOT = {
+							is_female = no
+						}
+					}
+					set_father = ROOT
+					set_gender = male
+				}
+				else_if = {
+					limit = {
+						ROOT = {
+							is_female = yes
+						}
+						set_mother = ROOT
+						set_gender = female
+					}
+				}
+				change_diplomacy = global_clone_diplomacy
+				change_martial = global_clone_martial
+				change_stewardship = global_clone_stewardship
+				change_intrigue = global_clone_intrigue
+				change_learning = global_clone_learning
+				copy_traits_of_root = yes
+				tb_graph_culture_racial = yes
+				any_sibling = {
+					limit = {
+						trait = is_clone
+					}
+					add_rival = PREV
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 5
+				any_child = {
+					count == 0
+					is_alive = no
+				}
+			}
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	spell_lichdom = {
+		potential = {
+			z_wizard = yes
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+			has_character_modifier = wiz_necromancy
+			NOR = {
+				trait = creature_treant
+				trait = undead
+				trait = lich
+				trait = vampire
+				trait = vampire_spawn
+				trait = lich_baelnorn
+				trait = creature_monster
+				trait = creature_devil
+				trait = creature_daemon
+				trait = creature_demon
+				trait = creature_angel
+				trait = creature_genie
+				trait = longevity
+			}
+		}
+		
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			scaled_wealth = { value = 0.2 min = 100 }
+			custom_tooltip = {
+				text = MASTERWIZHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_wizard
+						trait = renowned_wizard
+						trait = legendary_wizard
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS30SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 30 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_lichdom_cooldown }
+						had_character_flag = { flag = spell_lichdom_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		
+		effect = {
+			scaled_wealth = { value = -0.2 min = 100 }
+			set_character_flag = spell_lichdom_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -30 } }
+			random = {
+				chance = 75
+				add_trait = lich
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = creature_human
+							trait = creature_aasimar
+							trait = creature_tiefling
+							trait = creature_half_giant
+							trait = creature_genasi
+							trait = creature_gith
+							trait = creature_gnome
+							trait = creature_halfling
+							trait = creature_centaur
+							trait = creature_wemic
+						}
+						if = {
+							limit = {
+								NOR = {
+									culture = shou
+									culture = khatin
+									culture = gugari
+									culture = kozakuran
+									culture = mulhorandi
+									culture = murghomi
+								}
+							}
+							set_graphical_culture = lich
+						}
+						else_if = {
+							limit = {
+								OR = {
+									culture = shou
+									culture = khatin
+									culture = gugari
+									culture = kozakuran
+								}
+							}
+							set_graphical_culture = undead_shou
+						}
+						else_if = {
+							limit = {
+								OR = {
+									culture = mulhorandi
+									culture = murghomi
+								}
+							}
+							set_graphical_culture = undead_mulhorandi
+						}
+					}
+					else_if = {
+						limit = {
+							OR = {
+								trait = creature_malison
+								trait = creature_pureblood
+							}
+						}
+						set_graphical_culture = cambion
+					}
+					else_if = {
+						limit = {
+							OR = {
+								trait = creature_elf
+								trait = creature_eladrin
+								trait = creature_feyri
+								trait = creature_drow
+								trait = creature_half_elf
+							}
+						}
+						set_graphical_culture = undeadelf
+					}
+					else_if = {
+						limit = {
+							OR = {
+								trait = creature_dwarf
+								trait = creature_half_dwarf
+							}
+						}
+						set_graphical_culture = dwarfvampire
+					}
+					else_if = {
+						limit = {
+							OR = {
+								trait = creature_naga
+								trait = creature_abomination
+								trait = creature_sarrukh
+							}
+						}
+						set_graphical_culture = bone_naga
+					}
+					else_if = {
+						limit = {
+							OR = {
+								trait = creature_ogre
+								trait = creature_half_ogre
+								trait = creature_ogrillon
+							}
+						}
+						set_graphical_culture = undeadogre
+					}
+				}
+			}
+		}
+	}
+	
+#Wild Magic spells
+
+	nahals_reckless_dweomer = {
+		potential = {
+			ai = no # Don't trust the AI to not rapid-fire this
+			z_wizard = yes
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
+			has_character_modifier = wiz_wild
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_nahals_reckless_dweomer_cooldown }
+						had_character_flag = { flag = spell_nahals_reckless_dweomer_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_clone_cooldown
+			hidden_tooltip = { change_variable = { which = wizspellpoints value = -30 } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						has_character_modifier = wiz_wild
+					}
+					random = {
+						chance = 65
+						character_event = { id = spellaux.4 }
+						break = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				random_list = {
+					10 = {
+						change_variable = { which = wizspellpoints value = 5 }
+					}
+					5 = {
+						change_variable = { which = wizspellpoints value = 10 }
+					}
+					1 = {
+						change_variable = { which = wizspellpoints value = 15 }
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0
 		}
 	}
 
@@ -5480,6 +5886,178 @@ settlement_decisions = {
 						trait = lich
 					}
 				}
+			}
+		}
+	}
+	
+	spell_blight = {
+		ai_check_interval = 5
+		filter = all
+		ai_target_filter = all # I really hope this doesn't mess it up
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_necromancy
+				has_character_flag = knows_spell_blight
+			}
+		}
+		potential = {
+			location = { NOT = { has_disease = yes } }
+			location = { holder_scope = { is_foe = FROM } }
+			OR = {
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_blight_cooldown }
+							had_character_flag = { flag = spell_blight_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_blight_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						enemy = {
+							ai = no
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.39 }
+						}
+					}
+				}
+			}
+			location = {
+				random_list = {
+					1 = {
+						spawn_disease = tuberculosis
+					}
+					1 = {
+						spawn_disease = typhoid_fever
+					}
+					1 = {
+						spawn_disease = typhus
+					}
+					1 = {
+						spawn_disease = measles
+					}
+					1 = {
+						spawn_disease = small_pox
+					}
+					1 = {
+						spawn_disease = syphilis
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 10
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 20
+				trait = patron_talona
 			}
 		}
 	}
