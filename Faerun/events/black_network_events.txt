@@ -156,10 +156,6 @@ character_event = { #AI join event
 							factor = 0
 							society_influence >= 30
 						}
-						add_society_modifier = 	{
-							modifier = network_successful_mission
-							years = 10
-						}
 					}
 					25 = {
 					}
@@ -380,8 +376,6 @@ character_event = {
   }
 }
 
-
-
 # Extra Tax on Demesne Province
 character_event = {
 	id = ZHE.21100
@@ -476,5 +470,200 @@ character_event = {
       }
     }
   }
+}
 
+### Risky but profitable trade route
+# Start of chain (hidden)
+character_event = {
+	id = ZHE.10100
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		job_treasurer = {
+			character_event = { id = ZHE.10101 }
+		}
+	}
+}
+
+# Start of chain (Steward)
+character_event = {
+	id = ZHE.10101
+	is_triggered_only = yes
+	desc = EVTDESC_ZHE_10101
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_economy
+
+	option = {
+		name = EVTOPTA_ZHE_10101
+		ai_chance = {
+			factor = 1
+		}
+		save_event_target_as = steward
+		FROM = { character_event = { id = ZHE.10102 } }
+	}
+
+	option = {
+		name = EVTOPTB_ZHE_10101
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+# Steward presents an opportunity
+character_event = {
+	id = ZHE.10102
+	is_triggered_only = yes
+	desc = EVTDESC_ZHE_10102
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_economy
+
+	option = {
+		name = EVTOPTA_ZHE_10102
+		set_character_flag = trade_route_progress
+		if = {
+			limit = {
+				capital_scope = {
+					coastal = no
+				}
+			}
+			character_event = { id = ZHE.10103 }
+			break = yes
+		}
+		character_event = { id = ZHE.10104 }
+	}
+
+	option = {
+		name = EVTOPTB_ZHE_10102
+		clr_character_flag = trade_route_progress
+	}
+}
+
+# Land: setting up a land based trade route
+character_event = {
+	id = ZHE.10103
+	is_triggered_only = yes
+	desc = EVTDESC_ZHE_10103
+	picture = GFX_evt_merchant_caravan
+	border = GFX_event_normal_frame_economy
+
+	option = { # hire crew
+		name = EVTOPTA_ZHE_10103
+		set_character_flag = trade_is_land
+		if = {
+			limit = { yearly_income = 200 }
+			wealth = -200
+		}
+		if = {
+			limit = {
+				yearly_income = 25
+				NOT = { yearly_income = 200 }
+			}
+			scaled_wealth = -1
+		}
+		if = {
+			limit = { NOT = { yearly_income = 25 } }
+			wealth = -25
+		}
+		hidden_tooltip = {
+			character_event = { id = ZHE.10105 days = 3 }
+		}
+	}
+
+	option = { # pillage as we go
+		name = EVTOPTB_ZHE_10103
+		tooltip_info = martial
+    trigger = {
+      martial = 15
+    }
+		set_character_flag = trade_is_land
+		if = {
+			limit = { yearly_income = 200 }
+			wealth = -80
+		}
+		if = {
+			limit = {
+				yearly_income = 25
+				NOT = { yearly_income = 200 }
+			}
+			scaled_wealth = -0.4
+		}
+		if = {
+			limit = { NOT = { yearly_income = 25 } }
+			wealth = -10
+		}
+    add_trait = cruel
+    hidden_tooltip = {
+      character_event = { id = ZHE.10105 days = 3 }
+    }
+	}
+
+	option = { # this is too expensive
+		name = EVTOPTC_ZHE_10103
+		clr_character_flag = trade_route_progress
+	}
+}
+
+# Naval: setting up a naval based trade route
+character_event = {
+	id = ZHE.10104
+	is_triggered_only = yes
+	desc = EVTDESC_ZHE_10104
+	picture = GFX_evt_busy_trading_dock_republic
+	border = GFX_event_normal_frame_economy
+
+	option = { # hire crew
+		name = EVTOPTA_ZHE_10104
+		if = {
+			limit = { yearly_income = 200 }
+			wealth = -200
+		}
+		if = {
+			limit = {
+				yearly_income = 25
+				NOT = { yearly_income = 200 }
+			}
+			scaled_wealth = -1
+		}
+		if = {
+			limit = { NOT = { yearly_income = 25 } }
+			wealth = -25
+		}
+		hidden_tooltip = {
+			character_event = { id = ZHE.10105 days = 3 }
+		}
+	}
+
+	option = { # piracy
+		name = EVTOPTB_ZHE_10104
+    tooltip_info = martial
+    trigger = {
+      martial = 15
+    }
+		if = {
+			limit = { yearly_income = 200 }
+			wealth = -80
+		}
+		if = {
+			limit = {
+				yearly_income = 25
+				NOT = { yearly_income = 200 }
+			}
+			scaled_wealth = -0.4
+		}
+		if = {
+			limit = { NOT = { yearly_income = 25 } }
+			wealth = -10
+		}
+    add_trait = cruel
+    hidden_tooltip = {
+      character_event = { id = ZHE.10105 days = 3 }
+    }
+	}
+
+	option = { # this is too expensive
+		name = EVTOPTC_ZHE_10104
+		clr_character_flag = trade_route_progress
+	}
 }
