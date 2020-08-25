@@ -1,0 +1,129 @@
+
+namespace = FWWar
+
+#FWWar1-10: Cormyrian Goblin War of 1371 events 
+
+
+character_event = {
+	id = FWWar.1
+	desc = EVTDESC_FWWar_1
+	picture = GFX_evt_dragon_1
+	border = GFX_event_normal_frame_war
+	
+	is_triggered_only = no
+	
+	trigger = {
+		date = 1371.2.28
+		NOT = {
+			has_global_flag = nalavara_spawned
+		}
+		AND = {  #check to ensure an Obarskyr rules Cormyr, or at least a Kingdom somewhere
+			dynasty = 500 #Obarskyr
+			num_of_king_titles >= 1
+		}
+		has_game_rule = {
+            name = minor_story_events
+            value = on
+        }
+	}
+	
+	immediate = {
+		set_global_flag = nalavara_spawned
+		save_event_target_as = obarskyr
+
+		create_character = {
+				random_traits = no
+				female = yes
+				dynasty = 13381 #Alavara
+				name = Nalavarauthatoryl
+				culture = draconic
+				religion = evil_human_pantheon #she's an elf who turned herself into a dragon out of hatred
+				trait = creature_dragon
+				trait = creature_red_dragon
+				trait = wroth
+				trait = deceitful
+				trait = proud
+				trait = ambitious
+				trait = zealous
+				trait = skilled_tactician
+				age = 1330
+				flag = ai_flag_refuse_conversion
+		}
+		new_character = {
+				add_rival = 20081 #hates Azoun IV
+				add_rival = ROOT #just in case Azoun IV isn't King, but another Obarskyr is
+				give_nickname = nick_the_devil_dragon
+				wealth = 500
+				character_event = { id = FWWar.2 days = 1 }
+		}
+	}
+	
+	option = {
+		name = "EVTOPTA_FWWar_1"
+	}
+		
+}
+
+character_event = { 
+	id = FWWar.2		#Nalavara emerges in the Goblin Marches - plays a little differently than the game history version but this should work well enough
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+					create_title = {
+						tier = DUKE
+						landless = yes
+						temporary = yes
+						culture = goblin
+						name = "CLAIMANT_ADVENTURE"
+						holder = ROOT
+						adventurer = yes
+					}
+					set_character_flag = duchy_adventurer
+					k_cormyr = {								
+						add_claim = ROOT
+					}
+					character_event = { id = FWWar.3 days = 1 }
+
+	}
+}
+
+
+character_event = { 
+	id = FWWar.3		#event to give Nalavara some goblin hordes to invade Cormyr with
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+  immediate = {
+        k_cormyr = {
+            holder_scope = {
+                reverse_unsafe_war = {
+                    target = ROOT
+                    casus_belli = invasion
+                    thirdparty = ROOT
+					thirdparty_title = PREV
+				}
+			}
+		}
+        spawn_unit = {
+            owner = ROOT
+            province = 376
+            home = 376
+
+            troops = {
+            archers = { 250 250 }
+            light_infantry = { 350 350 }
+            heavy_infantry = { 25 25 }
+            light_cavalry = { 175 175 }
+            }
+			match_character = event_target:obarskyr
+			match_mult = 1.5
+            attrition = 0.1
+            disband_on_peace = yes
+            maintenance_multiplier = 0.1
+			cannot_inherit = yes
+        }
+    }
+}

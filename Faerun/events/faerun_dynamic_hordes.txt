@@ -1,0 +1,372 @@
+namespace = dynhordes
+
+province_event = {
+	id = dynhordes.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		NOR = {
+			culture = orc
+			culture = goblin
+			culture = hobgoblin
+			culture = bugbear
+			culture = gnoll
+			culture = troll
+			culture = kobold
+		}
+		holder_scope = {
+			NOT = {
+				tier = COUNT
+				OR = {
+					ai = no
+					independent = yes
+				}
+			}
+			NOR = {
+				culture = orc
+				culture = goblin
+				culture = hobgoblin
+				culture = bugbear
+				culture = gnoll
+				culture = troll
+				culture = kobold
+				AND = {
+					culture = draconic
+					capital_scope = {
+						OR = {
+							culture = orc
+							culture = goblin
+							culture = hobgoblin
+							culture = bugbear
+							culture = gnoll
+							culture = troll
+							culture = kobold
+						}
+					}
+				}
+			}
+		}
+		any_neighbor_province = {
+			owner = {
+				ROOT = {
+					holder_scope = {
+						PREVPREV = {
+							NOT = { same_realm = PREV }
+						}
+					}
+				}
+			}
+		}
+		NOT = {
+			kingdom = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						OR = {
+							had_province_flag = { 
+								flag = dynhorde_spawned
+								years = 10
+							}
+							has_province_flag = dynhorde_spawning
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		set_province_flag = dynhorde_spawning
+		random_list = { # Will refine it later
+			50 = { # Orcs
+				set_province_flag = dynhorde_orc
+			}
+			35 = { # Hobgoblins
+				set_province_flag = dynhorde_hob
+			}
+			35 = { # Goblins
+				set_province_flag = dynhorde_gob
+			}
+			25 = { # Trolls
+				set_province_flag = dynhorde_troll
+			}
+			20 = { # Gnolls
+				set_province_flag = dynhorde_gnoll
+			}
+			15 = { # Bugbears
+				set_province_flag = dynhorde_bug
+			}
+			10 = { # Kobolds
+				set_province_flag = dynhorde_kob
+			}
+			1 = { # Kobolds led by dragon
+				set_province_flag = dynhorde_drag
+			}
+		}
+		holder_scope = {
+			character_event = { id = dynhordes.2 }
+			if = {
+				limit = {
+					independent = no
+				}
+				top_liege = {
+					ROOT = {
+						PREV = { # In order to ensure proper loc scoping
+							character_event = { id = dynhordes.2 }
+						}
+					}
+				}
+			}
+		}
+		province_event = { id = dynhordes.3 months = 4 random = 35 }
+	}
+}
+
+character_event = {
+	id = dynhordes.2
+	desc = dynhordes.2
+	picture = GFX_evt_orcs
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = dynhordes.2.a
+	}
+}
+
+province_event = { # Spawns the horde and its leader
+	id = dynhordes.3
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		trigger_switch = {
+			on_trigger = has_province_flag
+			dynhorde_orc = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = orc
+					religion = orc_pantheon
+					trait = creature_orc
+					female = no
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_hob = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = hobgoblin
+					religion = goblin_pantheon
+					trait = creature_hobgoblin
+					female = 75
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_gob = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = goblin
+					religion = goblin_pantheon
+					trait = creature_hobgoblin
+					female = 75
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_troll = {
+				create_character = {
+					age = 70
+					attributes = {
+						martial = 7
+					}
+					culture = troll
+					religion = abyssal_cult
+					trait = creature_troll
+					female = 95
+					dynasty = random
+					random_traits = yes
+					immortal_age = 30
+				}
+			}
+			dynhorde_gnoll = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = gnoll
+					religion = abyssal_cult
+					trait = creature_gnoll
+					female = random
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_bug = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = bugbear
+					religion = goblin_pantheon
+					trait = creature_bugbear
+					female = 75
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_kobold = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = kobold
+					religion = draconic_pantheon
+					trait = creature_kobold
+					female = random
+					dynasty = random
+					random_traits = yes
+				}
+			}
+			dynhorde_dragon = {
+				create_character = {
+					age = 30
+					attributes = {
+						martial = 7
+					}
+					culture = draconic
+					religion = draconic_pantheon
+					trait = creature_dragon
+					female = random
+					dynasty = random
+					random_traits = yes
+				}
+				new_character = {
+					random_list = {
+						1 = {
+							add_trait = creature_black_dragon
+						}
+						1 = {
+							add_trait = creature_blue_dragon
+						}
+						1 = {
+							add_trait = creature_green_dragon
+						}
+						1 = {
+							add_trait = creature_red_dragon
+						}
+						1 = {
+							add_trait = creature_white_dragon
+						}
+					}
+				}
+			}
+		}
+		new_character = {
+			set_character_flag = dynhorde_invader
+			if = {
+				limit = {
+					NOT = { culture = draconic }
+				}
+				create_title = {
+					tier = DUKE
+					landless = yes
+					temporary = yes
+					adventurer = yes
+					culture = PREV
+					name = "CLAIMANT_ADVENTURE"
+					holder = THIS
+				}
+			}
+			else_if = {
+				limit = {
+					culture = draconic
+				}
+				create_title = {
+					tier = DUKE
+					landless = yes
+					temporary = yes
+					adventurer = yes
+					culture = kobold
+					name = "CLAIMANT_ADVENTURE"
+					holder = THIS
+				}
+			}
+			ROOT = {
+				holder_scope = {
+					PREVPREV = {
+						spawn_unit = {
+							province = ROOT
+							home = ROOT
+							owner = THIS
+							leader = THIS
+							troops = {
+								light_infantry = { 300 300 }
+								heavy_infantry = { 80 80 }
+								archers = { 150 150 }
+							}
+							match_settlement = ROOT
+							match_mult = 2.5
+							match_min = 1000
+							disband_on_peace = yes
+							can_toggle_looting = no
+							reinforces = no
+							maintenance = no
+							attrition = 0.5
+							cannot_inherit = yes
+						}
+					}
+				}
+			}
+			ROOT = {
+				realm = {
+					holder_scope = {
+						PREVPREVPREV = {
+							war = {
+								target = PREV
+								casus_belli = dynhorde_invasion
+								thirdparty_title  = PREVPREV
+							}
+						}
+					}
+				}
+			}
+		}
+		clr_province_flag = dynhorde_spawning
+		set_province_flag = dynhorde_spawned
+		realm = {
+			holder_scope = {
+				character_event = { id = dynhordes.4 }
+			}
+		}
+		clear_flags_with_prefix = dynhorde
+	}
+}
+
+character_event = {
+	id = dynhordes.4
+	desc = dynhordes.4
+	picture = GFX_evt_orcs
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = dynhordes.4.a
+	}
+}
