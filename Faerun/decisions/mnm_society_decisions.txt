@@ -851,13 +851,13 @@ targeted_decisions = {
 			prisoner = no
 			NOT = { trait = incapable }
 			is_in_society = no
-			OR = {
-				is_female = no
-				has_game_rule = {
-					name = gender
-					value = all
-				}
-			}
+			# OR = {
+				# is_female = no
+				# has_game_rule = {
+					# name = gender
+					# value = all
+				# }
+			# }
 
 			#AI cannot invite other AIs when society is full
 			NAND = {
@@ -882,9 +882,28 @@ targeted_decisions = {
 			}
 		}
 		allow = {
-			has_assassins_prerequisites = yes
+			# has_assassins_prerequisites = yes
 			is_inaccessible_trigger = no
-
+			trait = creature_elf
+			age = 35
+			OR = {
+				trait = zealous
+				trait = wroth
+				trait = cruel
+			}
+			NOT = {
+				trait = kind
+				trait = cynical
+				culture = drow
+				culture = feyri
+				trait = creature_human
+				trait = creature_half_elf
+				trait = creature_feyri
+			}
+			NOT = { any_spouse = { NOT = { trait = creature_elf } } }
+			NOT = { any_lover = { NOT = { trait = creature_elf } } }
+			NOT = { any_friend = { NOT = { trait = creature_elf } } }
+			
 			FROM = {
 				custom_tooltip = {
 					text = recruit_delay_timer_tooltip
@@ -1115,6 +1134,59 @@ targeted_decisions = {
 			NOT = { character = FROM }
 			is_adult = yes
 			is_within_diplo_range = FROM
+			OR = {
+				trait = creature_drow
+				trait = creature_half_elf
+				trait = creature_feyri
+				trait = creature_human
+				culture = drow 
+				culture = feyri
+				AND = {
+					trait = creature_elf
+					NOT = { culture = drow }
+					NOT = { culture = feyri }
+					religion_group = elven_pantheon_group
+					trait = cynical
+				}
+				AND = {
+					trait = creature_elf
+					OR = {
+						any_spouse = { NOT = { trait = creature_elf } }
+						any_lover = { NOT = { trait = creature_elf } }
+						any_friend = { NOT = { trait = creature_elf } }
+					}
+				}
+				AND = {
+					any_claim = { owner = { 
+								AND = {
+								trait = creature_elf
+								religion_group = elven_pantheon_group
+								NOT = { trait = creature_half_elf }
+								NOT = { trait = creature_feyri }
+								NOT = { culture = drow }
+								NOT = { culture = feyri }
+								NOT = { trait = cynical	} 
+								}
+							 } 
+						}
+					NOT = {	trait = creature_elf }
+					NOT = { religion_group = elven_pantheon_group }
+				}
+				AND = {
+					NOT = {	trait = creature_elf }
+					NOT = { religion_group = elven_pantheon_group }
+					any_vassal = { 
+						AND = { 
+							trait = creature_elf
+							NOT = { trait = creature_half_elf }
+							NOT = { trait = creature_feyri }
+							NOT = { culture = drow }
+							NOT = { culture = feyri }
+							religion_group = elven_pantheon_group
+							NOT = { trait = cynical	} 
+					}	}
+				}	
+			}
 
 			#Limits for performance and sense-making
 			OR = {
@@ -1131,10 +1203,21 @@ targeted_decisions = {
 				ROOT = { any_claim = { any_claimant = { character = FROM } } } #Somneone sharing claims
 				AND = {
 					is_ruler = yes
+					AND = {
+						trait = creature_elf
+						NOT = { culture = drow }
+						NOT = { culture = feyri }
+						religion_group = elven_pantheon_group
+						trait = cynical
+					}
+				}
+				AND = {
+					is_ruler = yes
 					OR = {
-						trait = zealous
-						trait = cruel
-						trait = arbitrary
+						trait = creature_human
+						trait = creature_half_elf
+						trait = creature_feyri
+						trait = creature_drow
 					}
 				}
 			}
