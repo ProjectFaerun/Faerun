@@ -10,7 +10,7 @@ society_decisions = {
 			#has_dlc = "Mystics"
 				society_rank = {
 				society = lord_alliance
-				rank >= 2
+				rank >= 1
 			}
 		}
 
@@ -42,7 +42,7 @@ society_decisions = {
 
 	alliance_raise_ships = {
 		only_playable = yes
-		is_high_prio = yes
+		#is_high_prio = yes
 		is_mercenary = yes
 		ai_check_interval = 24
 
@@ -187,6 +187,97 @@ society_decisions = {
 
 		ai_will_do = {
 			factor = 1
+		}
+	}
+
+	call_for_heroes = {
+		ai_check_interval = 6 #check only once every 6 months.
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			society_rank = {
+				rank >= 2
+				society = lord_alliance
+			}
+			OR = {
+				ai = no
+				any_war = {
+					OR = {
+						any_defender = {
+							character = ROOT
+							is_primary_war_defender = yes
+						}
+						any_attacker = {
+							character = ROOT
+							is_primary_war_attacker = yes
+						}
+					}
+				}
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = call_for_heroes_cooldown
+				hidden_tooltip = {
+					NOT = {
+						has_character_modifier = call_for_heroes_cooldown
+					}
+				}
+			}
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			add_character_modifier = {
+				modifier = adventurers_boost
+				duration = 365
+			}
+			hidden_effect = {
+				add_character_modifier = {
+					name = call_for_heroes_cooldown
+					years = 2
+					hidden = yes
+				}
+			}
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0.5
+				trait = stubborn
+			}
+			modifier = {
+				factor = 0
+				war = no
+			}
+			modifier = { #I am losing the war, help!
+				factor = 10
+				any_war = {
+					defender = { character = ROOT }
+					attacker = {
+						war_score = -50
+					}
+				}
+			}
+			modifier = { #I am winning the war, no need!
+				factor = 0.25
+				any_war = {
+					defender = { character = ROOT }
+					attacker = {
+						war_score = 50
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				trait = gregarious
+			}
 		}
 	}
 

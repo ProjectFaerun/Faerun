@@ -3288,7 +3288,29 @@ decisions = {
 			factor = 0 # Just to be sure
 		}
 	}
-	
+	spell_controlweather_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_wizard = yes
+			has_character_flag = wiz_spellbook_open
+			OR = {
+				has_character_modifier = wiz_transmutation
+				has_character_flag = knows_spell_controlweather
+			}
+		}
+		
+		allow = {
+			always = no
+		}
+		
+		effect = {
+			break = yes # doesn't matter
+		}
+		
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}	
 	spell_clone = {
 		ai_check_interval = 50
 		potential = {
@@ -6078,5 +6100,290 @@ settlement_decisions = {
 			}
 		}
 	}
-	
+	spell_controlweather = {
+		ai_check_interval = 5
+		filter = all
+		ai_target_filter = all # I really hope this doesn't mess it up
+		
+		from_potential = {
+			z_wizard = yes
+			OR = {
+				has_character_modifier = wiz_transmutation
+				#has_character_flag = knows_spell_controlweather
+			}
+		}
+		potential = {
+			location = { holder_scope = { is_foe = FROM } }
+			OR = {
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+				holder_scope = {
+					character = FROM
+				}
+				
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERWIZHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_wizard
+							trait = renowned_wizard
+							trait = legendary_wizard
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_controlweather_cooldown }
+							had_character_flag = { flag = spell_controlweather_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_controlweather_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = wizspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							has_character_modifier = wiz_wild
+						}
+						random = {
+							chance = 15
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.39 }
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+			location = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								character = FROM
+							}
+						}
+					}							
+					add_province_modifier = {
+						name = africa_light_rain
+						months = 12
+					}
+                }
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}							
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}			
+					}
+				}
+				
+				
+			}
+			any_neighbor_independent_ruler = {
+				any_realm_province = {
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}			
+					}
+				}
+				#Insert Control Weather CB here
+				
+			}
+			random = {
+				chance = 50
+				any_neighbor_independent_ruler = {
+					any_realm_province = {
+						random_list = {
+							1 = {
+								add_province_modifier = {
+									name = africa_heavy_rain
+									months = 3
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought_risk
+									months = 12
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought
+									months = 6
+								}
+							}			
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+				
+			
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_talos }
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_umberlee }
+			}
+			modifier = {
+				factor = 3
+				FROM = { culture = shadovar } #Shadovar canonically caused a war with Cormyr through use of weather manipulation
+			}		
+			modifier = {
+				factor = 10
+				FROM = { culture = thayan } #Thay is pretty notorious canonically for doing this, and dgaf about neighbors caring
+			}		
+		}
+	}	
 }
