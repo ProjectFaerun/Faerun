@@ -21,7 +21,50 @@ decisions = {
 				name = undead_realm_lord
 				duration = -1
 			}
-			
+			any_vassal = {
+				limit = {
+					NOT = { tier = BARON }
+					NOT = { is_undead = yes }
+				}
+				set_defacto_liege = THIS
+				if = {
+					limit = {
+						higer_tier_than = COUNT
+					}
+					any_vassal = {
+						if = {
+							limit = {
+								NOT = { tier = BARON }
+								is_undead = yes
+							}
+							set_defacto_liege = ROOT
+						}
+						any_vassal = {
+							if = {
+								limit = {
+									NOT = { tier = BARON }
+									is_undead = yes
+								}
+								set_defacto_liege = ROOT
+							}
+						}
+					}
+				}
+			}
+			any_courtier_or_vassal = {
+				limit = {
+					OR = {
+						tier = BARON
+						is_ruler = no
+					}
+				}
+				if = {
+					limit = {
+						NOT = { is_undead = yes }
+					}
+					banish = yes
+				}
+			}
 		}
 		
 		ai_will_do = {
@@ -77,7 +120,7 @@ settlement_decisions = {
 				NOT = { has_province_modifier = empty_graves_mod }
 			}
 			FROM = {
-				piety = 100
+				piety = 50
 				custom_tooltip = {
 					text = SPELL_ON_COOLDOWN
 					hidden_tooltip = {
@@ -91,7 +134,7 @@ settlement_decisions = {
 		}
 		effect = {
 			FROM = { set_character_flag = spell_animate_dead_cooldown }
-			FROM = { piety = -100 }
+			FROM = { piety = -50 }
 			location = {
 				FROM = {
 					spawn_unit = {
@@ -101,7 +144,7 @@ settlement_decisions = {
 						troops = {
 							undead_troops = { 100 100 }
 						}
-						scaled_by_biggest_garrison = 1
+						scaled_by_biggest_garrison = 0.5
 						cannot_inherit = yes
 						attrition = 0.1
 						can_toggle_looting = no
