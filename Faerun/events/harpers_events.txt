@@ -1,0 +1,133 @@
+namespace = HRP
+
+#################################DECISIONS######################################
+
+# support people
+character_event = {
+	id = HRP.100
+	desc = EVTDESC_HRP_100
+	picture = GFX_evt_noble_in_castle
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_demesne_province = {
+			limit = {
+				NOR = {
+          has_province_modifier = support_people_sneaky
+          has_province_modifier = support_people_direct
+          has_province_modifier = support_people_fundraising
+			  }
+				any_province_holding = {
+					OR = {
+						holding_type = city
+						holding_type = temple
+						holding_type = castle
+						holding_type = tribal
+					}
+				}
+      }
+      save_event_target_as = tax_discount_target
+		}
+  }
+	# Tax discount on random demesne province
+	option = {
+		name = EVTOPTA_HRP_100
+
+		ai_chance = {
+			factor = 100
+		}
+
+		trigger = {
+			event_target:tax_discount_target = { always = yes }
+		}
+
+		character_event = {	id = HRP.101 tooltip = EVTTOOLTIP_HRP_101 }
+  }
+}
+
+# Tax Discount on Demesne Province
+character_event = {
+	id = HRP.101
+	desc = EVTDESC_HRP_101
+	picture = GFX_evt_noble_haughty_talking_to_peasants
+
+	is_triggered_only = yes
+
+	# first option High stewardship can trade vassal opinion for less sacrifice
+	option = {
+		name = EVTOPTA_HRP_101
+		tooltip_info = stewardship
+
+		trigger = {
+			stewardship = 15
+		}
+		any_vassal = {
+      opinion = {
+        modifier = opinion_angry
+        who = FROM
+        years = 5
+      }
+    }
+
+		event_target:tax_discount_target = {
+			add_province_modifier = {
+				modifier = support_people_sneaky
+				duration = 1825
+			}
+		}
+    custom_tooltip = {
+      text = increase_prosperity_event_custom_tooltip
+      hidden_tooltip = {
+        event_target:tax_discount_target = {
+          change_variable = { which = prosperity_value value = 15 }
+        }
+      }
+    }
+	}
+
+	# second option straight up tax concession
+	option = {
+		name = EVTOPTB_HRP_101
+
+		event_target:tax_discount_target = {
+			add_province_modifier = {
+				modifier = support_people_direct
+				duration = 1825
+			}
+		}
+    custom_tooltip = {
+      text = increase_prosperity_event_custom_tooltip
+      hidden_tooltip = {
+        event_target:tax_discount_target = {
+          change_variable = { which = prosperity_value value = 15 }
+        }
+      }
+    }
+	}
+
+  # third option High diplomacy fundraising
+  option = {
+    name = EVTOPTC_HRP_101
+    tooltip_info = diplomacy
+
+    trigger = {
+      diplomacy = 18
+    }
+
+    event_target:tax_discount_target = {
+      add_province_modifier = {
+        modifier = support_people_fundraising
+        duration = 1825
+      }
+    }
+    custom_tooltip = {
+      text = increase_prosperity_event_custom_tooltip
+      hidden_tooltip = {
+        event_target:tax_discount_target = {
+          change_variable = { which = prosperity_value value = 15 }
+        }
+      }
+    }
+  }
+}
