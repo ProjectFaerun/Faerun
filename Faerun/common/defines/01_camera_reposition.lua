@@ -30,7 +30,7 @@ NDefines.NFrontend.FRONTEND_LOOK_Y = 0.0
 NDefines.NFrontend.FRONTEND_LOOK_Z = 2700.0
 
 NDefines.NFrontend.SETTINGS_POS_X = 2400.0
-NDefines.NFrontend.SETTINGS_POS_Y = 150.0
+NDefines.NFrontend.SETTINGS_POS_Y = 250.0
 NDefines.NFrontend.SETTINGS_POS_Z = 1500.0
 NDefines.NFrontend.SETTINGS_LOOK_X = 2200.0
 NDefines.NFrontend.SETTINGS_LOOK_Y = 0.0
