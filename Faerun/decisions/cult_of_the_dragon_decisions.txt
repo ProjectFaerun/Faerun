@@ -32,7 +32,7 @@ society_decisions = {
 					years = 5
 					hidden = yes
 				}
-				increase_visibility_effect = yes
+				increase_visibility_minor_effect = yes
 				character_event = { id = CDR.200 }
 			}
 		}
@@ -88,6 +88,86 @@ society_decisions = {
 
 		ai_will_do = {
 			factor = 1
+		}
+	}
+
+}
+
+title_decisions = {
+
+	establish_cell = {
+		only_playable = yes
+		ai_check_interval = 60
+
+		ai_target_filter = realm_owned
+		filter = realm_owned
+
+		from_potential = {
+			society_rank >= 3
+			society_member_of = cult_of_the_dragon
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				has_society_currency_medium_trigger = yes
+			}
+			custom_tooltip = {
+				text = prepare_grounds_allow_tooltip
+				hidden_trigger = {
+					location = {
+						ROOT_FROM = {
+							NOT = { has_character_flag = preparing_cult_in_@PREV }
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			location = {
+				save_event_target_as = target_cult_province
+			}
+			FROM = {
+				if = {
+					limit = {
+						ai = no
+					}
+					detract_society_currency_medium_effect = yes
+				}
+			}
+			FROM = {
+				if = {
+					limit = {
+						is_society_grandmaster = yes
+					}
+					increase_visibility_minor_effect = yes
+				}
+				if = {
+					limit = {
+						NOT = { is_society_grandmaster = yes }
+					}
+					increase_visibility_effect = yes
+				}
+				set_character_flag = preparing_cult_in_@event_target:target_cult_province
+				character_event = { id = CDR.400 days = 700 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.5
+			}
 		}
 	}
 
