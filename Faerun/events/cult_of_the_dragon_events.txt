@@ -359,7 +359,7 @@ character_event = {
 				any_demesne_province = {
 					remove_province_modifier = secret_cult_cell
 				}
-			}			
+			}
 			20 = {
 				prestige = -10
 			}
@@ -388,6 +388,27 @@ character_event = {
 		name = EVTOPTA_CDR_404
 
 		add_society_currency_minor_effect = yes
+	}
+}
+
+# Cell finds dragon's lair
+character_event = {
+	id = CDR.405
+	hide_window = yes
+
+	trigger = {
+		society_member_of = cult_of_the_dragon
+		any_demesne_province = {
+	    has_province_modifier = secret_cult_cell
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 120
+	}
+
+	immediate = {
+		character_event = { id = CDR.6200 }
 	}
 }
 
@@ -429,4 +450,192 @@ character_event = {
 
     add_trait = lich
   }
+}
+
+###MISSIONS###
+
+#MISSION: Create a dracolich
+character_event = {
+	id = CDR.6200
+	picture = GFX_evt_dragon_1
+	desc = EVTDESC_CDR_6200
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_character = {
+			is_within_diplo_range = ROOT
+			trait = creature_dragon
+			NOR = {
+				trait = lich
+				trait = lich_baelnorn
+				trait = vampire
+				trait = vampire_spawn
+				trait = undead
+			}
+		}
+	}
+
+	immediate = {
+		#Find a dragon
+		random_character = {
+			limit = {
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
+				trait = creature_dragon
+				NOR = {
+					trait = lich
+					trait = lich_baelnorn
+					trait = vampire
+					trait = vampire_spawn
+					trait = undead
+				}
+			}
+			save_event_target_as = dracolich_target
+		}
+	}
+	option = {
+		name = EVTOPTA_CDR_6200
+		if = {
+			limit = {
+				event_target:dracolich_target = { always = yes }
+				is_within_diplo_range = event_target:dracolich_target
+			}
+			random_society_member = {
+				limit = { society_rank = { rank = 4 society = cult_of_the_dragon } }
+				character_event = { id = CDR.6201 }
+			}
+		}
+	}
+}
+
+#Ping event for GM
+character_event = {
+	id = CDR.6201
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { event_target:dracolich_target = { always = yes } }
+			FROM = { society_quest_event = { id = CDR.6202 days = 14 } }
+		}
+	}
+}
+
+#You get your target
+society_quest_event = {
+	id = CDR.6202
+	title = quest_dracolich
+	quest_target = event_target:dracolich_target
+
+	trigger = {
+		is_in_society = yes
+		event_target:dracolich_target = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+	desc = EVTDESC_CDR_6202
+
+	option = {
+		name = ACCEPT
+
+		event_target:dracolich_target = {
+			set_quest_target = {
+				id = quest_dracolich
+				holder = ROOT
+			}
+		}
+
+		event_target:dracolich_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+
+		event_target:dracolich_target = {
+			character_event = { id = CDR.6203 }
+		}
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+		ai_chance = { factor = 0 }
+	}
+}
+
+#event for Dragon target
+character_event = {
+	id = CDR.6203
+  is_triggered_only = yes
+  desc = EVTDESC_CDR_6203
+  picture = GFX_evt_acererak_1
+
+	option = { #yes dracolic
+    name = EVTOPTA_CDR_6203
+		ai_chance = {
+			factor = 0.001
+			modifier = {
+				factor = 10
+				age = 500
+			}
+			modifier = {
+				factor = 10
+				trait = ambitious
+			}
+			modifier = {
+				factor = 10
+				trait = cruel
+			}
+		}
+    add_trait = lich
+		FROM = { character_event = { id = CDR.6204 days = 14 } }
+  }
+
+	option = { #nope
+    name = EVTOPTB_CDR_6203
+
+		FROM = { character_event = { id = CDR.6205 days = 14 } }
+  }
+}
+
+#Success
+character_event = {
+  id = CDR.6204
+  desc = EVTDESC_CDR_6204
+  picture = GFX_evt_dragon_1
+
+  is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_CDR_6204
+		clr_quest = quest_dracolich
+		add_society_currency_major_effect = yes
+	}
+}
+
+#Fail
+character_event = {
+  id = CDR.6205
+  desc = EVTDESC_CDR_6205
+  picture = GFX_evt_dragon_1
+
+  is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_CDR_6205
+		clr_quest = quest_dracolich
+	}
 }
