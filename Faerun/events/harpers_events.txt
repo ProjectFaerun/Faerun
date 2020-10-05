@@ -487,3 +487,116 @@ character_event = {
 		}
   }
 }
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+  id = HRP.110
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = harpers
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = HRP.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = HRP.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_list = {
+			50 = { # do nothing
+			}
+			50 = {
+				trigger = {
+					can_join_society = harpers
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						trait = just
+						trait = scholar
+						trait = socializer
+						trait = schemer
+						trait = charitable
+						trait = patient
+						trait = diligent
+						trait = erudite
+						trait = kind
+						trait = brave
+					}
+				}
+				modifier = {
+					factor = 0
+					trait = cruel
+				}
+				modifier = {
+					factor = 0.5
+					trait = craven
+				}
+				modifier = {
+					factor = 0.2
+					trait = greedy
+				}
+				modifier = {
+					factor = 0.1
+					trait = lich
+				}
+				join_society = harpers
+				random_list = { # Artificially increase society influence for balance purposes, not really useful in my opinion.
+					75 = {
+						modifier = {
+							factor = 0
+							society_influence >= 30
+						}
+					}
+					25 = {
+					}
+				}
+				if = { # Make grandmaster is there is none
+					limit = {
+						NOT = {
+							society = {
+								any_society_member = {
+									is_society_grandmaster = yes
+								}
+							}
+						}
+					}
+					set_society_grandmaster = yes
+				}
+			}
+		}
+	}
+}

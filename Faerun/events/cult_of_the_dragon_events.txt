@@ -110,6 +110,9 @@ character_event = {
 				}
 			}
 		}
+		ai_chance = {
+				factor = 100
+		}
   }
 
 	option = {
@@ -261,7 +264,7 @@ character_event = {
 		name = EVTOPTA_CDR_400
 		event_target:target_cult_province = {
 			add_province_modifier = {
-				name = secret_cult_cell
+				modifier = secret_cult_cell
 				duration = -1
 			}
 		}
@@ -276,6 +279,7 @@ character_event = {
 
 	trigger = {
 		society_member_of = cult_of_the_dragon
+		higher_tier_than = BARON
 		any_demesne_province = {
 	    has_province_modifier = secret_cult_cell
 		}
@@ -300,6 +304,7 @@ character_event = {
 
 	trigger = {
 		society_member_of = cult_of_the_dragon
+		higher_tier_than = BARON
 		any_demesne_province = {
 	    has_province_modifier = secret_cult_cell
 		}
@@ -313,13 +318,19 @@ character_event = {
 		name = EVTOPTA_CDR_402
 
 		scaled_wealth = -0.1
+		ai_chance = {
+				factor = 100
+		}
 	}
 
 	option = { #lose cell
 		name = EVTOPTB_CDR_402
 
 		detract_society_currency_minor_effect = yes
-		any_demesne_province = {
+		random_demesne_province = {
+			limit = {
+				has_province_modifier = secret_cult_cell
+			}
 			remove_province_modifier = secret_cult_cell
 		}
 	}
@@ -332,9 +343,8 @@ character_event = {
 	picture = GFX_evt_secret_ceremony
 
 	trigger = {
-		NOT = {
-			society_member_of = cult_of_the_dragon
-		}
+		NOT = { society_member_of = cult_of_the_dragon }
+		higher_tier_than = BARON
 		any_demesne_province = {
 	    has_province_modifier = secret_cult_cell
 		}
@@ -346,17 +356,24 @@ character_event = {
 
 	option = { #lose money
 		name = EVTOPTA_CDR_403
-
+		ai_chance = {
+			factor = 30
+		}
 		scaled_wealth = -0.05
 	}
 
 	option = { #destroy cell
 		name = EVTOPTB_CDR_403
-
+		ai_chance = {
+			factor = 30
+		}
 		scaled_wealth = -0.2
 		random_list = {
 			80 = {
-				any_demesne_province = {
+				random_demesne_province = {
+					limit = {
+						has_province_modifier = secret_cult_cell
+					}
 					remove_province_modifier = secret_cult_cell
 				}
 			}
@@ -364,6 +381,57 @@ character_event = {
 				prestige = -10
 			}
 		}
+	}
+
+	option = { #join
+		name = EVTOPTC_CDR_403
+		trigger = {
+			is_in_society = no
+			age = 16
+			NOT = {
+				trait = kind
+				trait = charitable
+				trait = cynical
+				culture = monster
+			}
+			OR = {
+				trait = lunatic
+				trait = cruel
+				trait = ambitious
+				trait = greedy
+				trait = half_dragon
+				religion = draconic_pantheon
+				religion = tiamat
+			}
+		}
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 3
+				trait = lunatic
+			}
+			modifier = {
+				factor = 3
+				trait = cruel
+			}
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+			modifier = {
+				factor = 3
+				trait = greedy
+			}
+			modifier = {
+				factor = 3
+				trait = half_dragon
+			}
+			modifier = {
+				factor = 3
+				religion = draconic_pantheon
+			}
+		}
+		join_society = cult_of_the_dragon
 	}
 }
 
@@ -375,6 +443,7 @@ character_event = {
 
 	trigger = {
 		society_member_of = cult_of_the_dragon
+		higher_tier_than = BARON
 		any_demesne_province = {
 	    has_province_modifier = secret_cult_cell
 		}
@@ -614,7 +683,7 @@ character_event = {
 			factor = 0.001
 			modifier = {
 				factor = 10
-				age = 500
+				age = 400
 			}
 			modifier = {
 				factor = 10
@@ -662,5 +731,108 @@ character_event = {
 	option = {
 		name = EVTOPTA_CDR_6205
 		clr_quest = quest_dracolich
+	}
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+  id = CDR.110
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = cult_of_the_dragon
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = CDR.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = CDR.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_list = {
+			50 = { # do nothing
+			}
+			50 = {
+				trigger = {
+					can_join_society = cult_of_the_dragon
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						trait = lunatic
+						trait = impaler
+						trait = theologian
+						trait = scholar
+						trait = mystic
+						trait = erudite
+						trait = cruel
+						trait = greedy
+					}
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						trait = kind
+						trait = charitable
+						trait = cynical
+					}
+				}
+				join_society = cult_of_the_dragon #join the society
+				random_list = { # Artificially increase society influence for balance purposes, not really useful in my opinion.
+					75 = {
+						modifier = {
+							factor = 0
+							society_influence >= 30
+						}
+					}
+					25 = {
+					}
+				}
+				if = { # Make grandmaster is there is none
+					limit = {
+						NOT = {
+							society = {
+								any_society_member = {
+									is_society_grandmaster = yes
+								}
+							}
+						}
+					}
+					set_society_grandmaster = yes
+				}
+			}
+		}
 	}
 }
