@@ -1,0 +1,917 @@
+namespace = BFL
+
+#long live the brotherhood
+character_event = {
+	id = BFL.8000
+	picture = GFX_evt_feast
+	border = GFX_event_normal_frame_diplomacy
+	desc = EVTDESC_BFL_8000
+
+	capable_only = yes
+	prisoner = no
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_landed = yes
+		primary_title = {
+			is_landless_type_title = no
+		}
+		NOT = { is_inaccessible_trigger = yes }
+		any_independent_ruler = {
+			NOR = {
+				is_inaccessible_trigger = yes
+				war_with = ROOT
+			}
+			has_landed_title = k_a_brotherhood
+			is_within_diplo_range = ROOT
+		}
+	}
+
+	immediate = {
+		ROOT = { capital_scope = { save_event_target_as = capital } }
+		random_independent_ruler = {
+			limit = {
+				NOR = {
+					is_inaccessible_trigger = yes
+					war_with = ROOT
+				}
+
+				primary_title = {
+					is_landless_type_title = no
+				}
+        has_landed_title = d_brotherhood_of_true_flame
+        is_within_diplo_range = ROOT
+			}
+			save_event_target_as = target_ruler
+		}
+	}
+
+	option = {
+		name = EVTOPTA_BFL_8000
+		ai_chance = {
+			factor = 100
+		}
+		show_portrait = event_target:target_ruler
+		custom_tooltip = {
+			text = EVTOPTA_BFL_8000_TOOLTIP
+			hidden_tooltip = {
+				event_target:target_ruler = {
+					letter_event = { id = BFL.8001 days = 3 }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_BFL_8000
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+#Suggestion to form alliance
+letter_event = {
+  id = BFL.8001
+  picture = GFX_evt_feast
+  desc = EVTDESC_BFL_8001
+
+	is_triggered_only = yes
+
+	#accept
+	option = {
+		name = EVTOPTA_BFL_8001
+		ai_chance = {
+			factor = 100
+		}
+		custom_tooltip = {
+			text = EVTOPTA_BFL_8001_TOOLTIP
+			hidden_tooltip = {
+				FROM = {
+					letter_event = { id = BFL.8002 days = 3 }
+				}
+			}
+			opinion = {
+				modifier = in_non_aggression_pact
+				years = 10
+				who = FROM
+				origin_description = EVTTITLE_BFL_8001
+			}
+      FROM = {
+        opinion = {
+          modifier = in_non_aggression_pact
+          years = 10
+          who = ROOT
+          origin_description = EVTTITLE_BFL_8001
+        }
+      }
+    }
+    add_alliance = {
+      who = FROM
+      years = 10
+    }
+	}
+	#decline
+	option = {
+		name = EVTOPTB_BFL_8001
+		ai_chance = {
+			factor = 0
+		}
+		custom_tooltip = {
+			text = EVTOPTB_BFL_8001_TOOLTIP
+			FROM = {
+				letter_event = { id = BFL.8003 days = 3 }
+			}
+		}
+	}
+}
+
+#accepted the offer
+letter_event = {
+  id = BFL.8002
+  picture = GFX_evt_feast
+  desc = EVTDESC_BFL_8002
+
+	is_triggered_only = yes
+
+	#accept
+	option = {
+		name = EVTOPTA_BFL_8002
+		custom_tooltip = {
+			text = EVTOPTA_BFL_8002_TOOLTIP
+		}
+	}
+}
+
+#declined the offer
+letter_event = {
+  id = BFL.8003
+  picture = GFX_evt_feast
+  desc = EVTDESC_BFL_8003
+
+	is_triggered_only = yes
+
+	#accept
+	option = {
+		name = EVTOPTA_BFL_8003
+	}
+}
+
+# Get claim on Bonfire
+character_event = {
+  id = BFL.500
+  is_triggered_only = yes
+  desc = EVTDESC_BFL_500
+  picture = GFX_evt_stressed_ruler
+  border = GFX_event_normal_frame_economy
+
+	option = { #get claim
+		name = EVTOPTA_BFL_500
+		ai_chance = {
+			factor = 100
+		}
+		if = {
+			limit = {
+				AND = {
+					independent = yes
+					d_brotherhood_of_true_flame = {
+						has_holder = no
+					}
+				}
+			}
+			grant_title = d_brotherhood_of_true_flame
+		}
+		else = {
+			add_claim = d_brotherhood_of_true_flame
+		}
+	}
+
+  option = { #oopsie
+    name = EVTOPTB_BFL_500
+    random = {
+      chance = 50
+      add_trait = paranoid
+    }
+  }
+}
+
+########################JOINING############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = BFL.100
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = brotherhood_of_true_flame } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = brotherhood_of_true_flame
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = BFL.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = brotherhood_of_true_flame
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = BFL.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = brotherhood_of_true_flame
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = BFL.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = brotherhood_of_true_flame
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = BFL.101 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = BFL.101 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = BFL.101
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = BFL.102 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = BFL.102
+    desc = EVTDESC_BFL_102
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_BFL_102
+
+      join_society = brotherhood_of_true_flame
+
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+  id = BFL.110
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = brotherhood_of_true_flame
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = BFL.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = BFL.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_list = {
+			50 = { # do nothing
+			}
+			50 = {
+				trigger = {
+					can_join_society = brotherhood_of_true_flame
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						trait = zealous
+						z_wizard = yes
+						trait = schemer
+						trait = scholar
+						trait = impaler
+						trait = mystic
+						trait = proud
+						trait = envious
+						trait = ambitious
+						trait = cruel
+						trait = erudite
+						trait = deceitful
+					}
+				}
+				modifier = {
+					factor = 0
+						trait = kind
+				}
+				join_society = brotherhood_of_true_flame
+				random_list = { # Artificially increase society influence for balance purposes, not really useful in my opinion.
+					75 = {
+						modifier = {
+							factor = 0
+							society_influence >= 30
+						}
+					}
+					25 = {
+					}
+				}
+				if = { # Make grandmaster is there is none
+					limit = {
+						NOT = {
+							society = {
+								any_society_member = {
+									is_society_grandmaster = yes
+								}
+							}
+						}
+					}
+					set_society_grandmaster = yes
+				}
+			}
+		}
+	}
+}
+
+###########MISSIONS###########
+
+#Mission tombola
+character_event = {
+    id = BFL.1000
+    hide_window = yes
+
+    is_triggered_only = yes
+    capable_only = yes
+	is_in_society = yes
+
+	trigger = {
+		society_member_of = brotherhood_of_true_flame
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+		prisoner = no
+		society = {
+			any_society_member = {
+				NOT = { character = ROOT }
+				prisoner = no
+				is_within_diplo_range = ROOT
+				opinion = { who = ROOT value = 0 }
+			}
+		}
+	}
+
+    immediate = {
+    	#Picks out mission giver
+    	random_list = {
+    		20 = { #International society member
+    			society = {
+    				any_society_member = {
+    					limit = {
+							NOT = { character = ROOT }
+							prisoner = no
+    						is_within_diplo_range = ROOT
+							opinion = { who = ROOT value = 0 }
+    					}
+    					save_event_target_as = hermetic_collaborator
+    				}
+    			}
+    		}
+    		40 = { #Realm society member
+    			trigger = {
+    				society = {
+    					any_society_member = {
+    						NOT = { character = ROOT }
+    						prisoner = no
+    						is_within_diplo_range = ROOT
+							opinion = { who = ROOT value = 0 }
+							same_realm = ROOT
+    					}
+    				}
+    			}
+    			society = {
+    				any_society_member = {
+    					limit = {
+    						NOT = { character = ROOT }
+    						prisoner = no
+    						is_within_diplo_range = ROOT
+							opinion = { who = ROOT value = 0 }
+							same_realm = ROOT
+    					}
+    					save_event_target_as = hermetic_collaborator
+    				}
+    			}
+    		}
+    		40 = { #Apprentice
+    			trigger = {
+    				any_courtier_or_vassal = { has_minor_title =  title_flame_brotherhood_apprentice prisoner = no }
+					society_member_of = brotherhood_of_true_flame
+    			}
+    			random_courtier_or_vassal = {
+    				limit = { has_minor_title =  title_flame_brotherhood_apprentice }
+    				save_event_target_as = hermetic_collaborator
+    			}
+    		}
+    	}
+
+
+    	#Randomizes mission
+    	random_list = {
+
+    		25 = { #Find an apprentice
+    			trigger = {
+    				NOT = { any_courtier_or_vassal = { has_minor_title =  title_flame_brotherhood_apprentice } }
+    				ai = no
+    			}
+    			event_target:hermetic_collaborator = { character_event = { id = BRO.1404 days = 7 random = 7 } }
+    		}
+
+			25 = { #Build a laboratory
+				trigger = {
+					NOT = { has_character_flag = building_laboratory }
+					NOT = { has_character_flag = built_laboratory }
+					OR = {
+    					ai = no
+    					society_rank == 4
+    				}
+    				is_landed = yes
+				}
+				event_target:hermetic_collaborator = { character_event = { id = BRO.1120 days = 7 random = 7 } }
+			}
+
+			25 = { #Acquire/gather ingredients
+				trigger = {
+					is_landed = yes
+					NOT = {
+						any_artifact = {
+							has_artifact_flag = ingredient
+						}
+					}
+					event_target:hermetic_collaborator = { ai = yes }
+				}
+				event_target:hermetic_collaborator = { character_event = { id = BRO.1801 days = 7 random = 7 } }
+			}
+
+    		25 = { #Infiltrate lab
+    			trigger = {
+    				society = {
+    					any_society_member = {
+    						is_within_diplo_range = ROOT
+    						NOR = {
+    							character = ROOT
+    							character = event_target:hermetic_collaborator
+    							reverse_opinion = { who = event_target:hermetic_collaborator value = 20 }
+    							reverse_opinion = { who = ROOT value = 20 }
+    							has_character_flag = infiltration_rival
+    							has_character_flag = infiltration_mutual_dislike
+    							has_character_flag = infiltration_rich
+    						}
+    					}
+    				}
+    			}
+    			event_target:hermetic_collaborator = { character_event = { id = BRO.1430 days = 7 random = 7 } }
+    		}
+
+			105 = { # AI bypasses missions at times
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				random_list = {
+					70 = {
+						modifier = {
+							factor = 0.9
+							society_influence >= 30
+						}
+						modifier = {
+							factor = 0.9
+							society_influence >= 40
+						}
+						modifier = {
+							factor = 0.8
+							society_influence >= 50
+						}
+						modifier = {
+							factor = 0.7
+							society_influence >= 70
+						}
+						modifier = {
+							factor = 0.6
+							society_influence >= 80
+						}
+						modifier = {
+							factor = 0.5
+							society_influence >= 90
+						}
+						add_mission_succeed_influence_effect = yes
+					}
+					30 = {
+						add_mission_fail_influence_effect = yes
+					}
+				}
+			}
+
+			175 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+    	}
+    }
+}
+
+
+
+
+#Misc: apprenticeship
+#Ping event for apprenticeship completion
+character_event = {
+    id = BFL.1413
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	liege = {
+    		character = FROMFROM
+    		is_alive = yes
+    		society_member_of = brotherhood_of_true_flame
+    	}
+    	has_minor_title = title_flame_brotherhood_apprentice
+
+    }
+    immediate = { FROMFROM = { character_event = { id = BFL.1414 } } }
+}
+
+#Apprenticeship completion
+character_event = {
+    id = BFL.1414
+    desc = EVTDESC_MNM_1414
+    picture = GFX_evt_gathering_of_minds
+    border = GFX_event_normal_frame_religion
+
+    is_triggered_only = yes
+
+    option = {
+		name = EVTOPTA_MNM_1414
+
+        add_society_currency_major_effect = yes
+
+        FROM = {
+        	set_character_flag = completed_apprenticeship
+        	remove_title = title_flame_brotherhood_apprentice
+        	change_learning = 2
+        }
+    }
+}
+
+#Apprentice died
+character_event = {
+    id = BFL.1415
+    hide_window = yes
+    is_triggered_only = yes
+
+    is_in_society = yes
+    ai = yes
+
+    trigger = {
+    	society_member_of = brotherhood_of_true_flame
+    	has_minor_title = title_flame_brotherhood_apprentice
+		NOR = {
+			death_no_trace_trigger = yes
+			death_in_shou_lung_trigger = yes
+		}
+    }
+
+    immediate = {
+    	any_player = {
+	    	limit = {
+				ROOT = {
+					has_opinion_modifier = {
+						who = PREV
+						modifier = opinion_hermetic_apprentice
+					}
+				}
+			}
+    		character_event = { id = BFL.1416 }
+    		if = {
+    			limit = { has_character_flag = apprentice_hermetic_gathering }
+    			clear_delayed_event = { id = BRO.1825 }
+    			character_event = { id = BRO.1825 }
+    		}
+    	}
+    }
+}
+
+#Notification of dead apprentice
+character_event = {
+    id = BFL.1416
+    picture = GFX_evt_death
+    border = GFX_event_normal_frame_religion
+
+    desc = {
+    	trigger = {
+    		NOR = {
+    			NOT = { opinion = { value = 0 who = FROM } }
+    			NOT = { FROM = { learning = 12 } }
+    		}
+    	}
+    	text = EVTDESC_MNM_1416_A
+    }
+    desc = {
+    	trigger = {
+    		OR = {
+    			NOT = { opinion = { value = 0 who = FROM } }
+    			NOT = { FROM = { learning = 12 } }
+    		}
+    	}
+    	text = EVTDESC_MNM_1416_B
+    }
+
+    is_triggered_only = yes
+
+    option = {
+        name = EVTOPTA_MNM_1416
+    }
+}
+
+
+#Clear Apprentice title upon death or leaving Hermetics
+character_event = {
+	id = BFL.1611
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		society_member_of = brotherhood_of_true_flame
+	}
+
+	immediate = {
+		any_courtier_or_vassal = {
+			limit = {
+				has_minor_title = title_flame_brotherhood_apprentice
+			}
+			remove_title = title_flame_brotherhood_apprentice
+		}
+	}
+}
+
+###########################################################
+#########    Inherited ingredient set-up event    #########
+###########################################################
+character_event = {
+    id = BFL.5107
+    hide_window = yes
+    is_triggered_only = yes
+
+    trigger = {
+    	FROM = { has_artifact_flag = ingredient } #the artifact inherited must be an ingredient...
+    	NOT = { has_character_flag = dealing_with_inherited_ingredients } #you mustn't already dealing with this...
+    }
+
+    immediate = {
+    	set_character_flag = dealing_with_inherited_ingredients
+    	FROMFROM = { save_event_target_as = previous_ingredient_owner } #does this work on dead folk?
+    	character_event = { id = BFL.5108 }
+    }
+}
+
+#Dealing with inherited ingredients - delays the visible event
+character_event = {
+    id = BFL.5108
+    hide_window = yes
+    is_triggered_only = yes
+
+    immediate = {
+    	if = {
+    		limit = {
+    			ai = yes
+    			FROMFROM = { has_artifact_flag = ingredient }
+    		}
+    		FROMFROM = { destroy_artifact = yes }
+    	}
+    	if = {
+    		limit = {
+    			ai = no
+    			NOT = { has_character_flag = owns_inherited_ingredients }
+    		}
+    		set_character_flag = owns_inherited_ingredients
+    		character_event = { id = BFL.5108 days = 10 } #if this is the first instance of this event, send this event again to check if you ever inherited more than one ingredient...
+    		break = yes
+    	}
+    	if = { #run second time around
+    		limit = {
+    			ai = no
+    			has_character_flag = owns_inherited_ingredients
+    			any_artifact = {
+    				count = 2
+    				has_artifact_flag = ingredient
+    			}
+    		}
+    		repeat_event = { id = BFL.5109 } #send visible event
+    	}
+    }
+}
+
+#Inherited ingredients - keep or no?
+character_event = {
+    id = BFL.5109
+    picture = GFX_evt_experiment
+    border = GFX_event_normal_frame_religion
+    is_triggered_only = yes
+
+    desc = {
+    	text = EVTDESC_MNM_5109_hermetic
+    	trigger = {
+    		society_member_of = brotherhood_of_true_flame
+    	}
+    }
+    desc = {
+    	text = EVTDESC_MNM_5109_other_society
+    	trigger = {
+    		NOT = { society_member_of = brotherhood_of_true_flame }
+    		is_in_society = yes
+    	}
+    }
+    desc = {
+    	text = EVTDESC_MNM_5109_no_society
+    	trigger = {
+    		is_in_society = no
+    	}
+    }
+    desc = {
+    	text = EVTDESC_MNM_5109_child
+    	trigger = {
+    		NOT = { age = 16 }
+    	}
+    }
+
+    immediate = {
+    	select_random_hermetic_ingredient_effect = yes
+    	select_random_hermetic_ingredient_effect = yes
+    }
+
+    option = {
+        name = EVTOPTA_MNM_5109
+        destroy_selected_ingredient_1_and_2_effect = yes
+        piety = 25
+        ai_chance = { factor = 5 }
+    }
+    option = {
+        name = EVTOPTB_MNM_5109
+        destroy_all_ingredients_effect = yes
+        piety = 25
+        prestige = 25
+        ai_chance = { factor = 100 }
+    }
+    option = {
+        name = EVTOPTC_MNM_5109
+    }
+
+    after = {
+    	remove_selection_of_ingredients_effect = yes
+    	clr_character_flag = owns_inherited_ingredients
+    	clr_character_flag = dealing_with_inherited_ingredients
+    }
+}
+
+#Paranoid ward-making (random event, fired from on_society_bi_yearly_pulse)
+character_event = {
+    id = BFL.5110
+    desc = EVTDESC_MNM_5110
+    picture = GFX_evt_shady_meeting
+    border = GFX_event_normal_frame_intrigue
+    is_triggered_only = yes
+    capable_only = yes
+
+    trigger = {
+    	society_member_of = brotherhood_of_true_flame
+    	NOT = { has_character_flag = small_defense_against_dark_forces }
+    	NOT = { has_character_flag = medium_defense_against_dark_forces }
+    	NOT = { has_character_flag = large_defense_against_dark_forces }
+
+    	OR = {
+	    	NOT = {
+		    	has_game_rule = {
+					name = supernatural_events
+					value = off
+				}
+			}
+			NOT = {
+		    	has_game_rule = {
+					name = devil_worshipers
+					value = none
+				}
+			}
+    	}
+
+		any_artifact = {
+			count = 3
+			has_artifact_flag = ingredient
+		}
+    }
+
+    immediate = {
+    	select_random_hermetic_ingredient_effect = yes
+    	select_random_hermetic_ingredient_effect = yes
+    }
+
+    option = { #One ingredient is fine
+        name = EVTOPTA_MNM_5110
+        prestige = 15
+        piety = -10
+        destroy_selected_ingredient_1_effect = yes
+
+    	clr_character_flag = small_defense_against_dark_forces
+    	clr_character_flag = medium_defense_against_dark_forces
+    	clr_character_flag = large_defense_against_dark_forces
+        set_character_flag = small_defense_against_dark_forces
+
+        ai_chance = { factor = 10 }
+    }
+    option = { #I want to use both ingredients
+        name = EVTOPTB_MNM_5110
+        prestige = 25
+        piety = -20
+        destroy_selected_ingredient_1_and_2_effect = yes
+
+        clr_character_flag = small_defense_against_dark_forces
+    	clr_character_flag = medium_defense_against_dark_forces
+    	clr_character_flag = large_defense_against_dark_forces
+        set_character_flag = medium_defense_against_dark_forces
+
+        ai_chance = { factor = 10 }
+    }
+    option = { #I'll cover my quarters in these things!
+        name = EVTOPTC_MNM_5110
+        prestige = 35
+        piety = -30
+        destroy_all_ingredients_effect = yes
+
+        clr_character_flag = small_defense_against_dark_forces
+    	clr_character_flag = medium_defense_against_dark_forces
+    	clr_character_flag = large_defense_against_dark_forces
+        set_character_flag = large_defense_against_dark_forces
+
+        ai_chance = { factor = 100 }
+    }
+    option = { #this is paranoia!
+        name = EVTOPTD_MNM_5110
+        ai_chance = { factor = 0 }
+    }
+    after = {
+    	remove_selection_of_ingredients_effect = yes
+    }
+}
