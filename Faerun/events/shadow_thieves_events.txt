@@ -712,3 +712,110 @@ narrative_event = {
 		}
 	}
 }
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+	id = STH.110
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				society_member_of = shadow_thieves
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				is_adult = yes
+				is_in_society = no
+				controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = STH.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = STH.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      50 = { # do nothing
+      }
+      50 = {
+        trigger = {
+          can_join_society = shadow_thieves
+        }
+        modifier = {
+          factor = 2
+					OR = {
+						trait = envious
+						trait = seducer
+						trait = seductress
+						trait = impaler
+						trait = schemer
+						trait = greedy
+						trait = deceitful
+						z_rogue_classes = yes
+					}
+        }
+        modifier = {
+          factor = 0.2
+          trait = kind
+        }
+        modifier = {
+          factor = 0
+          trait = honest
+        }
+        modifier = {
+          factor = 0.1
+          trait = charitable
+        }
+        join_society = shadow_thieves
+        random_list = { # Artificially increase society influence for balance purposes, not really useful in my opinion.
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
