@@ -1,0 +1,1061 @@
+#Druid spellcasting
+
+decisions = {
+
+#Universal spells
+
+	dispel_druid = {
+		ai_check_interval = 30
+		potential = {
+			z_druid = yes
+			OR = {
+				ai = yes
+				has_character_flag = druid_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HASBADSPELL
+				hidden_tooltip = {
+					has_bad_spell_effect = yes
+				}
+			}
+			custom_tooltip = {
+				text = HAS10SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_dispel_cooldown }
+						had_character_flag = { flag = spell_dispel_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -10 } }
+			set_character_flag = spell_dispel_cooldown
+
+			dispel_minor_magic = yes
+		}
+		ai_will_do = {
+			factor = 0.1
+		}
+	}
+
+	wild_shape = {
+		ai_check_interval = 12
+		potential = {
+			z_druid = yes
+			OR = {
+				ai = yes
+				has_character_flag = druid_spellbook_open
+			}
+			hidden_tooltip = {
+				OR = {
+					ai = no
+					AND = {
+						has_character_flag = is_in_duel
+						NOT = { had_character_flag = { flag = is_in_duel months = 1 } }
+					}
+				}
+			}
+		}
+		allow = {
+			NOT = { has_character_modifier = tensers_transformation_mod }
+			NOT = { has_character_modifier = wild_shape_mod }
+			NOT = { has_character_modifier = improved_wild_shape_mod }
+			NOT = { has_character_modifier = expert_wild_shape_mod }
+			NOT = { has_character_modifier = master_wild_shape_mod }
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = TRAINEDDRUIDHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = trained_druid
+						trait = journeyman_druid
+						trait = expert_druid
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS5SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 5 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_wild_shape_cooldown }
+						had_character_flag = { flag = spell_wild_shape_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_wild_shape_cooldown
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -5 } }
+			if = {
+				limit = {
+					trait = trained_druid
+				}
+				add_character_modifier = {
+					name = wild_shape_mod
+					months = 1
+				}
+			}
+			else_if = {
+				limit = {
+					trait = journeyman_druid
+				}
+				add_character_modifier = {
+					name = improved_wild_shape_mod
+					months = 1
+				}
+			}
+			else_if = {
+				limit = {
+					trait = expert_druid
+				}
+				add_character_modifier = {
+					name = expert_wild_shape_mod
+					months = 1
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+				add_character_modifier = {
+					name = master_wild_shape_mod
+					months = 1
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	#call_lightning
+
+	#conjure_natural_allies
+
+	#wall_of_stone
+
+	#fire_storm
+
+	#blight
+
+	#weather
+
+}
+
+
+targeted_decisions = {
+
+#Universal spells
+
+	spell_lesser_restoration_druid = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+			NOR = { #if it's this bad they need greater restoration
+				trait = incapable
+				trait = sick_incapable
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_druid
+							trait = expert_druid
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -10 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ONEDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					remove_character_modifier = mild_illness
+					remove_character_modifier = severe_illness
+					remove_character_modifier = bedridden_illness
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						random_list = {
+							40 = {
+								modifier = {
+									NOT = { trait = flu }
+									factor = 0
+								}
+								remove_trait = flu
+								clr_character_flag = manifest_flu
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = dysentery }
+									factor = 0
+								}
+								remove_trait = dysentery
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = rabies }
+									factor = 0
+								}
+								remove_trait = rabies
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = has_measles }
+									factor = 0
+								}
+								remove_trait = has_measles
+							}
+							40 = {
+								modifier = {
+									NOT = {
+										trait = food_poisoning
+									}
+									factor = 0
+								}
+								remove_trait = food_poisoning
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = gout }
+									factor = 0
+								}
+								remove_trait = gout
+							}
+							40 = {
+								modifier = {
+									NOT = { trait = scurvy }
+									factor = 0
+								}
+								remove_trait = scurvy
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = lovers_pox }
+									factor = 0
+								}
+								remove_trait = lovers_pox
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = cancer }
+									factor = 0
+								}
+								remove_trait = cancer
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = pneumonic }
+									factor = 0
+								}
+								remove_trait = pneumonic
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = syphilitic }
+									factor = 0
+								}
+								remove_trait = syphilitic
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = leper }
+									factor = 0
+								}
+								remove_trait = leper
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_tuberculosis}
+									factor = 0
+								}
+								remove_trait = has_tuberculosis
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_aztec_disease}
+									factor = 0
+								}
+								remove_trait = has_aztec_disease
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_small_pox}
+									factor = 0
+								}
+								remove_trait = has_small_pox
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_bubonic_plague}
+									factor = 0
+								}
+								remove_trait = has_bubonic_plague
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhus}
+									factor = 0
+								}
+								remove_trait = has_typhus
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhoid_fever}
+									factor = 0
+								}
+								remove_trait = has_typhoid_fever
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_greater_restoration_druid = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -10 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						#Greater restoration clears every disease
+						remove_trait = flu
+						remove_trait = dysentery
+						remove_trait = rabies
+						remove_trait = has_measles
+						remove_trait = food_poisoning
+						remove_trait = gout
+						remove_trait = scurvy
+						remove_trait = lovers_pox
+						remove_trait = cancer
+						remove_trait = pneumonic
+						remove_trait = syphilitic
+						remove_trait = leper
+						remove_trait = has_tuberculosis
+						remove_trait = has_aztec_disease
+						remove_trait = has_small_pox
+						remove_trait = has_bubonic_plague
+						remove_trait = has_typhus
+						remove_trait = has_typhoid_fever
+						#We also remove any symptoms even if they haven't developed into disease yet
+						remove_trait = abdominal_pain
+						remove_trait = chest_pain
+						remove_trait = cough
+						remove_trait = cramps
+						remove_trait = diarrhea
+						remove_trait = fatigue
+						remove_trait = fever
+						remove_trait = headache
+						remove_trait = infection
+						remove_trait = malaise
+						remove_trait = rash
+						remove_trait = vomiting
+						#also clear the flags so they don't keep getting sick
+						clr_character_flag = developing_illness
+						clr_character_flag = got_flu
+						clr_character_flag = manifest_flu
+						remove_character_modifier = mild_illness
+						remove_character_modifier = severe_illness
+						remove_character_modifier = bedridden_illness
+						#lastly remove incapable
+						remove_trait = incapable
+						remove_trait = sick_incapable
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_heal_druid = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_druid
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_healing_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -15 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLINJURIESCURED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+
+		}
+	}
+
+	spell_regenerate_druid = {
+		ai_check_interval = 5
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+				trait = disfigured
+				trait = one_eyed
+				trait = one_handed
+				trait = one_legged
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS30SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 30 }
+					}
+				}
+				custom_tooltip = {
+					text = RENOWNEDDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_healing_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -30 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLREGENERATED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+					remove_trait = one_eyed
+					remove_trait = disfigured
+					remove_trait = one_legged
+					remove_trait = one_handed
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+		}
+	}
+}
+
+settlement_decisions = {
+
+	spell_restoration_prov_druid = {
+		ai_check_interval = 5
+		filter = realm_owned
+		ai_target_filter = realm_owned
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			location = { has_disease = yes }
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_druid
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -20 } } }
+
+			random_list = {
+				1 = {
+					location = {
+						reduce_disease = 1.0 # *should* remove it completely
+					}
+					hidden_tooltip = {
+						if = {
+							limit = {
+								location = {
+									holder_scope = {
+										NOT = { character = FROM }
+									}
+								}
+							}
+							location = {
+								holder_scope = {
+									opinion = {
+										modifier = cured_my_lands
+										who = FROM
+										years = 5
+									}
+									if = {
+										limit = {
+											ai = no
+										}
+										repeat_event = { id = spellaux.9 }
+									}
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								location = {
+									holder_scope = {
+										ai = no
+										character = FROM
+									}
+								}
+							}
+							location = {
+								FROM = { character_event = { id = spellaux.10 } }
+							}
+						}
+					}
+				}
+				1 = {
+					FROM = {
+						if = {
+							limit = {
+								ai = no
+							}
+							character_event = { id = spellaux.11 }
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				location = {
+					holder_scope = {
+						character = ROOT
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = patron_talona }
+			}
+		}
+	}
+
+}
