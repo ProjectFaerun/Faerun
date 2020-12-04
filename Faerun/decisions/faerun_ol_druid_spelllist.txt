@@ -151,17 +151,371 @@ decisions = {
 		}
 	}
 
-	#call_lightning
+	spell_call_lightning = {
+		ai_check_interval = 7
+		potential = {
+			z_druid = yes
+			OR = {
+				ai = yes
+				has_character_flag = druid_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = TRAINEDDRUIDHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = trained_druid
+						trait = journeyman_druid
+						trait = expert_druid
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS7SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 7 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_call_lightning_cooldown }
+						had_character_flag = { flag = spell_call_lightning_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_call_lightning_cooldown
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -7 } }
+			hidden_tooltip = {
+				combat = {
+					enemy = {
+						any_unit_leader = {
+							repeat_event = { id = spellaux.24 }
+						}
+					}
+				}
+				combat = {
+					enemy = {
+						any_unit_leader = {
+							combat = {
+								damage_unit = { percentage = 5 }
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
 
-	#conjure_natural_allies
+	spell_conjure_natural_allies = {
+		ai_check_interval = 10
+		potential = {
+			z_druid = yes
+			OR = {
+				AND = {
+					ai = yes
+					is_ruler = yes
+				}
+				has_character_flag = druid_spellbook_open
+			}
+		}
+		allow = {
+			war = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = druid_natural_allies }
+				}
+			}
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 15 }
+				}
+			}
+			custom_tooltip = {
+				text = JOURNEYMANDRUIDHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = journeyman_druid
+						trait = expert_druid
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_conjure_natural_allies_cooldown }
+						had_character_flag = { flag = spell_conjure_natural_allies_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_conjure_natural_allies_cooldown
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -15 } }
+			location = {
+				ROOT = {
+					spawn_unit = {
+						province = PREV
+						home = PREV
+						owner = THIS
+						earmark = druid_natural_allies
+						troops = {
+							archers = { 300 300 }
+							light_infantry = { 700 700 }
+							heavy_infantry = { 100 100 }
+						}
+						cannot_inherit = yes
+						attrition = 0.4
+						maintenance_multiplier = 0.1
+						can_toggle_looting = no
+						reinforces = no
+					}
+				}
+			}
+			hidden_tooltip = { character_event = { id = spellaux.19 months = 5 } }
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
 
-	#wall_of_stone
+	spell_conjure_elementals_druid = {
+		ai_check_interval = 10
+		potential = {
+			z_druid = yes
+			OR = {
+				AND = {
+					ai = yes
+					is_ruler = yes
+				}
+				has_character_flag = druid_spellbook_open
+			}
+		}
+		allow = {
+			war = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = druid_elementals }
+				}
+			}
+			custom_tooltip = {
+				text = HAS12SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 12 }
+				}
+			}
+			custom_tooltip = {
+				text = EXPERTDRUIDHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = expert_druid
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_conjure_elementals_cooldown }
+						had_character_flag = { flag = spell_conjure_elementals_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_conjure_elementals_cooldown
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -12 } }
+			location = {
+				ROOT = {
+					spawn_unit = {
+						province = PREV
+						home = PREV
+						owner = THIS
+						earmark = druid_elementals
+						troops = {
+							elemental_troops = { 600 600 }
+						}
+						cannot_inherit = yes
+						attrition = 0
+						maintenance_multiplier = 0
+						can_toggle_looting = no
+						reinforces = no
+					}
+				}
+			}
+			hidden_tooltip = { character_event = { id = spellaux.40 months = 5 } }
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
 
-	#fire_storm
+	spell_wall_of_stone_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_druid = yes
+			has_character_flag = druid_spellbook_open
+		}
 
-	#blight
+		allow = {
+			always = no
+		}
 
-	#weather
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_fire_storm = {
+		ai_check_interval = 7
+		potential = {
+			z_druid = yes
+			OR = {
+				ai = yes
+				has_character_flag = druid_spellbook_open
+			}
+		}
+		allow = {
+			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = MASTERDRUIDHIGHER
+				hidden_tooltip = {
+					OR = {
+						trait = master_druid
+						trait = renowned_druid
+						trait = legendary_druid
+					}
+				}
+			}
+			custom_tooltip = {
+				text = HAS23SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = druidspellpoints value = 23 }
+				}
+			}
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = spell_fire_storm_cooldown }
+						had_character_flag = { flag = spell_fire_storm_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = spell_fire_storm_cooldown
+			hidden_tooltip = { change_variable = { which = druidspellpoints value = -23 } }
+			hidden_tooltip = {
+				combat = {
+					enemy = {
+						any_unit_leader = {
+							repeat_event = { id = spellaux.31 }
+						}
+						combat = {
+							damage_unit = { percentage = 15 }
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+
+	spell_blight_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_druid = yes
+			has_character_flag = druid_spellbook_open
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_controlweather_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		potential = {
+			ai = no
+			z_druid = yes
+			has_character_flag = druid_spellbook_open
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
 
 }
 
@@ -1054,6 +1408,492 @@ settlement_decisions = {
 			modifier = {
 				factor = 0.1
 				FROM = { trait = patron_talona }
+			}
+		}
+	}
+
+	spell_wall_of_stone_druid = {
+		ai_check_interval = 24
+		filter = realm_owned
+		ai_target_filter = realm_owned
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			location = {
+				has_siege = yes
+				NOT = { has_province_modifier = spell_wall_of_stone_mod }
+			}
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_druid
+							trait = expert_druid
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_wall_of_stone_cooldown }
+							had_character_flag = { flag = spell_wall_of_stone_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_wall_of_stone_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -10 } } }
+			location = {
+				add_province_modifier = {
+					name = spell_wall_of_stone_mod
+					months = 4
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				FROM = { trait = diligent }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+		}
+	}
+
+	spell_blight_druid = {
+		ai_check_interval = 5
+		filter = all
+		ai_target_filter = all
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			location = { NOT = { has_disease = yes } }
+			location = { holder_scope = { is_foe = FROM } }
+			OR = {
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_druid
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_blight_cooldown }
+							had_character_flag = { flag = spell_blight_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_blight_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -20 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.39 }
+						}
+					}
+				}
+			}
+			location = {
+				random_list = {
+					1 = {
+						spawn_disease = tuberculosis
+					}
+					1 = {
+						spawn_disease = typhoid_fever
+					}
+					1 = {
+						spawn_disease = typhus
+					}
+					1 = {
+						spawn_disease = measles
+					}
+					1 = {
+						spawn_disease = small_pox
+					}
+					1 = {
+						spawn_disease = syphilis
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0.3
+				FROM = { trait = charitable }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = patron_talona }
+			}
+		}
+	}
+
+	spell_controlweather_druid = {
+		ai_check_interval = 5
+		filter = all
+		ai_target_filter = all
+
+		from_potential = {
+			z_druid = yes
+		}
+		potential = {
+			location = { holder_scope = { is_foe = FROM } }
+			OR = {
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+				holder_scope = {
+					character = FROM
+				}
+
+			}
+		}
+		allow = {
+			FROM = {
+				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = druidspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = RENOWNEDDRUIDHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = renowned_druid
+							trait = legendary_druid
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_controlweather_cooldown }
+							had_character_flag = { flag = spell_controlweather_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_controlweather_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = druidspellpoints value = -20 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.39 }
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+			location = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								character = FROM
+							}
+						}
+					}
+					add_province_modifier = {
+						name = africa_light_rain
+						months = 12
+					}
+                }
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}
+					}
+				}
+
+
+			}
+			any_neighbor_independent_ruler = {
+				any_realm_province = {
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}
+					}
+				}
+				#Insert Control Weather CB here
+
+			}
+			random = {
+				chance = 50
+				any_neighbor_independent_ruler = {
+					any_realm_province = {
+						random_list = {
+							1 = {
+								add_province_modifier = {
+									name = africa_heavy_rain
+									months = 3
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought_risk
+									months = 12
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought
+									months = 6
+								}
+							}
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+
+
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0.3
+				FROM = { trait = charitable }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = patron_talos }
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = patron_umberlee }
+			}
+			modifier = {
+				factor = 3
+				FROM = { culture = shadovar } #Shadovar canonically caused a war with Cormyr through use of weather manipulation
+			}
+			modifier = {
+				factor = 5
+				FROM = { culture = thayan } #Thay is pretty notorious canonically for doing this, and dgaf about neighbors caring
 			}
 		}
 	}
