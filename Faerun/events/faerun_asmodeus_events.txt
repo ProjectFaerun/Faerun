@@ -1,0 +1,375 @@
+namespace = asmodeusevent
+
+character_event = { # Openly Declare Allegiance event (Modified MNM.3811)
+    id = asmodeusevent.1
+    desc = EVTDESC_MNM_3811
+    picture = GFX_evt_dark_prayer
+    border = GFX_event_normal_frame_religion
+    is_triggered_only = yes
+	
+	immediate = {
+		# set_variable = { which = visibility_value value = 0 }
+		# remove_character_modifier = highly_suspect
+		# remove_character_modifier = under_suspicion
+	}
+    
+    option = {      
+        name = EVTOPTA_MNM_3811
+        custom_tooltip = { text = EVTOPTA_MNM_3811_TT }
+		add_character_modifier = {
+			modifier = devout_leader
+			duration = -1
+		}
+        if = {
+            limit = { ai = yes }
+            set_character_flag = ai_flag_refuse_conversion
+        }
+    }
+}
+
+# openly_adopt_faith - Convert cultists (Modified MNM.3800)
+character_event = {
+	id = asmodeusevent.2
+	desc = EVTDESC_MNM_3800
+    picture = GFX_evt_society_joining
+    border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		set_character_flag = currently_part_of_secret_religion_uncovering
+		# set_variable = { which = visibility_value value = 0 }
+		# remove_character_modifier = highly_suspect
+		# remove_character_modifier = under_suspicion
+	}
+	
+	option = {
+		name = EVTOPTA_MNM_3800
+		if = {
+			limit = {
+				any_demesne_title = {
+					controls_religion = yes
+				}
+			}
+			hidden_tooltip = {
+				liege = {
+					save_event_target_as = liege_target
+				}
+				create_character = {
+					age = 38
+					dynasty = random
+					religion = ROOT
+					culture = ROOT
+					random_traits = yes
+				}
+				new_character = {
+					save_event_target_as = new_holder
+				}
+			}
+			any_demesne_title = {
+				limit = {
+					controls_religion = yes
+				}
+				grant_title = event_target:new_holder
+				holder_scope = {
+					any_vassal = {
+						set_defacto_liege = event_target:liege_target
+					}
+				}
+			}
+			hidden_tooltip = {
+				set_defacto_liege = event_target:liege_target
+			}
+		}
+		if = { # Holy Orders/Static Mercs are given to a random new character
+			limit = {
+				any_demesne_title = {
+					OR = {
+						holy_order = yes
+						mercenary = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				liege = {
+					save_event_target_as = liege_target
+				}
+				create_character = {
+					age = 38
+					dynasty = random
+					religion = ROOT
+					culture = ROOT
+					random_traits = yes
+				}
+				new_character = {
+					save_event_target_as = new_holder
+				}
+			}
+			any_demesne_title = {
+				limit = {
+					OR = {
+						holy_order = yes
+						mercenary = yes
+					}
+				}
+				grant_title = event_target:new_holder
+				holder_scope = {
+					any_vassal = {
+						set_defacto_liege = event_target:liege_target
+					}
+				}
+			}
+			hidden_tooltip = {
+				set_defacto_liege = event_target:liege_target
+			}
+		}
+		flip_to_secret_religion_effect = yes
+        if = {
+            limit = { ai = yes }
+            set_character_flag = ai_flag_refuse_conversion
+        }
+	}
+}
+
+# openly_adopt_faith - Allow sympathisers the chance to flip (Modified MNM_3810)
+character_event = {
+	id = asmodeusevent.3
+	desc = EVTDESC_MNM_3810
+    picture = GFX_evt_society_joining
+    border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		OR = {
+			ai = yes
+			is_nomadic = yes
+		}
+	}
+	
+	immediate = {
+		FROM = {
+			trigger_switch = { # Figure out which society is uncovering itself
+				on_trigger = society_member_of
+				the_satanists = { 
+					ROOT = { set_character_flag = adopt_faith_infernal }
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = EVTOPTA_MNM_3810 
+		ai_chance = {
+			factor = 20
+			modifier = {
+				factor = 1.3
+				FROM = {
+					diplomacy = 7
+				}
+			}
+			modifier = {
+				factor = 1.3
+				FROM = {
+					diplomacy = 10
+				}
+			}
+			modifier = {
+				factor = 1.3
+				FROM = {
+					diplomacy = 13
+				}
+			}
+			modifier = {
+				factor = 1.25
+				FROM = {
+					diplomacy = 15
+				}
+			}
+			modifier = {
+				factor = 1.25
+				FROM = {
+					diplomacy = 17
+				}
+			}
+			modifier = {
+				factor = 1.2
+				FROM = {
+					diplomacy = 19
+				}
+			}
+			modifier = {
+				factor = 1.2
+				FROM = {
+					diplomacy = 21
+				}
+			}
+			modifier = {
+				factor = 1.2
+				FROM = {
+					diplomacy = 23
+				}
+			}
+			modifier = {
+				factor = 1.2
+				FROM = {
+					diplomacy = 25
+				}
+			}
+		}
+		if = {
+			limit = {
+				any_demesne_title = {
+					controls_religion = yes
+				}
+			}
+			hidden_tooltip = {
+				liege = {
+					save_event_target_as = liege_target
+				}
+				create_character = {
+					age = 38
+					dynasty = random
+					religion = ROOT
+					culture = ROOT
+					random_traits = yes
+				}
+				new_character = {
+					save_event_target_as = new_holder
+				}
+			}
+			any_demesne_title = {
+				limit = {
+					controls_religion = yes
+				}
+				grant_title = event_target:new_holder
+				holder_scope = {
+					any_vassal = {
+						set_defacto_liege = event_target:liege_target
+					}
+				}
+			}
+			hidden_tooltip = {
+				set_defacto_liege = event_target:liege_target
+			}
+		}
+		if = { # Holy Orders/Static Mercs are given to a random new character
+			limit = {
+				any_demesne_title = {
+					OR = {
+						holy_order = yes
+						mercenary = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				liege = {
+					save_event_target_as = liege_target
+				}
+				create_character = {
+					age = 38
+					dynasty = random
+					religion = ROOT
+					culture = ROOT
+					random_traits = yes
+				}
+				new_character = {
+					save_event_target_as = new_holder
+				}
+			}
+			any_demesne_title = {
+				limit = {
+					OR = {
+						holy_order = yes
+						mercenary = yes
+					}
+				}
+				grant_title = event_target:new_holder
+				holder_scope = {
+					any_vassal = {
+						set_defacto_liege = event_target:liege_target
+					}
+				}
+			}
+			hidden_tooltip = {
+				set_defacto_liege = event_target:liege_target
+			}
+		}
+		trigger_switch = {
+			on_trigger = has_character_flag
+			adopt_faith_infernal = {
+				religion = infernal
+			}
+		}
+		clear_secret_religion = yes
+        if = {
+            limit = { ai = yes }
+            set_character_flag = ai_flag_refuse_conversion
+        }
+	}
+	
+	option = {
+		name = EVTOPTB_MNM_3810
+		ai_chance = {
+			factor = 80
+			modifier = {
+				factor = 0.05
+				FROM = {
+					ROOT = {
+						has_prevs_secret_religion_truly_trigger = yes
+					}
+				}
+			}
+		}
+	}
+	
+	after = {
+		set_character_flag = currently_part_of_secret_religion_uncovering
+		
+		clr_character_flag = adopt_faith_infernal
+	}
+}
+
+# openly_adopt_faith - Flip provinces with local cult modifier (Modified MNM.3820)
+character_event = {
+	id = asmodeusevent.4
+	desc = EVTDESC_MNM_3820
+    picture = GFX_evt_society_joining
+    border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		FROM = {
+			trigger_switch = {
+				on_trigger = society_member_of
+				the_satanists = {
+					ROOT = {
+						set_character_flag = sr_infernal_prov_flip
+					}
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = EVTOPTA_MNM_3820
+		
+		trigger_switch = {
+			on_trigger = has_character_flag
+			
+			sr_infernal_prov_flip = { 
+				any_demesne_province = {
+					limit = {
+						has_province_modifier = secret_infernal_community
+					}
+					religion = infernal
+					remove_province_modifier = secret_infernal_community
+				}
+			}
+		}
+		clr_character_flag = sr_infernal_prov_flip
+
+	}
+}
+
