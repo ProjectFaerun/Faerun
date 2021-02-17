@@ -139,7 +139,7 @@ popular_elective = {
 			any_liege = {
 				FROMFROM = {
 					holder_scope = {
-						always = yes
+						character = PREVPREV
 					}
 				}
 			}
@@ -3442,156 +3442,37 @@ divine_elective = {
 	}
 
 	elector_selection = {
-		days = -5 		#If below 0, ROOT is not valid to be an Elector.
-		additive_modifier = { #Current ruler is always an elector.
-			value = 10
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
+		days = -1 		#If below 0, ROOT is not valid to be an Elector.
+		additive_modifier = { # The current ruler can always vote
+			value = 2
+			FROMFROM = {
+				holder_scope = {
+					character = ROOT
 				}
+			}
+		}
+		additive_modifier = { # Everyone under the title can vote if same religion
+			value = 2
+			any_liege = {
+				FROMFROM = {
+					holder_scope = {
+						character = PREVPREV
+						ROOT = {
+							religion = PREV
+						}
+					}
+				}
+			}
+		}
+		additive_modifier = { #Current ruler's heir is always a candidate and elector if possible
+			value = 2
+			player_heir = {
+				character = FROM
+				NOT = { character = ROOT }
 			}
 			FROMFROM = {
 				holder_scope = {
 					character = PREVPREV
-				}
-			}
-		}
-		additive_modifier = { #
-			value = 10
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			OR = { #
-				AND = {
-					higher_real_tier_than = BARON
-					FROMFROM = { real_tier = DUKE } #If the Elector Title is a Duchy, any vassal is an elector, otherwise only Dukes and above.
-				}
-				higher_real_tier_than = COUNT
-			}
-			OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
-				vassal_of = FROMFROM
-				independent = yes
-			}
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-		}
-		additive_modifier = {
-			value = -5
-			is_republic = yes
-		}
-		additive_modifier = {
-			value = -5
-			is_merchant_republic = yes
-		}
-		additive_modifier = {
-			value = -4
-			is_tribal = yes
-		}
-		additive_modifier = {
-			value = -4
-			is_nomadic = yes
-		}
-		additive_modifier = { #Theocracies favored over other government forms, feudalism left at base score.
-			value = 6
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			higher_real_tier_than = COUNT
-			is_theocracy = yes
-			FROMFROM = { #Tied to religion.
-				holder_scope = { religion = ROOT }
-			}
-			vassal_of = FROMFROM
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-		}
-		additive_modifier = { #prioritization based on religion.
-			value = 6
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			is_feudal = yes
-			vassal_of = FROMFROM
-			higher_real_tier_than = COUNT
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-			FROMFROM = {
-				holder_scope = {
-					religion = ROOT
-				}
-			}
-		}
-		additive_modifier = { #Slight prioritization based on religion_group.
-			value = 4
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			is_feudal = yes
-			vassal_of = FROMFROM
-			higher_real_tier_than = COUNT
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-			FROMFROM = {
-				holder_scope = {
-					NOT = { religion = ROOT }
-					religion_group = ROOT
-				}
-			}
-		}
-		additive_modifier = { #Slight prioritization based on culture.
-			value = 4
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			is_feudal = yes
-			vassal_of = FROMFROM
-			higher_real_tier_than = COUNT
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-			FROMFROM = {
-				holder_scope = {
-					culture = ROOT
 				}
 			}
 		}
@@ -7050,83 +6931,28 @@ magic_elective = {
 	}
 
 	elector_selection = {
-		days = -5 		#If below 0, ROOT is not valid to be an Elector.
-		additive_modifier = { #Current ruler is always an elector.
-			value = 10
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
+		days = -1 		#If below 0, ROOT is not valid to be an Elector.
+		additive_modifier = { # The current ruler can always vote
+			value = 2
 			FROMFROM = {
 				holder_scope = {
-					character = PREVPREV
+					character = ROOT
 				}
 			}
 		}
-		additive_modifier = { #Then the Councilors.
-			value = 10
-			vassal_of = FROMFROM
-			OR = {
-				has_job_title = job_chancellor
-				has_job_title = job_marshal
-				has_job_title = job_treasurer
-				has_job_title = job_spymaster
-				has_job_title = job_spiritual
-				has_minor_title = title_councilmember_king #Generic advisors
-				has_minor_title = title_councilmember_emperor
-			}
-		}
-		additive_modifier = {
-			value = 10
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
-				vassal_of = FROMFROM
-				independent = yes
-			}
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-			}
-		}
-		additive_modifier = {
-			value = -5
-			z_arcane_caster = no
-		}
-		additive_modifier = { #Slight prioritization based on culture.
-			value = 4
-			FROMFROM = { #Either title is higher than Duke-tier, or must be primary.
-				OR = {
-					higher_tier_than = DUKE
-					holder_scope = { primary_title = { title = PREVPREV } }
-				}
-			}
-			is_feudal = yes
-			vassal_of = FROMFROM
-			higher_real_tier_than = COUNT
-			OR = { #dejure vassal, or any vassal if title titular.
-				AND = {
-					FROMFROM = { is_titular = yes }
-					vassal_of = FROMFROM
-				}
-				any_dejure_liege = { title = FROMFROM }
-			}
-			FROMFROM = {
-				holder_scope = {
-					culture = ROOT
+		additive_modifier = { # Everyone under the title who is arcane caster can vote
+			value = 2
+			z_arcane_caster = yes
+			any_liege = {
+				FROMFROM = {
+					holder_scope = {
+						character = PREVPREV
+					}
 				}
 			}
 		}
 		additive_modifier = { #Current ruler's heir is always a candidate and elector if possible
-			value = 10
+			value = 2
 			player_heir = {
 				character = FROM
 				NOT = { character = ROOT }
