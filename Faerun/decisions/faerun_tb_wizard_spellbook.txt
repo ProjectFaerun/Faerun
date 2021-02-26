@@ -14,17 +14,16 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			custom_tooltip = {
-				text = HASBADSPELL
-				hidden_tooltip = {
-					has_bad_spell_effect = yes
-				}
-			}
 			custom_tooltip = {
 				text = HAS10SPELLPOINTS
 				hidden_tooltip = {
 					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = HASBADSPELL
+				hidden_tooltip = {
+					has_bad_spell_effect = yes
 				}
 			}
 			custom_tooltip = {
@@ -36,6 +35,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			hidden_tooltip = { change_variable = { which = wizspellpoints value = -10 } }
@@ -61,15 +61,20 @@ decisions = {
 
 	disrupt_undead = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
+			has_character_flag = wiz_spellbook_open #implies ai = no
+			#z_wizard = yes #if the player is not a wizard, they shouldn't have the spellbook open
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			in_battle = yes
+			war = yes
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
 			custom_tooltip = {
 				text = JOURNEYMANWIZHIGHER
 				hidden_tooltip = {
@@ -83,12 +88,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS15SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 15 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -97,8 +96,6 @@ decisions = {
 					}
 				}
 			}
-			war = yes
-			in_battle = yes
 			any_current_enemy = {
 				OR = {
 					trait = undead
@@ -108,6 +105,7 @@ decisions = {
 					trait = vampire_spawn
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			change_variable = { which = wizspellpoints value = -15 }
@@ -173,9 +171,10 @@ decisions = {
 
 	spell_banish_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			# ai = no #implied by spellbook open
+			# z_wizard = yes #implied by spellbook open
 			has_character_flag = wiz_spellbook_open
 		}
 
@@ -196,12 +195,8 @@ decisions = {
 		ai_check_interval = 50
 		potential = {
 			z_wizard = yes
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
-			NOT = { has_character_modifier = wiz_necromancy }
 			NOR = {
+				trait = longevity
 				trait = creature_treant
 				trait = undead
 				trait = lich
@@ -216,12 +211,21 @@ decisions = {
 				trait = creature_demon
 				trait = creature_angel
 				trait = creature_genie
-				trait = longevity
+			}
+			NOT = { has_character_modifier = wiz_necromancy }
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
 			}
 		}
 
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS30SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 30 }
+				}
+			}
 			scaled_wealth = { value = 0.2 min = 100 }
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
@@ -234,12 +238,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS30SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 30 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -248,6 +246,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 
 		effect = {
@@ -279,21 +278,21 @@ decisions = {
 # Abjuration spells
 
 	alustriels_mantle = {
-		ai_check_interval = 6
+		ai = no
+		ai_check_interval = 6000 #The AI has no chance of landing this as it's set up. was ai_check_interval = 6
 		potential = {
-			z_wizard = yes
+			#OR = {
+			#	ai = yes
+				has_character_flag = wiz_spellbook_open
+			#}
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_alustriels_mantle
 			}
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
+			z_wizard = yes
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { trait = alustriels_mantle_trait }
+			in_battle = yes
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -309,7 +308,8 @@ decisions = {
 					}
 				}
 			}
-			in_battle = yes
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { trait = alustriels_mantle_trait }
 		}
 		effect = {
 			set_character_flag = spell_alustriels_mantle_cooldown
@@ -337,19 +337,17 @@ decisions = {
 	nezrams_amethyst_aura = {
 		ai_check_interval = 10
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_nezrams_amethyst_aura
 			}
+			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = nezrams_amethyst_aura_mod }
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -365,6 +363,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = nezrams_amethyst_aura_mod }
 		}
 		effect = {
 			set_character_flag = spell_nezrams_amethyst_aura_cooldown
@@ -401,9 +401,10 @@ decisions = {
 
 	spell_remove_disease_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_abjuration
@@ -427,7 +428,7 @@ decisions = {
 	spell_mantle = {
 		ai_check_interval = 10
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_spell_mantle
@@ -438,8 +439,12 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = spell_mantle_mod }
+			custom_tooltip = {
+				text = HAS10SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
 			custom_tooltip = {
 				text = JOURNEYMANWIZHIGHER
 				hidden_tooltip = {
@@ -453,12 +458,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS10SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 10 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -467,6 +466,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = spell_mantle_mod }
 		}
 		effect = {
 			set_character_flag = spell_mantle_cooldown
@@ -514,7 +515,7 @@ decisions = {
 		ai_check_interval = 24
 		only_rulers = yes
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_planar_binding
@@ -525,7 +526,12 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 20 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -537,12 +543,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS20SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 20 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -551,6 +551,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_planar_binding_cooldown
@@ -705,9 +706,10 @@ decisions = {
 
 	burn_path_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_abjuration
@@ -732,9 +734,10 @@ decisions = {
 
 	spell_slow_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_transmutation
@@ -758,11 +761,11 @@ decisions = {
 	spell_longstrider = {
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_longstrider
 			}
+			z_wizard = yes #doesn't check for wizard traits later in evaluation
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
@@ -770,8 +773,6 @@ decisions = {
 		}
 		allow = {
 			in_command = yes
-			NOT = { trait = spell_longstrider_trait }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -787,6 +788,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { trait = spell_longstrider_trait }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_longstrider_cooldown
@@ -821,9 +824,10 @@ decisions = {
 
 	spell_fabricate_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_transmutation
@@ -847,7 +851,7 @@ decisions = {
 	spell_create_homunculus = {
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_create_homunculus
@@ -858,9 +862,13 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_artifact = homunculus_artf }
+			custom_tooltip = {
+				text = HAS13SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 13 }
+				}
+			}
 			NOT = { has_injury_trigger = yes }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = JOURNEYMANWIZHIGHER
 				hidden_tooltip = {
@@ -874,12 +882,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS13SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 13 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -888,6 +890,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_artifact = homunculus_artf }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_create_homunculus_cooldown
@@ -923,32 +927,34 @@ decisions = {
 	tensers_transformation = {
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_tensers_transformation
 			}
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
 			hidden_tooltip = {
 				OR = {
-					ai = no
+					has_character_flag = wiz_spellbook_open
+					#ai = no
 					AND = {
+						ai = yes
 						has_character_flag = is_in_duel
 						NOT = { had_character_flag = { flag = is_in_duel months = 1 } }
 					}
 				}
 			}
+			#OR = {
+			#	ai = yes
+			#	has_character_flag = wiz_spellbook_open
+			#}
 		}
 		allow = {
-			NOT = { has_character_modifier = tensers_transformation_mod }
-			NOT = { has_character_modifier = wild_shape_mod }
-			NOT = { has_character_modifier = improved_wild_shape_mod }
-			NOT = { has_character_modifier = expert_wild_shape_mod }
-			NOT = { has_character_modifier = master_wild_shape_mod }
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -960,12 +966,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS15SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 15 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -974,6 +974,12 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = tensers_transformation_mod }
+			NOT = { has_character_modifier = wild_shape_mod }
+			NOT = { has_character_modifier = improved_wild_shape_mod }
+			NOT = { has_character_modifier = expert_wild_shape_mod }
+			NOT = { has_character_modifier = master_wild_shape_mod }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_tensers_transformation_cooldown
@@ -1010,9 +1016,10 @@ decisions = {
 
 	spell_disintegrate_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_transmutation
@@ -1035,28 +1042,23 @@ decisions = {
 
 #Conjuration spells
 
+	#previously available to spymasters, see general note on job spells
 	mordekainens_faithful_hound = {
+		only_rulers = yes
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_flag = knows_spell_mordekainens_faithful_hound
 			}
+			is_ruler = yes
+			z_wizard = yes
 			OR = {
-				AND = {
-					ai = yes
-					OR = {
-						has_job_title = job_spymaster
-						is_ruler = yes
-					}
-				}
+				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = mordekainens_faithful_hound_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -1072,6 +1074,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = mordekainens_faithful_hound_mod }
 		}
 		effect = {
 			set_character_flag = spell_mordekainens_faithful_hound_cooldown
@@ -1107,21 +1111,19 @@ decisions = {
 	}
 
 	spell_find_familiar = {
-		ai_check_interval = 12
+		ai_check_interval = 24 #was 12 - this is a signature characteristic of wizards, but it produces a small game effect
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_flag = knows_spell_find_familiar
 			}
+			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_artifact = wiz_familiar_artf }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -1137,6 +1139,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_artifact = wiz_familiar_artf }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_find_familiar_cooldown
@@ -1172,7 +1176,7 @@ decisions = {
 		only_playable = yes
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_flag = knows_spell_summon_lesser_demons
@@ -1187,17 +1191,16 @@ decisions = {
 		}
 		allow = {
 			war = yes
-			NOT = { has_character_modifier = burn_path_mod }
-			custom_tooltip = {
-				text = NOSUMMONEDDEMONS
-				hidden_tooltip = {
-					NOT = { has_earmarked_regiments = wiz_lesser_demons }
-				}
-			}
 			custom_tooltip = {
 				text = HAS15SPELLPOINTS
 				hidden_tooltip = {
 					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_lesser_demons }
 				}
 			}
 			custom_tooltip = {
@@ -1221,6 +1224,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_summon_lesser_demons_cooldown
@@ -1272,7 +1276,7 @@ decisions = {
 		only_playable = yes
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_modifier = wiz_wild
@@ -1288,17 +1292,16 @@ decisions = {
 		}
 		allow = {
 			war = yes
-			NOT = { has_character_modifier = burn_path_mod }
-			custom_tooltip = {
-				text = NOSUMMONEDDEMONS
-				hidden_tooltip = {
-					NOT = { has_earmarked_regiments = wiz_elementals }
-				}
-			}
 			custom_tooltip = {
 				text = HAS12SPELLPOINTS
 				hidden_tooltip = {
 					check_variable = { which = wizspellpoints value = 12 }
+				}
+			}
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_elementals }
 				}
 			}
 			custom_tooltip = {
@@ -1322,6 +1325,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_conjure_elementals_cooldown
@@ -1371,7 +1375,7 @@ decisions = {
 		ai_check_interval = 24
 		only_rulers = yes
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_flag = knows_spell_greater_planar_binding
@@ -1382,7 +1386,12 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 25 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -1394,12 +1403,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS20SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 25 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -1408,6 +1411,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_greater_planar_binding_cooldown
@@ -1598,21 +1602,18 @@ decisions = {
 
 	incendiary_cloud = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
+			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_conjuration
 				has_character_flag = knows_spell_incendiary_cloud
 			}
-			OR = {
-				#ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
 		}
 		allow = {
-			war = yes
 			in_battle = yes
-			NOT = { has_character_modifier = burn_path_mod }
+			war = yes
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -1638,6 +1639,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_incendiary_cloud_cooldown
@@ -1689,28 +1691,23 @@ decisions = {
 
 #Divination spells
 
+	#previously available to spymasters, see general note on job spells
 	detect_thoughts = {
+		only_rulers = yes
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_detect_thoughts
 			}
+			is_ruler = yes
+			z_wizard = yes
 			OR = {
-				AND = {
-					ai = yes
-					OR = {
-						has_job_title = job_spymaster
-						is_ruler = yes
-					}
-				}
+				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = detect_thoughts_mod }
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -1726,6 +1723,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = detect_thoughts_mod }
 		}
 		effect = {
 			set_character_flag = spell_detect_thoughts_cooldown
@@ -1760,28 +1759,22 @@ decisions = {
 		}
 	}
 
+	#previously available to chancellors, see general note on job spells
 	comprehend_languages = {
+		only_rulers = yes
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_comprehend_languages
 			}
+			z_wizard = yes
 			OR = {
-				AND = {
-					ai = yes
-					OR = {
-						has_job_title = job_chancellor
-						is_ruler = yes
-					}
-				}
+				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = comprehend_languages_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -1797,6 +1790,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = comprehend_languages_mod }
 		}
 		effect = {
 			set_character_flag = spell_comprehend_languages_cooldown
@@ -1833,9 +1828,10 @@ decisions = {
 
 	spell_forget_past_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -1858,9 +1854,10 @@ decisions = {
 
 	probe_thoughts_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -1884,7 +1881,7 @@ decisions = {
 	legend_lore = {
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_legend_lore
@@ -1895,8 +1892,6 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = legend_lore_mod }
 			custom_tooltip = {
 				text = HAS15SPELLPOINTS
 				hidden_tooltip = {
@@ -1922,6 +1917,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = legend_lore_mod }
 		}
 		effect = {
 			set_character_flag = spell_legend_lore_cooldown
@@ -1948,27 +1945,22 @@ decisions = {
 		}
 	}
 
+	#previously available to spymasters, see general note on job spells
 	spell_anticipation = {
+		only_rulers = yes
 		ai_check_interval = 12
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_anticipation
 			}
 			OR = {
-				AND = {
-					ai = yes
-					OR = {
-						is_ruler = yes
-						has_job_title = job_spymaster
-					}
-				}
+				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HAS20SPELLPOINTS
 				hidden_tooltip = {
@@ -1994,6 +1986,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_anticipation_cooldown
@@ -2038,9 +2031,10 @@ decisions = {
 
 	spell_charm_person_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -2064,11 +2058,11 @@ decisions = {
 	spell_rage = {
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_rage
 			}
+			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
@@ -2076,8 +2070,6 @@ decisions = {
 		}
 		allow = {
 			in_command = yes
-			NOT = { trait = spell_rage_trait }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -2093,6 +2085,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { trait = spell_rage_trait }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_rage_cooldown
@@ -2127,9 +2121,10 @@ decisions = {
 
 	spell_crown_of_madness_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -2152,9 +2147,10 @@ decisions = {
 
 	spell_cathalas_compulsion_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -2177,9 +2173,10 @@ decisions = {
 
 	mordekainens_involuntary_wizardry_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -2203,9 +2200,10 @@ decisions = {
 
 	dominate_person_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_enchantment
@@ -2230,22 +2228,22 @@ decisions = {
 
 	spell_fireball = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
 				has_character_modifier = wiz_wild
 				has_character_flag = knows_spell_fireball
 			}
-			OR = {
+			z_wizard = yes
+			#OR = {
 				#ai = yes
 				has_character_flag = wiz_spellbook_open
-			}
+			#}
 		}
 		allow = {
-			war = yes
 			in_battle = yes
-			NOT = { has_character_modifier = burn_path_mod }
+			war = yes
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -2261,6 +2259,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_fireball_cooldown
@@ -2312,9 +2311,10 @@ decisions = {
 
 	spell_magic_missile_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_evocation
@@ -2336,20 +2336,27 @@ decisions = {
 	}
 
 	spell_lightning_bolt = {
-		ai_check_interval = 6
+		ai = no
+		ai_check_interval = 6000 #the ai has no chance of landing this. Was ai_check_interval = 6
 		potential = {
+			OR = {
+				has_character_modifier = wiz_evocation
+				has_character_flag = knows_spell_lightning_bolt
+			}
 			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
-			OR = {
-				has_character_modifier = wiz_evocation
-				has_character_flag = knows_spell_lightning_bolt
-			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			in_battle = yes #this was almost at the end of the evaluation - it's a very exclusive condition and should be used early when it applies
+			custom_tooltip = {
+				text = HAS15SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 15 }
+				}
+			}
 			custom_tooltip = {
 				text = JOURNEYMANWIZHIGHER
 				hidden_tooltip = {
@@ -2363,12 +2370,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS15SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 15 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -2377,12 +2378,12 @@ decisions = {
 					}
 				}
 			}
-			in_battle = yes
 			enemy = {
 				any_unit_leader = {
 					is_alive = yes # Just to make sure that there *is* a leader
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			change_variable = { which = wizspellpoints value = -15 }
@@ -2447,9 +2448,10 @@ decisions = {
 
 	spell_wall_of_stone_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_evocation
@@ -2472,21 +2474,27 @@ decisions = {
 
 	chain_lightning = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
 				has_character_flag = knows_spell_chain_lightning
 			}
-			OR = {
+			#OR = {
 				#ai = yes
 				has_character_flag = wiz_spellbook_open
-			}
+			#}
 		}
 		allow = {
+			in_battle = yes #lots of characters end up in wars at any one time, relatively few are in battles
 			war = yes
-			in_battle = yes
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS23SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 23 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -2498,12 +2506,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS23SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 23 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -2512,6 +2514,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_chain_lightning_cooldown
@@ -2563,21 +2566,27 @@ decisions = {
 
 	maddening_darkness = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
 				has_character_flag = knows_spell_maddening_darkness
 			}
-			OR = {
+			#OR = {
 				#ai = yes
 				has_character_flag = wiz_spellbook_open
-			}
+			#}
 		}
 		allow = {
-			war = yes
 			in_battle = yes
-			NOT = { has_character_modifier = burn_path_mod }
+			war = yes
+			custom_tooltip = {
+				text = HAS23SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 23 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -2589,12 +2598,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS23SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 23 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -2603,6 +2606,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_maddening_darkness_cooldown
@@ -2657,28 +2661,28 @@ decisions = {
 	phantom_steed = {
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_phantom_steed
 			}
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
+			#OR = {
+			#	ai = yes
+			#	has_character_flag = wiz_spellbook_open
+			#}
 			hidden_tooltip = {
 				OR = {
-					ai = no
+					has_character_flag = wiz_spellbook_open #implies ai = no
+					#ai = no
 					AND = {
+						ai = yes
 						has_character_flag = is_in_duel
 						NOT = { had_character_flag = { flag = is_in_duel months = 1 } }
 					}
 				}
+			z_wizard = yes
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = phantom_steed_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -2694,6 +2698,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = phantom_steed_mod }
 		}
 		effect = {
 			set_character_flag = phantom_steed_cooldown
@@ -2723,11 +2729,11 @@ decisions = {
 	alustriels_banner = {
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_alustriels_banner
 			}
+			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
@@ -2735,8 +2741,6 @@ decisions = {
 		}
 		allow = {
 			in_command = yes
-			NOT = { trait = alustriels_banner_trait }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = HAS5SPELLPOINTS
 				hidden_tooltip = {
@@ -2752,6 +2756,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { trait = alustriels_banner_trait }
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_alustriels_banner_cooldown
@@ -2788,32 +2794,32 @@ decisions = {
 		only_playable = yes
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_phantasmal_force
 			}
+			is_playable = yes
 			OR = {
-				AND = {
+				#AND = {
 					ai = yes
-					is_ruler = yes
-				}
+				#	is_ruler = yes
+				#}
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
 			war = yes
-			NOT = { has_character_modifier = burn_path_mod }
-			custom_tooltip = {
-				text = NOSUMMONEDDEMONS
-				hidden_tooltip = {
-					NOT = { has_earmarked_regiments = wiz_illusions }
-				}
-			}
 			custom_tooltip = {
 				text = HAS10SPELLPOINTS
 				hidden_tooltip = {
 					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_illusions }
 				}
 			}
 			custom_tooltip = {
@@ -2837,6 +2843,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_phantasmal_force_cooldown
@@ -2884,9 +2891,10 @@ decisions = {
 
 	phantasmal_killer_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_illusion
@@ -2909,21 +2917,27 @@ decisions = {
 
 	spell_weird = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_weird
 			}
-			OR = {
+			#OR = {
 				#ai = yes
 				has_character_flag = wiz_spellbook_open
-			}
+			#}
 		}
 		allow = {
-			war = yes
 			in_battle = yes
-			NOT = { has_character_modifier = burn_path_mod }
+			war = yes
+			custom_tooltip = {
+				text = HAS23SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 23 }
+				}
+			}
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -2935,12 +2949,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS23SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 23 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -2949,6 +2957,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_weird_cooldown
@@ -3000,9 +3009,10 @@ decisions = {
 
 	spell_mental_prison_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_illusion
@@ -3029,32 +3039,32 @@ decisions = {
 		only_playable = yes
 		ai_check_interval = 6
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_animate_dead
 			}
+			z_wizard = yes
+			is_playable = yes
 			OR = {
-				AND = {
+				#AND = {
 					ai = yes
-					is_ruler = yes
-				}
+				#	is_ruler = yes
+				#}
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
 			war = yes
-			NOT = { has_character_modifier = burn_path_mod }
-			custom_tooltip = {
-				text = NOSUMMONEDDEMONS
-				hidden_tooltip = {
-					NOT = { has_earmarked_regiments = wiz_animate_dead }
-				}
-			}
 			custom_tooltip = {
 				text = HAS12SPELLPOINTS
 				hidden_tooltip = {
 					check_variable = { which = wizspellpoints value = 10 }
+				}
+			}
+			custom_tooltip = {
+				text = NOSUMMONEDDEMONS
+				hidden_tooltip = {
+					NOT = { has_earmarked_regiments = wiz_animate_dead }
 				}
 			}
 			custom_tooltip = {
@@ -3066,6 +3076,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_animate_dead_cooldown
@@ -3112,21 +3123,19 @@ decisions = {
 	}
 
 	spell_false_life = {
-		ai_check_interval = 10
+		ai_check_interval = 12 #was 10
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_false_life
 			}
+			z_wizard = yes
 			OR = {
 				ai = yes
 				has_character_flag = wiz_spellbook_open
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
-			NOT = { has_character_modifier = spell_false_life_mod }
 			custom_tooltip = {
 				text = HAS7SPELLPOINTS
 				hidden_tooltip = {
@@ -3142,6 +3151,8 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
+			NOT = { has_character_modifier = spell_false_life_mod }
 		}
 		effect = {
 			set_character_flag = spell_false_life_cooldown
@@ -3178,9 +3189,10 @@ decisions = {
 
 	bestow_curse_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_necromancy
@@ -3205,7 +3217,7 @@ decisions = {
 		ai_check_interval = 24
 		only_rulers = yes
 		potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_create_undead
@@ -3216,7 +3228,12 @@ decisions = {
 			}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS20SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 20 }
+				}
+			}
 			custom_tooltip = {
 				text = JOURNEYMANWIZHIGHER
 				hidden_tooltip = {
@@ -3230,12 +3247,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS20SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 20 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -3244,6 +3255,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			set_character_flag = spell_create_undead_cooldown
@@ -3310,9 +3322,10 @@ decisions = {
 
 	spell_blight_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_necromancy
@@ -3334,9 +3347,10 @@ decisions = {
 	}
 	spell_controlweather_fake = { # This is basically a reminder that you have this spell and who you can use it on
 		ai = no
+		ai_check_interval = 6000
 		potential = {
-			ai = no
-			z_wizard = yes
+			#ai = no
+			#z_wizard = yes
 			has_character_flag = wiz_spellbook_open
 			OR = {
 				has_character_modifier = wiz_transmutation
@@ -3357,18 +3371,14 @@ decisions = {
 		}
 	}
 	spell_clone = {
-		ai_check_interval = 50
+		ai_check_interval = 60 #was 50. Sorry, Manshoon
 		only_rulers = yes
 		potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_clone
 			}
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
+			z_wizard = yes
 			NOR = {
 				trait = avatar
 				trait = creature_demon
@@ -3377,11 +3387,19 @@ decisions = {
 				trait = creature_angel
 				trait = creature_genie
 			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
+			}
 		}
 		allow = {
+			custom_tooltip = {
+				text = HAS30SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 30 }
+				}
+			}
 			scaled_wealth = { value = 0.1 min = 50 }
-			NOT = { has_injury_trigger = yes }
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
 				hidden_tooltip = {
@@ -3392,12 +3410,7 @@ decisions = {
 					}
 				}
 			}
-			custom_tooltip = {
-				text = HAS30SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 30 }
-				}
-			}
+			NOT = { has_injury_trigger = yes }
 			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
@@ -3407,6 +3420,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
 			scaled_wealth = { value = -0.1 min = 50 }
@@ -3523,33 +3537,39 @@ decisions = {
 	}
 
 	spell_lichdom = {
-		ai_check_interval = 24
+		only_rulers = yes #might exclude a few cases but these are rare
+		ai_check_interval = 60 #was 24 - any character who can't survive 5 years between checks doesn't deserve to be a lich anyway
 		potential = {
-			z_wizard = yes
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
 			has_character_modifier = wiz_necromancy
+			z_wizard = yes
 			NOR = {
-				trait = creature_treant
-				trait = undead
+				trait = longevity
 				trait = lich
+				trait = undead
 				trait = vampire
 				trait = vampire_spawn
 				trait = lich_baelnorn
+				trait = creature_treant
 				trait = creature_monster
 				trait = creature_devil
 				trait = creature_daemon
 				trait = creature_demon
 				trait = creature_angel
 				trait = creature_genie
-				trait = longevity
+			}
+			OR = {
+				ai = yes
+				has_character_flag = wiz_spellbook_open
 			}
 		}
 
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
+			custom_tooltip = {
+				text = HAS30SPELLPOINTS
+				hidden_tooltip = {
+					check_variable = { which = wizspellpoints value = 30 }
+				}
+			}
 			scaled_wealth = { value = 0.2 min = 100 }
 			custom_tooltip = {
 				text = MASTERWIZHIGHER
@@ -3562,12 +3582,6 @@ decisions = {
 				}
 			}
 			custom_tooltip = {
-				text = HAS30SPELLPOINTS
-				hidden_tooltip = {
-					check_variable = { which = wizspellpoints value = 30 }
-				}
-			}
-			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
 					OR = {
@@ -3576,6 +3590,7 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 
 		effect = {
@@ -3696,17 +3711,17 @@ decisions = {
 
 	nahals_reckless_dweomer = {
 		ai = no
+		ai_check_interval = 6000
 		potential = {
 			ai = no # Don't trust the AI to not rapid-fire this
-			z_wizard = yes
-			OR = {
-				ai = yes
-				has_character_flag = wiz_spellbook_open
-			}
 			has_character_modifier = wiz_wild
+			#z_wizard = yes
+			#OR = {
+			#	ai = yes
+				has_character_flag = wiz_spellbook_open
+			#}
 		}
 		allow = {
-			NOT = { has_character_modifier = burn_path_mod }
 			custom_tooltip = {
 				text = SPELL_ON_COOLDOWN
 				hidden_tooltip = {
@@ -3716,10 +3731,11 @@ decisions = {
 					}
 				}
 			}
+			NOT = { has_character_modifier = burn_path_mod }
 		}
 		effect = {
-			set_character_flag = spell_clone_cooldown
-			hidden_tooltip = { change_variable = { which = wizspellpoints value = -30 } }
+			set_character_flag = spell_nahals_reckless_dweomer_cooldown #was spell_clone_cooldown
+			#hidden_tooltip = { change_variable = { which = wizspellpoints value = -30 } } #looks like a copy-paste error?
 			hidden_tooltip = {
 				if = {
 					limit = {
@@ -3768,6 +3784,7 @@ targeted_decisions = {
 		}
 
 		potential = {
+			at_location = FROM
 			OR = {
 				trait = creature_angel
 				trait = creature_demon
@@ -3778,8 +3795,7 @@ targeted_decisions = {
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
-				at_location = ROOT
+				#at_location = ROOT
 				custom_tooltip = {
 					text = JOURNEYMANWIZHIGHER
 					hidden_tooltip = {
@@ -3807,6 +3823,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -3853,16 +3870,18 @@ targeted_decisions = {
 #Abjuration spells
 
 	spell_remove_disease_character = {
-		ai_check_interval = 6
+		ai = no
+		ai_check_interval = 6000
 		filter = realm_including_me
-		ai_target_filter = realm_including_me
+		ai_target_filter = none #ai has its own version
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_remove_disease
 			}
+			z_wizard = yes
 		}
 		potential = {
 			OR = {
@@ -3877,7 +3896,6 @@ targeted_decisions = {
 		}
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -3905,6 +3923,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -4154,13 +4173,14 @@ targeted_decisions = {
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_remove_disease
 			}
 		}
 		potential = {
+			at_location = FROM
 			OR = {
 				z_wizard = yes
 				z_sorcerer = yes
@@ -4170,8 +4190,7 @@ targeted_decisions = {
 		}
 		allow = {
 			FROM = {
-				at_location = ROOT
-				NOT = { has_character_modifier = burn_path_mod }
+				#at_location = ROOT
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -4197,6 +4216,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -4246,26 +4266,21 @@ targeted_decisions = {
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_slow
 			}
+			z_wizard = yes
 		}
 
 		potential = {
+			in_command = yes
 			OR = {
-				location = {
-					any_character = {
-						is_foe = FROM
-						in_command = yes
-					}
-				}
+				at_location = FROM
 				location = {
 					any_neighbor_province = {
 						any_character = {
-							is_foe = FROM
-							in_command = yes
+							character = FROM
 						}
 					}
 				}
@@ -4274,7 +4289,6 @@ targeted_decisions = {
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS5SPELLPOINTS
 					hidden_tooltip = {
@@ -4290,6 +4304,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 			NOT = { trait = spell_slow_trait }
 		}
@@ -4339,7 +4354,7 @@ targeted_decisions = {
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_disintegrate
@@ -4350,8 +4365,7 @@ targeted_decisions = {
 		}
 		allow = {
 			FROM = {
-				at_location = ROOT
-				NOT = { has_character_modifier = burn_path_mod }
+				#at_location = ROOT
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -4377,6 +4391,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -4443,27 +4458,33 @@ targeted_decisions = {
 		filter = all
 		ai_target_filter = none # So the AI will never see this
 		ai = no
+		ai_check_interval = 6000 #EK uses this for player-only targeted decisions and their mod runs quickly
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_forget_past
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 15 }
+					}
+				}
 				custom_tooltip = {
 					text = JOURNEYMANWIZHIGHER
 					hidden_tooltip = {
@@ -4477,12 +4498,6 @@ targeted_decisions = {
 					}
 				}
 				custom_tooltip = {
-					text = HAS15SPELLPOINTS
-					hidden_tooltip = {
-						check_variable = { which = wizspellpoints value = 15 }
-					}
-				}
-				custom_tooltip = {
 					text = SPELL_ON_COOLDOWN
 					hidden_tooltip = {
 						OR = {
@@ -4491,6 +4506,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -4528,27 +4544,33 @@ targeted_decisions = {
 		filter = all
 		ai_target_filter = none # So the AI will never see this
 		ai = no
+		ai_check_interval = 6000
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_divination
 				has_character_flag = knows_spell_probe_thoughts
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = wizspellpoints value = 15 }
+					}
+				}
 				custom_tooltip = {
 					text = JOURNEYMANWIZHIGHER
 					hidden_tooltip = {
@@ -4562,12 +4584,6 @@ targeted_decisions = {
 					}
 				}
 				custom_tooltip = {
-					text = HAS15SPELLPOINTS
-					hidden_tooltip = {
-						check_variable = { which = wizspellpoints value = 15 }
-					}
-				}
-				custom_tooltip = {
 					text = SPELL_ON_COOLDOWN
 					hidden_tooltip = {
 						OR = {
@@ -4576,6 +4592,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -4612,28 +4629,27 @@ targeted_decisions = {
 		filter = all
 		ai_target_filter = none # So the AI will never see this
 		ai = no
+		ai_check_interval = 6000
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_enchantment
 				has_character_flag = knows_spell_charm_person
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
-				NOT = { is_foe = ROOT }
 				custom_tooltip = {
 					text = HAS5SPELLPOINTS
 					hidden_tooltip = {
@@ -4649,6 +4665,8 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { is_foe = ROOT }
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 			NOT = {
 				has_opinion_modifier = {
@@ -4692,32 +4710,31 @@ targeted_decisions = {
 	}
 
 	spell_crown_of_madness = {
-		ai_check_interval = 30
+		ai_check_interval = 6000
 		filter = rivals
-		ai_target_filter = rivals
+		ai_target_filter = none
 		ai = no
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_enchantment
 				has_character_flag = knows_spell_crown_of_madness
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			NOT = { trait = lunatic }
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -4745,6 +4762,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -4783,18 +4801,18 @@ targeted_decisions = {
 	}
 
 	spell_cathalas_compulsion = {
-		ai_check_interval = 30
+		ai_check_interval = 6000
 		filter = rivals
-		ai_target_filter = rivals
+		ai_target_filter = none
 		ai = no
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_enchantment
 				has_character_flag = knows_spell_cathalas_compulsion
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
@@ -4809,7 +4827,6 @@ targeted_decisions = {
 			NOT = { is_rival = FROM }
 			NOT = { is_friend = FROM }
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -4837,6 +4854,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -4889,7 +4907,7 @@ targeted_decisions = {
 		only_playable = yes
 
 		from_potential = {
-			z_wizard = yes
+			#z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_enchantment
 				has_character_modifier = wiz_wild
@@ -4898,16 +4916,15 @@ targeted_decisions = {
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -4933,6 +4950,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -4983,37 +5001,37 @@ targeted_decisions = {
 	}
 
 	dominate_person = {
+		only_rulers = yes # equivalent to FROM is_landed
 		ai_check_interval = 12
 		filter = sub_realm
 		ai_target_filter = sub_realm
 
 		from_potential = {
-			is_landed = yes
-			is_inaccessible_or_incapable_trigger = no
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_enchantment
 				has_character_flag = knows_spell_dominate_person
 			}
+			is_landed = yes
+			is_inaccessible_or_incapable_trigger = no
+			z_wizard = yes
 		}
 		potential = {
-			is_adult = yes
-			ai = yes
 			OR = {
 				host = { character = FROM }
 				liege = { character = FROM }
 			}
+			is_adult = yes
+			ai = yes
 		}
 		allow = {
 			NOR = {
 				trait = creature_illithid
 				trait = creature_yikarian
-			}
-			NOT = {
+			#}
+			#NOT = {
 				has_opinion_modifier = { who = FROM modifier = mind_control }
 			}
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -5039,6 +5057,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -5076,19 +5095,18 @@ targeted_decisions = {
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
 				has_character_flag = knows_spell_magic_missile
 			}
+			z_wizard = yes
 		}
 		potential = {
 			at_location = FROM
 		}
 		allow = {
 			FROM = {
-				at_location = ROOT
-				NOT = { has_character_modifier = burn_path_mod }
+				#at_location = ROOT #already checked
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -5104,6 +5122,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -5169,26 +5188,22 @@ targeted_decisions = {
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_phantsmal_killer
 			}
+			z_wizard = yes
 		}
 
 		potential = {
+			in_command = yes
 			OR = {
-				location = {
-					any_character = {
-						is_foe = FROM
-						in_command = yes
-					}
-				}
+				at_location = FROM
 				location = {
 					any_neighbor_province = {
 						any_character = {
-							is_foe = FROM
-							in_command = yes
+							character = FROM
+							#in_command = yes
 						}
 					}
 				}
@@ -5197,7 +5212,6 @@ targeted_decisions = {
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS12SPELLPOINTS
 					hidden_tooltip = {
@@ -5225,6 +5239,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 			NOT = { has_character_modifier = phantasmal_killer_mod }
 		}
@@ -5272,32 +5287,32 @@ targeted_decisions = {
 	}
 
 	spell_mental_prison = {
-		ai_check_interval = 30
+		ai_check_interval = 6000
 		filter = rivals
-		ai_target_filter = rivals
+		ai_target_filter = none #was rivals but this is ai = no
 		ai = no
+		
 
 		from_potential = {
-			z_wizard = yes
+			ai = no
 			OR = {
 				has_character_modifier = wiz_illusion
 				has_character_flag = knows_spell_mental_prison
 			}
-			ai = no
+			z_wizard = yes
 		}
 
 		potential = {
-			ai = yes
 			OR = {
 				is_ruler = yes
 				same_realm = FROM
 			}
+			ai = yes
 		}
 
 		allow = {
 			NOT = { is_incapable = yes }
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS25SPELLPOINTS
 					hidden_tooltip = {
@@ -5323,6 +5338,7 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -5363,39 +5379,34 @@ targeted_decisions = {
 #Necromancy spells
 
 	bestow_curse = {
-		ai_check_interval = 6
+		ai_check_interval = 12 #was 6, but the potential block here is quite expensive
 		filter = rivals
 		ai_target_filter = rivals
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_bestow_curse
 			}
+			z_wizard = yes
 		}
 
+		#touch range spell, right?
 		potential = {
-			OR = {
-				location = {
-					any_character = {
-						is_foe = FROM
-					}
-				}
-				location = {
-					any_neighbor_province = {
-						any_character = {
-							is_foe = FROM
-						}
-					}
-				}
-			}
+			#OR = {
+				at_location = FROM
+				#location = {
+				#	any_neighbor_province = {
+				#		any_character = {
+				#			character = FROM
+				#		}
+				#	}
+				#}
+			#}
 		}
 
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = bestow_curse_mod }
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -5423,6 +5434,8 @@ targeted_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = bestow_curse_mod }
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 
@@ -5471,23 +5484,22 @@ settlement_decisions = {
 #Abjuration spells
 
 	spell_remove_disease_prov = {
-		ai_check_interval = 6
+		ai_check_interval = 12
 		filter = realm_owned
 		ai_target_filter = realm_owned
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_abjuration
 				has_character_flag = knows_spell_remove_disease
 			}
+			z_wizard = yes
 		}
 		potential = {
 			location = { has_disease = yes }
 		}
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -5515,6 +5527,7 @@ settlement_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -5658,16 +5671,16 @@ settlement_decisions = {
 
 	spell_fabricate = {
 		ai_check_interval = 24
-		filter = realm_owned
-		ai_target_filter = realm_owned
+		filter = owned #was realm_owned but the potential block means owned
+		ai_target_filter = owned #was realm_owned but the potential block means owned
 		only_rulers = yes
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				has_character_flag = knows_spell_fabricate
 			}
+			z_wizard = yes
 		}
 		potential = {
 			location = {
@@ -5681,7 +5694,6 @@ settlement_decisions = {
 				NOT = { has_province_modifier = spell_fabricate_mod }
 			}
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -5709,6 +5721,7 @@ settlement_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -5758,16 +5771,16 @@ settlement_decisions = {
 
 	spell_wall_of_stone = {
 		ai_check_interval = 24
-		filter = realm_owned
-		ai_target_filter = realm_owned
+		filter = owned #was realm_owned
+		ai_target_filter = owned #was realm_owned
 		only_rulers = yes
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_evocation
 				has_character_flag = knows_spell_wall_of_stone
 			}
+			z_wizard = yes
 		}
 		potential = {
 			location = {
@@ -5782,7 +5795,6 @@ settlement_decisions = {
 				NOT = { has_province_modifier = spell_wall_of_stone_mod }
 			}
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -5810,6 +5822,7 @@ settlement_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 		}
 		effect = {
@@ -5851,15 +5864,15 @@ settlement_decisions = {
 
 	#spell_animate_dead_prov = {
 		#ai_check_interval = 10
-		#filter = realm_owned
-		#ai_target_filter = realm_owned
+		#filter = owned #was realm_owned
+		#ai_target_filter = owned #was realm_owned
 
 		#from_potential = {
-			#z_wizard = yes
 			#OR = {
 				#has_character_modifier = wiz_necromancy
 				#has_character_flag = knows_spell_animate_dead
 			#}
+			#z_wizard = yes
 		#}
 		#potential = {
 			#location = {
@@ -5873,7 +5886,6 @@ settlement_decisions = {
 				#NOT = { has_province_modifier = empty_graves_mod }
 			#}
 			#FROM = {
-				#NOT = { has_character_modifier = burn_path_mod }
 				#custom_tooltip = {
 					#text = HAS12SPELLPOINTS
 					#hidden_tooltip = {
@@ -5889,6 +5901,7 @@ settlement_decisions = {
 						#}
 					#}
 				#}
+				#NOT = { has_character_modifier = burn_path_mod }
 			#}
 		#}
 		#effect = {
@@ -5976,36 +5989,36 @@ settlement_decisions = {
 	#}
 
 	spell_blight = {
-		ai_check_interval = 6
+		ai = no
+		ai_check_interval = 6000
 		filter = all
-		ai_target_filter = all # I really hope this doesn't mess it up
-		only_rulers = yes
+		ai_target_filter = none
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_necromancy
 				has_character_flag = knows_spell_blight
 			}
+			z_wizard = yes
 		}
 		potential = {
-			location = { NOT = { has_disease = yes } }
 			OR = {
-				location = {
-					FROM = {
-						at_location = PREV
-					}
-				}
+				#this block used to be in the opposite order - but FROM (the caster) will only be in one location. It's a little faster to cross off the settlements neighbouring the caster's realm first, then eval caster location
 				location = {
 					any_neighbor_province = {
 						holder_scope = { same_realm = FROM }
 					}
 				}
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
 			}
+			location = { NOT = { has_disease = yes } }
 		}
 		allow = {
 			FROM = {
-				NOT = { has_character_modifier = burn_path_mod }
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -6031,6 +6044,7 @@ settlement_decisions = {
 						}
 					}
 				}
+				NOT = { has_character_modifier = burn_path_mod }
 			}
 			location = { holder_scope = { is_foe = FROM } }
 			location = {
@@ -6160,25 +6174,20 @@ settlement_decisions = {
 		}
 	}
 	spell_controlweather = {
-		ai_check_interval = 5
+		ai_check_interval = 6000
 		filter = all
-		ai_target_filter = all # I really hope this doesn't mess it up
-		only_rulers = yes
+		ai_target_filter = none
+		ai = no
 
 		from_potential = {
-			z_wizard = yes
 			OR = {
 				has_character_modifier = wiz_transmutation
 				#has_character_flag = knows_spell_controlweather
 			}
+			z_wizard = yes
 		}
 		potential = {
 			OR = {
-				location = {
-					FROM = {
-						at_location = PREV
-					}
-				}
 				location = {
 					any_neighbor_province = {
 						holder_scope = { same_realm = FROM }
@@ -6187,6 +6196,11 @@ settlement_decisions = {
 				location = {
 					holder_scope = {
 						character = FROM
+					}
+				}
+				location = {
+					FROM = {
+						at_location = PREV
 					}
 				}
 			}
@@ -6221,18 +6235,18 @@ settlement_decisions = {
 				}
 			}
 			OR = {
-				location = { holder_scope = { is_foe = FROM } }
-				location = {
-					holder_scope = {
-						character = FROM
-					}
-				}
 				location = {
 					holder_scope = {
 						reverse_opinion = {
 							who = FROM
 							value <= -40
 						}
+					}
+				}
+				location = { holder_scope = { is_foe = FROM } }
+				location = {
+					holder_scope = {
+						character = FROM
 					}
 				}
 			}
