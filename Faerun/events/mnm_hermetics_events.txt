@@ -10255,63 +10255,6 @@ long_character_event = {
 	}
 }
 
-###########################################################
-#########    Inherited ingredient set-up event    #########
-###########################################################
-character_event = {
-    id = MNM.5107
-    hide_window = yes
-    is_triggered_only = yes
-
-    trigger = {
-    	FROM = { has_artifact_flag = ingredient } #the artifact inherited must be an ingredient...
-    	NOT = { has_character_flag = dealing_with_inherited_ingredients } #you mustn't already dealing with this...
-    }
-
-    immediate = {
-    	set_character_flag = dealing_with_inherited_ingredients
-    	FROMFROM = { save_event_target_as = previous_ingredient_owner } #does this work on dead folk?
-    	character_event = { id = MNM.5108 }
-    }
-}
-
-#Dealing with inherited ingredients - delays the visible event
-character_event = {
-    id = MNM.5108
-    hide_window = yes
-    is_triggered_only = yes
-
-    immediate = {
-    	if = {
-    		limit = {
-    			ai = yes
-    			FROMFROM = { has_artifact_flag = ingredient }
-    		}
-    		FROMFROM = { destroy_artifact = yes }
-    	}
-    	if = {
-    		limit = {
-    			ai = no
-    			NOT = { has_character_flag = owns_inherited_ingredients }
-    		}
-    		set_character_flag = owns_inherited_ingredients
-    		character_event = { id = MNM.5108 days = 10 } #if this is the first instance of this event, send this event again to check if you ever inherited more than one ingredient...
-    		break = yes
-    	}
-    	if = { #run second time around
-    		limit = {
-    			ai = no
-    			has_character_flag = owns_inherited_ingredients
-    			any_artifact = {
-    				count = 2
-    				has_artifact_flag = ingredient
-    			}
-    		}
-    		repeat_event = { id = MNM.5109 } #send visible event
-    	}
-    }
-}
-
 #Inherited ingredients REMOVED GIVEN TO ARCANE BROTHERHOOD
 
 #Paranoid ward-making REMOVED GIVEN TO ARCANE BROTHERHOOD

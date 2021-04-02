@@ -1,0 +1,129 @@
+#by Olrox17
+
+society_decisions = {
+
+	delve_into_heraldry = {
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			not_casting = yes
+				society_rank = {
+				society = heralds
+				rank >= 2
+			}
+		}
+
+		allow = {
+			has_society_currency_minor_trigger = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = delve_into_forbidden_cooldown_tooltip
+				NOT = { has_character_modifier = delve_into_heraldry_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = delve_into_heraldry_cooldown
+					years = 5
+					hidden = yes
+				}
+				character_event = { id = HERA.200 }
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+		}
+	}
+
+}
+
+targeted_decisions = {
+
+	#write about a ruler
+	write_about_ruler = {
+		only_playable = yes
+
+		ai_target_filter = independent_rulers
+		ai_check_interval = 60
+
+		from_potential = {
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			OR = {
+				society_rank = {
+					society = heralds
+					rank = 4
+				}
+			}
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			is_adult = yes
+			is_ruler = yes
+			is_within_diplo_range = FROM
+		}
+
+		allow = {
+			ROOT = {
+				NOT = { society_member_of = heralds }
+				prisoner = no
+				is_inaccessible_trigger = no
+			}
+			FROM = {
+				has_society_currency_major_trigger = yes
+				is_inaccessible_trigger = no
+				custom_tooltip = {
+					text = write_about_ruler_cooldown_tooltip
+					NOT = { has_character_modifier = write_about_ruler_cooldown }
+				}
+			}
+		}
+
+		effect = {
+			save_event_target_as = writing_target
+			FROM = {
+				detract_society_currency_major_effect = yes
+				character_event = { id = HERA.300 }
+				hidden_effect = {
+					add_character_modifier = {
+						name = write_about_ruler_cooldown
+						years = 5
+						hidden = yes
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+
+}
