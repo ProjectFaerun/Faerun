@@ -1,0 +1,495 @@
+namespace = KNI
+
+########################################################
+# RANK 2 POWER - Warrior Training
+########################################################
+character_event = {
+    id = KNI.10040
+    picture = GFX_evt_teaching_moment
+    border = GFX_event_normal_frame_war
+
+    is_triggered_only = yes
+
+    desc = EVTDESC_KNI_10040
+
+    immediate = {
+        hidden_effect = { select_and_save_fellow_society_member_effect = yes }
+    }
+
+    option = { #Finally!
+        name = EVTOPTA_KNI_10040
+
+        add_trait = knight_order_leader
+        #add_legend_progress_trivial_effect = yes
+        clr_character_flag = choosing_warrior_training
+    }
+}
+
+#############################################
+# RANK 2 POWER - Summon Commander
+character_event = {
+    id = KNI.25000
+    desc = EVTDESC_KNI_25000
+    picture = GFX_evt_joust
+
+    border = GFX_event_normal_frame_war
+
+    is_triggered_only = yes
+
+		option = {
+			name = EVTOPTAKNI25000
+
+			trigger = {
+				any_realm_character = {
+					NOT = {
+						higher_tier_than = BARON
+					}
+					liege = { character = ROOT }
+					has_minor_title = title_commander
+					NOT = {
+						martial = 10
+					}
+				}
+				OR = {
+					AND = {
+						tier = COUNT
+						any_realm_character = {
+							count = 2
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = DUKE
+						any_realm_character = {
+							count = 4
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = KING
+						is_nomadic = no
+						any_realm_character = {
+							count = 6
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = EMPEROR
+						is_nomadic = no
+						any_realm_character = {
+							count = 8
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = KING
+						is_nomadic = yes
+						any_realm_character = {
+							count = 2
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = EMPEROR
+						is_nomadic = yes
+						any_realm_character = {
+							count = 4
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+				}
+			}
+
+			random_realm_character = {
+				limit = {
+					NOT = {
+						higher_tier_than = BARON
+					}
+					liege = { character = ROOT }
+					has_minor_title = title_commander
+					NOT = {
+						martial = 12
+					}
+				}
+				opinion = {
+					modifier = insulted
+					who = ROOT
+					years = 2
+				}
+				remove_title = title_commander
+			}
+
+			event_target:invited_lodge_soldier = {
+				show_scope_change = no
+				opinion = {
+					modifier = opinion_loyal_servant
+					who = ROOT
+					years = 10
+				}
+				give_minor_title = title_commander
+			}
+		}
+    option = {
+        name = EVTOPTBKNI25000
+        trigger = {
+            OR = {
+                AND = {
+                    tier = COUNT
+                    NOT = {
+                        any_realm_character = {
+                            count = 2
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+                AND = {
+                    tier = DUKE
+                    NOT = {
+                        any_realm_character = {
+                            count = 4
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+                AND = {
+                    tier = KING
+                    is_nomadic = no
+                    NOT = {
+                        any_realm_character = {
+                            count = 6
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+                AND = {
+                    tier = EMPEROR
+                    is_nomadic = no
+                    NOT = {
+                        any_realm_character = {
+                            count = 8
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+                AND = {
+                    tier = KING
+                    is_nomadic = yes
+                    NOT = {
+                        any_realm_character = {
+                            count = 2
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+                AND = {
+                    tier = EMPEROR
+                    is_nomadic = yes
+                    NOT = {
+                        any_realm_character = {
+                            count = 4
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                    }
+                }
+            }
+        }
+
+        event_target:invited_lodge_soldier = {
+			show_scope_change = no
+            opinion = {
+                modifier = opinion_loyal_servant
+                who = ROOT
+                years = 10
+            }
+            give_minor_title = title_commander
+        }
+    }
+    option = {
+        name = EVTOPTCKNI25000
+        event_target:invited_lodge_soldier = {
+            show_scope_change = no
+            opinion = {
+                modifier = opinion_loyal_servant
+                who = ROOT
+                years = 10
+            }
+        }
+        ai_chance = {
+            factor = 100
+        }
+    }
+}
+
+
+########################JOINING############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = KNI.100
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = knight_order_purple_dragons } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_purple_dragons
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_purple_dragons
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_purple_dragons
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_purple_dragons
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.101 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = KNI.101 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = KNI.101
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = KNI.102 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = KNI.102
+    desc = EVTDESC_KNI_102
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_KNI_102
+
+      join_society = knight_order_purple_dragons
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+  id = KNI.110
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = knight_order_purple_dragons
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+      }
+			character_event = { id = KNI.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = KNI.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      50 = { # do nothing
+      }
+      50 = {
+        trigger = { #meet the requirement
+          can_join_society = knight_order_purple_dragons
+        }
+				modifier = {
+          factor = 10
+          has_landed_title = d_purple_dragons
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = brave
+            trait = humble
+            trait = diligent
+            trait = just
+            trait = strategist
+            trait = duelist
+          }
+        }
+        modifier = {
+          factor = 0.2
+          OR = {
+            trait = arbitrary
+            trait = slothful
+          }
+        }
+        modifier = {
+          factor = 0.1
+          trait = craven
+        }
+        join_society = knight_order_purple_dragons
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+
+#######################Rank UP#############################
+
+#Hidden start: Send the rank-up request to the current Grandmaster (delayed event on self, from decision to rank up)
+character_event = {
+	id = KNI.120
+
+	hide_window = yes
+
+	trigger = { #has pressed the button
+		has_character_flag = has_sent_request_to_rank_up
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = { #if he's still a member
+			limit = { is_in_society = yes }
+			random_society_member = { #will send the request to a random top rank member of the same society
+				limit = {
+					is_society_grandmaster = yes
+					same_society_as = ROOT
+				}
+				character_event = { id = KNI.121 } # send request to Grand Master.
+			}
+		}
+		if = { #if he's not a member
+			limit = { is_in_society = no }
+			clr_character_flag = has_sent_request_to_rank_up
+		}
+	}
+}
+
+#Grandmaster gets the rank-up request
+character_event = {
+	id = KNI.121
+
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:rank_up_target = { letter_event = { id = KNI.122 } } #send it back
+	}
+}
+
+#Grand master approves my request
+letter_event = {
+	id = KNI.122
+	desc = EVTDESC_KNI_122
+	border = GFX_event_letter_frame_war
+
+	trigger = {
+		society_rank < 4 #cannot rank up past 4
+		has_character_flag = has_sent_request_to_rank_up
+	}
+
+	is_triggered_only = yes
+
+	#Rank up approved
+	option = {
+		name = EVTOPTA_KNI_122
+		if = { limit = { society_rank < 4 } #if not max rank, rank up
+			society_rank_up = 1
+		}
+		clr_character_flag = has_sent_request_to_rank_up
+	}
+}
