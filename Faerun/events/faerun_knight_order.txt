@@ -659,3 +659,194 @@ character_event = { #AI join event
     }
   }
 }
+
+
+########################JOINING CHALICE############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = KNI.300
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = knight_order_silver_chalice } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_silver_chalice
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.301 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_silver_chalice
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.301 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_silver_chalice
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.301 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = knight_order_silver_chalice
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = KNI.301 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = KNI.301 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = KNI.301
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = KNI.302 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = KNI.302
+    desc = EVTDESC_KNI_302
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_KNI_302
+
+      join_society = knight_order_silver_chalice
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP CHALICE###########################
+
+character_event = { #force the AI to join a society
+  id = KNI.310
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = knight_order_silver_chalice
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+      }
+			character_event = { id = KNI.311 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = KNI.311
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      50 = { # do nothing
+      }
+      50 = {
+        trigger = { #meet the requirement
+          can_join_society = knight_order_silver_chalice
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = brave
+            trait = honest
+            trait = zealous
+            trait = just
+            trait = strategist
+            trait = duelist
+          }
+        }
+        modifier = {
+          factor = 0.2
+          OR = {
+            trait = cruel
+            trait = impaler
+            trait = slothful
+          }
+        }
+        modifier = {
+          factor = 0.1
+          trait = craven
+        }
+        join_society = knight_order_silver_chalice
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
