@@ -1,107 +1,6 @@
 namespace = wizinit
 
 character_event = {
-	id = wizinit.1
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		z_wizard = yes
-		OR = {
-			is_save_game = no
-			NOT = { has_character_flag = wizspellinit }
-		}
-	}
-
-	immediate = {
-		set_character_flag = wizspellinit
-		set_variable = { which = wizspellpoints value = 0 }
-		export_to_variable = {
-			which = wizspellpoints
-			value = learning
-		}
-		trigger_switch = {
-			on_trigger = trait
-			wizard = {
-				change_variable = { which = wizspellpoints value = 1 }
-			}
-			trained_wizard = {
-				change_variable = { which = wizspellpoints value = 2 }
-			}
-			journeyman_wizard = {
-				change_variable = { which = wizspellpoints value = 4 }
-			}
-			expert_wizard = {
-				change_variable = { which = wizspellpoints value = 7 }
-			}
-			master_wizard = {
-				change_variable = { which = wizspellpoints value = 10 }
-			}
-			renowned_wizard = {
-				change_variable = { which = wizspellpoints value = 13 }
-			}
-			legendary_wizard = {
-				change_variable = { which = wizspellpoints value = 15 }
-			}
-		}
-		add_character_modifier = {
-			name = wiz_spellpoint_mod
-			duration = -1
-		}
-		character_event = { id = wizinit.2 years = 1 }
-	}
-}
-
-character_event = {
-	id = wizinit.2
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = { # This is to catch the extremely rare cases of someone ceasing to be a wizard
-			limit = {
-				z_wizard = no
-			}
-			remove_character_modifier = wiz_spellpoint_mod
-			break = yes
-		}
-		# Resets the variable
-		set_variable = { which = wizspellpoints value = 0 }
-		export_to_variable = {
-			which = wizspellpoints
-			value = learning
-		}
-		trigger_switch = {
-			on_trigger = trait
-			wizard = {
-				change_variable = { which = wizspellpoints value = 1 }
-			}
-			trained_wizard = {
-				change_variable = { which = wizspellpoints value = 2 }
-			}
-			journeyman_wizard = {
-				change_variable = { which = wizspellpoints value = 4 }
-			}
-			expert_wizard = {
-				change_variable = { which = wizspellpoints value = 7 }
-			}
-			master_wizard = {
-				change_variable = { which = wizspellpoints value = 10 }
-			}
-			renowned_wizard = {
-				change_variable = { which = wizspellpoints value = 13 }
-			}
-			legendary_wizard = {
-				change_variable = { which = wizspellpoints value = 16 }
-			}
-		}
-		character_event = { id = wizinit.2 years = 1 }
-	}
-}
-
-character_event = {
 	id = wizinit.3
 	desc = WIZSPECDESC
 	picture = GFX_evt_wizard
@@ -124,31 +23,25 @@ character_event = {
 	}
 
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		name = WIZSPEC1
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_abjuration
-				duration = -1
-			}
-		}
+		add_trait = wiz_abjuration
 	}
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		name = WIZSPEC2
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_transmutation
-				duration = -1
-			}
-		}
+		add_trait = wiz_transmutation
 	}
 	option = {
-		name = WIZSPEC3
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_conjuration
-				duration = -1
-			}
+		ai_chance = {
+			factor = 10
 		}
+		name = WIZSPEC3
+		add_trait = wiz_conjuration
 	}
 	option = {
 		trigger = {
@@ -158,48 +51,63 @@ character_event = {
 		character_event = { id = wizinit.4 }
 	}
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		trigger = {
 			ai = yes
 		}
 		name = OK
-		add_character_modifier = {
-			name = wiz_divination
-			duration = -1
-		}
+		add_trait = wiz_divination
 	}
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		trigger = {
 			ai = yes
 		}
 		name = OK
-		add_character_modifier = {
-			name = wiz_enchantment
-			duration = -1
-		}
+		add_trait = wiz_enchantment
 	}
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		trigger = {
 			ai = yes
 		}
 		name = OK
-		add_character_modifier = {
-			name = wiz_evocation
-			duration = -1
-		}
+		add_trait = wiz_evocation
 	}
 	option = {
+		ai_chance = {
+			factor = 10
+		}
 		trigger = {
 			ai = yes
 		}
 		name = OK
-		add_character_modifier = {
-			name = wiz_illusion
-			duration = -1
-		}
+		add_trait = wiz_illusion
 	}
 	option = {
 		ai_chance = {
 			factor = 1
+			modifier = {
+				factor = 0.2
+				OR = {
+					trait = kind
+					religion_group = good_human_pantheon_group
+				}
+			}
+			modifier = {
+				factor = 10
+				OR = {
+					religion_group = evil_human_pantheon_group
+					religion_group = drow_pantheon_group
+					religion_group = aberration_group
+				}
+			}
 			modifier = {
 				factor = 1000
 				OR = {
@@ -207,6 +115,10 @@ character_event = {
 					trait = lich
 					trait = vampire
 					trait = vampire_spawn
+					trait = patron_velsharoon
+					trait = patron_myrkul
+					religion = kiaransalee
+					religion = thasmudyanic
 				}
 			}
 		}
@@ -215,10 +127,7 @@ character_event = {
 			NOT = { trait = patron_kelemvor }
 		}
 		name = OK
-		add_character_modifier = {
-			name = wiz_necromancy
-			duration = -1
-		}
+		add_trait = wiz_necromancy
 	}
 	option = {
 		trigger = {
@@ -241,30 +150,15 @@ character_event = {
 
 	option = {
 		name = WIZSPEC4
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_divination
-				duration = -1
-			}
-		}
+		add_trait = wiz_divination
 	}
 	option = {
 		name = WIZSPEC5
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_enchantment
-				duration = -1
-			}
-		}
+		add_trait = wiz_enchantment
 	}
 	option = {
 		name = WIZSPEC6
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_evocation
-				duration = -1
-			}
-		}
+		add_trait = wiz_evocation
 	}
 	option = {
 		name = TB_OPT_MORE
@@ -281,36 +175,14 @@ character_event = {
 
 	option = {
 		name = WIZSPEC7
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_illusion
-				duration = -1
-			}
-		}
+		add_trait = wiz_illusion
 	}
 	option = {
 		trigger = {
 			NOT = { trait = patron_kelemvor }
 		}
 		name = WIZSPEC8
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_necromancy
-				duration = -1
-			}
-		}
-	}
-	option = {
-		trigger = {
-			year = 1359
-		}
-		name = WIZSPEC9
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = wiz_wild
-				duration = -1
-			}
-		}
+		add_trait = wiz_necromancy
 	}
 	option = {
 		name = TB_OPT_BACK
@@ -323,710 +195,208 @@ character_event = {
 	id = wizinit.6
 	desc = WIZINIT.6
 	picture = GFX_evt_wizard
-
+	
 	is_triggered_only = yes
-
+	
 	option = {
 		name = WIZINIT.6.a
-		hidden_tooltip = {
-			random_list = {
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_alustriels_mantle
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_alustriels_mantle
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_nezrams_amethyst_aura
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_nezrams_amethyst_aura
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_remove_disease
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_remove_disease
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_spell_mantle
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_spell_mantle
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_planar_binding
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_planar_binding
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_burn_path
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_burn_path
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_slow
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_slow
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_longstrider
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_longstrider
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_fabricate
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_fabricate
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_create_homunculus
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_create_homunculus
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_tensers_transformation
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_tensers_transformation
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_disintegrate
-							has_character_modifier = wiz_transmutation
-							has_character_modifier = wiz_abjuration
-						}
-					}
-					set_character_flag = learn_disintegrate
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_mordekainens_faithful_hound
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-						}
-					}
-					set_character_flag = learn_mordekainens_faithful_hound
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_find_familiar
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-						}
-					}
-					set_character_flag = learn_find_familiar
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_summon_lesser_demons
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-						}
-					}
-					set_character_flag = learn_summon_lesser_demons
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_conjure_elementals
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_wild
-						}
-					}
-					set_character_flag = learn_conjure_elementals
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_greater_planar_binding
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-						}
-					}
-					set_character_flag = learn_greater_planar_binding
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_incendiary_cloud
-							has_character_modifier = wiz_conjuration
-							has_character_modifier = wiz_divination
-						}
-					}
-					set_character_flag = learn_incendiary_cloud
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_detect_thoughts
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_detect_thoughts
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_comprehend_languages
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_comprehend_languages
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_forget_past
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_forget_past
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_probe_thoughts
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_probe_thoughts
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_legend_lore
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_legend_lore
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_anticipation
-							has_character_modifier = wiz_divination
-							has_character_modifier = wiz_conjuration
-						}
-					}
-					set_character_flag = learn_anticipation
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_charm_person
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-						}
-					}
-					set_character_flag = learn_charm_person
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_rage
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-						}
-					}
-					set_character_flag = learn_rage
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_crown_of_madness
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-						}
-					}
-					set_character_flag = learn_crown_of_madness
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_cathalas_compulsion
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-						}
-					}
-					set_character_flag = learn_cathalas_compulsion
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_mordekainens_involuntary_wizardry
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_wild
-						}
-					}
-					set_character_flag = learn_mordekainens_involuntary_wizardry
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_dominate_person
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_evocation
-						}
-					}
-					set_character_flag = learn_dominate_person
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_fireball
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-							has_character_modifier = wiz_wild
-						}
-					}
-					set_character_flag = learn_fireball
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_magic_missile
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-						}
-					}
-					set_character_flag = learn_magic_missile
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_lightning_bolt
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-						}
-					}
-					set_character_flag = learn_lightning_bolt
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_wall_of_stone
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-						}
-					}
-					set_character_flag = learn_wall_of_stone
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_chain_lightning
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-						}
-					}
-					set_character_flag = learn_chain_lightning
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_maddening_darkness
-							has_character_modifier = wiz_evocation
-							has_character_modifier = wiz_enchantment
-						}
-					}
-					set_character_flag = learn_maddening_darkness
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_phantom_steed
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_phantom_steed
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_alustriels_banner
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_alustriels_banner
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_phantasmal_force
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_phantasmal_force
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_phantasmal_killer
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_phantasmal_killer
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_weird
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_weird
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_mental_prison
-							has_character_modifier = wiz_illusion
-							has_character_modifier = wiz_necromancy
-						}
-					}
-					set_character_flag = learn_mental_prison
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_animate_dead
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_animate_dead
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_false_life
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_false_life
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_bestow_curse
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_bestow_curse
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_create_undead
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_create_undead
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_blight
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_blight
-				}
-				1 = {
-					modifier = {
-						factor = 0
-						OR = {
-							has_character_flag = knows_spell_clone
-							has_character_modifier = wiz_necromancy
-							has_character_modifier = wiz_illusion
-						}
-					}
-					set_character_flag = learn_clone
-				}
-			}
-			character_event = { id = wizinit.7 days = 150 }
-		}
+		add_trait = longevity
 	}
 }
 
 character_event = {
 	id = wizinit.7
 	desc = WIZINIT.7
-	picture = GFX_evt_wizard
-
+	picture = GFX_evt_acererak_1
+	
 	is_triggered_only = yes
-
+	
 	option = {
-		name = OK
-		trigger_switch = {
-			on_trigger = has_character_flag
-			learn_alustriels_mantle = {
-				set_character_flag = knows_spell_alustriels_mantle
+		trigger = {
+			NOR = {
+				AND = {
+					religion_group = good_human_pantheon_group
+					NOR = {
+						religion = mulhorandi_faith
+						religion = untheric_faith
+					}
+				}
+				religion_group = elven_pantheon_group
+				religion = natural
+				religion = adama
+				religion = dwarven_pantheon
+				religion = gnome_pantheon
+				religion = bahamut
+				religion = earthmother_reformed
+				religion = earthmother
+				religion = yuir_reformed
+				religion = yuir
+				religion = ubtao_worship
+				religion = ubtao_reformed
 			}
-			learn_nezrams_amethyst_aura = {
-				set_character_flag = knows_spell_nezrams_amethyst_aura
+		}
+		name = WIZINIT.7.a
+		add_trait = lich
+		hidden_tooltip = {
+			if = {
+				limit = {
+					OR = {
+						trait = creature_human
+						trait = creature_aasimar
+						trait = creature_tiefling
+						trait = creature_half_giant
+						trait = creature_genasi
+						trait = creature_gith
+						trait = creature_gnome
+						trait = creature_halfling
+						trait = creature_centaur
+						trait = creature_wemic
+					}
+				}
+				set_graphical_culture = lich
 			}
-			learn_remove_disease = {
-				set_character_flag = knows_spell_remove_disease
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_malison
+						trait = creature_pureblood
+					}
+				}
+				set_graphical_culture = cambion
 			}
-			learn_spell_mantle = {
-				set_character_flag = knows_spell_spell_mantle
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_elf
+						trait = creature_sea_elf
+						trait = creature_eladrin
+						trait = creature_feyri
+						trait = creature_drow
+						trait = creature_half_elf
+					}
+				}
+				set_graphical_culture = undeadelf
 			}
-			learn_planar_binding = {
-				set_character_flag = knows_spell_planar_binding
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_dwarf
+						trait = creature_half_dwarf
+					}
+				}
+				set_graphical_culture = dwarfvampire
 			}
-			learn_burn_path = {
-				set_character_flag = knows_spell_burn_path
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_naga
+						trait = creature_abomination
+						trait = creature_sarrukh
+					}
+				}
+				set_graphical_culture = bone_naga
 			}
-			learn_slow = {
-				set_character_flag = knows_spell_slow
-			}
-			learn_longstrider = {
-				set_character_flag = knows_spell_longstrider
-			}
-			learn_fabricate = {
-				set_character_flag = knows_spell_fabricate
-			}
-			learn_create_homunculus = {
-				set_character_flag = knows_spell_create_homunculus
-			}
-			learn_tensers_transformation = {
-				set_character_flag = knows_spell_tensers_transformation
-			}
-			learn_disintegrate = {
-				set_character_flag = knows_spell_disintegrate
-			}
-			learn_mordekainens_faithful_hound = {
-				set_character_flag = knows_spell_mordekainens_faithful_hound
-			}
-			learn_find_familiar = {
-				set_character_flag = knows_spell_find_familiar
-			}
-			learn_summon_lesser_demons = {
-				set_character_flag = knows_spell_summon_lesser_demons
-			}
-			learn_conjure_elementals = {
-				set_character_flag = knows_spell_conjure_elementals
-			}
-			learn_greater_planar_binding = {
-				set_character_flag = knows_spell_greater_planar_binding
-			}
-			learn_incendiary_cloud = {
-				set_character_flag = knows_spell_incendiary_cloud
-			}
-			learn_detect_thoughts = {
-				set_character_flag = knows_spell_detect_thoughts
-			}
-			learn_comprehend_languages = {
-				set_character_flag = knows_spell_comprehend_languages
-			}
-			learn_forget_past = {
-				set_character_flag = knows_spell_forget_past
-			}
-			learn_probe_thoughts = {
-				set_character_flag = knows_spell_probe_thoughts
-			}
-			learn_legend_lore = {
-				set_character_flag = knows_spell_legend_lore
-			}
-			learn_anticipation = {
-				set_character_flag = knows_spell_anticipation
-			}
-			learn_charm_person = {
-				set_character_flag = knows_spell_charm_person
-			}
-			learn_rage = {
-				set_character_flag = knows_spell_rage
-			}
-			learn_crown_of_madness = {
-				set_character_flag = knows_spell_crown_of_madness
-			}
-			learn_cathalas_compulsion = {
-				set_character_flag = knows_spell_cathalas_compulsion
-			}
-			learn_mordekainens_involuntary_wizardry = {
-				set_character_flag = knows_spell_mordekainens_involuntary_wizardry
-			}
-			learn_dominate_person = {
-				set_character_flag = knows_spell_dominate_person
-			}
-			learn_fireball = {
-				set_character_flag = knows_spell_fireball
-			}
-			learn_magic_missile = {
-				set_character_flag = knows_spell_magic_missile
-			}
-			learn_lightning_bolt = {
-				set_character_flag = knows_spell_lightning_bolt
-			}
-			learn_wall_of_stone = {
-				set_character_flag = knows_spell_wall_of_stone
-			}
-			learn_chain_lightning = {
-				set_character_flag = knows_spell_chain_lightning
-			}
-			learn_maddening_darkness = {
-				set_character_flag = knows_spell_maddening_darkness
-			}
-			learn_phantom_steed = {
-				set_character_flag = knows_spell_phantom_steed
-			}
-			learn_alustriels_banner = {
-				set_character_flag = knows_spell_alustriels_banner
-			}
-			learn_phantasmal_force = {
-				set_character_flag = knows_spell_phantasmal_force
-			}
-			learn_phantasmal_killer = {
-				set_character_flag = knows_spell_phantasmal_killer
-			}
-			learn_weird = {
-				set_character_flag = knows_spell_weird
-			}
-			learn_mental_prison = {
-				set_character_flag = knows_spell_mental_prison
-			}
-			learn_animate_dead = {
-				set_character_flag = knows_spell_animate_dead
-			}
-			learn_false_life = {
-				set_character_flag = knows_spell_false_life
-			}
-			learn_bestow_curse = {
-				set_character_flag = knows_spell_bestow_curse
-			}
-			learn_create_undead = {
-				set_character_flag = knows_spell_create_undead
-			}
-			learn_blight = {
-				set_character_flag = knows_spell_blight
-			}
-			learn_clone = {
-				set_character_flag = knows_spell_clone
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_ogre
+						trait = creature_half_ogre
+						trait = creature_ogrillon
+					}
+				}
+				set_graphical_culture = undeadogre
 			}
 		}
 	}
-
-	after = {
-		clear_flags_with_prefix = learn
-		clr_character_flag = is_researching_spells
+	
+	option = {
+		trigger = {
+			NOR = {
+				religion_group = evil_human_pantheon_group
+				religion_group = drow_pantheon
+				religion_group = goblin_pantheon_group
+				religion_group = orc_pantheon_group
+				religion_group = aberration_group
+				religion = deities_of_fury
+				religion = laduguer
+				religion = urdlen
+				religion = vaprak
+				religion = tiamat
+				religion = entropy
+				religion = blue_flame
+			}
+		}
+		name = WIZINIT.7.b
+		add_trait = archlich
+		hidden_tooltip = {
+			if = {
+				limit = {
+					OR = {
+						trait = creature_human
+						trait = creature_aasimar
+						trait = creature_tiefling
+						trait = creature_half_giant
+						trait = creature_genasi
+						trait = creature_gith
+						trait = creature_gnome
+						trait = creature_halfling
+						trait = creature_centaur
+						trait = creature_wemic
+					}
+				}
+				set_graphical_culture = lich
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_malison
+						trait = creature_pureblood
+					}
+				}
+				set_graphical_culture = cambion
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_elf
+						trait = creature_sea_elf
+						trait = creature_eladrin
+						trait = creature_feyri
+						trait = creature_drow
+						trait = creature_half_elf
+					}
+				}
+				set_graphical_culture = undeadelf
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_dwarf
+						trait = creature_half_dwarf
+					}
+				}
+				set_graphical_culture = dwarfvampire
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_naga
+						trait = creature_abomination
+						trait = creature_sarrukh
+					}
+				}
+				set_graphical_culture = bone_naga
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_ogre
+						trait = creature_half_ogre
+						trait = creature_ogrillon
+					}
+				}
+				set_graphical_culture = undeadogre
+			}
+		}
 	}
 }
