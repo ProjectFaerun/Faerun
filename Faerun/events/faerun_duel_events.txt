@@ -1,0 +1,1283 @@
+namespace = frduel
+
+### Nomad Leadership Duel (Adapted from claim_duel_decision - hfp_duel_events) ###
+# Get challenged (sent from duel_decision )
+character_event = {
+    id = frduel.1
+    title = claim_duel_challenge_title
+    picture = GFX_evt_rider_1
+    border = GFX_event_normal_frame_war    
+    desc = frduel_desc.1
+
+    is_triggered_only = yes
+    
+    immediate = {
+        if = { #to prevent spam...
+            limit = { NOT = { has_character_modifier = recent_duel_timer } }
+            add_character_modifier = {
+                modifier = recent_duel_timer
+                hidden = yes
+                months = 3
+            }
+        }
+        event_target:combatant_1 = { #combatant_1/attacker
+            if = {
+                limit = { NOT = { has_character_modifier = recent_duel_timer } }
+                #special circumstances, like initiation duel, etc
+                add_character_modifier = { #OUTCOMMENT FOR TESTING PURPOSES
+                    modifier = recent_duel_timer
+                    hidden = yes
+                    months = 3
+                }
+            }
+        }
+    }
+    
+    option = { #Challenge accepted
+        name = EVTOPTA_WOL_11000
+        custom_tooltip = { text = EVTOPTA_HF_10095_TT }
+        ai_chance = {
+            factor = 20
+            modifier = {
+                factor = 2
+                trait = proud
+            }
+            modifier = {
+                factor = 0.5
+                trait = craven
+            }
+        }
+        if = {
+            limit = { trait = craven }
+            random = {
+                chance = 20
+                remove_trait = craven
+            }
+        }
+        pacifists_lose_piety_effect = yes
+        if = {
+            limit = { #Warriors like a warrior who acts like one...
+                is_member_of_any_warrior_lodge_trigger = yes
+            }
+            add_legend_progress_trivial_effect = yes
+        }
+		set_character_flag = is_in_duel
+        event_target:combatant_1 = {
+			set_character_flag = is_in_duel
+            character_event = { id = frduel.2 days = 2 }
+        }
+        set_character_flag = add_duel_xp
+        clr_character_flag = punish_declining
+    }
+    option = { #No way! He/She can't just DUEL me for my titles...!
+        name = {
+            text = EVTOPTA_HF_10095_wroth
+            trigger = { trait = wroth }
+        }
+        name = {
+            text = EVTOPTA_HF_10095_craven
+            trigger = { NOT = { trait = wroth } }
+        }
+
+        if = {
+            limit = { trait = craven }
+            add_character_modifier = {
+                modifier = cowardly_ruler
+                years = 5
+            }
+        }
+        else = {
+            add_trait = craven
+        }
+        ai_chance = {
+            factor = 3
+            modifier = {
+                trait = craven
+                factor = 1.5
+            }
+        }
+        if = {
+            limit = { has_character_flag = punish_declining }
+            if = {
+                limit = { 
+                    NOR = {
+                        trait = craven
+                        trait = brave
+                        trait = berserker 
+                    }
+                }
+                random = {
+                    chance = 50
+                    add_trait = craven
+                    hidden_tooltip = {
+                        character_event = {
+                            id = 38257 #Notify Craven
+                        }
+                    }
+                }
+            }
+            if = {
+                limit = {
+                    trait = brave
+                }
+                remove_trait = brave
+            }
+            prestige = -50
+            add_character_modifier = {
+                modifier = declined_prestige_duel_timer
+                hidden = yes
+                duration = 1095
+            }
+        }
+        hidden_tooltip = {
+            remove_character_modifier = recent_duel_timer
+        }
+        event_target:combatant_1 = { #the attacker/combatant_1
+            hidden_tooltip = {
+                remove_character_modifier = recent_duel_timer
+                if = {
+                    limit = {
+                        NOT = { has_character_modifier = duels_declined }
+                    }
+                    opinion = {
+                        modifier = opinion_fled_duel
+                        who = ROOT
+                        years = 100
+                    }
+                }
+                else = {
+                    opinion = {
+                        modifier = opinion_declined_my_duel #For visuals
+                        who = ROOT
+                        years = 100
+                    }
+                }
+                character_event = { id = HFP.10097 days = 3 } #Duel rejected...
+            }
+        }
+        increase_cowardly_status_effect = yes #tracks duel cowardice
+        clr_character_flag = punish_declining
+    }
+}
+
+# Start the duel - For the attacker (combatant_1)
+character_event = {
+    id = frduel.2
+    title = challenge_accepted_title
+    is_triggered_only = yes
+    picture = GFX_evt_rider_1
+    border = GFX_event_normal_frame_war
+    desc = frduel_desc.2
+
+    option = {
+        name = {
+            text = EVTOPTA_WOL_11001 #Let's fight!
+        }
+        custom_tooltip = { text = EVTOPTA_HFP_10096_CLAIM_DUEL_TT } # "This might affect the fate of <title>..."
+
+        if = {
+            limit = { #Warriors like a warrior who acts like one...
+                is_member_of_any_warrior_lodge_trigger = yes
+            }
+            add_legend_progress_trivial_effect = yes
+        }
+
+        #FALLBACK:
+        if = { #If FROM is no longer alive, clear relevant flags, etc...
+            limit = { FROM = { NOT = { is_alive = yes } } }
+            hidden_effect = {
+                remove_character_modifier = recent_duel_timer
+                clr_duel_flags_effect = yes
+            }
+        }
+        else = {
+            hidden_effect = {
+                set_character_flag = add_duel_xp
+                reset_duel_timers_effect = yes
+                character_event = { id = HFP.10100 } #Send hidden set-up of duel (from there: result)
+            }
+        }
+        ai_chance = {
+            factor = 80
+        }
+    }
+
+    option = { # [INTRIGUE OPTION]
+        name = {
+            text = EVTOPTA_HF_10096 #I will do something.... special.
+        }
+        tooltip_info = intrigue
+
+        custom_tooltip = { text = EVTOPTA_HF_10096_TT } #you will use any means necessary...
+
+        set_character_flag = attacker_using_poison@event_target:combatant_2
+
+        if = { #There is a chance the poison fails...
+            limit = {
+                OR = {
+                    FROM = {
+                        job_spymaster = {
+                            opinion = { who = PREV value = 15 } #if they like their employer
+                            intrigue = ROOT #and they can match your intrigue
+                        }
+                    }
+                    FROM = { intrigue = ROOT } #they alone can match your intrigue
+                }
+            }
+            set_character_flag = poison_can_fail_against@event_target:combatant_2
+        }
+        
+        #FALLBACK:
+        if = { #If FROM is no longer alive, clear relevant flags, etc...
+            limit = { FROM = { NOT = { is_alive = yes } } }
+            hidden_effect = {
+                remove_character_modifier = recent_duel_timer
+                clr_duel_flags_effect = yes
+            }
+        }
+        else = {
+            hidden_effect = {
+                set_character_flag = add_duel_xp
+                reset_duel_timers_effect = yes
+                character_event = { id = HFP.10100 } #Send hidden set-up of duel (from there: result)
+            }
+        }
+
+        ai_chance = {
+            factor = 20
+            dishonorable_ai_chance_increase_score = yes
+        }
+
+        trigger = {
+            intrigue = 12
+            has_dlc = "Holy Fury"
+        }
+    }
+}
+#DEATH: I killed my opponent - I won!
+character_event = {
+    id = frduel.3   # HFP.10103
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+    portrait = event_target:other_combatant
+
+    immediate = {
+		if = {
+			limit = {
+				z_has_class = yes
+			}
+			tb_duel_won_xp = yes
+		}
+        sound_effect = duel_win
+        set_winner_flags_and_save_opponent_effect = yes
+        random_list = {
+            10 = {
+                set_character_flag = desc_A
+                event_target:other_combatant = { set_character_flag = desc_A }
+            }
+            10 = {
+                set_character_flag = desc_B
+                event_target:other_combatant = { set_character_flag = desc_B }
+            }
+            10 = {
+                set_character_flag = desc_C
+                event_target:other_combatant = { set_character_flag = desc_C }
+            }
+        }
+    }
+    # CLAIM DUELS...
+    desc = {
+        text = EVTDESC_HF_10103_A
+        trigger = {
+            has_character_flag = desc_A
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+    desc = {
+        text = EVTDESC_HF_10103_B
+        trigger = {
+            has_character_flag = desc_B
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+    desc = {
+        text = EVTDESC_HF_10103_C
+        trigger = {
+            has_character_flag = desc_C
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+    desc = { # Can happen both in regular duels and claim duels
+        text = EVTDESC_HF_10103_intrigue_A_attacker #I attacked using intrigue and won
+        trigger = {
+            is_using_intrigue_trigger = yes
+        }
+    }
+    desc = { # Can happen both in regular duels and claim duels
+        text = EVTDESC_HF_10103_intrigue_A_defender_spymaster #They used intrigue, but I won anyway (thanks to my spymaster)
+        trigger = {
+            job_spymaster = {
+                opinion = { who = PREV value = 15 } #if they like their employer
+                intrigue = event_target:other_combatant #and they can match their intrigue
+            }
+            is_using_intrigue_trigger = no
+            event_target:other_combatant = { is_using_intrigue_trigger = yes }
+        }
+    }
+    desc = { # Can happen both in regular duels and claim duels
+        text = EVTDESC_HF_10103_intrigue_A_defender_self #They used intrigue, but I won anyway (thanks to my own intrigue)
+        trigger = {
+            intrigue = event_target:other_combatant
+            is_using_intrigue_trigger = no
+            event_target:other_combatant = { is_using_intrigue_trigger = yes }
+        }
+    }
+
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    option = { #If claim duel, the following options are displayed instead...
+        name = {
+            text = EVTOPTA_HF_10103_default #You brought your own death.
+            trigger = {
+                #always available for randomization
+            }
+        }
+        name = {
+            text = EVTOPTA_HF_10103_sad #Curse you, for making me do this!
+            trigger = {
+                OR = {
+                    trait = kind
+                    is_friend = event_target:other_combatant
+                }
+                NOT = { is_rival = event_target:other_combatant }
+            }
+        }
+        name = {
+            text = EVTOPTA_HF_10103_mean #I had a feeling I would have to destroy you.
+            trigger = {
+                OR = {
+                    trait = cruel
+                    is_rival = event_target:other_combatant
+                }
+                NOT = { is_friend = event_target:other_combatant }
+            }
+        }
+        custom_tooltip = { text = you_win_the_duel_tt }
+        apply_generic_duel_victory_effect = yes
+        add_blood_splatter_effect = yes
+
+        
+        tooltip = {
+            apply_nomad_leadership_duel_defeat_effect = yes #For Nomad Leadership Duel        
+            event_target:other_combatant = {
+                if = {
+                    limit = {
+                        has_character_flag = injury_face
+                        has_character_flag = desc_A #decapitation desc
+                        has_nickname = no
+                    }
+                    give_nickname = nick_the_headless
+                }
+            }
+            event_target:other_combatant = {
+                show_scope_change = no
+                death = {
+                    death_reason = death_duel
+                    killer = ROOT
+                }
+            }
+        }
+        event_target:other_combatant = {
+            player_heir = {
+                # set_government_type = nomadic_tribal_government
+                character_event = { id = nomadtribalmaint.2 }
+                character_event = { id = nomadtribalmaint.3 }
+                character_event = { id = nomadtribalmaint.13 }
+            }
+        }
+        hidden_effect = {
+            event_target:other_combatant = { character_event = { id = frduel.4 } } #"I was decapitated (CLAIM DUEL VERSION)" event
+        }
+        ai_chance = {
+            factor = 20
+            modifier = {
+                factor = 2
+                trait = impaler
+            }
+            modifier = {
+                factor = 1.1
+                trait = cruel
+            }
+            modifier = {
+                factor = 5
+                is_rival = event_target:other_combatant
+            }
+        }
+        trigger = {
+            event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 }
+        }
+    }
+    option = { #If KIND/CHARITABLE/ETC: spare their life?
+        name = frduel_desc_opt.3a #I need warriors like you
+        # tooltip_info_custom = available_because_benevolent_tt
+
+        custom_tooltip = { text = you_win_the_duel_tt }
+        custom_tooltip = { text = frduel_desc_merciful_TT }
+            
+        apply_merciful_modifier_effect = yes
+
+        tooltip = { # *actually* added further down the line...
+            if = { limit = { has_character_flag = is_rival_fight }
+                prestige = 100
+            }
+            else = { prestige = 50 }
+        
+            add_character_modifier = {
+                modifier = recent_duel_victory
+                months = 12 #also clears upon new duel!
+            }
+        }
+        
+        hidden_effect = {
+            event_target:other_combatant = {
+                if = {
+                    limit = {
+                        character = event_target:combatant_1
+                        has_character_flag = attacker_using_poison@event_target:combatant_2
+                    }
+                    set_character_flag = is_spared_poisoner
+                }
+                character_event = { id = frduel.5 }  #"I could be spared (CLAIM DUEL VERSION)" event 
+            }
+        }
+
+        ai_chance = {
+            factor = 10
+            likes_other_combatant_score = yes
+            modifier = {
+                factor = 1.5
+                has_character_modifier = the_merciful
+            }
+            modifier = {
+                factor = 5
+                is_close_relative = event_target:other_combatant
+            }
+        }
+
+        trigger = {
+            event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 }
+            # OR = {
+                # trait = kind
+                # trait = charitable
+                # trait = temperate
+                # trait = humble
+                # trait = patient
+                # trait = trusting
+                # is_close_relative = event_target:other_combatant
+            # }
+            character = event_target:combatant_2 #You are the defender
+        }
+    }
+    after = {
+        tooltip = {
+            clean_up_after_duel_effect = yes
+        }
+    }
+}
+
+#DEATH: I died in the duel - I lost (fired from HFP.10103 above)
+character_event = {
+    id = frduel.4   #HFP.10104
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+    portrait = event_target:other_combatant
+
+    immediate = {
+		if = {
+			limit = {
+				z_has_class = yes
+			}
+			tb_duel_lost_xp = yes
+		}
+        sound_effect = duel_lose
+        set_loser_flags_and_save_opponent_effect = yes
+    }
+
+    desc = {
+        text = EVTDESC_HFP_10104_D
+        trigger = {
+            has_character_flag = desc_A
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+    desc = {
+        text = EVTDESC_HFP_10104_E
+        trigger = {
+            has_character_flag = desc_B
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+    desc = {
+        text = EVTDESC_HFP_10104_F
+        trigger = {
+            has_character_flag = desc_C
+            event_target:combatant_1 = {
+                has_character_flag = nomadrule_duel@event_target:combatant_2
+                NOT = { has_character_flag = attacker_using_poison@event_target:combatant_2 }
+            }
+        }
+    }
+
+    desc = { # Can happen both in regular duels and claim duels
+        text = EVTDESC_HF_10104_intrigue_A_attacker #I used poison and lost
+        trigger = {
+            is_using_intrigue_trigger = yes
+        }
+    }
+    desc = { # Can happen both in regular duels and claim duels
+        text = EVTDESC_HF_10104_intrigue_A_defender #attacker used poison, and I am dying
+        trigger = {
+            is_using_intrigue_trigger = no
+            event_target:other_combatant = { is_using_intrigue_trigger = yes }
+        }
+    }
+
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    option = {      
+        name = EVTOPTA_HFP_10104 #Nooooo...!
+        custom_tooltip = { text = you_lose_the_duel_tt }
+
+        hidden_effect = { FROM = { apply_nomad_leadership_duel_defeat_effect = yes } }
+        apply_nomad_leadership_duel_defeat_effect = yes #Usurp top title
+
+        if = {
+            limit = {
+                event_target:combatant_1 = {
+                    character = ROOT
+                    has_character_flag = nomadrule_duel@event_target:combatant_2
+                    has_character_flag = attacker_using_poison@event_target:combatant_2
+                    event_target:other_combatant = {
+                        job_spymaster = {
+                            opinion = { who = PREV value = 15 } #if they like their employer
+                            intrigue = ROOT #and they can match your intrigue
+                        }
+                        NOT = { intrigue = ROOT }
+                    }
+                }
+            }
+            event_target:other_combatant = { #Because saving event target is one more line :P
+                job_spymaster = {
+                    set_character_flag = hi_flag
+                    set_character_flag = bye_flag
+                }
+            }
+        }
+
+        if = {
+            limit = {
+                OR = {
+                    multiplayer = no
+                    event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 }
+                }
+            }
+            debug_battle_death_counter_effect = yes #for debug purposes
+            send_notifications_after_champion_stand_in_effect = yes
+            if = {
+                limit = {
+                    has_character_flag = injury_face
+                    has_character_flag = desc_A
+                    has_nickname = no
+                }
+                give_nickname = nick_the_headless
+            }
+            if = {
+                limit = { event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 } }
+                if = {
+                    limit = { character = event_target:combatant_1 } 
+                    death = {
+                        death_reason = death_claim_duel_attacker #for flavor
+                        killer = event_target:other_combatant
+                    }
+                }
+                else = {
+                    death = {
+                        death_reason = death_claim_duel_defender #for flavor
+                        killer = event_target:other_combatant
+                    }
+                }
+            }
+            else = {
+                death = {
+                    death_reason = death_duel #regular duel death
+                    killer = event_target:other_combatant
+                }
+            }
+        }
+        player_heir = {
+            # set_government_type = nomadic_tribal_government
+            character_event = { id = nomadtribalmaint.2 }
+            character_event = { id = nomadtribalmaint.3 }
+            character_event = { id = nomadtribalmaint.13 }
+        }
+        trigger = {
+            OR = {
+                event_target:other_combatant = {
+                    NOT = { dynasty = ROOT }
+                }
+                event_target:other_combatant = {
+                    is_landed = yes
+                    dynasty = ROOT
+                }
+                event_target:other_combatant = {
+                    ai = no
+                }
+            }
+        }
+    }
+    
+    # SPECIAL OPTION: Only in Claim Duels, for players, if the opponent is an AI of your dynasty...
+    option = {
+        name = EVTOPTB_HFP_10104
+        tooltip_info_custom = available_because_dynasty_member_tt
+        hidden_effect = { FROM = { apply_nomad_leadership_duel_defeat_effect = yes } }
+        apply_nomad_leadership_duel_defeat_effect = yes # Usurp Top Title
+
+        if = {
+            limit = { multiplayer = no }
+            debug_battle_death_counter_effect = yes #for debug purposes
+            send_notifications_after_champion_stand_in_effect = yes
+            if = {
+                limit = {
+                    has_character_flag = injury_face
+                    has_character_flag = desc_A
+                    has_nickname = no
+                }
+                give_nickname = nick_the_headless
+            }
+            if = {
+                limit = { character = event_target:combatant_1 } 
+                death = {
+                    death_reason = death_claim_duel_attacker #for flavor
+                    killer = event_target:other_combatant
+                }
+            }
+            else = {
+                death = {
+                    death_reason = death_claim_duel_defender #for flavor
+                    killer = event_target:other_combatant
+                }
+            }
+        }
+
+        set_player_character = event_target:other_combatant #take control of the winner...
+        event_target:other_combatant = {
+            set_government_type = nomadic_tribal_government
+            character_event = { id = nomadtribalmaint.2 }
+            character_event = { id = nomadtribalmaint.3 }
+            character_event = { id = nomadtribalmaint.13 }
+        }
+        event_target:other_combatant = { if = { limit = { has_character_flag = someone_died } add_kinslayer_trait_effect = yes } } 	
+
+        trigger = {
+            event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 }
+            ai = no
+            event_target:other_combatant = {
+                ai = yes
+                dynasty = ROOT
+                is_landed = no
+            }
+        }
+    }
+    after = {
+        if = {
+            limit = {
+                is_using_intrigue_trigger = no
+                event_target:other_combatant = { is_using_intrigue_trigger = yes }
+            }
+            tooltip = {
+                handle_poison_effect = yes
+            }
+        }
+        hidden_effect = {
+            clean_up_after_duel_effect = yes
+            FROM = { clean_up_after_duel_effect = yes } #test if this works, even if character is_dying
+        }
+    }
+}
+
+############## SPECIAL CLAIM DUEL FOLLOW-UP (if chose to spare life) ############
+
+#DEATH: I should've died in the duel - I lost (fired from HFP.10103)
+character_event = {
+    id = frduel.5   # HF.10104
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+    portrait = event_target:other_combatant
+
+    immediate = {
+		if = {
+			limit = {
+				z_has_class = yes
+			}
+			tb_duel_lost_xp = yes
+		}
+        sound_effect = duel_lose
+        set_loser_flags_and_save_opponent_effect = yes
+    }
+
+    desc = {
+        text = frduel_desc.5a
+        trigger = {
+            has_character_flag = desc_A
+            NOT = { has_character_flag = is_spared_poisoner }
+        }
+    }
+    desc = {
+        text = frduel_desc.5b
+        trigger = {
+            has_character_flag = desc_B
+            NOT = { has_character_flag = is_spared_poisoner }
+        }
+    }
+    desc = {
+        text = frduel_desc.5c
+        trigger = {
+            has_character_flag = desc_C
+            NOT = { has_character_flag = is_spared_poisoner }
+        }
+    }
+    desc = {
+        text = frduel_desc.5d
+        trigger = { has_character_flag = is_spared_poisoner }
+    }
+
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    option = { # I'll walk away while I can...
+        name = EVTOPTA_HF_10104
+        custom_tooltip = { text = you_lose_the_duel_tt }
+
+        #to take care of after effects...
+        event_target:combatant_1 = { clr_character_flag = someone_died }
+        event_target:combatant_2 = { clr_character_flag = someone_died }
+
+        FROM = { character_event = { id = frduel.6 days = 1 } } #follow-up
+
+        tooltip = { clean_up_after_duel_effect = yes }
+        
+        ai_chance = {
+            factor = 10
+            likes_other_combatant_score = yes
+        }
+    }
+    
+    # I would rather DIE
+    option = {
+        name = EVTOPTB_HF_10104
+
+        custom_tooltip = { text = you_lose_the_duel_tt }
+
+        # For correct effects and tooltips...
+        hidden_effect = { FROM = { apply_nomad_leadership_duel_defeat_effect = yes } }
+        apply_nomad_leadership_duel_defeat_effect = yes
+
+        if = {
+            limit = {
+                has_character_flag = injury_face
+                has_character_flag = desc_A
+                has_nickname = no
+            }
+            give_nickname = nick_the_headless
+        }
+        if = {
+            limit = { character = event_target:combatant_1 } 
+            death = {
+                death_reason = death_claim_duel_attacker #for flavor
+                killer = event_target:other_combatant
+            }
+        }
+        else = {
+            death = {
+                death_reason = death_claim_duel_defender #for flavor
+                killer = event_target:other_combatant
+            }
+        }
+        tooltip = { clean_up_after_duel_effect = yes }
+        FROM = { character_event = { id = frduel.7 days = 1 } } #follow-up
+        player_heir = {
+            # set_government_type = nomadic_tribal_government
+            character_event = { id = nomadtribalmaint.2 }
+            character_event = { id = nomadtribalmaint.3 }
+            character_event = { id = nomadtribalmaint.13 }
+        }
+
+        ai_chance = {
+            factor = 10
+            modifier = {
+                factor = 2
+                has_character_modifier = proving_bravery
+            }
+            title_tier_reduction_score = yes # less likely, the more they have to lose...
+        }
+
+        trigger = {
+            OR = {                
+                event_target:other_combatant = {
+                    NOT = { dynasty = ROOT }
+                }
+                event_target:other_combatant = {
+                    is_landed = yes
+                    dynasty = ROOT
+                }
+                event_target:other_combatant = {
+                    ai = no
+                }
+            }
+        }
+    }
+
+    # SPECIAL OPTION: for players, if the opponent is an AI of your dynasty...
+    option = {
+        name = EVTOPTC_HF_10104
+        tooltip_info_custom = available_because_dynasty_member_tt
+        
+        custom_tooltip = { text = you_lose_the_duel_tt }
+
+        # For correct effects and tooltips...
+        hidden_effect = { FROM = { apply_nomad_leadership_duel_defeat_effect = yes } }
+        apply_nomad_leadership_duel_defeat_effect = yes
+
+        if = {
+            limit = {
+                has_character_flag = injury_face
+                has_character_flag = desc_A
+                has_nickname = no
+            }
+            give_nickname = nick_the_headless
+        }
+        if = {
+            limit = { character = event_target:combatant_1 } 
+            death = {
+                death_reason = death_claim_duel_attacker #for flavor
+                killer = event_target:other_combatant
+            }
+        }
+        else = {
+            death = {
+                death_reason = death_claim_duel_defender #for flavor
+                killer = event_target:other_combatant
+            }
+        }
+        
+        tooltip = { clean_up_after_duel_effect = yes }
+
+        set_player_character = event_target:other_combatant #take control of the winner...
+        event_target:other_combatant = {
+            set_government_type = nomadic_tribal_government
+            character_event = { id = nomadtribalmaint.2 }
+            character_event = { id = nomadtribalmaint.3 }
+            character_event = { id = nomadtribalmaint.13 }
+        }
+        event_target:other_combatant = { if = { limit = { has_character_flag = someone_died } add_kinslayer_trait_effect = yes } } 	
+
+        FROM = { character_event = { id = frduel.7 days = 1 } } #follow-up
+
+        trigger = {
+            event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 }
+            ai = no
+            event_target:other_combatant = {
+                ai = yes
+                dynasty = ROOT
+                is_landed = no
+            }
+        }
+    }
+}
+
+#For the merciful fighter: (FROM chose to live)...
+character_event = {
+    id = frduel.6   # HF.10105
+    title = duel_aftermath_title
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+    
+    desc = {
+        text = EVTDESC_HF_10105_A
+        trigger = { 
+            character = event_target:combatant_1
+        }
+        
+    }
+    desc = {
+        text = EVTDESC_HF_10105_A
+        trigger = { 
+            character = event_target:combatant_2
+        }
+    }
+
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    ### Become friendly
+    option = { # You have my forgiveness
+        name = EVTOPTA_HF_10105
+        custom_tooltip = { text = EVTOPTA_HF_10105_TT }
+
+        if = {
+            limit = { trait = cruel }
+            remove_trait = cruel
+        }
+        else_if = {
+            limit = { trait = envious }
+            remove_trait = envious
+        }
+
+        if = { #if you already have an opinion in place, become friends...
+            limit = {
+                OR = {
+                    reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+                    has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+                }
+            }
+            tooltip = { add_friend = FROM }
+        }
+        else = { #otherwise, add opinions... (*actually* added in follow-up)
+            tooltip = {
+                opinion = {
+                    who = FROM
+                    modifier = opinion_budding_friendship
+                    years = 10
+                }
+                reverse_opinion = {
+                    who = FROM
+                    modifier = opinion_budding_friendship
+                    years = 10
+                }
+            }
+        }
+        FROM = { set_character_flag = they_were_nice_about_it }
+    }
+
+    ### Become rivals
+    option = { #I will be WATCHING you...
+        name = EVTOPTB_HF_10105
+        tooltip_info_custom = available_because_malevolent_tt
+
+        if = {
+            limit = { trait = kind }
+            remove_trait = kind
+        }
+        else_if = {
+            limit = { NOT = { trait = cruel } }
+            add_trait = cruel
+        }
+        else_if = {
+            limit = { NOT = { trait = arbitrary } }
+            add_trait = arbitrary
+        }
+        else_if = {
+            limit = { NOT = { trait = envious } }
+            add_trait = envious
+        }
+
+        custom_tooltip = { text = EVTOPTB_HF_10105_TT }
+        tooltip = {
+            FROM = {
+                show_scope_change = no
+                add_character_modifier = {
+                    name = publicly_humiliated
+                    years = 5
+                }
+            }
+            if = {
+                limit = { NOT = { is_rival = FROM } }
+                add_rival = event_target:other_combatant
+            }
+        }
+        FROM = { set_character_flag = they_were_mean_about_it }
+        
+        trigger = {
+            OR = {
+                trait = deceitful
+                trait = cruel
+                trait = arbitrary
+                trait = wroth
+                trait = envious
+                trait = cynical
+                trait = lunatic
+                trait = proud
+                trait = paranoid
+                trait = possessed
+            }
+        }
+    }
+
+    after = {
+        FROM = { character_event = { id = frduel.8 } }
+        hidden_effect = { clean_up_after_duel_effect = yes }
+    }
+}
+
+#For the merciful fighter: (FROM chose to die)...
+character_event = {
+    id = frduel.7   # HF.10106
+    title = getDuelTitle
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    desc = {
+        text = frduel_desc.7a
+        trigger = { character = event_target:combatant_1 }
+    }
+    desc = {
+        text = EVTDESC_HF_10106_B
+        trigger = { character = event_target:combatant_2 }
+    }
+    
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    option = {      
+        name = EVTOPTA_HF_10106 #what a waste of a man/woman
+        trigger = { character = event_target:combatant_1 }
+    }
+    option = {      
+        name = EVTOPTB_HF_10106 #such needless drama
+        custom_tooltip = { text = EVTOPTB_HF_10106_TT }
+        trigger = { character = event_target:combatant_2 }
+    }
+
+    after = {
+        clean_up_after_duel_effect = yes
+        hidden_effect = {
+            FROM = { clean_up_after_duel_effect = yes }
+        }
+    }
+}
+
+#Final event for the defeated fighter, whose life has been spared...
+character_event = {
+    id = frduel.8   # HF.10107
+    title = duel_aftermath_title
+    desc = EVTDESC_HF_10107_A
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    picture = {
+        picture = GFX_evt_duel_team #snowy picture
+        trigger = {
+            capital_scope = {
+                location = { is_winter = yes }
+            }
+        }
+    }
+
+    option = {      
+        name = EVTOPTA_HF_10107 #I could never have expected this generosity
+
+        if = { #if you already have an opinion in place, become friends...
+            limit = {
+                OR = {
+                    reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+                    has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+                }
+            }
+            add_friend = FROM
+        }
+        else = { #otherwise, add opinions...
+            opinion = {
+                who = FROM
+                modifier = opinion_budding_friendship
+                years = 10
+            }
+            reverse_opinion = {
+                who = FROM
+                modifier = opinion_budding_friendship
+                years = 10
+            }
+        }
+        
+        clr_character_flag = they_were_nice_about_it
+        trigger = { has_character_flag = they_were_nice_about_it }
+    }
+
+    option = {      
+        name = EVTOPTB_HF_10107 #I'm glad you show your true feelings...
+
+        add_character_modifier = {
+            name = publicly_humiliated
+            years = 5
+        }
+
+        if = {
+            limit = { NOT = { is_rival = FROM } }
+            add_rival = event_target:other_combatant
+        }
+
+        clr_character_flag = they_were_mean_about_it
+        trigger = { has_character_flag = they_were_mean_about_it }
+    }
+
+    after = {
+        hidden_effect = {
+            clean_up_after_duel_effect = yes
+            FROM = { clean_up_after_duel_effect = yes }
+        }
+    }
+}
+
+#Cowardly display/Humiliation for the other combatant - I won!
+character_event = {
+    id = frduel.9   # HFP.10107
+    desc = EVTDESC_HFP_10107
+    picture = GFX_evt_bad_news
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+
+    portrait = event_target:other_combatant
+
+    picture = {
+        picture = GFX_evt_camaraderie
+        trigger = { has_character_flag = use_tribal_victory_pic }
+    }
+    picture = {
+        picture = GFX_evt_armory
+        trigger = {
+            NOT = { has_character_flag = use_tribal_victory_pic }
+        }
+    }
+
+    immediate = {
+        set_winner_flags_and_save_opponent_effect = yes
+    }
+
+    option = {      
+        name = EVTOPTA_HFP_10107 # Look at them run!
+        custom_tooltip = { text = you_win_the_duel_tt }
+        apply_generic_duel_victory_effect = yes
+        apply_nomad_leadership_duel_defeat_effect = yes #Usurp top title
+        #If expanded upon, set specific effects here
+    }
+    after = {
+        clean_up_after_duel_effect = yes
+    }
+}
+
+#Cowardly display - I lost
+character_event = {
+    id = frduel.10  # HFP.10108
+    desc = EVTDESC_HFP_10108 #I ran away...!
+    picture = GFX_evt_bad_news
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+    immediate = {
+        set_loser_flags_and_save_opponent_effect = yes
+        clr_character_flag = add_duel_xp #Because you are chicken! No reward!
+
+        if = {
+            limit = {
+                OR = {
+                    has_quest = quest_warrior_lodge_duel_honor
+                    has_quest = quest_warrior_lodge_duel_deadly
+                }
+                quest_target = { character = event_target:other_combatant }
+            }
+            set_character_flag = failed_mission #Because makes no sense this clears the mission...
+        }
+    }
+
+    portrait = event_target:other_combatant
+
+    option = {
+        name = {
+            text = EVTOPTA_HFP_10108_craven
+            trigger = { trait = craven }
+        }
+        name = {
+            text = EVTOPTA_HFP_10108_shy
+            trigger = { trait = shy }
+        }
+        name = {
+            text = EVTOPTA_HFP_10108_wroth
+            trigger = { trait = wroth }
+        }
+        name = {
+            text = EVTOPTA_HFP_10108 #I should've stayed and fought!
+            trigger = {
+                NOR = {
+                    trait = craven
+                    trait = shy
+                    trait = wroth
+                }
+            }
+        }
+        custom_tooltip = { text = you_lose_the_duel_tt }
+
+        apply_nomad_leadership_duel_defeat_effect = yes #Usurp Top Title
+
+    }
+    after = {
+        set_character_flag = skip_blood_effect
+        clean_up_after_duel_effect = yes
+    }
+}

@@ -1,0 +1,639 @@
+namespace = nomadtribalmaint
+
+# from on_settlement_construction_completed
+# Builds Nomadic Tribal Building after holding is constructed
+character_event = {
+	id = nomadtribalmaint.1
+
+	hide_window = yes
+
+	only_rulers = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = { holding_type = tribal }
+		ROOT = { government = nomadic_tribal_government }
+	}
+
+	immediate = {
+		if = {
+            limit = { 
+                OR = {
+                    culture = aslanlar
+                    culture = tuigan
+                    culture = chuchian
+                    culture = shaaran
+                    culture = centaur
+                    culture = wemic
+                    culture = eraka
+                }
+            }
+            FROM = { add_building = tb_nomadtribal }
+		}
+		if = {
+            limit = { 
+                OR = {
+                    culture = gnoll
+                    culture = bugbear
+                    culture = goblin
+                    culture = batiri
+                    culture = bakemono
+                    culture = hobgoblin
+                    culture = orc
+                    culture = orog
+                    culture = tanarukk
+                }
+            }
+            FROM = { add_building = tb_hordetribal }
+		}
+    }
+} 
+
+# called from on_startup, on_create_title, on_new_holder_usurpation and on_new_holder on_actions
+# Empowers nomad council
+character_event = {
+	id = nomadtribalmaint.2
+	hide_window = yes
+	is_triggered_only = yes
+	only_rulers = yes
+
+	trigger = { 
+        government = nomadic_tribal_government
+        }
+
+	immediate = { 
+		any_demesne_title = {
+			add_law = {
+    				law = law_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = war_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = revoke_title_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = imprison_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = grant_title_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = banish_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+			add_law = {
+    				law = execution_voting_power_1
+    				cooldown = no
+    				opinion_effect = no
+			}
+            enable_council_voting_on_issue = execute_imprisoned_interaction
+		}
+
+	}
+
+}
+
+# called from on_new_holder and on_new_holder_usurpation
+# Ensures tribal holdings will have Nomadic Tribal buildings after changing owners
+character_event = { 
+	id = nomadtribalmaint.3
+	hide_window = yes
+	is_triggered_only = yes
+	
+	trigger = {
+        ROOT = { government = nomadic_tribal_government }
+		FROM = {
+			lower_real_tier_than = DUKE
+			location = {
+				any_province_holding = {
+					holding_type = tribal
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		FROM = {
+			location = {
+				any_province_holding = {
+                    limit = {
+                        holding_type = tribal
+                        NOT = { has_building = tb_nomadtribal }
+                        ROOT = {
+                            OR = {
+                                culture = aslanlar
+                                culture = tuigan
+                                culture = chuchian
+                                culture = shaaran
+                                culture = centaur
+                                culture = wemic
+                                culture = eraka
+                            }
+                        } 
+					}
+					add_building = tb_nomadtribal
+				}
+				any_province_holding = {
+                    limit = {
+                        holding_type = tribal
+                        NOT = { has_building = tb_hordetribal }
+                        ROOT = {
+                            OR = {
+                                culture = gnoll
+                                culture = bugbear
+                                culture = goblin
+                                culture = batiri
+                                culture = bakemono
+                                culture = hobgoblin
+                                culture = orc
+                                culture = orog
+                                culture = tanarukk
+                            }
+                        } 
+					}
+					add_building = tb_hordetribal
+				}
+			}
+		}
+	}		
+}
+
+# from on_new_holder_inheritance
+# Adopt Nomadic Tribal Government if inheriting a higher title with the correct culture
+character_event = { 
+	id = nomadtribalmaint.4
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		FROMFROM = { government = nomadic_tribal_government }
+		ROOT = {
+            NOT = { higher_real_tier_than = FROMFROM }
+            # OR = {
+                # government = tribal_government
+                # is_landed = no
+            # }
+            government = tribal_government
+            OR = {
+                culture = aslanlar
+                culture = tuigan
+                culture = chuchian
+                culture = shaaran
+                culture = eraka
+                culture = centaur
+                culture = wemic
+                culture = gnoll
+                culture = bugbear
+                culture = goblin
+                culture = batiri
+                culture = bakemono
+                culture = hobgoblin
+                culture = orc
+                culture = orog
+                culture = tanarukk
+            }
+        }
+	}
+	
+	immediate = {
+		ROOT = { set_government_type = nomadic_tribal_government }
+        ROOT = { character_event = { id = nomadtribalmaint.2 } }
+        ROOT = { character_event = { id = nomadtribalmaint.13 } }
+	}
+}
+
+# Called from nomadtribalmaint.7 (adopt nomad gov decision)
+# extra help to keep levy from tanking while the game processes all the new buildings
+character_event = {
+	id = nomadtribalmaint.5 
+
+	hide_window = yes
+
+	only_rulers = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		ROOT = { government = nomadic_tribal_government } 
+	}
+
+	immediate = {
+		any_demesne_title = {
+			limit = { tier = BARON }
+			refill_holding_levy = yes
+		}
+    }
+}
+
+# Nomadic succession for nomads
+character_event = {
+	id = nomadtribalmaint.6
+	hide_window = yes
+	is_triggered_only = yes
+	only_rulers = yes
+
+	trigger = { 
+        government = nomadic_tribal_government
+    }
+
+	immediate = { 
+		FROM = {
+			if = {
+				limit = {
+					OR = {
+                        higher_tier_than = BARON
+                        is_tribal_type_title = yes
+					}
+				}
+				add_law = {
+                    law = succ_nomadic_elective
+                    cooldown = no
+                    opinion_effect = no
+                }
+			}
+		}
+	}
+
+}
+
+# Called from the adopt nomadic tribal government decision
+# Refils holdings after changing government in addition to buildings 
+character_event = {
+	id = nomadtribalmaint.7
+
+	hide_window = yes
+
+	only_rulers = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		government = nomadic_tribal_government 
+	}
+
+	immediate = {
+			any_demesne_title = {
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = tb_nomadtribal }
+						ROOT = {
+                            OR = {
+                                culture = aslanlar
+                                culture = tuigan
+                                culture = chuchian
+                                culture = shaaran
+                                culture = centaur
+                                culture = wemic
+                                culture = eraka
+                            }
+                        }
+					}
+					add_building = tb_nomadtribal
+				}
+				if = {
+					limit = {
+						tier = BARON
+						NOR = { 
+                            has_building = tb_hillfort_1 
+                            has_building = tb_hillfort_2
+                            has_building = tb_hillfort_3
+                            has_building = tb_hillfort_4 
+						}
+						ROOT = {
+                            OR = {
+                                culture = aslanlar
+                                culture = tuigan
+                                culture = chuchian
+                                culture = shaaran
+                                culture = centaur
+                                culture = wemic
+                                culture = eraka
+                            }
+                        }
+					}
+					add_building = tb_hillfort_1
+				}
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = tb_hordetribal }
+						ROOT = {
+                            OR = {
+                                culture = gnoll
+                                culture = bugbear
+                                culture = goblin
+                                culture = batiri
+                                culture = bakemono
+                                culture = hobgoblin
+                                culture = orc
+                                culture = orog
+                                culture = tanarukk
+                            }
+                        }
+					}
+					add_building = tb_hordetribal
+				}
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = tb_horde_fort_1 }
+						ROOT = {
+                            OR = {
+                                culture = gnoll
+                                culture = bugbear
+                                culture = goblin
+                                culture = batiri
+                                culture = bakemono
+                                culture = hobgoblin
+                                culture = orc
+                                culture = orog
+                                culture = tanarukk
+                            }
+                        }
+					}
+					add_building = tb_horde_fort_1
+				}
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = no_meat_preserver_1 }
+						location = { is_capital = yes }
+						ROOT = {
+                            OR = {
+                                culture = gnoll
+                                culture = bugbear
+                                culture = goblin
+                                culture = batiri
+                                culture = bakemono
+                                culture = hobgoblin
+                                culture = orc
+                                culture = orog
+                                culture = tanarukk
+                            }
+                        }
+					}
+					add_building = no_meat_preserver_1
+				}
+			}
+			any_demesne_title = {
+				limit = { tier = BARON }
+				refill_holding_levy = yes
+			}
+		character_event = { id = nomadtribalmaint.5 days = 3 } # extra help to keep levy from tanking while the game processes all the new buildings
+		# character_event = { id = nomadtribalmaint.5 days = 15 } 
+		# character_event = { id = nomadtribalmaint.5 days = 30 } 
+    }
+}
+
+# Announcement event for adopting nomadic tribal government
+narrative_event = {
+	id = nomadtribalmaint.8
+	title = nomadtribalmaintNAME.8
+	desc = nomadtribalmaintdesc.8
+	picture = {
+        trigger = { FROM = { culture = aslanlar } }
+        picture = GFX_evt_moors
+	}
+	picture = {
+        trigger = { FROM = { culture = eraka } }
+        picture = GFX_evt_savage_frontier
+	}
+	picture = {
+        trigger = { FROM = { culture = gnoll } }
+        picture = GFX_evt_gnoll_1
+	}
+	picture = {
+        trigger = { FROM = { culture = wemic } }
+        picture = GFX_evt_wemic
+	}
+	picture = {
+        trigger = { FROM = { culture = centaur } }
+        picture = GFX_evt_centaur_1
+	}
+	picture = {
+        trigger = { 
+            FROM = {
+                OR = {
+                    culture = goblin
+                    culture = batiri
+                    culture = bakemono
+                    culture = hobgoblin
+                    culture = bugbear
+                }
+            }
+        }
+        picture = GFX_evt_goblins
+	}
+	picture = {
+        trigger = { 
+            FROM = {
+                OR = {
+                    culture = orc
+                    culture = orog
+                    culture = tanarukk
+                }
+            }
+        }
+        picture = GFX_evt_orcs
+	}
+	picture = {
+        trigger = { 
+            FROM = {
+                OR = {
+                    culture = tuigan
+                    culture = chuchian
+                    culture = shaaran
+                }
+            }
+        }
+        picture = GFX_evt_steppe_mercenaries
+	}
+	border = GFX_event_narrative_frame_diplomacy
+
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+    
+}
+
+# Option to adopt nomad culture and change government if inheriting as a tribal + not higher rank
+character_event = {
+	id = nomadtribalmaint.9          # Adapted JD.60212
+	desc = nomadtribalmaintdesc.9
+	picture = GFX_evt_steppe_mercenaries
+
+	is_triggered_only = yes
+
+	trigger = {
+        OR = {
+            government = nomadic_tribal_government
+            government = tribal_government
+        }
+		FROMFROM = { government = nomadic_tribal_government }
+        NOT = { culture = FROMFROM }
+        NOT = { higher_real_tier_than = FROMFROM }
+        is_close_relative = FROMFROM
+        # primary_title = { title = FROM } # FROMFROM
+	}
+
+	option = { #Convert culture
+		name = EVT_OPTA_JD_60212
+		culture = FROMFROM
+		set_government_type = nomadic_tribal_government
+		character_event = { id = nomadtribalmaint.2 }
+		character_event = { id = nomadtribalmaint.13 }
+		character_event = { id = nomadtribalmaint.11 } 
+	}
+	option = { #Let the horde fizzle out
+		name = nomadtribalmaintdesc.9b
+		ai_chance = { factor = 0 }
+	}
+}
+
+# from OFFER_VASSALIZATION_INTERACTION_ACCEPT_EVENT
+# Builds Nomadic Tribal Building when vassal changes government upon vassalisation + valid culture
+character_event = { 
+	id = nomadtribalmaint.10 
+
+	hide_window = yes
+
+	only_rulers = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		government = nomadic_tribal_government 
+	}
+
+	immediate = {
+		FROM = { character_event = { id = nomadtribalmaint.11 days = 1 } }
+		FROM = { character_event = { id = nomadtribalmaint.2 days = 1 } }
+		FROM = { character_event = { id = nomadtribalmaint.13 days = 1 } }
+	}
+}
+
+# Builds Nomadic Tribal Building upon inheritance and vassalisation
+# From on_new_holder_inheritance
+character_event = {
+	id = nomadtribalmaint.11
+
+	hide_window = yes
+
+	only_rulers = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		government = nomadic_tribal_government 
+	}
+
+	immediate = {
+			any_demesne_title = {
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = tb_nomadtribal }
+						ROOT = {
+                            OR = {
+                                culture = aslanlar
+                                culture = tuigan
+                                culture = chuchian
+                                culture = shaaran
+                                culture = centaur
+                                culture = wemic
+                                culture = eraka
+                            }
+                        }
+					}
+					add_building = tb_nomadtribal
+				}
+				if = {
+					limit = {
+						tier = BARON
+						NOT = { has_building = tb_hordetribal }
+						ROOT = {
+                            OR = {
+                                culture = gnoll
+                                culture = bugbear
+                                culture = goblin
+                                culture = batiri
+                                culture = bakemono
+                                culture = hobgoblin
+                                culture = orc
+                                culture = orog
+                                culture = tanarukk
+                            }
+                        }
+					}
+					add_building = tb_hordetribal
+				}
+			}
+    }
+}
+
+# Disable nomadic elective if title inherited by a non nomad 
+character_event = {
+	id = nomadtribalmaint.12          
+	hide_window = yes
+	is_triggered_only = yes
+	only_rulers = yes
+
+	trigger = {
+        NOT = { government = nomadic_tribal_government }
+        is_landed = yes
+		FROMFROM = { government = nomadic_tribal_government }
+	}
+
+	immediate = { 
+		FROM = {
+			succession = gavelkind
+		}
+
+	}
+}
+
+# Startup event to enable nomadic succession for nomads
+character_event = {
+	id = nomadtribalmaint.13
+	hide_window = yes
+	is_triggered_only = yes
+	only_rulers = yes
+
+	trigger = { 
+        government = nomadic_tribal_government
+    }
+
+	immediate = { 
+		any_demesne_title = {
+			limit = {
+                OR = {
+                higher_tier_than = BARON
+                is_tribal_type_title = yes
+                }
+			}
+			add_law = {
+                law = succ_nomadic_elective
+                cooldown = no
+                opinion_effect = no
+			}
+		}
+	}
+
+}
