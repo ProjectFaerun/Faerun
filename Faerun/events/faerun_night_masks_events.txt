@@ -1,0 +1,909 @@
+namespace = MASK
+
+# established guild
+character_event = {
+	id = MASK.400
+	desc = EVTDESC_MASK_400
+	picture = GFX_evt_bandits
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_MASK_400
+		event_target:target_thieves_province = {
+			add_province_modifier = {
+				modifier = night_masks_guild
+				duration = -1
+			}
+		}
+	}
+}
+
+# Hostile Guild
+character_event = {
+	id = MASK.403
+	desc = EVTDESC_MASK_403
+	picture = GFX_evt_bandits
+
+	trigger = {
+		NOT = { society_member_of = night_masks }
+		higher_tier_than = BARON
+		any_demesne_province = {
+	    has_province_modifier = night_masks_guild
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 60
+	}
+
+	option = { #lose money
+		name = EVTOPTA_MASK_403
+		ai_chance = {
+			factor = 30
+		}
+		scaled_wealth = -0.05
+	}
+
+	option = { #destroy guild
+		name = EVTOPTB_MASK_403
+		ai_chance = {
+			factor = 30
+		}
+		scaled_wealth = -0.2
+		random_list = {
+			80 = {
+				random_demesne_province = {
+					limit = {
+						has_province_modifier = night_masks_guild
+					}
+					remove_province_modifier = night_masks_guild
+				}
+			}
+			20 = {
+				prestige = -10
+			}
+		}
+	}
+
+	option = { #join
+		name = EVTOPTC_MASK_403
+		trigger = {
+			is_in_society = no
+			age = 16
+			intrigue = 10
+			NOT = {
+				trait = honest
+				culture = monster
+			}
+			OR = {
+				z_rogue_classes = yes
+				AND = {
+					trait = patron_mask
+					OR = {
+						z_cleric = yes
+						z_warlock = yes
+					}
+				}
+			}
+		}
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 3
+				trait = deceitful
+			}
+			modifier = {
+				factor = 3
+				trait = schemer
+			}
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+			modifier = {
+				factor = 3
+				trait = greedy
+			}
+			modifier = {
+				factor = 3
+				trait = envious
+			}
+		}
+		join_society = night_masks
+	}
+}
+
+#Mission Trigger: Heist
+character_event = {
+	id = MASK.1430
+	hide_window = yes
+
+	trigger = {
+		society_member_of = night_masks
+		higher_tier_than = BARON
+		any_demesne_province = {
+			has_province_modifier = night_masks_guild
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 400
+	}
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				NOR = {
+					has_non_aggression_pact_with = ROOT
+					society_member_of = night_masks
+				}
+				primary_title = {
+					is_landless_type_title = no
+				}
+				controls_religion = no
+				holy_order = no
+				mercenary = no
+				is_landed = yes
+				is_within_diplo_range = ROOT
+			}
+			save_event_target_as = target_ruler
+		}
+		if = {
+			limit = {
+				event_target:target_ruler = { always = yes }
+				is_within_diplo_range = event_target:target_ruler
+			}
+			random_society_member = {
+				limit = { society_rank = { rank = 4 society = night_masks } }
+				character_event = { id = MASK.1431 }
+			}
+		}
+	}
+}
+
+#Ping event for GM
+character_event = {
+	id = MASK.1431
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { society_quest_event = { id = MASK.1432 days = 7 } }
+	}
+}
+
+#You get your target realm
+society_quest_event = {
+	id = MASK.1432
+	title = quest_night_heist
+	quest_target = event_target:target_ruler
+
+	trigger = {
+		is_in_society = yes
+		event_target:target_ruler = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+	desc = EVTDESC_STH_1432
+
+	option = {
+		name = ACCEPT
+
+		event_target:target_ruler = {
+			set_quest_target = {
+				id = quest_night_heist
+				holder = ROOT
+			}
+		}
+
+		event_target:target_ruler = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+
+		character_event = { id = MASK.1433 days = 20 }
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+		ai_chance = { factor = 0 }
+	}
+}
+
+#Get past the guards
+character_event = {
+	id = MASK.1433
+	desc = EVTDESC_STH_1433
+	picture = GFX_evt_eavesdropping
+	border = GFX_event_normal_frame_intrigue
+
+	trigger = { has_quest = quest_night_heist }
+	is_triggered_only = yes
+
+	#Bribe
+	option = {
+		trigger = {
+			OR = {
+				ai = no
+				scaled_wealth = 3
+			}
+			diplomacy = 12
+		}
+		name = EVTOPTA_STH_1433
+		tooltip_info = diplomacy
+
+		scaled_wealth = { value = -3 min = -300 }
+
+		set_character_flag = bribed_guards
+		character_event = { id = MASK.1434 days = 7 }
+	}
+
+	#Stealth
+	option = {
+		trigger = {
+			intrigue = 10
+		}
+		name = EVTOPTB_STH_1433
+		tooltip_info = intrigue
+
+		random_list = {
+			60 = {
+				modifier = { FROM = { intrigue = 12 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 14 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 16 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 18 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 20 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 22 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 26 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 30 } factor = 1.4 }
+				modifier = { FROM = { intrigue = 35 } factor = 1.4 }
+				modifier = { FROM = { intrigue = 40 } factor = 1.5 }
+				modifier = { FROM = { intrigue = 50 } factor = 3 }
+				set_character_flag = sneaked_past_guards
+				character_event = { id = MASK.1434 days = 7 tooltip = EVTTOOLTIP_STH.1434 }
+			}
+			40 = {
+				set_character_flag = sneaked_past_guards
+				character_event = { id = MASK.1435 days = 7 tooltip = EVTTOOLTIP_STH.1435 } #fail
+			}
+		}
+	}
+
+	#Violence
+	option = {
+		trigger = {
+			combat_rating = 30
+		}
+		name = EVTOPTC_STH_1433
+		tooltip_info = combat_rating
+
+		random_list = {
+			60 = {
+				modifier = { FROM = { combat_rating = 40 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 50 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 60 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 70 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 80 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 90 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 100 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 120 } factor = 1.4 }
+				modifier = { FROM = { combat_rating = 140 } factor = 1.4 }
+				modifier = { FROM = { combat_rating = 160 } factor = 1.5 }
+				modifier = { FROM = { combat_rating = 200 } factor = 3 }
+				set_character_flag = killed_guards
+				character_event = { id = MASK.1434 days = 7 tooltip = EVTTOOLTIP_STH.1434 }
+			}
+			40 = {
+				set_character_flag = killed_guards
+				character_event = { id = MASK.1435 days = 7 tooltip = EVTTOOLTIP_STH.1435 } #fail
+			}
+		}
+	}
+
+	#Bad idea
+	option = {
+		name = EVTOPTD_STH_1433
+		clr_quest = { id = quest_night_heist failure = yes }
+	}
+}
+
+#You're in
+character_event = {
+    id = MASK.1434
+    picture = GFX_evt_shady_meeting
+    border = GFX_event_normal_frame_intrigue
+
+		trigger = { has_quest = quest_night_heist }
+
+    desc = {
+    	trigger = { has_character_flag = bribed_guards }
+    	text = EVTDESC_STH_1434_A
+    	picture = GFX_evt_shady_meeting
+    }
+    desc = {
+    	trigger = { has_character_flag = sneaked_past_guards }
+    	text = EVTDESC_STH_1434_B
+    	picture = GFX_evt_shadow
+    }
+		desc = {
+    	trigger = { has_character_flag = killed_guards }
+    	text = EVTDESC_STH_1434_C
+    	picture = GFX_evt_bandits
+    }
+
+    is_triggered_only = yes
+
+		option = { #weapons
+			name = EVTOPTA_STH_1434
+			random_list = {
+				10 = {
+					add_artifact = dancing_sword
+				}
+				10 = {
+					add_artifact = defender_sword
+				}
+				10 = {
+					add_artifact = dwarven_thrower
+				}
+				10 = {
+					add_artifact = luck_blade
+				}
+				10 = {
+					add_artifact = nine_lives_stealer
+				}
+				10 = {
+					add_artifact = scimitar_of_speed
+				}
+				10 = {
+					add_artifact = staff_of_striking
+				}
+				10 = {
+					add_artifact = staff_thunder_lightning
+				}
+				10 = {
+					add_artifact = sun_blade
+				}
+				10 = {
+					add_artifact = greater_rod_pact_keeper
+				}
+				10 = {
+					add_artifact = staff_of_fire
+				}
+				10 = {
+					add_artifact = staff_of_frost
+				}
+				10 = {
+					add_artifact = staff_of_healing
+				}
+				10 = {
+					add_artifact = staff_of_power
+				}
+				10 = {
+					add_artifact = staff_of_woodlands
+				}
+				10 = {
+					add_artifact = defending_dagger
+				}
+				20 = {
+					add_artifact = berserker_axe
+				}
+				20 = {
+					add_artifact = flame_tongue
+				}
+				20 = {
+					add_artifact = frost_brand
+				}
+				20 = {
+					add_artifact = life_drinker
+				}
+				20 = {
+					add_artifact = mace_of_terror
+				}
+				20 = {
+					add_artifact = oathbow
+				}
+				20 = {
+					add_artifact = sword_of_sharpness
+				}
+				20 = {
+					add_artifact = sword_of_life_stealing
+				}
+				20 = {
+					add_artifact = sword_of_wounding
+				}
+				20 = {
+					add_artifact = trident_of_warning
+				}
+				20 = {
+					add_artifact = lesser_rod_pact_keeper
+				}
+				20 = {
+					add_artifact = normal_rod_pact_keeper
+				}
+				20 = {
+					add_artifact = staff_of_swarming_insects
+				}
+				20 = {
+					add_artifact = staff_python
+				}
+				20 = {
+					add_artifact = dagger_of_lifekeeping
+				}
+				20 = {
+					add_artifact = sylvan_scimitar
+				}
+				20 = {
+					add_artifact = sword_of_subtlety
+				}
+				20 = {
+					add_artifact = wand_of_binding
+				}
+				20 = {
+					add_artifact = wand_of_fear
+				}
+				20 = {
+					add_artifact = wand_of_fireballs
+				}
+				20 = {
+					add_artifact = wand_of_lightning
+				}
+				20 = {
+					add_artifact = greater_wand_war_mage
+				}
+				20 = {
+					add_artifact = dagger_of_venom
+				}
+				20 = {
+					add_artifact = javelin_of_lightning
+				}
+				20 = {
+					add_artifact = flensing_gauntlet
+				}
+				20 = {
+					add_artifact = wand_magic_missile
+				}
+				20 = {
+					add_artifact = wand_of_web
+				}
+				20 = {
+					add_artifact = normal_wand_war_mage
+				}
+			}
+			new_artifact = {
+				set_creation_date = 1.1.1
+			}
+			character_event = { id = STH.1436 days = 5 }
+		}
+
+		option = { #armor
+			name = EVTOPTB_STH_1434
+			random_list = {
+				10 = {
+					add_artifact = animated_shield
+				}
+				10 = {
+					add_artifact = spellguard_shield
+				}
+				20 = {
+					add_artifact = arrowcatching_shield
+				}
+				20 = {
+					add_artifact = sentinel_shield
+				}
+				20 = {
+					add_artifact = shield_missile_attraction
+				}
+				10 = {
+					add_artifact = dwarven_plate
+				}
+				10 = {
+					add_artifact = efreeti_chain
+				}
+				20 = {
+					add_artifact = glamoured_studded_leather
+				}
+				20 = {
+					add_artifact = demon_armor
+				}
+				20 = {
+					add_artifact = elven_chain
+				}
+				20 = {
+					add_artifact = dragon_scale_mail
+				}
+			}
+			new_artifact = {
+				set_creation_date = 1.1.1
+			}
+			character_event = { id = STH.1436 days = 5 }
+		}
+
+		option = { #jewelry
+			name = EVTOPTC_STH_1434
+			random_list = {
+				25 = {
+					add_artifact = amulet_of_no_detection
+				}
+				25 = {
+					add_artifact = medallion_of_thoughts
+				}
+				25 = {
+					add_artifact = periapt_of_health
+				}
+				25 = {
+					add_artifact = amulet_of_health
+				}
+			}
+			new_artifact = {
+				set_creation_date = 1.1.1
+			}
+			character_event = { id = STH.1436 days = 5 }
+		}
+
+		option = { #clothing
+			name = EVTOPTD_STH_1434
+			random_list = {
+				10 = {
+					add_artifact = robe_of_colors
+				}
+				10 = {
+					add_artifact = robe_of_stars
+				}
+				20 = {
+					add_artifact = robe_of_eyes
+				}
+				20 = {
+					add_artifact = cape_of_the_mountebank
+				}
+				20 = {
+					add_artifact = cloak_of_elvenkind
+				}
+				20 = {
+					add_artifact = cloak_of_protection
+				}
+				10 = {
+					add_artifact = cloak_of_arachnida
+				}
+				10 = {
+					add_artifact = cloak_of_displacement
+				}
+				10 = {
+					add_artifact = cloak_of_the_bat
+				}
+				10 = {
+					add_artifact = mantle_of_spell_resistance
+				}
+			}
+			new_artifact = {
+				set_creation_date = 1.1.1
+			}
+			character_event = { id = STH.1436 days = 5 }
+		}
+
+    after = {
+			hidden_effect = {
+				clr_character_flag = bribed_guards
+				clr_character_flag = sneaked_past_guards
+				clr_character_flag = killed_guards
+			}
+		}
+}
+
+#You get caught
+character_event = {
+    id = MASK.1435
+    picture = GFX_evt_into_the_dungeon
+    border = GFX_event_normal_frame_intrigue
+
+	trigger = { has_quest = quest_night_heist }
+
+    desc = {
+    	trigger = {
+    		has_character_flag = sneaked_past_guards
+    	}
+    	text = EVTDESC_STH_1435_A
+    }
+    desc = {
+    	trigger = {
+				has_character_flag = killed_guards
+    	}
+    	text = EVTDESC_STH_1435_B
+    }
+
+    is_triggered_only = yes
+
+    option = {
+        name = EVTOPTA_STH_1435
+
+        event_target:target_ruler = {
+        	if = {
+	        	limit = { is_landed = yes }
+	        	ROOT = { imprison = PREV }
+	        }
+
+	        if = {
+	        	limit = { is_landed = no }
+	        	host = {
+		        	ROOT = { imprison = PREV }
+	        	}
+	        }
+        }
+
+        reverse_opinion = {
+        	who = event_target:target_ruler
+        	modifier = opinion_thief
+        	years = 20
+        }
+        hidden_effect = {
+        	clr_character_flag = sneaked_past_guards
+        	clr_character_flag = killed_guards
+        }
+        clr_quest = { id = quest_night_heist failure = yes }
+    }
+
+		option = {
+        name = EVTOPTB_STH_1435
+				trigger = {
+					combat_rating = 150
+				}
+				tooltip_info = combat_rating
+
+        reverse_opinion = {
+        	who = event_target:target_ruler
+        	modifier = opinion_thief
+        	years = 20
+        }
+				add_character_modifier = {
+					modifier = true_villain_modifier
+					duration = 3650
+				}
+        hidden_effect = {
+        	clr_character_flag = sneaked_past_guards
+        	clr_character_flag = killed_guards
+        }
+        clr_quest = { id = quest_night_heist failure = yes }
+    }
+}
+
+#You escape and mission is complete
+character_event = {
+    id = MASK.1436
+    desc = EVTDESC_STH_1436
+    picture = GFX_evt_shady_meeting
+    border = GFX_event_normal_frame_intrigue
+
+    is_triggered_only = yes
+
+    trigger = { has_quest = quest_night_heist }
+
+    option = {
+        name = EVTOPTA_STH_1436
+        clr_quest = quest_night_heist
+				add_society_currency_minor_effect = yes
+    }
+}
+
+
+########################JOINING############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = MASK.100
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = night_masks } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = night_masks
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = MASK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = night_masks
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = MASK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = night_masks
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = MASK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = night_masks
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = MASK.101 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = MASK.101 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = MASK.101
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = MASK.102 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = MASK.102
+    desc = EVTDESC_MASK_102
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_MASK_102
+
+      join_society = night_masks
+
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+	id = MASK.110
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				society_member_of = night_masks
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				is_adult = yes
+				is_in_society = no
+				controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = MASK.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = MASK.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = {
+          can_join_society = night_masks
+        }
+        modifier = {
+          factor = 2
+					OR = {
+						trait = seducer
+						trait = seductress
+						trait = impaler
+						trait = schemer
+					}
+        }
+				modifier = {
+          factor = 2
+          trait = envious
+        }
+				modifier = {
+          factor = 2
+          trait = deceitful
+        }
+				modifier = {
+          factor = 2
+          trait = vampire
+        }
+				modifier = {
+          factor = 2
+          z_rogue_classes = yes
+        }
+        modifier = {
+          factor = 0.1
+          trait = kind
+        }
+        modifier = {
+          factor = 0
+          trait = honest
+        }
+        modifier = {
+          factor = 0.1
+          trait = charitable
+        }
+				modifier = {
+					factor = 0.1
+					is_landed = no
+				}
+        join_society = night_masks
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}

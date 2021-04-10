@@ -1,0 +1,1276 @@
+namespace = HERA
+
+########################JOINING############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = HERA.100
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = heralds } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = heralds
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = HERA.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = heralds
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = HERA.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = heralds
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = HERA.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = heralds
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = HERA.101 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = HERA.101 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = HERA.101
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = HERA.102 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = HERA.102
+    desc = EVTDESC_HERA_102
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_HERA_102
+
+      join_society = heralds
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+  id = HERA.110
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = heralds
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+      }
+			character_event = { id = HERA.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = HERA.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = { #meet the requirement
+          can_join_society = heralds
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = socializer
+            trait = scholar
+          }
+        }
+        modifier = {
+          factor = 2
+          trait = content
+        }
+        modifier = {
+          factor = 2
+          trait = erudite
+        }
+        modifier = {
+          factor = 2
+          trait = gregarious
+        }
+        modifier = {
+          factor = 2
+          trait = poet
+        }
+        modifier = {
+          factor = 0.3
+          OR = {
+            trait = shy
+            trait = wroth
+          }
+        }
+        modifier = {
+          factor = 0.1
+          trait = lich
+        }
+        modifier = {
+          factor = 0
+          trait = ambitious
+        }
+        join_society = heralds
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+
+#######################Rank UP#############################
+
+#Hidden start: Send the rank-up request to the current Grandmaster (delayed event on self, from decision to rank up)
+character_event = {
+	id = HERA.120
+
+	hide_window = yes
+
+	trigger = { #has pressed the button
+		has_character_flag = has_sent_request_to_rank_up
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = { #if he's still a member
+			limit = { is_in_society = yes }
+			random_society_member = { #will send the request to a random top rank member of the same society
+				limit = {
+					is_society_grandmaster = yes
+					same_society_as = ROOT
+				}
+				character_event = { id = HERA.121 } # send request to Grand Master.
+			}
+		}
+		if = { #if he's not a member
+			limit = { is_in_society = no }
+			clr_character_flag = has_sent_request_to_rank_up
+		}
+	}
+}
+
+#Grandmaster gets the rank-up request
+character_event = {
+	id = HERA.121
+
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:rank_up_target = { letter_event = { id = HERA.122 } } #send it back
+	}
+}
+
+#Grand master approves my request
+letter_event = {
+	id = HERA.122
+	desc = EVTDESC_HERA_122
+	border = GFX_event_letter_frame_war
+
+	trigger = {
+		society_rank < 4 #cannot rank up past 4
+		has_character_flag = has_sent_request_to_rank_up
+	}
+
+	is_triggered_only = yes
+
+	#Rank up approved
+	option = {
+		name = EVTOPTA_HERA_122
+		if = { limit = { society_rank < 4 } #if not max rank, rank up
+			society_rank_up = 1
+		}
+		clr_character_flag = has_sent_request_to_rank_up
+	}
+}
+
+#################################DECISIONS######################################
+
+# start delving
+character_event = {
+	id = HERA.200
+	desc = EVTDESC_HERA_200
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_200
+
+		character_event = { id = HERA.201 days = 90 }
+  }
+}
+
+# random delving result
+character_event = {
+	id = HERA.201
+	desc = EVTDESC_HERA_201
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_201
+		add_character_modifier = {
+			name = heraldic_knowledge
+			years = 5
+		}
+		random_list = {
+			60 = { # nothing else
+			}
+			10 = {
+				#add content
+          if = {
+            limit = {
+              trait = ambitious
+              NOR = {
+                trait = stressed
+                trait = depressed
+              }
+            }
+            random_list = {
+              90 = { add_trait = stressed }
+              10 = {
+                add_trait = stressed
+                add_trait = content
+              }
+            }
+          }
+          else_if = {
+            limit = {
+              trait = ambitious
+              trait = stressed
+              NOT = { trait = depressed }
+            }
+            random_list = {
+              66 = { add_trait = depressed }
+              33 = {
+                add_trait = depressed
+                add_trait = content
+              }
+            }
+          }
+          else_if = {
+            limit = {
+              trait = ambitious
+              trait = depressed
+              NOT = { trait = stressed }
+            }
+            random_list = {
+              66 = { add_trait = stressed }
+              33 = {
+                add_trait = stressed
+                add_trait = content
+              }
+            }
+          }
+          else_if = {
+            limit = {
+              trait = ambitious
+              AND = {
+                trait = stressed
+                trait = depressed
+              }
+            }
+            add_trait = content
+            random_list = {
+              33 = {}
+              33 = { remove_trait = stressed }
+              33 = { remove_trait = depressed }
+            }
+          }
+          else_if = {
+            limit = {
+              NOT = { trait = content }
+            }
+            add_trait = content
+          }
+			}
+			10 = {
+				add_trait = erudite
+				if = {
+					limit = {
+						trait = naive_appeaser
+					}
+					hidden_tooltip = { remove_trait = naive_appeaser }
+					add_trait = underhanded_rogue
+					break = yes
+				}
+				if = {
+					limit = {
+						trait = underhanded_rogue
+					}
+					hidden_tooltip = { remove_trait = underhanded_rogue }
+					add_trait = charismatic_negotiator
+					break = yes
+				}
+				if = {
+					limit = {
+						trait = charismatic_negotiator
+					}
+					hidden_tooltip = { remove_trait = charismatic_negotiator }
+					add_trait = grey_eminence
+				}
+			}
+			10 = {
+				#add diligent
+					if = {
+						limit = {
+							trait = slothful
+							NOR = {
+								trait = stressed
+								trait = depressed
+							}
+						}
+						random_list = {
+							90 = { add_trait = stressed }
+							10 = {
+								add_trait = stressed
+								add_trait = diligent
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = slothful
+							trait = stressed
+							NOT = { trait = depressed }
+						}
+						random_list = {
+							66 = { add_trait = depressed }
+							33 = {
+								add_trait = depressed
+								add_trait = diligent
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = slothful
+							trait = depressed
+							NOT = { trait = stressed }
+						}
+						random_list = {
+							66 = { add_trait = stressed }
+							33 = {
+								add_trait = stressed
+								add_trait = diligent
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = slothful
+							AND = {
+								trait = stressed
+								trait = depressed
+							}
+						}
+						add_trait = diligent
+						random_list = {
+							33 = {}
+							33 = { remove_trait = stressed }
+							33 = { remove_trait = depressed }
+						}
+					}
+          else_if = {
+            limit = {
+              NOT = { trait = diligent }
+            }
+            add_trait = diligent
+          }
+        if = {
+          limit = {
+            trait = naive_appeaser
+          }
+          hidden_tooltip = { remove_trait = naive_appeaser }
+          add_trait = underhanded_rogue
+          break = yes
+        }
+				if = {
+					limit = {
+						trait = underhanded_rogue
+					}
+					hidden_tooltip = { remove_trait = underhanded_rogue }
+					add_trait = charismatic_negotiator
+					break = yes
+				}
+				if = {
+					limit = {
+						trait = charismatic_negotiator
+					}
+					hidden_tooltip = { remove_trait = charismatic_negotiator }
+					add_trait = grey_eminence
+				}
+			}
+			10 = {
+				#add gregarious
+					if = {
+						limit = {
+							trait = shy
+							NOR = {
+								trait = stressed
+								trait = depressed
+							}
+						}
+						random_list = {
+							90 = { add_trait = stressed }
+							10 = {
+								add_trait = stressed
+								add_trait = gregarious
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = shy
+							trait = stressed
+							NOT = { trait = depressed }
+						}
+						random_list = {
+							66 = { add_trait = depressed }
+							33 = {
+								add_trait = depressed
+								add_trait = gregarious
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = shy
+							trait = depressed
+							NOT = { trait = stressed }
+						}
+						random_list = {
+							66 = { add_trait = stressed }
+							33 = {
+								add_trait = stressed
+								add_trait = gregarious
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							trait = shy
+							AND = {
+								trait = stressed
+								trait = depressed
+							}
+						}
+						add_trait = gregarious
+						random_list = {
+							33 = {}
+							33 = { remove_trait = stressed }
+							33 = { remove_trait = depressed }
+						}
+					}
+					else_if = {
+						limit = {
+							NOT = { trait = gregarious }
+						}
+						add_trait = gregarious
+					}
+			}
+		}
+		ai_chance = {
+				factor = 100
+		}
+  }
+
+	option = {
+		name = EVTOPTB_HERA_201
+    add_character_modifier = {
+			name = good_nights_sleep
+			years = 1
+		}
+  }
+}
+
+# write about a ruler
+character_event = {
+	id = HERA.300
+	desc = EVTDESC_HERA_300
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = { #Praise, diplomacy
+		name = EVTOPTA_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { diplomacy = 12 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 14 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 16 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 18 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 20 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 22 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 26 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 30 } factor = 1.4 }
+        modifier = { ROOT = { diplomacy = 35 } factor = 1.4 }
+        modifier = { ROOT = { diplomacy = 40 } factor = 1.5 }
+        modifier = { ROOT = { diplomacy = 50 } factor = 3 }
+        character_event = { id = HERA.301 days = 90 tooltip = EVTTOOLTIP_HERA.301 } #good praise
+      }
+      40 = {
+        character_event = { id = HERA.302 days = 90 tooltip = EVTTOOLTIP_HERA.302 } #failed praise
+      }
+    }
+
+    ai_chance = {
+      factor = 1
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= 0 }
+      }
+      modifier = {
+        factor = 2
+        opinion = { who = event_target:writing_target value >= 20 }
+      }
+      modifier = {
+        factor = 3
+        opinion = { who = event_target:writing_target value >= 30 }
+      }
+      modifier = {
+        factor = 4
+        opinion = { who = event_target:writing_target value >= 40 }
+      }
+      modifier = {
+        factor = 5
+        opinion = { who = event_target:writing_target value >= 50 }
+      }
+    }
+  }
+  option = { #Defame, intrigue
+		name = EVTOPTB_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { intrigue = 12 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 14 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 16 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 18 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 20 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 22 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 26 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 30 } factor = 1.4 }
+        modifier = { ROOT = { intrigue = 35 } factor = 1.4 }
+        modifier = { ROOT = { intrigue = 40 } factor = 1.5 }
+        modifier = { ROOT = { intrigue = 50 } factor = 3 }
+        character_event = { id = HERA.303 days = 90 tooltip = EVTTOOLTIP_HERA.303 } #successful defamation
+      }
+      40 = {
+        character_event = { id = HERA.304 days = 90 tooltip = EVTTOOLTIP_HERA.304 } #failed defamation
+      }
+    }
+
+    ai_chance = {
+      factor = 1
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 0 }
+      }
+      modifier = {
+        factor = 2
+        opinion = { who = event_target:writing_target value <= -20 }
+      }
+      modifier = {
+        factor = 3
+        opinion = { who = event_target:writing_target value <= -30 }
+      }
+      modifier = {
+        factor = 4
+        opinion = { who = event_target:writing_target value <= -40 }
+      }
+      modifier = {
+        factor = 5
+        opinion = { who = event_target:writing_target value <= -50 }
+      }
+    }
+  }
+  option = { #Be Impartial, learning
+		name = EVTOPTC_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { learning = 12 } factor = 1.2 }
+        modifier = { ROOT = { learning = 14 } factor = 1.2 }
+        modifier = { ROOT = { learning = 16 } factor = 1.2 }
+        modifier = { ROOT = { learning = 18 } factor = 1.2 }
+        modifier = { ROOT = { learning = 20 } factor = 1.3 }
+        modifier = { ROOT = { learning = 22 } factor = 1.3 }
+        modifier = { ROOT = { learning = 26 } factor = 1.3 }
+        modifier = { ROOT = { learning = 30 } factor = 1.4 }
+        modifier = { ROOT = { learning = 35 } factor = 1.4 }
+        modifier = { ROOT = { learning = 40 } factor = 1.5 }
+        modifier = { ROOT = { learning = 50 } factor = 3 }
+        character_event = { id = HERA.305 days = 90 tooltip = EVTTOOLTIP_HERA.305 } #good research
+      }
+      40 = {
+        character_event = { id = HERA.306 days = 90 tooltip = EVTTOOLTIP_HERA.306 } #inaccurate research
+      }
+    }
+
+    ai_chance = {
+      factor = 5
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= -10 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 10 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= -20 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 20 }
+      }
+    }
+  }
+}
+
+# good praise
+character_event = {
+	id = HERA.301
+	desc = EVTDESC_HERA_301
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_301
+    event_target:writing_target = { character_event = { id = HERA.307 } }
+  }
+}
+
+# failed praise
+character_event = {
+	id = HERA.302
+	desc = EVTDESC_HERA_302
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_302
+    prestige = -200
+    event_target:writing_target = { character_event = { id = HERA.308 } }
+  }
+}
+
+# successful defamation
+character_event = {
+	id = HERA.303
+	desc = EVTDESC_HERA_303
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_303
+    event_target:writing_target = { character_event = { id = HERA.309 } }
+  }
+}
+
+# failed defamation
+character_event = {
+	id = HERA.304
+	desc = EVTDESC_HERA_304
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_304
+    prestige = -200
+    event_target:writing_target = { character_event = { id = HERA.310 } }
+  }
+}
+
+# good research
+character_event = {
+	id = HERA.305
+	desc = EVTDESC_HERA_305
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_305
+    prestige = 100
+    add_character_modifier = {
+			name = popular_modifier
+			years = 5
+		}
+    event_target:writing_target = { character_event = { id = HERA.311 } }
+  }
+}
+
+# inaccurate research
+character_event = {
+	id = HERA.306
+	desc = EVTDESC_HERA_306
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_306
+    prestige = -100
+    event_target:writing_target = { character_event = { id = HERA.312 } }
+  }
+}
+
+# target receives good praise
+character_event = {
+	id = HERA.307
+	desc = EVTDESC_HERA_307
+	picture = GFX_evt_noble_in_castle
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_307
+    prestige = 200
+    add_character_modifier = {
+			name = popular_modifier
+			years = 5
+		}
+    if = {
+        limit = {
+            OR = {
+                reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+                has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
+            }
+        }
+        add_friend = FROM
+    }
+    else = {
+        opinion = {
+            who = FROM
+            modifier = opinion_budding_friendship
+            years = 10
+        }
+        reverse_opinion = {
+            who = FROM
+            modifier = opinion_budding_friendship
+            years = 10
+        }
+    }
+    if = {
+      limit = {
+        is_friend = FROM
+      }
+      FROM = { character_event = { id = HERA.313 } }
+    }
+  }
+}
+
+# target receives failed praise
+character_event = {
+	id = HERA.308
+	desc = EVTDESC_HERA_308
+	picture = GFX_evt_scandal
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_308
+    prestige = -200
+    add_character_modifier = {
+			name = unpopular_modifier
+			years = 5
+		}
+    if = {
+      limit = {
+          has_opinion_modifier = { who = FROM modifier = opinion_insulted }
+      }
+      add_rival = FROM
+    }
+    else = {
+      opinion = {
+        who = FROM
+        modifier = opinion_insulted
+        years = 10
+      }
+    }
+  }
+}
+
+# target is hit with successful defamation
+character_event = {
+	id = HERA.309
+	desc = EVTDESC_HERA_309
+	picture = GFX_evt_scandal
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_309
+    prestige = -200
+    add_character_modifier = {
+			name = unpopular_modifier
+			years = 5
+		}
+    if = {
+      limit = {
+          has_opinion_modifier = { who = FROM modifier = opinion_insulted }
+      }
+      add_rival = FROM
+    }
+    else = {
+      opinion = {
+        who = FROM
+        modifier = opinion_insulted
+        years = 10
+      }
+    }
+  }
+}
+
+# target enjoys failed defamation
+character_event = {
+	id = HERA.310
+	desc = EVTDESC_HERA_310
+	picture = GFX_evt_noble_in_castle
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_310
+    prestige = 200
+    add_character_modifier = {
+			name = popular_modifier
+			years = 5
+		}
+  }
+}
+
+# good research on target
+character_event = {
+	id = HERA.311
+	desc = EVTDESC_HERA_311
+	picture = GFX_evt_noble_in_castle
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_311
+    prestige = 100
+    opinion = {
+        who = FROM
+        modifier = opinion_approves
+        years = 10
+    }
+  }
+}
+
+# inaccurate research on target
+character_event = {
+	id = HERA.312
+	desc = EVTDESC_HERA_312
+	picture = GFX_evt_scandal
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_312
+    prestige = -100
+    opinion = {
+      who = FROM
+      modifier = opinion_insulted
+      years = 10
+    }
+  }
+}
+
+
+#possible alliance
+character_event = {
+	id = HERA.313
+	picture = GFX_evt_feast
+	border = GFX_event_normal_frame_diplomacy
+	desc = EVTDESC_HERA_313
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_landed = yes
+		primary_title = {
+			is_landless_type_title = no
+		}
+		NOT = { is_inaccessible_trigger = yes }
+    FROM = {
+      NOR = {
+        is_inaccessible_trigger = yes
+        trait = incapable
+        has_non_aggression_pact_with = ROOT
+        war_with = ROOT
+      }
+      is_landed = yes
+      primary_title = {
+        is_landless_type_title = no
+      }
+      prisoner = no
+      is_within_diplo_range = ROOT
+    }
+	}
+
+	option = {
+		name = EVTOPTA_HERA_313
+		ai_chance = {
+			factor = 100
+		}
+		show_portrait = FROM
+		hidden_tooltip = {
+			FROM = {
+				letter_event = { id = HERA.314 days = 3 }
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_HERA_313
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+#Suggestion to form alliance
+letter_event = {
+	id = HERA.314
+  picture = GFX_evt_feast
+	desc = EVTDESC_HERA_314
+
+	is_triggered_only = yes
+
+	#accept
+	option = {
+		name = EVTOPTA_HERA_314
+		ai_chance = {
+			factor = 100
+		}
+		hidden_tooltip = {
+			FROM = {
+				letter_event = { id = HERA.315 days = 3 }
+			}
+		}
+		opinion = {
+			modifier = in_non_aggression_pact
+			years = 10
+			who = FROM
+		}
+    FROM = {
+      opinion = {
+        modifier = in_non_aggression_pact
+        years = 10
+        who = ROOT
+      }
+    }
+    add_alliance = {
+      who = FROM
+      years = 10
+    }
+	}
+	#decline
+	option = {
+		name = EVTOPTB_HERA_314
+		ai_chance = {
+			factor = 0
+		}
+		FROM = {
+			letter_event = { id = HERA.316 days = 3 }
+		}
+	}
+}
+
+#accepted the offer
+letter_event = {
+  id = HERA.315
+  picture = GFX_evt_feast
+  desc = EVTDESC_HERA_315
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_315
+	}
+}
+
+#declined the offer
+letter_event = {
+  id = HERA.316
+  picture = GFX_evt_feast
+  desc = EVTDESC_HERA_316
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_316
+	}
+}
+
+
+# FOR UNLANDED AI write about a ruler
+character_event = {
+	id = HERA.400
+	desc = EVTDESC_HERA_400
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+  trigger = {
+    society_rank = {
+      society = heralds
+      rank = 4
+    }
+    ai = yes
+    is_landed = no
+	}
+
+  immediate = {
+		random_independent_ruler = {
+			limit = {
+				primary_title = {
+					is_landless_type_title = no
+				}
+        is_landed = yes
+        NOT = { society_member_of = heralds }
+        is_within_diplo_range = ROOT
+			}
+			save_event_target_as = writing_target
+		}
+	}
+
+	option = { #Praise, diplomacy
+		name = EVTOPTA_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { diplomacy = 12 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 14 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 16 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 18 } factor = 1.2 }
+        modifier = { ROOT = { diplomacy = 20 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 22 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 26 } factor = 1.3 }
+        modifier = { ROOT = { diplomacy = 30 } factor = 1.4 }
+        modifier = { ROOT = { diplomacy = 35 } factor = 1.4 }
+        modifier = { ROOT = { diplomacy = 40 } factor = 1.5 }
+        modifier = { ROOT = { diplomacy = 50 } factor = 3 }
+        character_event = { id = HERA.301 days = 90 tooltip = EVTTOOLTIP_HERA.301 } #good praise
+      }
+      40 = {
+        character_event = { id = HERA.302 days = 90 tooltip = EVTTOOLTIP_HERA.302 } #failed praise
+      }
+    }
+
+    ai_chance = {
+      factor = 1
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= 0 }
+      }
+      modifier = {
+        factor = 2
+        opinion = { who = event_target:writing_target value >= 20 }
+      }
+      modifier = {
+        factor = 3
+        opinion = { who = event_target:writing_target value >= 30 }
+      }
+      modifier = {
+        factor = 4
+        opinion = { who = event_target:writing_target value >= 40 }
+      }
+      modifier = {
+        factor = 5
+        opinion = { who = event_target:writing_target value >= 50 }
+      }
+    }
+  }
+  option = { #Defame, intrigue
+		name = EVTOPTB_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { intrigue = 12 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 14 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 16 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 18 } factor = 1.2 }
+        modifier = { ROOT = { intrigue = 20 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 22 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 26 } factor = 1.3 }
+        modifier = { ROOT = { intrigue = 30 } factor = 1.4 }
+        modifier = { ROOT = { intrigue = 35 } factor = 1.4 }
+        modifier = { ROOT = { intrigue = 40 } factor = 1.5 }
+        modifier = { ROOT = { intrigue = 50 } factor = 3 }
+        character_event = { id = HERA.303 days = 90 tooltip = EVTTOOLTIP_HERA.303 } #successful defamation
+      }
+      40 = {
+        character_event = { id = HERA.304 days = 90 tooltip = EVTTOOLTIP_HERA.304 } #failed defamation
+      }
+    }
+
+    ai_chance = {
+      factor = 1
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 0 }
+      }
+      modifier = {
+        factor = 2
+        opinion = { who = event_target:writing_target value <= -20 }
+      }
+      modifier = {
+        factor = 3
+        opinion = { who = event_target:writing_target value <= -30 }
+      }
+      modifier = {
+        factor = 4
+        opinion = { who = event_target:writing_target value <= -40 }
+      }
+      modifier = {
+        factor = 5
+        opinion = { who = event_target:writing_target value <= -50 }
+      }
+    }
+  }
+  option = { #Be Impartial, learning
+		name = EVTOPTC_HERA_300
+
+    random_list = {
+      60 = {
+        modifier = { ROOT = { learning = 12 } factor = 1.2 }
+        modifier = { ROOT = { learning = 14 } factor = 1.2 }
+        modifier = { ROOT = { learning = 16 } factor = 1.2 }
+        modifier = { ROOT = { learning = 18 } factor = 1.2 }
+        modifier = { ROOT = { learning = 20 } factor = 1.3 }
+        modifier = { ROOT = { learning = 22 } factor = 1.3 }
+        modifier = { ROOT = { learning = 26 } factor = 1.3 }
+        modifier = { ROOT = { learning = 30 } factor = 1.4 }
+        modifier = { ROOT = { learning = 35 } factor = 1.4 }
+        modifier = { ROOT = { learning = 40 } factor = 1.5 }
+        modifier = { ROOT = { learning = 50 } factor = 3 }
+        character_event = { id = HERA.305 days = 90 tooltip = EVTTOOLTIP_HERA.305 } #good research
+      }
+      40 = {
+        character_event = { id = HERA.306 days = 90 tooltip = EVTTOOLTIP_HERA.306 } #inaccurate research
+      }
+    }
+
+    ai_chance = {
+      factor = 5
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= -10 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 10 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value <= -20 }
+      }
+      modifier = {
+        factor = 0.5
+        opinion = { who = event_target:writing_target value >= 20 }
+      }
+    }
+  }
+}
