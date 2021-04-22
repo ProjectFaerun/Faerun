@@ -1,0 +1,91 @@
+
+# Adapted from Holy Fury Claim Duel
+# Nomad Duel for Leadership effects
+apply_nomad_leadership_duel_defeat_effect = { 
+	if = { 
+		limit = { event_target:combatant_1 = { has_character_flag = nomadrule_duel@event_target:combatant_2 } }
+		if = {  # if you are the *attacker* ...
+			limit = { event_target:combatant_1 = { character = PREV } }
+			if = {
+				limit = {
+					OR = { # and you *won*...
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+				if = {
+                    limit = {
+                        event_target:combatant_2 = { is_landed = no }
+                        OR = {
+                            is_child_of = event_target:combatant_2
+                            sibling = event_target:combatant_2
+                        }
+                    }
+                    event_target:combatant_2 = {
+                        any_demesne_title = {
+                            grant_title = {
+                            target = event_target:combatant_1
+                            type = duel
+                            }
+                        }
+                    }
+				}
+				else = {
+                    event_target:target_title = {
+                        grant_title = {
+                        target = event_target:combatant_1
+                        type = duel
+                        }
+                    }
+				}
+			}
+			# else = { #means you lost...
+				# event_target:combatant_1 = { imprison = event_target:combatant_2 }
+			# }
+		}
+		
+	###	#################################### #### #### ####
+
+		else_if = { # If you are the *defender*...
+			limit = { event_target:combatant_2 = { character = PREV } }
+			if = {
+				limit = {
+					OR = { #and you *won*...
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+				# event_target:combatant_1 = { imprison = event_target:combatant_2 }
+			}
+			else = { # you *lost*...
+				if = {
+                    limit = {
+                        event_target:combatant_1 = {
+                            is_landed = no
+                            OR = {
+                                is_child_of = event_target:combatant_2
+                                sibling = event_target:combatant_2
+                            }
+                        }
+                    }
+                    event_target:combatant_2 = {
+                        any_demesne_title = {
+                            grant_title = {
+                            target = event_target:combatant_1
+                            type = duel
+                            }
+                        }
+                    }
+				}
+				else = {
+                    event_target:target_title = {
+                        grant_title = {
+                        target = event_target:combatant_1
+                        type = duel
+                        }
+                    }
+				}
+			}
+		}
+	}
+}

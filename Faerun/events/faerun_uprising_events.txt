@@ -1,0 +1,987 @@
+namespace = fr_uprising
+
+##### Nomad Instability event chain#######(With Unstable Nomad Game Rule toggled)
+
+narrative_event = {
+	id = fr_uprising.1          #Start of event chain
+	desc = fr_uprising_desc.1
+    title = fr_uprising_desc_title.1
+    picture = GFX_evt_barbarian_1
+    border = GFX_event_narrative_frame_war
+    is_triggered_only = yes
+    only_independent = yes
+
+	has_dlc = "Horse Lords"
+	
+	capable_only = yes
+	prisoner = no
+	min_age = 16
+	
+	trigger = {
+        check_variable = { which = hog_khan_warning value == 0 } 
+        government = nomadic_tribal_government
+		has_regent = no
+		war = no
+        num_of_count_titles_in_realm > 20
+		NOT = {                           
+			has_game_rule = {
+				name = nomad_stability
+				value = stable
+			}
+		}
+        any_vassal = {
+            NOT = { tier = BARON } 
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no
+        }
+	}
+	
+	option = {
+		name = fr_uprising_desc_opt.1a
+		hidden_tooltip = {
+            ROOT = { set_variable = { which = hog_khan_warning value = 1 } }
+		}
+	}
+	
+}
+
+narrative_event = {
+	id = fr_uprising.2
+	desc = fr_uprising_desc.2
+    title = fr_uprising_desc_title.2
+    picture = GFX_evt_council_quarrelling
+    border = GFX_event_narrative_frame_war
+    is_triggered_only = yes
+    only_independent = yes
+
+	has_dlc = "Horse Lords"
+	
+	capable_only = yes
+	prisoner = no
+	min_age = 16
+	
+	trigger = {
+        check_variable = { which = hog_khan_warning value == 1 }  
+        government = nomadic_tribal_government
+		has_regent = no
+		war = no
+		num_of_count_titles_in_realm > 20        
+		NOT = {                           
+			has_game_rule = {
+				name = nomad_stability
+				value = stable
+			}
+		}
+        any_vassal = {
+            NOT = { tier = BARON } 
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no
+        }
+	}
+	
+	option = {
+		name = fr_uprising_desc_opt.2a
+		hidden_tooltip = {
+            ROOT = { set_variable = { which = hog_khan_warning value = 2 } }
+		} 
+        any_vassal = {
+            limit = { NOT = { tier = BARON } }
+            opinion = {
+                modifier = opinion_ignored_demands
+                who = ROOT
+                years = 10
+            }
+            narrative_event = { id = fr_uprising.15 }
+        }
+		hidden_tooltip = {
+			any_realm_character = { 
+                opinion = {
+                    modifier = opinion_ignored_demands
+                    who = ROOT
+                    years = 10
+                }
+            }
+		} 
+	}
+	
+}
+
+character_event = {
+	id = fr_uprising.3
+	desc = fr_uprising_desc.3
+    title = fr_uprising_desc_title.3
+    picture = GFX_evt_council_quarrelling
+    border = GFX_event_normal_frame_war
+    only_independent = yes
+	capable_only = yes
+	prisoner = no
+	min_age = 16
+
+	has_dlc = "Horse Lords"
+
+	mean_time_to_happen = {
+        months = 5
+    }
+	
+	trigger = {
+        check_variable = { which = hog_khan_warning value == 2 }
+        NOT = { has_character_flag = hogging_khan } 
+        government = nomadic_tribal_government
+		has_regent = no
+		war = no
+		any_demesne_title = {
+			can_be_given_away = yes
+			tier = COUNT
+			NOT = { location = { is_capital = yes } }
+		}
+		num_of_count_titles_in_realm > 20        
+		NOT = {                           
+			has_game_rule = {
+				name = nomad_stability
+				value = stable
+			}
+		}
+        any_vassal = {
+            NOT = { tier = BARON } 
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no
+        }
+	}
+	
+	immediate = {
+		random_demesne_title = {
+			limit = {
+				can_be_given_away = yes
+				tier = COUNT
+				NOT = { location = { is_capital = yes } }
+			}
+			save_event_target_as = nomad_vassal_wanted_title
+		}
+       random_vassal = {
+			limit = {
+                NOT = { tier = BARON } 
+                relative_realm_size = {
+                    who = liege
+                    size < 0.10
+                }
+                NOT = { primary_title = { temporary = yes } }
+                in_revolt = no
+                is_primary_war_defender = no                       
+            }
+			save_event_target_as = nomad_vassal_title_beneficiary
+        }
+	}
+	
+	option = {
+		name = fr_uprising_desc_opt.3a # Hand over Title
+		ai_chance = { factor = 0 }
+		event_target:nomad_vassal_title_beneficiary = {
+			reverse_opinion = {
+				who = ROOT
+				years = 15
+				modifier = requested_land
+			}
+			event_target:nomad_vassal_wanted_title = { gain_title = event_target:nomad_vassal_title_beneficiary }
+            letter_event = { id = fr_uprising.16 }
+		}
+	}
+	
+	option = {
+		name = fr_uprising_desc_opt.3b # Don't hand it over
+		ROOT = { character_event = { id = fr_uprising.4 } }
+        any_vassal = {
+            limit = { NOT = { tier = BARON } }
+            opinion = {
+                modifier = opinion_ignored_demands
+                who = ROOT
+                years = 5
+            }
+            narrative_event = { id = fr_uprising.17 }
+        }
+		ai_chance = { factor = 100 }
+	}
+}
+
+character_event = { 
+	id = fr_uprising.4  # Warning and sets the rest in motion
+	hide_window = yes
+	
+	only_independent = yes
+
+	has_dlc = "Horse Lords"
+    
+	is_triggered_only = yes
+	
+	trigger = {
+        NOT = { has_character_flag = hogging_khan } 
+        government = nomadic_tribal_government
+        num_of_count_titles_in_realm > 20
+		NOT = {                           
+			has_game_rule = {
+				name = nomad_stability
+				value = stable
+			}
+		}
+        any_vassal = {
+            NOT = { tier = BARON } 
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no  
+        }
+	}
+	
+	immediate = {
+		ROOT = { set_character_flag = hogging_khan }
+		ROOT = { character_event = { id = fr_uprising.5 } }
+	}
+}
+
+character_event = {
+	id = fr_uprising.5       # Warning event
+	title = fr_uprising_desc_title.5
+	desc = fr_uprising_desc.5
+	picture = GFX_evt_barbarian_1
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.5a
+	}
+}
+
+character_event = { 
+	id = fr_uprising.6              #Chaotic Revolt Ticker
+	hide_window = yes
+	
+	only_independent = yes
+
+	has_dlc = "Horse Lords"
+
+	has_character_flag = hogging_khan
+    
+	mean_time_to_happen = {
+        months = 3
+    }
+	
+	trigger = {
+        # NOT = { check_variable = { which = overhog value >= 20 } }
+        check_variable = { which = overhog value < 20 }
+        NOT = { has_character_flag = faced_chaotic_revolt }
+        government = nomadic_tribal_government
+        num_of_count_titles_in_realm > 20
+        any_vassal = {
+            NOT = { tier = BARON }
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no 
+
+        }
+		NOT = {
+			any_war = {
+				defender = { character = ROOT }
+				using_cb = fr_chaotic_revolt # Realm not in chaos
+			}
+		}
+	}
+	
+	immediate = {
+		ROOT = { change_variable = { which = overhog value = 1 } }
+		if = {
+            limit = { check_variable = { which = overhog value == 6 } }
+            ROOT = { character_event = { id = fr_uprising.20 } }
+		}
+		if = {
+            limit = { check_variable = { which = overhog value == 12 } }
+            ROOT = { character_event = { id = fr_uprising.21 } }
+		}
+		if = {
+            limit = { check_variable = { which = overhog value == 18 } }
+            ROOT = { character_event = { id = fr_uprising.22 } }
+		}
+	}
+}
+
+character_event = { 
+	id = fr_uprising.7          # It Begins
+	hide_window = yes
+	
+	is_triggered_only = yes
+	only_independent = yes
+	
+	trigger = {
+        check_variable = { which = overhog value >= 20 }
+	}
+	
+	immediate = {
+		ROOT = { set_character_flag = faced_chaotic_revolt }
+		ROOT = { save_event_target_as = chaotic_revolt_liege }
+		ROOT = { narrative_event = { id = fr_uprising.8 } }
+	}
+}
+
+narrative_event = {
+    id = fr_uprising.8
+    desc = fr_uprising_desc.8
+    title = fr_uprising_desc_title.8
+    picture = GFX_evt_large_army
+    border = GFX_event_narrative_frame_war
+    is_triggered_only = yes
+    has_character_flag = faced_chaotic_revolt
+    only_independent = yes
+
+    trigger = {
+        check_variable = { which = overhog value >= 20 }
+        any_vassal = {
+            higher_tier_than = BARON
+            prisoner = no
+        }
+		NOT = {
+			any_war = {
+				defender = { character = ROOT }
+				using_cb = fr_chaotic_revolt # Realm not in chaos
+			}
+		}
+    }
+
+    immediate = {
+        random_vassal = {   # Pick a suitable vassal
+            limit = { higher_tier_than = BARON prisoner = no war = no }
+            preferred_limit = { among_most_powerful_vassals = 2 OR = { tier = KING tier = DUKE } }
+            preferred_limit = { is_powerful_vassal = yes OR = { tier = KING tier = DUKE } }
+            preferred_limit = { among_most_powerful_vassals = 2 }
+            preferred_limit = { is_powerful_vassal = yes is_foe = ROOT }
+            preferred_limit = { is_powerful_vassal = yes }
+            save_event_target_as = designated_rebel_nomad
+            set_character_flag = designated_rebel_nomad
+            narrative_event = { id = fr_uprising.9 }
+        }
+    }
+
+    option = {
+        name = fr_uprising_desc_opt.8a
+        reverse_unsafe_war = {
+            target = event_target:designated_rebel_nomad
+            casus_belli = fr_chaotic_revolt
+        }
+        event_target:designated_rebel_nomad = {
+			create_title = {
+				tier = EMPEROR
+				landless = yes
+				temporary = yes
+				culture = event_target:designated_rebel_nomad
+				name = "CHAOTIC_UPRISER"
+				holder = event_target:designated_rebel_nomad
+			}
+        }
+        any_realm_character = {
+            limit = { higher_tier_than = BARON NOT = { character = event_target:designated_rebel_nomad } }
+            narrative_event = { id = fr_uprising.18 }
+        }
+        any_vassal = {
+            limit = { higher_tier_than = BARON }
+            set_character_flag = designated_rebel_nomad_ally
+            set_defacto_liege = event_target:designated_rebel_nomad
+            join_attacker_wars = event_target:designated_rebel_nomad
+        }
+
+    }
+
+}
+
+narrative_event = {
+    id = fr_uprising.9                      # The populace joins in
+    desc = fr_uprising_desc.9
+    title = fr_uprising_desc_title.9
+    picture = GFX_evt_large_army
+    border = GFX_event_narrative_frame_war
+    is_triggered_only = yes
+    only_playable = yes
+
+    trigger = {
+    }
+
+    immediate = {
+	capital_scope = {
+		ROOT = {
+            spawn_unit = {
+                province = PREV
+                owner = ROOT 
+                can_toggle_looting = no      
+                match_character = event_target:chaotic_revolt_liege
+                match_mult = 0.2
+                attrition = 0
+                maintenance_multiplier = 0
+                reinforces = yes
+                earmark = popular_revolters
+            }
+            spawn_unit = {
+                province = PREV
+                owner = ROOT 
+                can_toggle_looting = no      
+                match_character = event_target:chaotic_revolt_liege
+                match_mult = 0.2
+                attrition = 0
+                maintenance_multiplier = 0
+                reinforces = yes
+                earmark = popular_revolters
+            }
+            spawn_unit = {
+                province = PREV
+                owner = ROOT 
+                can_toggle_looting = no      
+                match_character = event_target:chaotic_revolt_liege
+                match_mult = 0.2
+                attrition = 0
+                maintenance_multiplier = 0
+                reinforces = yes
+                earmark = popular_revolters
+            }
+            spawn_unit = {
+                province = PREV
+                owner = ROOT 
+                can_toggle_looting = no      
+                match_character = event_target:chaotic_revolt_liege
+                match_mult = 0.2
+                attrition = 0
+                maintenance_multiplier = 0
+                reinforces = yes
+                earmark = popular_revolters
+            }
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+				trait = peasant_leader 
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+				trait = peasant_leader 
+			}
+            spawn_fleet = {
+                province = closest
+                owner = ROOT       
+                match_character = event_target:chaotic_revolt_liege
+                match_mult = 0.8
+                match_min = 100						
+                earmark = popular_revolters
+            }
+	    }
+	  }
+    }
+
+    option = {
+        name = fr_uprising_desc_opt.9a
+    }
+}
+character_event = { # Fallback Ticker         
+	id = fr_uprising.10
+	hide_window = yes
+	ai = no	
+	is_triggered_only = yes	
+	trigger = {
+        over_max_demesne_size >= 25
+        check_variable = { which = global_overdmlimit value < 10 }
+	}
+	
+	immediate = {
+		change_variable = { which = global_overdmlimit value = 1 }
+	}
+}
+
+character_event = { 
+	id = fr_uprising.11
+	hide_window = yes
+	ai = no	
+	is_triggered_only = yes	
+	trigger = {
+        over_max_demesne_size >= 25
+        check_variable = { which = global_overdmlimit value >= 10 }
+	}
+	
+	immediate = {
+		ROOT = { character_event = { id = fr_uprising.12 } }
+	}
+}
+
+character_event = { # Fallback Uprising
+	id = fr_uprising.12
+	desc = fr_uprising_desc.12 
+	picture = GFX_evt_moors
+	border = GFX_event_normal_frame_war
+	
+	only_playable = yes
+	is_triggered_only = yes
+	
+	trigger = {
+        over_max_demesne_size >= 25
+	}
+	
+	immediate = {
+		capital_scope = { 
+			location = {
+				create_character = {
+					random_traits = yes
+					dynasty = random
+					religion = ROOT
+					culture = ROOT
+					female = no
+					age = 38
+					attributes = {
+						martial = 15
+					}
+					trait = brilliant_strategist
+					trait = peasant_leader
+				}
+				
+				new_character = {
+					create_title = {
+						tier = DUKE
+						landless = yes
+						temporary = yes
+						culture = ROOT
+						name = "POPULAR_REVOLT"
+						holder = THIS
+					}
+					
+					spawn_unit = {
+						province = PREV
+						home = PREV
+						owner = THIS
+						leader = THIS
+						match_character = ROOT
+						match_mult = 0.7
+						earmark = popular_revolters
+						reinforces = yes
+						reinforce_rate_multiplier = 0.25
+						attrition = 0
+					}
+					create_character = {
+						random_traits = yes
+						dynasty = THIS
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 18
+						attributes = {
+							martial = 15
+						}
+						trait = brilliant_strategist
+						trait = peasant_leader
+					}
+					new_character = {
+						set_father = PREV
+						spawn_unit = {
+							province = PREVPREV
+							home = PREVPREV
+							owner = PREV
+							match_character = ROOT
+							match_mult = 0.7
+							earmark = popular_revolters
+							reinforces = yes
+							reinforce_rate_multiplier = 0.25
+							attrition = 0
+						}
+					}
+					
+					create_character = {
+						random_traits = yes
+						dynasty = THIS
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 20
+						attributes = {
+							martial = 15
+						}
+						trait = brilliant_strategist
+						trait = peasant_leader
+					}
+					new_character = {
+						set_father = PREV
+						spawn_unit = {
+							province = PREVPREV
+							home = PREVPREV
+							owner = PREV
+							match_character = ROOT
+							match_mult = 0.7
+							earmark = popular_revolters
+							reinforces = yes
+							reinforce_rate_multiplier = 0.25
+							attrition = 0
+						}
+					}
+					
+					create_character = {
+						random_traits = yes
+						dynasty = NONE
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 20
+						attributes = {
+							martial = 15
+						}
+						trait = brilliant_strategist
+						trait = peasant_leader
+					}
+					new_character = {
+						spawn_unit = {
+							province = PREVPREV
+							home = PREVPREV
+							owner = PREV
+							match_character = ROOT
+							match_mult = 0.7
+							earmark = popular_revolters
+							reinforces = yes
+							reinforce_rate_multiplier = 0.25
+							attrition = 0
+						}
+					}
+					create_character = {
+						random_traits = yes
+						dynasty = NONE
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 22
+						attributes = {
+							martial = 15
+						}
+						trait = brilliant_strategist
+						trait = peasant_leader
+					}
+					new_character = {
+						spawn_unit = {
+							province = PREVPREV
+							home = PREVPREV
+							owner = PREV
+							match_character = ROOT
+							match_mult = 0.7
+							earmark = popular_revolters
+							reinforces = yes
+							reinforce_rate_multiplier = 0.25
+							attrition = 0
+						}
+					}
+					create_character = {
+						random_traits = yes
+						dynasty = NONE
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 22
+						attributes = {
+							martial = 15
+						}
+						trait = brilliant_strategist
+						trait = peasant_leader
+					}
+					new_character = {
+						spawn_unit = {
+							province = PREVPREV
+							home = PREVPREV
+							owner = PREV
+							match_character = ROOT
+							match_mult = 0.7
+							earmark = popular_revolters
+							reinforces = yes
+							reinforce_rate_multiplier = 0.25
+							attrition = 0
+						}
+					}
+					spawn_fleet = {
+						province = closest
+						owner = THIS
+						match_character = ROOT
+						match_mult = 5
+						match_min = 1000
+						earmark = popular_revolters
+					}
+					
+					set_character_flag = chaotic_revolter
+					war = {
+						target = ROOT
+						casus_belli = fr_chaotic_revolt
+					}
+					clr_character_flag = chaotic_revolter
+					
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = fr_uprising_desc_opt.12a
+	}
+}
+
+narrative_event = {
+	id = fr_uprising.13 # The uprising succeeds
+	title = fr_uprising_desc_title.13
+	desc = fr_uprising_desc.13
+	picture = GFX_evt_carnage_1
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.13a
+	}
+}
+
+narrative_event = {
+	id = fr_uprising.14 # The uprising fails
+	title = fr_uprising_desc_title.14
+	desc = fr_uprising_desc.14
+	picture = GFX_evt_barbarian_1
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.14a
+	}
+}
+
+narrative_event = {
+	id = fr_uprising.15 # First vassal reaction to land demand
+	title = fr_uprising_desc_title.15
+	desc = fr_uprising_desc.15
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.15a
+	}
+}
+
+letter_event = {
+	id = fr_uprising.16 # Notification for nomad liege handing out land
+	desc = fr_uprising_desc.16
+	is_friendly = yes
+	border = GFX_event_letter_frame_diplomacy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.16a
+		opinion = {
+			modifier = opinion_grateful
+			who = FROM
+			months = 120
+		}
+	}
+}
+
+narrative_event = {
+	id = fr_uprising.17 # Vassal reaction to refusal to hand out land
+	title = fr_uprising_desc_title.17
+	desc = fr_uprising_desc.17
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.17a
+	}
+}
+
+narrative_event = {
+	id = fr_uprising.18 # Chaotic Revolt announcement for other vassals
+	title = fr_uprising_desc_title.18
+	desc = fr_uprising_desc.18
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.18a
+	}
+}
+
+character_event = { 
+	id = fr_uprising.19  # Fallback if Nomad Instability chain breaks
+	hide_window = yes
+	
+	only_independent = yes
+
+	has_dlc = "Horse Lords"
+    
+	is_triggered_only = yes
+	
+	trigger = {
+        NOT = { has_character_flag = hogging_khan } 
+        government = nomadic_tribal_government
+        num_of_count_titles_in_realm > 20
+		NOT = {                           
+			has_game_rule = {
+				name = nomad_stability
+				value = stable
+			}
+		}
+        any_vassal = {
+            NOT = { tier = BARON } 
+            relative_realm_size = {
+                who = liege
+                size < 0.10
+            }
+            NOT = { primary_title = { temporary = yes } }
+            in_revolt = no
+            is_primary_war_defender = no 
+        }
+        NOT = {
+            any_demesne_title = {
+                can_be_given_away = yes
+                tier = COUNT
+                NOT = { location = { is_capital = yes } }
+            }
+		}
+	}
+	
+	immediate = {
+		ROOT = { set_character_flag = hogging_khan }
+		ROOT = { character_event = { id = fr_uprising.5 } }
+	}
+}
+
+character_event = {
+	id = fr_uprising.20 # Notification for 30% revolt score
+	desc = fr_uprising_desc.20
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.20a
+	}
+}
+character_event = {
+	id = fr_uprising.21 # Notification for 60% revolt score
+	desc = fr_uprising_desc.21
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.21a
+	}
+}
+character_event = {
+	id = fr_uprising.22 # Notification for 90% revolt score
+	desc = fr_uprising_desc.22
+	picture = GFX_evt_steppe_mercenaries
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fr_uprising_desc_opt.22a
+	}
+}
+
+character_event = { 
+	id = fr_uprising.23  # Clear Flags for liege
+	hide_window = yes
+    
+	is_triggered_only = yes
+	
+	trigger = {
+	}
+	
+	immediate = {
+		set_variable = { which = hog_khan_warning value = 0 }
+		clr_character_flag = hogging_khan
+		set_variable = { which = overhog value = 0 }
+		clr_character_flag = faced_chaotic_revolt
+	}
+}
+
+character_event = { 
+	id = fr_uprising.24  # Clear Flags for Revolters
+	hide_window = yes
+    
+	is_triggered_only = yes
+	
+	trigger = {
+	}
+	
+	immediate = {
+		clr_character_flag = designated_rebel_nomad
+		clr_character_flag = designated_rebel_nomad_ally
+	}
+}
+
+character_event = { 
+	id = fr_uprising.25              #Chaotic Revolt Reverse Ticker for under control nomads
+	hide_window = yes
+	
+	only_independent = yes
+
+	has_dlc = "Horse Lords"
+
+	has_character_flag = hogging_khan
+    
+	is_triggered_only = yes
+	
+	trigger = {
+        check_variable = { which = overhog value > 0 }
+        NOT = { has_character_flag = faced_chaotic_revolt }
+        government = nomadic_tribal_government
+        num_of_count_titles_in_realm > 20
+        NOT = {
+            any_vassal = {
+                NOT = { tier = BARON }
+                relative_realm_size = {
+                    who = liege
+                    size < 0.10
+                }
+                NOT = { primary_title = { temporary = yes } }
+                in_revolt = no
+                is_primary_war_defender = no 
+            }
+        }
+		NOT = {
+			any_war = {
+				defender = { character = ROOT }
+				using_cb = fr_chaotic_revolt # Realm not in chaos
+			}
+		}
+	}
+	
+	immediate = {
+		ROOT = { change_variable = { which = overhog value = -1 } }
+	}
+}

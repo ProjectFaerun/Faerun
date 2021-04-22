@@ -1,0 +1,122 @@
+targetted_decisions = {
+	fr_prepared_invasion = {
+		only_playable = yes
+		is_high_prio = yes		
+		filter = independent_rulers
+		ai_target_filter = independent_rulers
+		ai_check_interval = 48		
+
+		from_potential = {
+			is_playable = yes
+			war = no
+			mercenary = no
+			holy_order = no
+			is_incapable = no
+			wealth >= 2
+			NOT = { has_character_flag = prep_invader }
+			NOT = { has_truce = ROOT } 
+			OR = {
+                government = nomadic_tribal_government
+                has_religion_feature = religion_adventuring
+                religion = deities_of_fury
+                religion = primordial
+                religion = uthgardt_faith
+                religion = martial_faith
+                religion = giant_pantheon
+                religion = vaprak
+                religion = goblin_pantheon
+                religion = orc_pantheon
+			}
+			realm_size < 50
+			num_of_count_titles_in_realm < 20 
+		}
+
+		potential = {            
+			higher_tier_than = DUKE
+			NOT = { has_truce = FROM }
+			is_within_diplo_range = FROM 
+			independent = yes
+			NOT = { character = FROM } 
+			NOT = { is_liege_or_above_of = FROM } 			 
+		}
+
+		allow = {
+			FROM = { prestige = 750 }
+			custom_tooltip = {	
+	        	text = fr_prepared_invaded_tip
+	        	NOT = { has_character_flag = prep_inv_target }
+			}		
+			any_realm_title = { is_valid_viking_invasion_target = ROOT }
+		}
+
+		effect = {
+            FROM = { prestige = -500 }
+	        FROM = {
+	        	save_persistent_event_target = { name = prep_invader_target scope = ROOT }
+	            pacifists_lose_piety_effect = yes
+	        }
+			custom_tooltip = {
+				text = start_preparing_invasion_TT
+
+				FROM = { set_character_flag = prep_invader }
+				FROM = { add_character_modifier = { name = launched_prepared_invasion years = 2 } } # hidden = yes 
+				FROM = { narrative_event = { id = fr_prepared_invasion.2 days = 730 } }
+
+				FROM = { character_event = { id = fr_prepared_invasion.5 days = 30  } }
+				FROM = { character_event = { id = fr_prepared_invasion.10 } }
+			}
+            reverse_opinion = {
+                modifier = preparing_to_invade
+                who = FROM
+                months = 24
+            }
+            opinion = {
+                modifier = preparing_to_invade_me
+                who = FROM
+                months = 24
+            }			
+            set_character_flag = prep_inv_target
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+	        modifier = {
+	            factor = 0.5
+	        }
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    top_liege = {
+                    	num_of_count_titles_in_realm >= 20
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    OR = {
+                    	trait = content
+                    	trait = slothful
+                    	trait = craven
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = {
+                    trait = ambitious
+	            }
+	        }
+	        modifier = {
+	            factor = 0.1
+	            FROM = {
+                    lower_tier_than = DUKE
+	            }
+	        }
+		}
+	}
+}
