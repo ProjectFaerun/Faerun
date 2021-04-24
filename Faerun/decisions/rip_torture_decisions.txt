@@ -932,13 +932,11 @@ targetted_decisions = {
 			OR = {
 				has_character_modifier = cannibal
 				trait = cannibal_trait
-				graphical_culture = beargfx
 				graphical_culture = dragongfx
 			}
 			OR = {
 				trait = possessed
 				trait = lunatic
-				graphical_culture = beargfx
 				graphical_culture = dragongfx
 			}
 		}
@@ -955,6 +953,15 @@ targetted_decisions = {
 		
 		ai_will_do = {
 			factor = 1
+			modifier = {
+				factor = 0
+				FROM = { 		
+					graphical_culture = dragongfx
+					olrox_is_evil_religion_trigger = no 
+					NOT = { trait = cannibal_trait }
+					NOT = { has_character_modifier = cannibal }  
+				}
+			}
 		}
 		
 		effect = {
@@ -971,30 +978,31 @@ targetted_decisions = {
 					add_blood_splatter_effect = yes
 					random_list = {
 						50 = { # Nothing happens
-							modifier = {
-								factor = 0
-								OR = {
-									ROOT = {
-										immortal = yes
-									}
-									AND = {
-										ROOT = {
-											controls_religion = yes
-										}
-										FROM = { NOT = { religion_group = ROOT } }
-									}
-								}
-							}
+							# modifier = {
+								# factor = 0
+								# OR = {
+									# ROOT = {
+										# immortal = yes
+									# }
+									# AND = {
+										# ROOT = {
+											# controls_religion = yes
+										# }
+										# FROM = { NOT = { religion_group = ROOT } }
+									# }
+								# }
+							# }
 						}
 						50 = { # Get sick
 							modifier = {
 								factor = 0
 								OR = {
-									immortal = yes
+									# immortal = yes
+									FROM = { graphical_culture = dragongfx }
 									has_character_flag = demon_child
-									ROOT = {
-										immortal = yes
-									}
+									# ROOT = {
+										# immortal = yes
+									# }
 									AND = {
 										ROOT = {
 											controls_religion = yes
@@ -1060,9 +1068,9 @@ targetted_decisions = {
 							20 = { # Get nickname The Cannibal
 								give_nickname = nick_the_cannibal
 							}
-							15 = { # Get nickname The Dragon
-								give_nickname = nick_the_dragon
-							}
+							# 15 = { # Get nickname The Dragon
+								# give_nickname = nick_the_dragon
+							# }
 							15 = { # Get nickname The Abomination
 								give_nickname = nick_the_abomination
 							}
@@ -1084,8 +1092,11 @@ targetted_decisions = {
 					limit = {
 						NOR = {
 							trait = lunatic
-							graphical_culture = beargfx
-							graphical_culture = dragongfx
+							AND = {
+								graphical_culture = dragongfx									
+								olrox_is_evil_religion_trigger = yes
+								ROOT = { NOT = { graphical_culture = dragongfx } }
+							}
 						}
 					}
 					add_trait = lunatic
@@ -1094,8 +1105,11 @@ targetted_decisions = {
 					limit = {
 						NOR = {
 							has_character_modifier = crazy_cannibal
-							graphical_culture = beargfx
-							graphical_culture = dragongfx
+							AND = {
+								graphical_culture = dragongfx
+								olrox_is_evil_religion_trigger = yes
+								ROOT = { NOT = { graphical_culture = dragongfx } }
+							}
 						}
 					}
 					add_character_modifier = {
@@ -1103,7 +1117,18 @@ targetted_decisions = {
 						duration = -1
 					}
 				}
+				if = {
+					limit = {
+						graphical_culture = dragongfx
+						NOR = {
+							trait = cannibal_trait
+							ROOT = { NOT = { graphical_culture = dragongfx } }
+						}
+					}
+					add_trait = cannibal_trait
+				}
 				add_kinslayer_trait_effect = yes
+				set_council_malcontent = yes
 			}
 		}
 	}
