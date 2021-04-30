@@ -259,6 +259,7 @@ character_event = {
 }	
 
 #The Church wants to organise a Miracle play for a local saint
+#Adapted for Faerun
 character_event = {
 	id = 73002
 	desc = EVTDESC73002
@@ -270,7 +271,7 @@ character_event = {
 	min_age = 16
 	only_playable = yes
 	prisoner = no
-	religion = good_human_pantheon
+	# religion = good_human_pantheon
 	
 	trigger = {
 		in_command = no
@@ -1406,7 +1407,7 @@ letter_event = {
 letter_event = {
 	id = 73205
 	desc = EVTDESC73205
-	picture = GFX_evt_spymaster
+	# picture = GFX_evt_spymaster
 	border = GFX_event_letter_frame_war
 	
 	is_triggered_only = yes
@@ -1740,7 +1741,7 @@ letter_event = {
 letter_event = {
 	id = 73222
 	desc = EVTDESC73222
-	picture = GFX_evt_spymaster
+	# picture = GFX_evt_spymaster
 	
 	is_triggered_only = yes
 
@@ -1976,7 +1977,7 @@ letter_event = {
 letter_event = {
 	id = 73232
 	desc = EVTDESC73232
-	picture = GFX_evt_spymaster
+	# picture = GFX_evt_spymaster
 	
 	is_triggered_only = yes
 
@@ -2316,18 +2317,17 @@ character_event = {
 	border = GFX_event_normal_frame_intrigue 
 	picture = GFX_evt_suspicious_noble
 	
-	ai = no
 	only_playable = yes
 	only_capable = yes
-	min_age = 150
+	min_age = 50
 	prisoner = no
 	
 	
 	immediate = {
-		any_courtier_or_vassal = {
+		random_vassal = {
 			limit = {
 				ai = yes
-				immortal = no
+				among_most_powerful_vassals = 4
 				OR = {
 					intrigue = 15
 					trait = envious
@@ -2335,24 +2335,29 @@ character_event = {
 					trait = ambitious
 					trait = cynical
 					trait = paranoid
-					trait = creature_halfling
-					trait = creature_human
-					trait = creature_orc
-					trait = creature_goblin
-					trait = creature_lizardfolk
+					trait = greedy
+					trait = lunatic
+					immortal = no
+					AND = {
+						olrox_is_evil_religion_trigger = yes
+						NOT = { trait = content }
+					}
 				}
 			}
 			save_event_target_as = immortal_suspector
 		}
 	}
 	trigger = {
+		immortal = yes
+		total_years_played = 20
+		ruled_years = 10
+		higher_tier_than = count
 		NOR = {
-			has_character_flag = special_marshal
+			has_character_flag = immortal_crisis
 			religion_group = good_human_pantheon_group
 			religion_group = zakharan_group
 			religion_group = elven_pantheon_group
 			religion_group = karaturan_group
-			religion = adama
 			religion = dwarven_pantheon
 			religion = gnome_pantheon
 			religion = faceless_god
@@ -2361,33 +2366,58 @@ character_event = {
 	
 	mean_time_to_happen = {
 		months = 150
+		modifier = {
+			factor = 0.5
+			ruled_years = 40
+		}
+		modifier = {
+			factor = 0.5
+			ruled_years = 60
+		}
+		modifier = {
+			factor = 0.5
+			ruled_years = 80
+		}
+		modifier = {
+			factor = 0.5
+			ruled_years = 100
+		}
 	}
 
 	option = {
 		name = EVTOPTA_FCE_0001 #React normally.
-		set_character_flag = special_marshal
+		set_character_flag = immortal_crisis
 		event_target:immortal_suspector = {
 			opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
 		}
 	}
 	option = {
 		name = EVTOPTB_FCE_0001 #React diplomatically.
-		set_character_flag = special_marshal
 		trigger = {
 			OR = {
-				diplomacy = 15
-				trait = just
-				trait = honest
-				z_bard = yes
+				diplomacy = 20
+				trait = expert_bard
+				trait = master_bard
+				trait = renowned_bard
+				trait = legendary_bard
 			}
 		}
-		event_target:immortal_suspector = {
-			opinion = { modifier = opinion_calmed who = ROOT years = 5 } 
+		random_list = {
+			10 = {
+				event_target:immortal_suspector = {
+					opinion = { modifier = opinion_calmed who = ROOT years = 5 } 
+				}
+			}
+			10 = {
+				set_character_flag = immortal_crisis
+				event_target:immortal_suspector = {
+					opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
+				}
+			}
 		}
 	}
 	option = {
 		name = EVTOPTC_FCE_0001 #React truthfully.
-		set_character_flag = special_marshal
 		trigger = {
 			OR = {
 				trait = creature_sarrukh
@@ -2400,13 +2430,22 @@ character_event = {
 				trait = lich
 			}
 		}
-		event_target:immortal_suspector = {
-			opinion = { modifier = opinion_unconvinced who = ROOT years = 10 } 
+		random_list = {
+			5 = {
+				event_target:immortal_suspector = {
+					opinion = { modifier = opinion_unconvinced who = ROOT years = 10 } 
+				}
+			}
+			15 = {
+				set_character_flag = immortal_crisis
+				event_target:immortal_suspector = {
+					opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
+				}
+			}
 		}
 	}
 	option = {
 		name = EVTOPTD_FCE_0001 #React evilly.
-		set_character_flag = special_marshal
 		trigger = {
 			OR = {
 				martial = 20
@@ -2414,12 +2453,24 @@ character_event = {
 				z_rogue = yes
 				z_shadow = yes
 				trait = impaler
+				olrox_is_evil_religion_trigger = yes
 			}
 		}
 		piety = -250
 		add_trait = cruel
 		add_trait = lunatic
 		add_trait = arbitrary
+		set_character_flag = immortal_crisis
+		hidden_tooltip = {
+			any_vassal = {
+				limit = {
+					ai = yes
+					among_most_powerful_vassals = 5
+				}
+				opinion = { modifier = opinion_evil_tyrant who = ROOT years = 100 }
+				opinion = { modifier = immortal_suspicions who = ROOT years = 100 }
+			}
+		}
 		event_target:immortal_suspector = {
 			random_list = {
 				10 = {
@@ -2430,20 +2481,17 @@ character_event = {
 				}
 				20 = {
 					add_trait = mangled
-					opinion = { modifier = opinion_evil_tyrant who = ROOT years = 100 }
 				}
 				30 = {
 					add_trait = maimed
-					opinion = { modifier = opinion_evil_tyrant who = ROOT years = 100 }
 				}
 				40 = {
 					add_trait = wounded
-					opinion = { modifier = opinion_evil_tyrant who = ROOT years = 100 }
 				}
 			}
 		}
 	}
-	after = {
-		set_character_flag = special_marshal
-	}
+	# after = {
+		# character_event = { id = RIP.30317 years = 1 }
+	# }
 }
