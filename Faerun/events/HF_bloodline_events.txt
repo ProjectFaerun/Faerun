@@ -232,7 +232,7 @@ character_event = { # Great warrior character arrives
 						}
 				
 						prisoner = no
-						NOT = { trait = incapable }
+						is_incapable = no
 						NOT = { is_inaccessible_trigger = yes }
 						NOT = { has_character_flag = guru }
 						NOT = { has_character_modifier = refusing_to_lead }
@@ -700,7 +700,7 @@ character_event = {
 		OR = {
 			FROM = {
 				age = 16
-				NOT = { trait = incapable }
+				is_incapable = no
 				any_owned_bloodline = {
 					bloodline_is_active_for = PREV
 					has_bloodline_flag = bloodline_spawned_ships 
@@ -711,7 +711,7 @@ character_event = {
 			}
 			ROOT = {
 				age = 16
-				NOT = { trait = incapable }
+				is_incapable = no
 				any_owned_bloodline = {
 					bloodline_is_active_for = PREV
 					has_bloodline_flag = bloodline_spawned_ships 
@@ -728,7 +728,7 @@ character_event = {
 			limit = {
 				FROM = {
 					age = 16
-					NOT = { trait = incapable }
+					is_incapable = no
 					any_owned_bloodline = {
 						bloodline_is_active_for = PREV
 						has_bloodline_flag = bloodline_spawned_ships 
@@ -808,7 +808,7 @@ character_event = {
 			limit = {
 				ROOT = {
 					age = 16
-					NOT = { trait = incapable }
+					is_incapable = no
 					any_owned_bloodline = {
 						has_bloodline_flag = bloodline_spawned_ships 
 						bloodline_is_active_for = PREV
@@ -1058,7 +1058,7 @@ character_event = {
 		killer = { #Not necessary to have the ambition to stack up the variable, but necessary to unlock the bloodline.
 			is_playable = yes
 			is_landed = yes
-			NOT = { trait = incapable }
+			is_incapable = no
 			NOT = { 
 				has_character_flag = flag_about_to_murder_bloodline
 			}
@@ -1581,6 +1581,7 @@ character_event = {
 				trait = cannibal_trait
 			}
 			trait = cruel
+			NOT = { controls_religion = yes }
 		}
 		# if = { 
 			# limit = { NOT = { trait = cannibal_trait } } 
@@ -2056,13 +2057,21 @@ character_event = {
 	option = {
 		name = EVTOPTAHF24033
 		trigger = { 
-			religion_group = christian 
+			OR = { 
+				religion_group = good_human_pantheon_group 
+				religion_group = zakharan_group
+				religion_group = elven_pantheon_group
+				religion_group = karaturan_group
+				religion = dwarven_pantheon
+				religion = gnome_pantheon
+				religion = bahamut
+			} 
 			is_evil_trigger = no 
-			OR = {
-				is_female = no
-				has_religion_feature = religion_matriarchal 	#AltStart
-				has_religion_feature = religion_equal
-			}
+			# OR = {
+				# is_female = no
+				# has_religion_feature = religion_matriarchal 	#AltStart
+				# has_religion_feature = religion_equal
+			# }
 		}
 		custom_tooltip = { text = TT_EVTOPTAHF24033 }
 		if = { 
@@ -2199,6 +2208,7 @@ narrative_event = {
 				inheritance = matrilineal
 			}		
 		}
+		set_bloodline_founder_religion_flag_effect = yes
 		ai_chance = { 
 			factor = 100
 		}
@@ -2371,16 +2381,16 @@ narrative_event = {
 			if = { 
 				limit = { this_has_super_cool_nickname_trigger = no }
 				random_list = { 
-					10 = { 
-						trigger = { religion_group = christian }
-						give_nickname = nick_the_angel 
-					} 
+					# 10 = { 
+						# trigger = { religion_group = christian }
+						# give_nickname = nick_the_angel 
+					# } 
 					10 = { 
 						give_nickname = nick_the_pure 
 					} 
-					10 = { 
-						give_nickname = nick_the_celestial 
-					} 
+					# 10 = { 
+						# give_nickname = nick_the_celestial 
+					# } 
 					10 = { 
 						give_nickname = nick_the_radiant 
 					} 
@@ -4303,7 +4313,18 @@ narrative_event = {
 			ROOT = { give_nickname = nick_the_theologian }
 		}
 		if = { 
-			limit = { religion_group = christian }
+			limit = {
+				OR = {
+					AND = { 
+						religion_group = good_human_pantheon_group
+						NOT = { religion = solar }
+					}
+					religion_group = karaturan_group
+					religion = dwarven_pantheon
+					religion = gnome_pantheon
+					religion = bahamut
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4319,7 +4340,7 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = muslim }
+			limit = { religion_group = zakharan_group }
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4335,7 +4356,13 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = jewish_group }
+			limit = {
+				OR = {
+					religion = solar
+					religion = blue_flame
+					religion = kossuth
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4351,7 +4378,19 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = pagan_group }
+			limit = { 
+				OR = {
+					AND = { 
+						religion_group = wild_human_pantheon_group
+						NOT = { religion = uthgardt_faith }
+						NOT = { religion = martial_faith }
+						NOT = { religion = kossuth }
+					}
+					religion_group = pagan_group
+					religion_group = elven_pantheon_group
+					religion = draconic_pantheon
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4367,7 +4406,12 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = zoroastrian_group }
+			limit = {
+				AND = { 
+					religion_group = atheist_group
+					NOT = { religion = blue_flame }
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4383,7 +4427,21 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = indian_group }
+			limit = { 
+				OR = {
+					religion_group = evil_human_pantheon_group
+					religion_group = drow_pantheon
+					religion_group = giant_pantheon_group
+					religion_group = goblin_pantheon_group
+					religion_group = orc_pantheon_group
+					religion_group = aberration_group
+					religion = urdlen
+					religion = laduguer
+					religion = tiamat
+					religion = uthgardt_faith
+					religion = martial_faith
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4962,7 +5020,18 @@ narrative_event = {
 			ROOT = { give_nickname = nick_the_zealot }
 		}
 		if = { 
-			limit = { religion_group = christian }
+			limit = {
+				OR = {
+					AND = { 
+						religion_group = good_human_pantheon_group
+						NOT = { religion = solar }
+					}
+					religion_group = karaturan_group
+					religion = dwarven_pantheon
+					religion = gnome_pantheon
+					religion = bahamut
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4978,7 +5047,7 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = muslim }
+			limit = { religion_group = zakharan_group }
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -4994,7 +5063,13 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = jewish_group }
+			limit = {
+				OR = {
+					religion = solar
+					religion = blue_flame
+					religion = kossuth
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -5010,7 +5085,19 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = pagan_group }
+			limit = { 
+				OR = {
+					AND = { 
+						religion_group = wild_human_pantheon_group
+						NOT = { religion = uthgardt_faith }
+						NOT = { religion = martial_faith }
+						NOT = { religion = kossuth }
+					}
+					religion_group = pagan_group
+					religion_group = elven_pantheon_group
+					religion = draconic_pantheon
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -5026,7 +5113,12 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = zoroastrian_group }
+			limit = {
+				AND = { 
+					religion_group = atheist_group
+					NOT = { religion = blue_flame }
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -5042,7 +5134,21 @@ narrative_event = {
 			}
 		}
 		else_if = { 
-			limit = { religion_group = indian_group }
+			limit = { 
+				OR = {
+					religion_group = evil_human_pantheon_group
+					religion_group = drow_pantheon
+					religion_group = giant_pantheon_group
+					religion_group = goblin_pantheon_group
+					religion_group = orc_pantheon_group
+					religion_group = aberration_group
+					religion = urdlen
+					religion = laduguer
+					religion = tiamat
+					religion = uthgardt_faith
+					religion = martial_faith
+				}
+			}
 			if = { 
 				limit = { is_female = no }
 				create_bloodline = {
@@ -5270,7 +5376,7 @@ character_event = {
 			add_trait = cruel
 		}
 		hidden_tooltip = { 
-			character_event = { id = HF.24073 days = 150 random = 250 }
+			narrative_event = { id = HF.24073 days = 150 random = 250 }
 		}
 		ai_chance = { 
 			factor = 30
@@ -5289,7 +5395,7 @@ character_event = {
 			years = 5
 		}
 		hidden_tooltip = { 
-			character_event = { id = HF.24073 days = 500 random = 500 }
+			narrative_event = { id = HF.24073 days = 500 random = 500 }
 		}
 		ai_chance = { 
 			factor = 30
@@ -5304,7 +5410,7 @@ character_event = {
 		}
 		scaled_wealth = { value = -2 min = -350 max = -600 }
 		hidden_tooltip = { 
-			character_event = { id = HF.24073 days = 1000 random = 1000 }
+			narrative_event = { id = HF.24073 days = 1000 random = 1000 }
 		}
 		ai_chance = { 
 			factor = 30
@@ -5334,7 +5440,7 @@ character_event = {
 			years = 5
 		}
 		hidden_tooltip = { 
-			character_event = { id = HF.24073 days = 2000 random = 2000 }
+			narrative_event = { id = HF.24073 days = 2000 random = 2000 }
 		}
 		ai_chance = { 
 			factor = 30
@@ -6745,7 +6851,7 @@ character_event = {
 				NOT = {
 					character = ROOT
 				}
-				religion_group = christian
+				# religion_group = good_human_pantheon_group
 			}
 		}
 	}
@@ -6787,14 +6893,18 @@ character_event = {
 					factor = 1.35
 					any_courtier_or_vassal = {
 						count = 2
-						has_bloodline_flag = bloodline_knights
+						any_owned_bloodline = {
+							has_bloodline_flag = bloodline_knights
+						}
 					}
 				}
 				modifier = {
 					factor = 1.35
 					any_courtier_or_vassal = {
 						count = 3
-						has_bloodline_flag = bloodline_knights
+						any_owned_bloodline = {
+							has_bloodline_flag = bloodline_knights
+						}
 					}
 				}
 			}
@@ -6814,6 +6924,15 @@ character_event = { # Knight character arrives
 	only_capable = yes
 	prisoner = no
 	min_age = 16
+
+	trigger = {
+		NOT = {
+			any_courtier_or_vassal = {
+				count = 4
+				has_character_flag = bloodline_great_hero
+			}
+		}
+	}
 	
 	immediate = {
 		spawn_fantastic_commander_effect = yes
@@ -6851,7 +6970,7 @@ character_event = { # Knight character arrives
 						}
 				
 						prisoner = no
-						NOT = { trait = incapable }
+						is_incapable = no
 						NOT = { is_inaccessible_trigger = yes }
 						NOT = { has_character_flag = guru }
 						NOT = { has_character_modifier = refusing_to_lead }
@@ -6895,7 +7014,7 @@ character_event = { # Knight character arrives
 				}
 				AND = {
 					tier = KING
-					is_nomadic = no
+					# is_nomadic = no
 					any_realm_character = {
 						count = 6
 						liege = { character = ROOT }
@@ -6904,31 +7023,31 @@ character_event = { # Knight character arrives
 				}
 				AND = {
 					tier = EMPEROR
-					is_nomadic = no
+					# is_nomadic = no
 					any_realm_character = {
 						count = 8
 						liege = { character = ROOT }
 						has_minor_title = title_commander
 					}
 				}
-				AND = {
-					tier = KING
-					is_nomadic = yes
-					any_realm_character = {
-						count = 2
-						liege = { character = ROOT }
-						has_minor_title = title_commander
-					}
-				}
-				AND = {
-					tier = EMPEROR
-					is_nomadic = yes
-					any_realm_character = {
-						count = 4
-						liege = { character = ROOT }
-						has_minor_title = title_commander
-					}
-				}
+				# AND = {
+					# tier = KING
+					# is_nomadic = yes
+					# any_realm_character = {
+						# count = 2
+						# liege = { character = ROOT }
+						# has_minor_title = title_commander
+					# }
+				# }
+				# AND = {
+					# tier = EMPEROR
+					# is_nomadic = yes
+					# any_realm_character = {
+						# count = 4
+						# liege = { character = ROOT }
+						# has_minor_title = title_commander
+					# }
+				# }
 			}
 		}
 		
@@ -6985,7 +7104,7 @@ character_event = { # Knight character arrives
 						}
 				
 						prisoner = no
-						NOT = { trait = incapable }
+						is_incapable = no
 						NOT = { is_inaccessible_trigger = yes }
 						NOT = { has_character_flag = guru }
 						NOT = { has_character_modifier = refusing_to_lead }
@@ -7024,7 +7143,7 @@ character_event = { # Knight character arrives
 				}
 				AND = {
 					tier = KING
-					is_nomadic = no
+					# is_nomadic = no
 					NOT = {
 						any_realm_character = {
 							count = 6
@@ -7035,7 +7154,7 @@ character_event = { # Knight character arrives
 				}
 				AND = {
 					tier = EMPEROR
-					is_nomadic = no
+					# is_nomadic = no
 					NOT = {
 						any_realm_character = {
 							count = 8
@@ -7044,28 +7163,28 @@ character_event = { # Knight character arrives
 						}
 					}
 				}
-				AND = {
-					tier = KING
-					is_nomadic = yes
-					NOT = {
-						any_realm_character = {
-							count = 2
-							liege = { character = ROOT }
-							has_minor_title = title_commander
-						}
-					}
-				}
-				AND = {
-					tier = EMPEROR
-					is_nomadic = yes
-					NOT = {
-						any_realm_character = {
-							count = 4
-							liege = { character = ROOT }
-							has_minor_title = title_commander
-						}
-					}
-				}
+				# AND = {
+					# tier = KING
+					# is_nomadic = yes
+					# NOT = {
+						# any_realm_character = {
+							# count = 2
+							# liege = { character = ROOT }
+							# has_minor_title = title_commander
+						# }
+					# }
+				# }
+				# AND = {
+					# tier = EMPEROR
+					# is_nomadic = yes
+					# NOT = {
+						# any_realm_character = {
+							# count = 4
+							# liege = { character = ROOT }
+							# has_minor_title = title_commander
+						# }
+					# }
+				# }
 			}
 		}
 		
@@ -7115,11 +7234,21 @@ character_event = { # Bard character arrives
 	only_capable = yes
 	prisoner = no
 	min_age = 16
+
+	trigger = {
+		NOT = {
+			any_courtier_or_vassal = {
+				count = 4
+				has_character_flag = bloodline_great_hero
+			}
+		}
+	}
 	
 	immediate = {
 		spawn_fantastic_diplomat_effect = yes
 		event_target:invited_character = {
 			add_trait = poet
+			set_character_flag = bloodline_great_hero
 		}
 	}
 	
@@ -7146,14 +7275,14 @@ character_event = { # Bard character arrives
 	}
 }
 
-#Landless ladies of same religion might ask for protection.
+#Landless ladies of same religion might ask for protection. # and Bachelors
 character_event = { 
 	id = HF.24132
 	hide_window = yes
 
 	is_triggered_only = yes
 	
-	only_women = yes
+	# only_women = yes
 	min_age = 16
 	max_age = 30
 	only_capable = yes
@@ -7161,15 +7290,24 @@ character_event = {
 	
 	trigger = {
 		is_ruler = no
-		is_female = yes
-		NOT = { has_religion_feature = religion_matriarchal }
-		religion_group = christian
+		OR = {
+			AND = {
+				is_female = yes
+				NOT = { has_religion_feature = religion_matriarchal }
+			}
+			AND = {
+				is_female = no
+				NOT = { has_religion_feature = religion_patriarchal }
+			}
+		}
+		religion_group = good_human_pantheon_group
 		is_married = no
 		NOT = { num_of_children = 1 }
 		NOT = { num_of_lovers = 1 }
 		NOT = { num_of_friends = 1 }
 		NOR = { 
-			trait = nun 
+			trait = nun
+			trait = monk 
 			trait = brave
 			trait = content
 		}
@@ -7182,12 +7320,46 @@ character_event = {
 			}
 			any_neighbor_independent_ruler = {  
 				age = 16
-				NOT = { trait = incapable }
+				is_incapable = no
 				any_owned_bloodline = { 
 					has_bloodline_flag = bloodline_knights
 					bloodline_is_active_for = PREV
 				}
 				religion = ROOT
+				OR = {
+					AND = {
+						is_female = yes
+						NOT = { trait = homosexual }
+						ROOT = {
+							is_female = no
+							NOT = { trait = homosexual }
+						}
+					}
+					AND = {
+						is_female = no
+						NOT = { trait = homosexual }
+						ROOT = {
+							is_female = yes
+							NOT = { trait = homosexual }
+						}
+					}
+					AND = {
+						is_female = no
+						evilcat_samesex_valid = yes
+						ROOT = {
+							is_female = no
+							evilcat_samesex_valid = yes
+						}
+					}
+					AND = {
+						is_female = yes
+						evilcat_samesex_valid = yes
+						ROOT = {
+							is_female = yes
+							evilcat_samesex_valid = yes
+						}
+					}
+				}
 			}
 		}
 
@@ -7203,6 +7375,40 @@ character_event = {
 						bloodline_is_active_for = PREV
 					}
 					religion = ROOT
+					OR = {
+						AND = {
+							is_female = yes
+							NOT = { trait = homosexual }
+							ROOT = {
+								is_female = no
+								NOT = { trait = homosexual }
+							}
+						}
+						AND = {
+							is_female = no
+							NOT = { trait = homosexual }
+							ROOT = {
+								is_female = yes
+								NOT = { trait = homosexual }
+							}
+						}
+						AND = {
+							is_female = no
+							evilcat_samesex_valid = yes
+							ROOT = {
+								is_female = no
+								evilcat_samesex_valid = yes
+							}
+						}
+						AND = {
+							is_female = yes
+							evilcat_samesex_valid = yes
+							ROOT = {
+								is_female = yes
+								evilcat_samesex_valid = yes
+							}
+						}
+					}
 				}
 				character_event = { id = HF.24133 }
 			}
@@ -7210,7 +7416,7 @@ character_event = {
 	}
 }
 
-character_event = { # Woman asks for assistance
+character_event = { # Woman asks for assistance # Or Man
 	id = HF.24133
 	desc = EVTDESCHF24133
 	picture = GFX_evt_homage_hf
@@ -7227,7 +7433,7 @@ character_event = { # Woman asks for assistance
 		trigger = {
 			is_benevolent_trigger = yes
 			is_married = no
-			is_female = no
+			# is_female = no
 			FROM = { is_married = no }
 		}
 		FROM = {
