@@ -154,13 +154,18 @@ targeted_decisions = {
 		from_potential = {
 			is_playable = yes
 			is_adult = yes
-			is_undead = yes
 			NOT = { trait = incapable }
-			society_rank = {
-				society = twisted_rune
-				rank = 4
-			}
 			prisoner = no
+			OR = {
+				trait = wiz_necromancy
+				AND = {
+					society_rank = {
+						society = twisted_rune
+						rank = 4
+					}
+					is_undead = yes
+				}
+			}
 		}
 
 		potential = {
@@ -172,32 +177,124 @@ targeted_decisions = {
 
 		allow = {
 			ROOT = {
-				prisoner = no
+				OR = {
+					AND = {
+						prisoner = no
+						FROM = {
+							society_rank = {
+								society = twisted_rune
+								rank = 4
+							}
+						}
+					}
+					AND = {
+						prisoner = yes
+						host = { character = FROM }
+					}
+				}
 				is_inaccessible_trigger = no
-				NAND = {
-					olrox_is_good_religion_trigger = yes
-					OR = {
-						is_benevolent_trigger = yes
-					}
-				}
-				NAND = {
-					olrox_is_environmental_religion_trigger = yes
-					OR = {
-						is_benevolent_trigger = yes
-					}
-				}
 			}
 			FROM = {
-				has_society_currency_major_trigger = yes
 				is_inaccessible_trigger = no
+				hidden_tooltip = {
+					NOT = { has_character_flag = turning_vassal_undead }
+				}
+				NOR = {
+					trait = kind
+					trait = charitable
+				}
+				OR = {
+					AND = {
+						has_society_currency_major_trigger = yes
+						society_member_of = twisted_rune
+					}
+					AND = {
+						trait = wiz_necromancy
+						hidden_tooltip = {
+							OR = {
+								AND = {
+									trait = wizard
+									wealth = 100
+								}
+								AND = {
+									trait = trained_wizard
+									wealth = 85
+								}
+								AND = {
+									trait = journeyman_wizard
+									wealth = 70
+								}
+								AND = {
+									trait = expert_wizard
+									wealth = 55
+								}
+								AND = {
+									trait = master_wizard
+									wealth = 40
+								}
+								AND = {
+									trait = renowned_wizard
+									wealth = 25
+								}
+								AND = {
+									trait = legendary_wizard
+									wealth = 10
+								}
+							}
+						}
+						NOT = { society_member_of = twisted_rune }
+					}
+				}
 			}
 		}
 
 		effect = {
-			FROM = { detract_society_currency_major_effect = yes }
-			FROM = { increase_visibility_effect = yes }
+			if = {
+				limit = {
+					FROM = { society_member_of = twisted_rune }
+				}
+				FROM = { detract_society_currency_major_effect = yes }
+				FROM = { increase_visibility_effect = yes }
+			}
 
-			character_event = { id = TWI.200 days = 1 }
+			if = {
+				limit = {
+					FROM = { NOT = { society_member_of = twisted_rune } }
+				}
+				FROM = {
+					trigger_switch = {
+						on_trigger = trait
+						wizard = {
+							wealth = -100
+						}
+						trained_wizard = {
+							wealth = -85
+						}
+						journeyman_wizard = {
+							wealth = -70
+						}
+						expert_wizard = {
+							wealth = -55
+						}
+						master_wizard = {
+							wealth = -40
+						}
+						renowned_wizard = {
+							wealth = -25
+						}
+						legendary_wizard = {
+							wealth = -10
+						}
+					}
+				}
+			}
+
+			hidden_effect = {
+				FROM = {
+					set_character_flag = turning_vassal_undead
+				}
+				character_event = { id = TWI.200 days = 1 }
+			}
 		}
 
 		revoke_allowed = {
