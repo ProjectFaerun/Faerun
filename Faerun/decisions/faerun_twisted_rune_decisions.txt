@@ -154,13 +154,18 @@ targeted_decisions = {
 		from_potential = {
 			is_playable = yes
 			is_adult = yes
-			is_undead = yes
 			NOT = { trait = incapable }
-			society_rank = {
-				society = twisted_rune
-				rank = 4
-			}
 			prisoner = no
+			OR = {
+				trait = wiz_necromancy
+				AND = {
+					society_rank = {
+						society = twisted_rune
+						rank = 4
+					}
+					is_undead = yes
+				}
+			}
 		}
 
 		potential = {
@@ -168,36 +173,196 @@ targeted_decisions = {
 			age = 16
 			ai = yes
 			NOT = { is_undead = yes }
+			OR = {
+				NOT = { has_character_flag = evaded_turning_vassal_undead }
+				AND = {
+					prisoner = yes
+					host = { character = FROM }
+				}
+			}
 		}
 
 		allow = {
 			ROOT = {
-				prisoner = no
+				OR = {
+					AND = {
+						prisoner = no
+						FROM = {
+							society_rank = {
+								society = twisted_rune
+								rank = 4
+							}
+						}
+					}
+					AND = {
+						prisoner = yes
+						host = { character = FROM }
+					}
+				}
 				is_inaccessible_trigger = no
-				NAND = {
-					olrox_is_good_religion_trigger = yes
-					OR = {
-						is_benevolent_trigger = yes
-					}
-				}
-				NAND = {
-					olrox_is_environmental_religion_trigger = yes
-					OR = {
-						is_benevolent_trigger = yes
-					}
-				}
 			}
 			FROM = {
-				has_society_currency_major_trigger = yes
 				is_inaccessible_trigger = no
+				hidden_tooltip = {
+					NOT = { has_character_flag = turning_vassal_undead }
+				}
+				NOT = { trait = kind }
+				OR = {
+					AND = {
+						has_society_currency_major_trigger = yes
+						society_member_of = twisted_rune
+					}
+					AND = {
+						trait = wiz_necromancy
+						hidden_tooltip = {
+							OR = {
+								AND = {
+									trait = wizard
+									wealth = 100
+								}
+								AND = {
+									trait = trained_wizard
+									wealth = 85
+								}
+								AND = {
+									trait = journeyman_wizard
+									wealth = 70
+								}
+								AND = {
+									trait = expert_wizard
+									wealth = 55
+								}
+								AND = {
+									trait = master_wizard
+									wealth = 40
+								}
+								AND = {
+									trait = renowned_wizard
+									wealth = 25
+								}
+								AND = {
+									trait = legendary_wizard
+									wealth = 10
+								}
+							}
+						}
+						NOT = { society_member_of = twisted_rune }
+					}
+				}
 			}
 		}
 
 		effect = {
-			FROM = { detract_society_currency_major_effect = yes }
-			FROM = { increase_visibility_effect = yes }
+			if = {
+				limit = {
+					FROM = { society_member_of = twisted_rune }
+				}
+				FROM = { detract_society_currency_major_effect = yes }
+				FROM = { increase_visibility_effect = yes }
+			}
+			else_if = {
+				limit = {
+					FROM = { NOT = { society_member_of = twisted_rune } }
+				}
+				FROM = {
+					trigger_switch = {
+						on_trigger = trait
+						wizard = {
+							wealth = -100
+						}
+						trained_wizard = {
+							wealth = -85
+						}
+						journeyman_wizard = {
+							wealth = -70
+						}
+						expert_wizard = {
+							wealth = -55
+						}
+						master_wizard = {
+							wealth = -40
+						}
+						renowned_wizard = {
+							wealth = -25
+						}
+						legendary_wizard = {
+							wealth = -10
+						}
+					}
+				}
+			}
 
-			character_event = { id = TWI.200 days = 1 }
+			if = {
+				limit = {
+					prisoner = yes
+				}
+				hidden_effect = {
+					FROM = {
+						set_character_flag = turning_vassal_undead
+					}
+					character_event = { id = TWI.200 days = 1 }
+				}
+			}
+			else_if = {
+				limit = {
+					prisoner = no
+				}
+				random_list = {
+					50 = {
+						modifier = { FROM = { intrigue = 12 } factor = 1.2 }
+						modifier = { FROM = { intrigue = 14 } factor = 1.2 }
+						modifier = { FROM = { intrigue = 16 } factor = 1.2 }
+						modifier = { FROM = { intrigue = 18 } factor = 1.2 }
+						modifier = { FROM = { intrigue = 20 } factor = 1.3 }
+						modifier = { FROM = { intrigue = 22 } factor = 1.3 }
+						modifier = { FROM = { intrigue = 26 } factor = 1.3 }
+						modifier = { FROM = { intrigue = 30 } factor = 1.4 }
+						modifier = { FROM = { intrigue = 35 } factor = 1.4 }
+						modifier = { FROM = { intrigue = 40 } factor = 1.5 }
+						modifier = { FROM = { intrigue = 50 } factor = 3 }
+						modifier = { FROM = { combat_rating = 40 } factor = 1.2 }
+						modifier = { FROM = { combat_rating = 50 } factor = 1.2 }
+						modifier = { FROM = { combat_rating = 60 } factor = 1.2 }
+						modifier = { FROM = { combat_rating = 70 } factor = 1.2 }
+						modifier = { FROM = { combat_rating = 80 } factor = 1.3 }
+						modifier = { FROM = { combat_rating = 90 } factor = 1.3 }
+						modifier = { FROM = { combat_rating = 100 } factor = 1.3 }
+						modifier = { FROM = { combat_rating = 120 } factor = 1.4 }
+						modifier = { FROM = { combat_rating = 140 } factor = 1.4 }
+						modifier = { FROM = { combat_rating = 160 } factor = 1.5 }
+						modifier = { FROM = { combat_rating = 200 } factor = 3 }
+						FROM = { set_character_flag = turning_vassal_undead }
+						character_event = { id = TWI.200 days = 1 tooltip = EVTTOOLTIP_TWI.200 }
+					}
+					50 = {
+						modifier = { ROOT = { intrigue = 12 } factor = 1.2 }
+						modifier = { ROOT = { intrigue = 14 } factor = 1.2 }
+						modifier = { ROOT = { intrigue = 16 } factor = 1.2 }
+						modifier = { ROOT = { intrigue = 18 } factor = 1.2 }
+						modifier = { ROOT = { intrigue = 20 } factor = 1.3 }
+						modifier = { ROOT = { intrigue = 22 } factor = 1.3 }
+						modifier = { ROOT = { intrigue = 26 } factor = 1.3 }
+						modifier = { ROOT = { intrigue = 30 } factor = 1.4 }
+						modifier = { ROOT = { intrigue = 35 } factor = 1.4 }
+						modifier = { ROOT = { intrigue = 40 } factor = 1.5 }
+						modifier = { ROOT = { intrigue = 50 } factor = 3 }
+						modifier = { ROOT = { combat_rating = 40 } factor = 1.2 }
+						modifier = { ROOT = { combat_rating = 50 } factor = 1.2 }
+						modifier = { ROOT = { combat_rating = 60 } factor = 1.2 }
+						modifier = { ROOT = { combat_rating = 70 } factor = 1.2 }
+						modifier = { ROOT = { combat_rating = 80 } factor = 1.3 }
+						modifier = { ROOT = { combat_rating = 90 } factor = 1.3 }
+						modifier = { ROOT = { combat_rating = 100 } factor = 1.3 }
+						modifier = { ROOT = { combat_rating = 120 } factor = 1.4 }
+						modifier = { ROOT = { combat_rating = 140 } factor = 1.4 }
+						modifier = { ROOT = { combat_rating = 160 } factor = 1.5 }
+						modifier = { ROOT = { combat_rating = 200 } factor = 3 }
+						set_character_flag = evaded_turning_vassal_undead
+						character_event = { id = TWI.201 days = 1 tooltip = EVTTOOLTIP_TWI.201 } #fail
+						FROM = { character_event = { id = TWI.202 days = 1 } }
+					}
+				}
+			}
 		}
 
 		revoke_allowed = {
