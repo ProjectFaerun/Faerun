@@ -23,6 +23,10 @@ targeted_decisions = {
 					society = night_masks
 					rank >= 2
 				}
+				society_rank = {
+					society = shadow_telflamm
+					rank >= 2
+				}
 			}
 			prisoner = no
 		}
@@ -41,6 +45,7 @@ targeted_decisions = {
 			ROOT = {
 				NOT = { society_member_of = shadow_thieves }
 				NOT = { society_member_of = night_masks }
+				NOT = { society_member_of = shadow_telflamm }
 				prisoner = no
 				is_inaccessible_trigger = no
 				NOT = { owes_favor_to = FROM }
@@ -154,6 +159,10 @@ targeted_decisions = {
 					society = night_masks
 					rank >= 1
 				}
+				society_rank = {
+					society = shadow_telflamm
+					rank >= 1
+				}
 			}
 			prisoner = no
 		}
@@ -168,6 +177,7 @@ targeted_decisions = {
 			ROOT = {
 				NOT = { society_member_of = shadow_thieves }
 				NOT = { society_member_of = night_masks }
+				NOT = { society_member_of = shadow_telflamm }
 				prisoner = no
 				is_inaccessible_trigger = no
 			}
@@ -309,6 +319,10 @@ society_decisions = {
 					society = night_masks
 					rank == 4
 				}
+				society_rank = {
+					society = shadow_telflamm
+					rank == 4
+				}
 			}
 		}
 
@@ -362,6 +376,53 @@ society_decisions = {
 			modifier = {
 				factor = 0
 				lifestyle_traits = 1
+			}
+		}
+	}
+
+	shadow_telflamm_walker = {
+		only_playable = yes
+
+		filter = self
+		ai_target_filter = self
+
+		ai_check_interval = 60
+
+		potential = {
+			character = FROM
+			is_playable = yes
+			not_casting = yes
+			is_adult = yes
+			OR = {
+				society_rank = {
+					society = shadow_telflamm
+					rank == 4
+				}
+			}
+			NOT = { has_character_flag = is_telflamm_walker }
+		}
+
+		allow = {
+			has_society_currency_major_trigger = yes
+		}
+
+		effect = {
+			set_character_flag = is_telflamm_walker
+			add_character_modifier = {
+				modifier = shadow_telflamm_walker_modifier
+				duration = -1
+			}
+			increase_visibility_effect = yes
+			detract_society_currency_major_effect = yes
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				health < 5
 			}
 		}
 	}
@@ -463,6 +524,10 @@ title_decisions = {
 					society_rank >= 3
 					society_member_of = night_masks
 				}
+				AND = {
+					society_rank >= 3
+					society_member_of = shadow_telflamm
+				}
 			}
 		}
 
@@ -530,6 +595,12 @@ title_decisions = {
 					}
 					character_event = { id = MASK.400 days = 400 }
 				}
+				else_if = {
+					limit = {
+						society_member_of = shadow_telflamm
+					}
+					character_event = { id = TELF.400 days = 400 }
+				}
 			}
 		}
 
@@ -550,6 +621,15 @@ title_decisions = {
 					society_member_of = night_masks
 					any_demesne_province = {
 				    has_province_modifier = night_masks_guild
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				AND = {
+					society_member_of = shadow_telflamm
+					any_demesne_province = {
+				    has_province_modifier = shadow_telflamm_guild
 					}
 				}
 			}
