@@ -369,10 +369,29 @@ character_event = {
 		if = {
 			limit = {
 				OR = {
-					trait = wizard
-					trait = trained_wizard
+					AND = {
+						trait = wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = trained_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = cleric
+						NAND = {
+							z_wizard = yes
+							trait = wiz_necromancy
+						}
+					}
+					AND = {
+						trait = trained_cleric
+						NAND = {
+							z_wizard = yes
+							trait = wiz_necromancy
+						}
+					}
 				}
-				NOT = { trait = wiz_necromancy }
 			}
 			location = {
 				ROOT = {
@@ -399,10 +418,41 @@ character_event = {
 		else_if = {
 			limit = {
 				OR = {
-					trait = journeyman_wizard
-					trait = expert_wizard
+					AND = {
+						trait = journeyman_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = expert_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = journeyman_cleric
+						NAND = {
+							OR = {
+								trait = journeyman_wizard
+								trait = expert_wizard
+								trait = master_wizard
+								trait = renowned_wizard
+								trait = legendary_wizard
+							}
+							trait = wiz_necromancy
+						}
+					}
+					AND = {
+						trait = expert_cleric
+						NAND = {
+							OR = {
+								trait = journeyman_wizard
+								trait = expert_wizard
+								trait = master_wizard
+								trait = renowned_wizard
+								trait = legendary_wizard
+							}
+							trait = wiz_necromancy
+						}
+					}
 				}
-				NOT = { trait = wiz_necromancy }
 			}
 			location = {
 				ROOT = {
@@ -429,10 +479,37 @@ character_event = {
 		else_if = {
 			limit = {
 				OR = {
-					trait = master_wizard
-					trait = renowned_wizard
+					AND = {
+						trait = master_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = renowned_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = master_cleric
+						NAND = {
+							OR = {
+								trait = master_wizard
+								trait = renowned_wizard
+								trait = legendary_wizard
+							}
+							trait = wiz_necromancy
+						}
+					}
+					AND = {
+						trait = renowned_cleric
+						NAND = {
+							OR = {
+								trait = master_wizard
+								trait = renowned_wizard
+								trait = legendary_wizard
+							}
+							trait = wiz_necromancy
+						}
+					}
 				}
-				NOT = { trait = wiz_necromancy }
 			}
 			location = {
 				ROOT = {
@@ -458,8 +535,23 @@ character_event = {
 		}
 		else_if = {
 			limit = {
-				trait = legendary_wizard
-				NOT = { trait = wiz_necromancy }
+				OR = {
+					AND = {
+						trait = legendary_wizard
+						NOT = { trait = wiz_necromancy }
+					}
+					AND = {
+						trait = legendary_cleric
+						NAND = {
+							OR = {
+								trait = master_wizard
+								trait = renowned_wizard
+								trait = legendary_wizard
+							}
+							trait = wiz_necromancy
+						}
+					}
+				}
 			}
 			location = {
 				ROOT = {
@@ -660,7 +752,13 @@ character_event = {
 
 	option = {
 		trigger = {
-			NOT = { is_evil_religion = yes }
+			OR = {
+				AND = {
+					NOT = { is_evil_religion = yes }
+					z_cleric = no
+				}
+				olrox_is_good_religion_trigger = yes
+			}
 		}
 		name = WIZINIT.11.a
 		set_character_flag = binding_angel
@@ -668,33 +766,46 @@ character_event = {
 	}
 
 	option = {
+		trigger = {
+			OR = {
+				z_cleric = no
+				AND = {
+					olrox_is_good_religion_trigger = no
+					is_evil_religion = no
+				}
+			}
+		}
 		name = WIZINIT.11.b
 		character_event = { id = wizinit.22 }
 	}
 
 	option = {
 		trigger = {
-			NOR = {
-				AND = {
-					religion_group = good_human_pantheon_group
-					NOT = { religion = mercantile }
-					NOT = { religion = chessic }
-					NOT = { religion = arcane }
-					NOT = { religion = untheric_faith }
-					NOT = { religion = calishite_faith }
-					NOT = { religion = lapal }
+			OR = {
+				NOR = {
+					AND = {
+						religion_group = good_human_pantheon_group
+						NOT = { religion = mercantile }
+						NOT = { religion = chessic }
+						NOT = { religion = arcane }
+						NOT = { religion = untheric_faith }
+						NOT = { religion = calishite_faith }
+						NOT = { religion = lapal }
+					}
+					religion = natural
+					religion_group = elven_pantheon_group
+					religion = dwarven_pantheon
+					religion = gnome_pantheon
+					religion = bahamut
+					religion = ubtao_reformed
+					religion = ubtao_worship
+					religion = earthmother
+					religion = earthmother_reformed
+					religion = yuir
+					religion = yuir_reformed
+					z_cleric = yes
 				}
-				religion = natural
-				religion_group = elven_pantheon_group
-				religion = dwarven_pantheon
-				religion = gnome_pantheon
-				religion = bahamut
-				religion = ubtao_reformed
-				religion = ubtao_worship
-				religion = earthmother
-				religion = earthmother_reformed
-				religion = yuir
-				religion = yuir_reformed
+				is_evil_religion = yes
 			}
 		}
 		name = WIZINIT.11.c
@@ -933,6 +1044,21 @@ character_event = {
 				}
 				character_event = { id = wizinit.21 }
 			}
+		}
+	}
+
+	#cleric block
+	option = {
+		name = WIZINIT.12.c
+		tooltip_info = cleric
+		trigger = {
+			z_cleric = yes
+		}
+		ai_chance = {
+			factor = 100
+		}
+		hidden_tooltip = {
+			character_event = { id = wizinit.13 }
 		}
 	}
 }
