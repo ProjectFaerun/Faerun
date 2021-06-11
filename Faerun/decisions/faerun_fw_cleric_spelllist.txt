@@ -6,7 +6,10 @@ decisions = {
 		ai = no
 		ai_check_interval = 6000
 		potential = {
-			z_cleric = yes
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+			}
 			NOT = { not_casting = yes }
 		}
 
@@ -27,7 +30,10 @@ decisions = {
 		ai = no
 		ai_check_interval = 6000
 		potential = {
-			z_cleric = yes
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+			}
 			NOT = { not_casting = yes }
 		}
 
@@ -116,6 +122,257 @@ decisions = {
 
 targeted_decisions = {
 
+	spell_heal = {
+		ai_check_interval = 12
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				z_ranger = yes
+				z_paladin = yes
+			}
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						OR = {
+							trait = druid
+							trait = cleric
+							trait = journeyman_ranger
+							trait = journeyman_paladin
+						}
+						wealth = 140
+					}
+					AND = {
+						OR = {
+							trait = trained_druid
+							trait = trained_cleric
+							trait = expert_ranger
+							trait = expert_paladin
+						}
+						wealth = 120
+					}
+					AND = {
+						OR = {
+							trait = journeyman_druid
+							trait = journeyman_cleric
+							trait = master_ranger
+							trait = master_paladin
+						}
+						wealth = 100
+					}
+					AND = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							trait = renowned_ranger
+							trait = renowned_paladin
+						}
+						wealth = 80
+					}
+					AND = {
+						OR = {
+							trait = master_druid
+							trait = master_cleric
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+						wealth = 60
+					}
+					AND = {
+						OR = {
+							trait = renowned_druid
+							trait = renowned_cleric
+						}
+						wealth = 40
+					}
+					AND = {
+						OR = {
+							trait = legendary_druid
+							trait = legendary_cleric
+						}
+						wealth = 20
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_healing_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -20
+					}
+					legendary_cleric = {
+						wealth = -20
+					}
+					renowned_druid = {
+						wealth = -40
+					}
+					renowned_cleric = {
+						wealth = -40
+					}
+					master_druid = {
+						wealth = -60
+					}
+					master_cleric = {
+						wealth = -60
+					}
+					legendary_ranger = {
+						wealth = -60
+					}
+					legendary_paladin = {
+						wealth = -60
+					}
+					expert_druid = {
+						wealth = -80
+					}
+					expert_cleric = {
+						wealth = -80
+					}
+					renowned_ranger = {
+						wealth = -80
+					}
+					renowned_paladin = {
+						wealth = -80
+					}
+					journeyman_druid = {
+						wealth = -100
+					}
+					journeyman_cleric = {
+						wealth = -100
+					}
+					master_ranger = {
+						wealth = -100
+					}
+					master_paladin = {
+						wealth = -100
+					}
+					trained_druid = {
+						wealth = -120
+					}
+					trained_cleric = {
+						wealth = -120
+					}
+					expert_ranger = {
+						wealth = -120
+					}
+					expert_paladin = {
+						wealth = -120
+					}
+					druid = {
+						wealth = -140
+					}
+					cleric = {
+						wealth = -140
+					}
+					journeyman_ranger = {
+						wealth = -140
+					}
+					journeyman_paladin = {
+						wealth = -140
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLINJURIESCURED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 100000
+				character = ROOT
+			}
+			modifier = {
+				factor = 0.1
+				NOT = { wealth = 500 }
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 3
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 3
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+					trait = greedy
+				}
+			}
+		}
+	}
+
 	spell_lesser_restoration = {
 		ai_check_interval = 12
 		filter = realm_including_me
@@ -125,6 +382,8 @@ targeted_decisions = {
 			OR = {
 				z_cleric = yes
 				z_druid = yes
+				z_ranger = yes
+				z_paladin = yes
 			}
 		}
 		potential = {
@@ -145,6 +404,8 @@ targeted_decisions = {
 						OR = {
 							trait = journeyman_druid
 							trait = journeyman_cleric
+							trait = master_ranger
+							trait = master_paladin
 						}
 						wealth = 125
 					}
@@ -152,6 +413,8 @@ targeted_decisions = {
 						OR = {
 							trait = expert_druid
 							trait = expert_cleric
+							trait = renowned_ranger
+							trait = renowned_paladin
 						}
 						wealth = 100
 					}
@@ -159,6 +422,8 @@ targeted_decisions = {
 						OR = {
 							trait = master_druid
 							trait = master_cleric
+							trait = legendary_ranger
+							trait = legendary_paladin
 						}
 						wealth = 75
 					}
@@ -175,23 +440,6 @@ targeted_decisions = {
 							trait = legendary_cleric
 						}
 						wealth = 35
-					}
-				}
-				custom_tooltip = {
-					text = JOURNEYMANCLEHIGHER
-					hidden_tooltip = {
-						OR = {
-							trait = journeyman_cleric
-							trait = expert_cleric
-							trait = master_cleric
-							trait = renowned_cleric
-							trait = legendary_cleric
-							trait = journeyman_druid
-							trait = expert_druid
-							trait = master_druid
-							trait = renowned_druid
-							trait = legendary_druid
-						}
 					}
 				}
 				custom_tooltip = {
@@ -228,16 +476,34 @@ targeted_decisions = {
 					master_cleric = {
 						wealth = -75
 					}
+					legendary_ranger = {
+						wealth = -75
+					}
+					legendary_paladin = {
+						wealth = -75
+					}
 					expert_druid = {
 						wealth = -100
 					}
 					expert_cleric = {
 						wealth = -100
 					}
+					renowned_ranger = {
+						wealth = -100
+					}
+					renowned_paladin = {
+						wealth = -100
+					}
 					journeyman_druid = {
 						wealth = -125
 					}
 					journeyman_cleric = {
+						wealth = -125
+					}
+					master_ranger = {
+						wealth = -125
+					}
+					master_paladin = {
 						wealth = -125
 					}
 				}
@@ -714,215 +980,6 @@ targeted_decisions = {
 			modifier = {
 				factor = 0.01
 				trait = patron_talona
-			}
-		}
-	}
-
-	spell_heal = {
-		ai_check_interval = 12
-		filter = realm_including_me
-		ai_target_filter = realm_including_me
-
-		from_potential = {
-			OR = {
-				z_cleric = yes
-				z_druid = yes
-			}
-		}
-		potential = {
-			OR = {
-				trait = wounded
-				trait = mangled
-				trait = severely_injured
-			}
-		}
-		allow = {
-			FROM = {
-				OR = {
-					AND = {
-						OR = {
-							trait = druid
-							trait = cleric
-						}
-						wealth = 140
-					}
-					AND = {
-						OR = {
-							trait = trained_druid
-							trait = trained_cleric
-						}
-						wealth = 120
-					}
-					AND = {
-						OR = {
-							trait = journeyman_druid
-							trait = journeyman_cleric
-						}
-						wealth = 100
-					}
-					AND = {
-						OR = {
-							trait = expert_druid
-							trait = expert_cleric
-						}
-						wealth = 80
-					}
-					AND = {
-						OR = {
-							trait = master_druid
-							trait = master_cleric
-						}
-						wealth = 60
-					}
-					AND = {
-						OR = {
-							trait = renowned_druid
-							trait = renowned_cleric
-						}
-						wealth = 40
-					}
-					AND = {
-						OR = {
-							trait = legendary_druid
-							trait = legendary_cleric
-						}
-						wealth = 20
-					}
-				}
-				custom_tooltip = {
-					text = SPELL_ON_COOLDOWN
-					hidden_tooltip = {
-						OR = {
-							NOT = { has_character_flag = spell_healing_cooldown }
-							had_character_flag = { flag = spell_healing_cooldown months = 1 }
-						}
-					}
-				}
-			}
-		}
-		effect = {
-			FROM = {
-				set_character_flag = spell_healing_cooldown
-				trigger_switch = {
-					on_trigger = trait
-					legendary_druid = {
-						wealth = -20
-					}
-					legendary_cleric = {
-						wealth = -20
-					}
-					renowned_druid = {
-						wealth = -40
-					}
-					renowned_cleric = {
-						wealth = -40
-					}
-					master_druid = {
-						wealth = -60
-					}
-					master_cleric = {
-						wealth = -60
-					}
-					expert_druid = {
-						wealth = -80
-					}
-					expert_cleric = {
-						wealth = -80
-					}
-					journeyman_druid = {
-						wealth = -100
-					}
-					journeyman_cleric = {
-						wealth = -100
-					}
-					trained_druid = {
-						wealth = -120
-					}
-					trained_cleric = {
-						wealth = -120
-					}
-					druid = {
-						wealth = -140
-					}
-					cleric = {
-						wealth = -140
-					}
-				}
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
-					if = {
-						limit = {
-							ai = no
-						}
-						repeat_event = { id = spellaux.7 }
-					}
-				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
-					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLINJURIESCURED
-				hidden_tooltip = {
-					remove_trait = wounded
-					remove_trait = mangled
-					remove_trait = severely_injured
-				}
-			}
-		}
-		ai_will_do = {
-			factor = 0.1
-			modifier = {
-				factor = 100000
-				character = ROOT
-			}
-			modifier = {
-				factor = 0.1
-				NOT = { wealth = 500 }
-			}
-			modifier = {
-				factor = 0
-				is_foe = ROOT
-			}
-			modifier = {
-				factor = 3
-				trait = kind
-			}
-			modifier = {
-				factor = 10
-				is_friend = ROOT
-			}
-			modifier = {
-				factor = 3
-				opinion = {
-					who = ROOT
-					value = 50
-				}
-			}
-			modifier = {
-				factor = 0.5
-				trait = slothful
-			}
-			modifier = {
-				factor = 0.1
-				OR = {
-					trait = cruel
-					trait = impaler
-					trait = greedy
-				}
 			}
 		}
 	}
