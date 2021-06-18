@@ -19,7 +19,7 @@ claim = {
 			NOT = { culture = monster }
 		}
 		ROOT = {
-			NOT = { culture = monster }
+			NOT = { culture = monster }		
 		}
 		OR = {
 			ROOT = { is_female = no }
@@ -310,7 +310,7 @@ other_claim = {
 			NOT = { culture = monster }
 		}
 		ROOT = {
-			NOT = { culture = monster }
+			NOT = { culture = monster }		
 		}
 		OR = {
 			ROOT = { is_female = no }
@@ -6358,12 +6358,12 @@ bid_for_independence = {
 			}
 			mercenary = no
 			
-			OR = {
-				is_nomadic = no
-				NOT = {
-					clan_opinion = { who = FROM value = 0 }
-				}
-			}
+			# OR = {
+			# 	is_nomadic = no
+			# 	NOT = {
+			# 		clan_opinion = { who = FROM value = 0 }
+			# 	}
+			# }
 		}
 		
 		FROM = {
@@ -6393,7 +6393,7 @@ bid_for_independence = {
 			# No independence factions in merchant republics
 			NOT = {
 				AND = {
-					is_merchant_republic = yes
+					is_patrician = yes
 					liege = {
 						is_merchant_republic = yes
 					}
@@ -9753,8 +9753,10 @@ viking_invasion = {
 		}
 		ROOT = {
 			has_opinion_modifier = { who = FROM modifier = preparing_to_invade }
-			persistent_event_target:prep_invader_target = { NOT = { war_with = ROOT } } 
+			FROM = { NOT = { war_with = ROOT } } 
 			NOT = { is_liege_or_above = FROM }
+			NOT = { pacifist = yes }
+			NOT = { trait = patron_eldath }
 			mercenary = no
             OR = {
                 government = nomadic_tribal_government
@@ -9784,7 +9786,7 @@ viking_invasion = {
 	}
 
 	on_add = {
-		ROOT = { remove_character_modifier = prepared_invasion_timer }
+		ROOT = { remove_character_modifier = launched_prepared_invasion }
 		hidden_tooltip = { fire_haruspicy_event_effect = yes }
 		if = {
 			limit = { defender = { is_offmap_governor = shou_lung } }
@@ -10077,7 +10079,7 @@ pagan_subjugation = {
 					defender = { character = PREVPREV }
 					OR = {
 						using_cb = pagan_subjugation
-						using_cb = nomad_subjugation
+						# using_cb = nomad_subjugation
 					}
 				}
                 primary_title = {
@@ -12297,6 +12299,8 @@ pagan_county_conquest = {
 		}
 		ROOT = {
 			mercenary = no
+			NOT = { trait = patron_eldath }
+			NOT = { pacifist = yes }
 		}
 		OR = {
 			ROOT = {
@@ -12312,6 +12316,7 @@ pagan_county_conquest = {
 			AND = {
 				ROOT = {
 					religion_group = pagan_group
+					NOT = { has_religion_feature = religion_peaceful }
 					OR = { 
                         NOT = { same_realm = FROM }
                         AND = { 
@@ -16462,6 +16467,8 @@ nomad_dispute = {
 		}
 		ROOT = {
 			government = nomadic_tribal_government
+			NOT = { trait = patron_eldath }
+			NOT = { pacifist = yes }
 			same_realm = FROM
 			is_foe = FROM
 		}
@@ -16608,6 +16615,7 @@ cb_liberate_nomad_duchy = {
 		ROOT = {
 			NOT = { government = nomadic_tribal_government }
 			NOT = { pacifist = yes }
+			NOT = { trait = patron_eldath }
 			NOT = { same_realm = FROM }
 			mercenary = no
 			NOT = { culture = monster }
@@ -17683,12 +17691,10 @@ nomad_expansion = {
 			NOT = { has_character_modifier = fr_nomad_conquerer_modifier }
 			NOT = { has_character_modifier = true_villain_modifier }
 			NOT = { has_character_flag = declaring_conquest }
+			NOT = { pacifist = yes }
 			NOR = {
 				trait = content
-				trait = shy
-				trait = craven
-				trait = kind
-				trait = humble
+				trait = patron_eldath
 			}
 			# population_factor = 0.5
 		}
@@ -17922,14 +17928,25 @@ nomad_expansion = {
 		
 		modifier = {
 			factor = 2.0
-			OR = {
-				culture_group = taan_group
-				culture_group = orc_group
-				culture_group = goblinoid_group
-				culture_group = gnoll_group
-				is_evil_religion = yes
+			ROOT = {
+				OR = {
+					culture_group = taan_group
+					culture_group = orc_group
+					culture_group = goblinoid_group
+					culture_group = gnoll_group
+					is_evil_religion = yes
+				}
 			}
 		}
+		modifier = {
+			factor = 0
+			ROOT = {
+				OR = {
+					trait = shy
+					trait = craven
+				}				
+			}
+		}		
 		# modifier = {
 			# factor = 0
 			# ROOT = {
