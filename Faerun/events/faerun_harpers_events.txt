@@ -667,3 +667,408 @@ character_event = { #AI join event
 		}
 	}
 }
+
+###MISSIONS### (start on 1000)
+
+#Mission tombola
+character_event = {
+	id = HRP.1000
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = harpers
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				society_member_of = harpers
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			15 = {
+				character_event = { id = HRP.1001 } #Agent Elimination
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#MISSION: #Agent Elimination
+character_event = {
+  id = HRP.1001
+  hide_window = yes
+
+  is_triggered_only = yes
+
+  trigger = {
+    any_realm_character = {
+      NOT = {
+        is_inaccessible_trigger = yes
+        character = ROOT
+      }
+      prisoner = no
+      OR = {
+        society_member_of = arcane_brotherhood
+        society_member_of = brotherhood_of_true_flame
+        society_member_of = cult_of_the_dragon
+        society_member_of = shadow_thieves
+        society_member_of = night_masks
+        society_member_of = shadow_telflamm
+        society_member_of = twisted_rune
+        society_member_of = eldreth_veluuthra
+        society_member_of = the_satanists
+        society_member_of = black_network
+      }
+    }
+  }
+
+	immediate = {
+    random_realm_character = {
+      limit = {
+        NOT = { is_inaccessible_trigger = yes }
+        NOT = { character = ROOT }
+        prisoner = no
+        OR = {
+          society_member_of = arcane_brotherhood
+          society_member_of = brotherhood_of_true_flame
+          society_member_of = cult_of_the_dragon
+          society_member_of = shadow_thieves
+          society_member_of = night_masks
+          society_member_of = shadow_telflamm
+          society_member_of = twisted_rune
+          society_member_of = eldreth_veluuthra
+          society_member_of = the_satanists
+          society_member_of = black_network
+        }
+      }
+      save_event_target_as = elimination_target
+    }
+
+    if = {
+			limit = {
+				event_target:elimination_target = { always = yes }
+				is_within_diplo_range = event_target:elimination_target
+			}
+			event_target:quest_giver = {
+				character_event = { id = HRP.1002 }
+			}
+		}
+	}
+}
+
+#Ping event for quest giver
+character_event = {
+	id = HRP.1002
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { event_target:elimination_target = { always = yes } }
+			FROM = { society_quest_event = { id = HRP.1003 days = 7 random = 7 } }
+		}
+	}
+}
+
+#You get your target
+society_quest_event = {
+	id = HRP.1003
+	title = quest_agent_elimination
+	quest_target = event_target:elimination_target
+  desc = EVTDESC_HRP_1003
+
+	trigger = {
+		is_in_society = yes
+		event_target:elimination_target = {
+			is_alive = yes
+      prisoner = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:elimination_target = {
+			set_quest_target = {
+				id = quest_agent_elimination
+				holder = ROOT
+			}
+		}
+
+		hidden_effect = {
+			if = { #Makes sure the AI actually does the mission
+				limit = { ai = yes }
+				random_list = {
+					20 = {
+						trigger = {
+							attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 6 }
+						}
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = HRP.1004 days = 150 random = 100 } #Triggers plot event
+					}
+					20 = {
+						trigger = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 3 } }
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = HRP.1004 days = 300 random = 100 } #Triggers plot event
+					}
+					20 = {
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = HRP.1004 days = 500 random = 300 } #Triggers plot event
+					}
+					40 = {
+						modifier = { event_target:elimination_target = { intrigue = 12 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 14 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 16 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 18 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { tier = COUNT } factor = 1.5 }
+						modifier = { event_target:elimination_target = { tier = DUKE } factor = 2 }
+						modifier = { event_target:elimination_target = { tier = KING } factor = 2.5 }
+						modifier = { event_target:elimination_target = { tier = EMPEROR } factor = 5 }
+						character_event = { id = HRP.1005 } #Clears quest
+					}
+				}
+			}
+		}
+		event_target:elimination_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+
+#Helps AI do mission
+character_event = {
+  id = HRP.1004
+  hide_window = yes
+  is_triggered_only = yes
+  trigger = {
+  	NOT = { plot_target_char = { is_quest_target_of = ROOT } }
+  	has_quest = quest_agent_elimination
+  }
+  immediate = {
+  	character_event = { id = HRP.1008 }
+  }
+}
+
+#AI clean-up
+character_event = {
+    id = HRP.1005
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	NOT = { plot_target_char = { is_quest_target_of = ROOT } }
+    	has_quest = quest_agent_elimination
+    }
+    immediate = {
+    	clr_quest = {
+    		id = quest_agent_elimination
+    		failure = yes
+    	}
+    }
+}
+
+#AI mission assassination attempt
+character_event = {
+	id = HRP.1008
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { save_event_target_as = assassin }
+    random_list = {
+      60 = { #Kill
+        random_list = {
+          75 = {	#Not discovered
+            modifier = {
+              event_target:assassin = { intrigue = 12 }
+              factor = 1.5
+            }
+            modifier = {
+              event_target:assassin = { intrigue = 15 }
+              factor = 1.5
+            }
+            event_target:elimination_target = { death = { death_reason = death_murder_unknown killer = event_target:assassin } }
+          }
+          25 = {	#Discovered
+            modifier = {
+              event_target:assassin = { NOT = { intrigue = 8 } }
+              factor = 1.5
+            }
+            modifier = {
+              event_target:assassin = { NOT = { intrigue = 5 } }
+              factor = 1.5
+            }
+            event_target:elimination_target = { death = { death_reason = death_murder killer = event_target:assassin } }
+            event_target:assassin = { character_event = { id = 10 } }
+          }
+        }
+        modifier = {
+          factor = 3
+          event_target:elimination_target = { trait = incapable }
+        }
+        modifier = {
+          factor = 2
+          event_target:elimination_target = { prisoner = yes }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 6 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:elimination_target value = 10 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:elimination_target value = 20 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:elimination_target value = 30 } }
+        }
+      }
+      40 = { #No Kill
+        random_list = {
+          50 = {	#Not discovered
+            modifier = {
+              event_target:assassin = { intrigue = 12 }
+              factor = 1.5
+            }
+            modifier = {
+              event_target:assassin = { intrigue = 15 }
+              factor = 1.5
+            }
+						event_target:assassin = {
+							clr_quest = {
+								id = quest_agent_elimination
+								failure = yes
+							}
+						}
+          }
+          25 = {	#Discovered and wounded
+            modifier = {
+              event_target:assassin = { NOT = { intrigue = 8 } }
+              factor = 1.5
+            }
+            modifier = {
+              event_target:assassin = { NOT = { intrigue = 5 } }
+              factor = 1.5
+            }
+						event_target:assassin = {
+							clr_quest = {
+								id = quest_agent_elimination
+								failure = yes
+							}
+						}
+            random_list = {
+        			70 = {
+        				event_target:assassin = {
+        					tooltip = { add_trait = wounded }
+        				}
+        			}
+        			30 = {
+        				event_target:assassin = {
+        					tooltip = { add_maimed_trait_effect = yes }
+        				}
+        			}
+        		}
+            event_target:assassin = { character_event = { id = 11 } }
+          }
+          25 = { #Assassin is Killed
+            modifier = {
+              factor = 1.3
+              event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 10 } }
+            }
+            modifier = {
+              factor = 1.3
+              event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 20 } }
+            }
+            modifier = {
+              factor = 1.3
+              event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 30 } }
+            }
+            event_target:assassin = { death = { death_reason = death_battle killer = event_target:elimination_target } }
+            event_target:assassin = { character_event = { id = 11 } }
+          }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:assassin attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:assassin attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:assassin attribute = intrigue value = 6 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 10 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 20 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 30 } }
+        }
+      }
+    }
+	}
+}

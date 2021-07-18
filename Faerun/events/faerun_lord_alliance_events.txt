@@ -217,74 +217,6 @@ character_event = { #AI join event
   }
 }
 
-#######################Rank UP#############################
-
-#Hidden start: Send the rank-up request to the current Grandmaster (delayed event on self, from decision to rank up)
-character_event = {
-	id = LA.120
-
-	hide_window = yes
-
-	trigger = { #has pressed the button
-		has_character_flag = has_sent_request_to_rank_up
-	}
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = { #if he's still a member
-			limit = { is_in_society = yes }
-			random_society_member = { #will send the request to a random top rank member of the same society
-				limit = {
-					is_society_grandmaster = yes
-					same_society_as = ROOT
-				}
-				character_event = { id = LA.121 } # send request to Grand Master.
-			}
-		}
-		if = { #if he's not a member
-			limit = { is_in_society = no }
-			clr_character_flag = has_sent_request_to_rank_up
-		}
-	}
-}
-
-#Grandmaster gets the rank-up request
-character_event = {
-	id = LA.121
-
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:rank_up_target = { letter_event = { id = LA.122 } } #send it back
-	}
-}
-
-#Grand master approves my request
-letter_event = {
-	id = LA.122
-	desc = EVTDESC_LA_122
-	border = GFX_event_letter_frame_war
-
-	trigger = {
-		society_rank < 4 #cannot rank up past 4
-		has_character_flag = has_sent_request_to_rank_up
-	}
-
-	is_triggered_only = yes
-
-	#Rank up approved
-	option = {
-		name = EVTOPTA_LA_122
-		if = { limit = { society_rank < 4 } #if not max rank, rank up
-			society_rank_up = 1
-		}
-		clr_character_flag = has_sent_request_to_rank_up
-	}
-}
-
 #################################DECISIONS######################################
 
 #alliance diplomacy
@@ -491,5 +423,417 @@ character_event = {
       }
       end_war = whitepeace
 		}
+	}
+}
+
+
+###MISSIONS### (start on 500)
+
+#Mission tombola
+character_event = {
+	id = LA.500
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = lord_alliance
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				society_member_of = lord_alliance
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			15 = {
+				character_event = { id = LA.501 } #Agent Elimination
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#MISSION: #Agent Elimination
+character_event = {
+  id = LA.501
+  hide_window = yes
+
+  is_triggered_only = yes
+
+  trigger = {
+    any_realm_character = {
+      NOT = {
+        is_inaccessible_trigger = yes
+        character = ROOT
+      }
+      prisoner = no
+      OR = {
+        society_member_of = arcane_brotherhood
+        society_member_of = brotherhood_of_true_flame
+        society_member_of = black_network
+        society_member_of = cult_of_the_dragon
+        society_member_of = shadow_thieves
+        society_member_of = night_masks
+        society_member_of = shadow_telflamm
+        society_member_of = twisted_rune
+        society_member_of = eldreth_veluuthra
+        society_member_of = the_satanists
+      }
+    }
+  }
+
+	immediate = {
+    random_realm_character = {
+      limit = {
+        NOT = { is_inaccessible_trigger = yes }
+        NOT = { character = ROOT }
+        prisoner = no
+        OR = {
+          society_member_of = arcane_brotherhood
+          society_member_of = brotherhood_of_true_flame
+          society_member_of = black_network
+          society_member_of = cult_of_the_dragon
+          society_member_of = shadow_thieves
+          society_member_of = night_masks
+          society_member_of = shadow_telflamm
+          society_member_of = twisted_rune
+          society_member_of = eldreth_veluuthra
+          society_member_of = the_satanists
+        }
+      }
+      save_event_target_as = elimination_target
+    }
+
+    if = {
+			limit = {
+				event_target:elimination_target = { always = yes }
+				is_within_diplo_range = event_target:elimination_target
+			}
+			event_target:quest_giver = {
+				character_event = { id = LA.502 }
+			}
+		}
+	}
+}
+
+#Ping event for quest giver
+character_event = {
+	id = LA.502
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { event_target:elimination_target = { always = yes } }
+			FROM = { society_quest_event = { id = LA.503 days = 7 random = 7 } }
+		}
+	}
+}
+
+#You get your target
+society_quest_event = {
+	id = LA.503
+	title = quest_agent_elimination
+	quest_target = event_target:elimination_target
+  desc = EVTDESC_LA_503
+
+	trigger = {
+		is_in_society = yes
+		event_target:elimination_target = {
+			is_alive = yes
+      prisoner = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:elimination_target = {
+			set_quest_target = {
+				id = quest_agent_elimination
+				holder = ROOT
+			}
+		}
+
+		hidden_effect = {
+			if = { #Makes sure the AI actually does the mission
+				limit = { ai = yes }
+				random_list = {
+					20 = {
+						trigger = {
+							attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 6 }
+						}
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = LA.504 days = 150 random = 100 } #Triggers plot event
+					}
+					20 = {
+						trigger = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 3 } }
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = LA.504 days = 300 random = 100 } #Triggers plot event
+					}
+					20 = {
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = LA.504 days = 500 random = 300 } #Triggers plot event
+					}
+					40 = {
+						modifier = { event_target:elimination_target = { intrigue = 12 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 14 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 16 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { intrigue = 18 } factor = 1.2 }
+						modifier = { event_target:elimination_target = { tier = COUNT } factor = 1.5 }
+						modifier = { event_target:elimination_target = { tier = DUKE } factor = 2 }
+						modifier = { event_target:elimination_target = { tier = KING } factor = 2.5 }
+						modifier = { event_target:elimination_target = { tier = EMPEROR } factor = 5 }
+						character_event = { id = LA.505 } #Clears quest
+					}
+				}
+			}
+		}
+		event_target:elimination_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+
+#Helps AI do mission
+character_event = {
+  id = LA.504
+  hide_window = yes
+  is_triggered_only = yes
+  trigger = {
+  	NOT = { plot_target_char = { is_quest_target_of = ROOT } }
+  	has_quest = quest_agent_elimination
+  }
+  immediate = {
+  	character_event = { id = LA.508 }
+  }
+}
+
+#AI clean-up
+character_event = {
+    id = LA.505
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	NOT = { plot_target_char = { is_quest_target_of = ROOT } }
+    	has_quest = quest_agent_elimination
+    }
+    immediate = {
+    	clr_quest = {
+    		id = quest_agent_elimination
+    		failure = yes
+    	}
+    }
+}
+
+#event checking if target is dead/imprisoned - used for all societies with this kind of mission
+character_event = {
+	id = LA.506
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_quest_target = yes
+	}
+
+	immediate = {
+		any_quester_targeting_this = {
+			if = {
+				limit = {
+					has_quest = quest_agent_elimination
+          OR = {
+            ROOT = { killer = { character = PREVPREV } }
+            ROOT = {
+              prisoner = yes
+              host = { character = PREVPREV }
+            }
+          }
+				}
+				character_event = { id = LA.507 days = 1 } #Completes mission
+			}
+      if = {
+				limit = {
+					NAND = {
+						has_quest = quest_agent_elimination
+						ROOT = { killer = { character = PREVPREV } }
+					}
+				}
+				character_event = { id = MNM.6992 days = 4 } #Fails all missions
+			}
+		}
+	}
+}
+
+#Quest ending event - used for all societies with this kind of mission
+character_event = {
+  id = LA.507
+  picture = GFX_evt_shady_meeting
+  border = GFX_event_normal_frame_intrigue
+
+  is_triggered_only = yes
+
+  desc = {
+		trigger = { society_member_of = lord_alliance }
+		text = EVTDESC_LA_507
+	}
+  desc = {
+		trigger = { society_member_of = black_network }
+		text = EVTDESC_LA_507_ZHE
+	}
+  desc = {
+		trigger = { society_member_of = harpers }
+		text = EVTDESC_LA_507_HRP
+	}
+  desc = {
+		trigger = { society_member_of = twisted_rune }
+		text = EVTDESC_LA_507_TWI
+	}
+
+  trigger = {
+  	has_quest = quest_agent_elimination
+  }
+
+  option = {
+    name = {
+			text = EVTOPTA_LA_507
+			trigger = { society_member_of = lord_alliance }
+		}
+    name = {
+			text = EVTOPTA_LA_507_ZHE
+			trigger = { society_member_of = black_network }
+		}
+    name = {
+			text = EVTOPTA_LA_507_HRP
+			trigger = { society_member_of = harpers }
+		}
+    name = {
+			text = EVTOPTA_LA_507_TWI
+			trigger = { society_member_of = twisted_rune }
+		}
+    clr_quest = quest_agent_elimination
+
+		if = {
+			limit = { FROM = { higher_tier_than = DUKE } }
+			add_society_currency_medium_effect = yes
+		}
+		if = {
+			limit = { FROM = { lower_tier_than = KING } }
+			add_society_currency_minor_effect = yes
+		}
+  }
+}
+
+#AI mission imprisonment attempt
+character_event = {
+	id = LA.508
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { save_event_target_as = abductor }
+    random_list = {
+      40 = { #Imprison
+        modifier = {
+          factor = 3
+          event_target:elimination_target = { trait = incapable }
+        }
+        modifier = {
+          factor = 2
+          event_target:elimination_target = { prisoner = yes }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:elimination_target attribute = intrigue value = 6 } }
+        }
+
+        event_target:elimination_target = { imprison = event_target:abductor }
+      }
+      40 = { #Fail
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:abductor attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:abductor attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:elimination_target = { attribute_diff = { character = event_target:abductor attribute = intrigue value = 6 } }
+        }
+        modifier = { event_target:elimination_target = { combat_rating = 40 } factor = 1.1 }
+				modifier = { event_target:elimination_target = { combat_rating = 50 } factor = 1.1 }
+				modifier = { event_target:elimination_target = { combat_rating = 60 } factor = 1.2 }
+				modifier = { event_target:elimination_target = { combat_rating = 70 } factor = 1.2 }
+				modifier = { event_target:elimination_target = { combat_rating = 80 } factor = 1.2 }
+				modifier = { event_target:elimination_target = { combat_rating = 90 } factor = 1.3 }
+				modifier = { event_target:elimination_target = { combat_rating = 100 } factor = 1.3 }
+				modifier = { event_target:elimination_target = { combat_rating = 120 } factor = 1.4 }
+				modifier = { event_target:elimination_target = { combat_rating = 140 } factor = 1.4 }
+				modifier = { event_target:elimination_target = { combat_rating = 160 } factor = 1.5 }
+				modifier = { event_target:elimination_target = { combat_rating = 200 } factor = 3 }
+
+        event_target:abductor = {
+          clr_quest = {
+        		id = quest_agent_elimination
+        		failure = yes
+        	}
+        }
+      }
+    }
 	}
 }

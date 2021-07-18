@@ -367,104 +367,168 @@ character_event = {
 }
 
 character_event = {
-	id = govmaint.10
+	id = govmaint.12
 	hide_window = yes
 	
 	is_triggered_only = yes
 	
 	trigger = {
-		NOT = { government = magocratic_feudal_government }
-		primary_title = {
-			title = FROM
+		is_patrician = yes
+		NOR = {
+			NOT = { has_religion_feature = religion_matriarchal }
+			NOT = { has_religion_feature = religion_equal }
+			NOT = { has_religion_feature = religion_feature_earthmother }
+			NOT = { has_religion_feature = religion_feature_yuir }
+			NOR = {
+				religion = lolth_cult
+				culture = batiri
+				culture = troll
+			}
 		}
-		OR = {
-			z_wizard = yes
-			z_sorcerer = yes
-			z_warlock = yes
-			z_bard = yes
+		family_palace = {
+			has_law = agnatic_succession
 		}
-		FROM = {
-			OR = {
-				has_law = succ_magic_elective
-				has_law = succ_magic_dynastic
-				AND = {
-					has_law = succ_magic_wizard
-					ROOT = {
-						z_wizard = yes
-					}
-				}
-				AND = {
-					has_law = succ_magic_zulkir
-					ROOT = {
-						z_wizard = yes
-					}
-				}
+		liege = {
+			is_merchant_republic = yes
+			any_demesne_title = {
+				is_merchant_republic = yes
+				NOT = { has_law = agnatic_succession }
 			}
 		}
 	}
 	
 	immediate = {
-		set_government_type = magocratic_feudal_government
+		if = {
+			limit = {
+				liege = {
+					is_merchant_republic = yes
+					any_demesne_title = {
+						is_merchant_republic = yes
+						has_law = cognatic_succession
+					}
+				}
+			}
+			family_palace = {
+				set_law = cognatic_succession
+			}
+		}
+		else_if = {
+			limit = {
+				liege = {
+					is_merchant_republic = yes
+					any_demesne_title = {
+						is_merchant_republic = yes
+						has_law = true_cognatic_succession
+					}
+				}
+			}
+			family_palace = {
+				set_law = true_cognatic_succession
+			}
+		}
+		else_if = {
+			limit = {
+				liege = {
+					is_merchant_republic = yes
+					any_demesne_title = {
+						is_merchant_republic = yes
+						has_law = enatic_cognatic_succession
+					}
+				}
+			}
+			family_palace = {
+				set_law = enatic_cognatic_succession
+			}
+		}
+		else_if = {
+			limit = {
+				liege = {
+					is_merchant_republic = yes
+					any_demesne_title = {
+						is_merchant_republic = yes
+						has_law = enatic_succession
+					}
+				}
+			}
+			family_palace = {
+				set_law = enatic_succession
+			}
+		}
 	}
 }
 
 character_event = {
-	id = govmaint.11
+	id = govmaint.13
 	hide_window = yes
-	
-	trigger = {
-		independent = no
-		liege = {
-			government = magocratic_feudal_government
-		}
-		FROM = {
-			capital_holding = {
-				holding_type = castle
-			}
-		}
-		OR = {
-			AND = {
-				liege = {
-					OR = {
-						has_law = succ_magic_wizard
-						has_law = succ_magic_zulkir
-					}
-				}
-				z_wizard = yes
-			}
-			AND = {
-				liege = {
-					OR = {
-						has_law = succ_magic_dynastic
-						has_law = succ_magic_elective
-					}
-				}
-				OR = {
-					z_wizard = yes
-					z_bard = yes
-					z_sorcerer = yes
-					z_warlock = yes
-				}
-			}
-		}
-	}
 	
 	is_triggered_only = yes
 	
+	trigger = {
+		law = agnatic_succession
+		law = succ_gavelkind
+	}
+	
 	immediate = {
-		set_government_type = magocratic_feudal_government
 		if = {
 			limit = {
-				liege = {
-					OR = {
-						has_law = succ_magic_wizard
-						has_law = succ_magic_zulkir
-					}
+				culture_group = orc_group
+			}
+			set_law = succ_turkish_succession
+		}
+		if = {
+			limit = {
+				culture_group = goblinoid_group
+			}
+			set_law = enatic_cognatic_succession
+		}
+		if = {
+			limit = {
+				culture = calishite
+			}
+			set_law = cognatic_succession
+		}
+		if = {
+			limit = {
+				culture = troll
+			}
+			set_law = enatic_succession
+		}
+		if = {
+			limit = {
+				government = democratic_feudal_government
+			}
+			set_law = succ_popular_elective
+		}
+		if = {
+			limit = {
+				NOR = {
+					culture_group = orc_group
+					culture_group = goblinoid_group
+					culture = calishite
+					culture = troll
 				}
 			}
-			add_law = succ_magic_wizard
-			break = yes
+			set_law = true_cognatic_succession
 		}
-		add_law = succ_magic_elective
+		if = {
+			limit = {
+				government = divine_feudal_government
+			}
+			set_law = succ_divine_dynastic
+		}
+		if = {
+			limit = {
+				government = theocracy_government
+			}
+			set_law = succ_divine_elective
+		}
+		if = {
+			limit = {
+				FROM = { title = k_thay }
+				z_wizard = yes
+				culture = thayan
+			}
+			set_law = succ_magic_zulkir
+		}
 	}
 }
