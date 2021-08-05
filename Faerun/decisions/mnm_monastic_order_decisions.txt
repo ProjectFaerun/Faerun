@@ -1,0 +1,744 @@
+###########################################
+#
+# Society decisions for monastic orders
+#
+###########################################
+
+society_decisions = {
+
+	#Perfect Self
+	monastic_orders_perfect_self = {
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 60
+		potential = {
+			is_monastic_member_trigger = yes
+			society_rank = 4
+			not_casting = yes
+			is_playable = yes
+		}
+		allow = {
+			custom_tooltip = {
+				text = FIGHTABILITYNOCD
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = monastic_training }
+						had_character_flag = {
+							flag = monastic_training
+							years = 5
+						}
+					}
+				}
+			}
+			has_society_currency_major_trigger = yes
+			NOT = { has_severe_disability_trigger = yes }
+			NOT = { is_sick_or_injured_trigger = yes }
+		}
+		effect = {
+			hidden_tooltip = {
+				set_character_flag = monastic_training
+				random_list = {
+					1 = { # Gain Brawny
+						modifier = {
+							factor = 0
+							OR = {
+								trait = feeble
+								trait = robust
+							}
+						}
+						character_event = { id = fighterevt.1 }
+					}
+					1 = { # Lose Frail
+						modifier = {
+							factor = 0
+							NOT = { trait = feeble }
+						}
+						character_event = { id = fighterevt.3 }
+					}
+					1 = { # Gain Groomed
+						modifier = {
+							factor = 0
+							OR = {
+								trait = groomed
+								trait = uncouth
+							}
+						}
+						character_event = { id = MNM.4900 }
+					}
+					1 = { # Lose Uncouth
+						modifier = {
+							factor = 0
+							NOT = { trait = uncouth }
+						}
+						character_event = { id = MNM.4901 }
+					}
+					1 = { # Gain Shrewd
+						modifier = {
+							factor = 0
+							OR = {
+								trait = shrewd
+								trait = dull
+							}
+						}
+						character_event = { id = MNM.4902 }
+					}
+					1 = { # Lose Dull
+						modifier = {
+							factor = 0
+							NOT = { trait = dull }
+						}
+						character_event = { id = MNM.4903 }
+					}
+					1 = { # Lose Fat
+						modifier = {
+							factor = 0
+							NOT = { trait = is_fat }
+						}
+						character_event = { id = fighterevt.4 }
+					}
+					1 = { # Lose Stressed
+						modifier = {
+							factor = 0
+							NOT = { trait = stressed }
+						}
+						character_event = { id = fighterevt.11 }
+					}
+					1 = { # Temp +2 Health
+						modifier = {
+							factor = 0
+							NOT = {
+								trait = robust
+								trait = groomed
+								trait = shrewd
+							}
+						}
+						character_event = { id = fighterevt.9 }
+					}
+				}
+			}
+			detract_society_currency_major_effect = yes
+		}
+		ai_will_do = {
+			factor = 0.8
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+
+	vassalize_sun_soul = {
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 60
+
+		potential = {
+			society_member_of = monastic_order_sun_soul
+			society_rank = 4
+			not_casting = yes
+			is_playable = yes
+			religion = solar
+			higher_tier_than = DUKE
+
+			NOT = {
+				d_sun_soul = {
+					owner = {
+						has_opinion_modifier = {
+							who = ROOT
+							modifier = opinion_unfit_ruler
+						}
+					}
+				}
+			}
+
+			is_title_active = d_sun_soul
+
+			d_sun_soul = {
+				holder_scope = {
+					NOT = { has_truce = ROOT }
+					ROOT = { NOT = { has_truce = PREV } }
+					liege = {
+						NOT = { character = ROOT }
+					}
+					NOT = { num_of_count_titles = 3 }
+					independent = yes
+					primary_title = { title = d_sun_soul }
+				}
+			}
+
+			NOT = {
+				has_alternate_start_parameter = { key = religion_names value = random }
+			}
+		}
+
+		allow = {
+			wealth = 250
+			has_society_currency_major_trigger = yes
+			independent = yes
+
+			conditional_tooltip = {
+				trigger = {
+					NOT = {
+						d_sun_soul = {
+							owner = {
+								opinion = {
+									who = ROOT
+									value = 25
+								}
+							}
+						}
+					}
+				}
+
+				custom_tooltip = {
+					text = vassalize_knights_templar_opinion_TT
+
+					d_sun_soul = {
+						owner = {
+							opinion = {
+								who = ROOT
+								value = 25
+							}
+						}
+					}
+				}
+			}
+
+			custom_tooltip = {
+				text = only_one_vassalized_holy_order_TT
+
+				NOT = {
+					any_realm_lord = {
+						holy_order = yes
+					}
+				}
+			}
+		}
+
+		effect = {
+			wealth = -250
+
+			hidden_tooltip = {
+				d_sun_soul = {
+					holder_scope = {
+						wealth = 250
+						character_event = {
+							id = SoA.1015
+						}
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	#Switch Celibate
+	 monastic_orders_go_celibate = {
+		 ai = no
+		 potential = {
+			 OR = {
+				 is_dharmic_monastic_member_trigger = yes
+				 is_christian_monastic_member_trigger = yes
+			 }
+			 society_rank >= 2
+			 NOT = { has_character_modifier = promise_of_celibacy }
+			 NOT = { trait = celibate }
+		 }
+
+		 allow = {
+			 NOT = {
+				 trait = celibate
+				 trait = hedonist
+				 trait = seducer
+				 trait = seductress
+			 }
+		 }
+
+		 effect = {
+			 tooltip = {
+				 add_trait = celibate
+			 }
+			 character_event = {
+				 id = MNM.4090
+			 }
+		 }
+
+		 ai_will_do = {
+			 factor = 0
+		 }
+	 }
+
+	 monastic_orders_stop_celibate = {
+		 ai = no
+		 potential = {
+			 OR = {
+				 is_christian_monastic_member_trigger = yes
+				 is_dharmic_monastic_member_trigger = yes
+			 }
+			 society_rank >= 2
+			 trait = celibate
+		 }
+
+		 allow = {
+			 trait = celibate
+		 }
+
+		 effect = {
+			 tooltip = {
+				 remove_trait = celibate
+			 }
+			 character_event = {
+				 id = MNM.4091
+			 }
+		 }
+
+		 ai_will_do = {
+			 factor = 0
+		 }
+	 }
+}
+
+targetted_decisions = {
+	monastic_orders_spiritual_guidance = {  ### Monastic Order Rank 2 power : targeted decision to remove one of target's vices
+		ai_check_interval = 24
+		potential = {
+			NOT = { trait = incapable }
+			OR = {
+				same_realm = FROM
+				same_society_as = FROM
+			}
+			is_within_diplo_range = FROM
+			religion = FROM
+		}
+
+		from_potential = {
+			has_DLC = "Mystics"
+			society_rank >= 2
+			is_monastic_member_trigger = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+		}
+
+		allow = {
+			FROM = {
+				has_society_currency_medium_trigger = yes	###requires 300SocCur
+				is_inaccessible_trigger = no
+				prisoner = no
+				in_command = no
+			}
+			is_inaccessible_trigger = no
+			prisoner = no
+			in_command = no
+			same_realm = FROM
+			hidden_tooltip = {
+				OR = {
+					FROM = { ai = no }
+					is_landed = yes
+					is_patrician = yes
+					is_close_relative = FROM
+				}
+			}
+			NOT = {
+				has_opinion_modifier = {	###opinion modifier 10yrs cooldown
+					who =  FROM
+					modifier = opinion_spiritual_guidance
+				}
+			}
+			custom_tooltip = {
+				text = spiritual_guidance_tooltip
+
+				OR = {
+					AND = {
+						trait = lustful #bad for all monks
+						FROM = { NOT = { trait = lustful } }
+					}
+					AND = {
+						trait = gluttonous #bad for all monks
+						FROM = { NOT = { trait = gluttonous } }
+					}
+					AND = {
+						trait = slothful #bad for all monks
+						FROM = { NOT = { trait = slothful } }
+					}
+					AND = {
+						trait = greedy #ok for neutral and evil monks
+						FROM = { NOT = { trait = greedy } }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						trait = wroth #ok for evil monks
+						FROM = { NOT = { trait = wroth } }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						trait = envious #ok for neutral and evil monks
+						FROM = { NOT = { trait = envious } }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						trait = proud #ok for evil monks
+						FROM = { NOT = { trait = proud } }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						trait = cruel #ok for neutral and evil monks
+						FROM = { NOT = { trait = cruel } }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					#add kind, charitable and content later as removable sins for evil monks
+					#add arbitrary and deceitful later as removable sins for lawful neutral monks
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				detract_society_currency_medium_effect = yes	###lose 300SocCur
+			}
+			random_list = {				###Will randomly remove one sin that target has and you don't
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = lustful }
+							FROM = { trait = lustful }
+						}
+					}
+					set_character_flag = spiritual_guidance_lustful
+					remove_trait = lustful
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = gluttonous }
+							FROM = { trait = gluttonous }
+						}
+					}
+					set_character_flag = spiritual_guidance_gluttonous
+					remove_trait = gluttonous
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = slothful }
+							FROM = { trait = slothful }
+						}
+					}
+					set_character_flag = spiritual_guidance_slothful
+					remove_trait = slothful
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = greedy }
+							FROM = { trait = greedy }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = spiritual_guidance_greedy
+					remove_trait = greedy
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = wroth }
+							FROM = { trait = wroth }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = spiritual_guidance_wroth
+					remove_trait = wroth
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = envious }
+							FROM = { trait = envious }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = spiritual_guidance_envious
+					remove_trait = envious
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = proud }
+							FROM = { trait = proud }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = spiritual_guidance_proud
+					remove_trait = proud
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = cruel }
+							FROM = { trait = cruel }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = spiritual_guidance_cruel
+					remove_trait = cruel
+				}
+			}
+			opinion = {										###opinion mostly serves as a 10 years cooldown ; +5 Opinion
+				who = FROM
+				modifier = opinion_spiritual_guidance
+				months = 120
+			}
+			FROM = { character_event = { id = MNM.4950 } }
+			character_event = { id = MNM.4951 }
+		}
+
+		revoke_allowed = {
+		always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					AND = {
+						is_close_relative = FROM						###AI will only target landed relatives in the same realm
+						same_realm = FROM
+						OR = {
+							is_landed = yes
+							is_patrician = yes
+						}
+					}
+				}
+			}
+		}
+	}
+
+	monastic_orders_teach_virtue = {  ### Monastic Order Rank 3 power : targeted decision to give target a virtue
+		ai_check_interval = 24
+		potential = {
+			NOT = { trait = incapable }
+			OR = {
+				same_realm = FROM
+				same_society_as = FROM
+			}
+			is_within_diplo_range = FROM
+		}
+
+		from_potential = {
+			has_DLC = "Mystics"
+			society_rank >= 3
+			is_monastic_member_trigger = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			religion = ROOT
+		}
+
+		allow = {
+			FROM = {
+				has_society_currency_major_trigger = yes	###requires 500SocCur
+				is_inaccessible_trigger = no
+				prisoner = no
+				in_command = no
+			}
+			is_inaccessible_trigger = no
+			prisoner = no
+			in_command = no
+			same_realm = FROM
+			hidden_tooltip = {
+				OR = {
+					FROM = { ai = no }
+					is_landed = yes
+					is_patrician = yes
+					is_close_relative = FROM
+				}
+			}
+			NOT = {
+				has_opinion_modifier = {	###opinion modifier 10yrs cooldown
+					who =  FROM
+					modifier = opinion_teach_virtue
+				}
+			}
+			custom_tooltip = {
+				text = teach_virtue_tooltip
+				OR ={
+					AND = {
+						NOT = { trait = chaste }
+						FROM = { trait = chaste }
+					}
+					AND = {
+						NOT = { trait = temperate }
+						FROM = { trait = temperate }
+					}
+					AND = {
+						NOT = { trait = diligent }
+						FROM = { trait = diligent }
+					}
+					AND = {
+						NOT = { trait = charitable }
+						FROM = { trait = charitable }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						NOT = { trait = patient }
+						FROM = { trait = patient }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						NOT = { trait = kind }
+						FROM = { trait = kind }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					AND = {
+						NOT = { trait = humble }
+						FROM = { trait = humble }
+						FROM = { society_member_of = monastic_order_sun_soul }
+					}
+					#add cruel, greedy and ambitious later as virtues for evil monks
+					#add just and h latonester as virtues for lawful neutral monks
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				detract_society_currency_major_effect = yes	###lose 500SocCur
+			}
+			random_list = {				###Will randomly add one virtue that you have and target doesn't
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = chaste
+							FROM = { NOT = { trait = chaste } }
+						}
+					}
+					set_character_flag = teach_virtue_chaste
+					add_trait = chaste
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = temperate
+							FROM = { NOT = { trait = temperate } }
+						}
+					}
+					set_character_flag = teach_virtue_temperate
+					add_trait = temperate
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = diligent
+							FROM = { NOT = { trait = diligent } }
+						}
+					}
+					set_character_flag = teach_virtue_diligent
+					add_trait = diligent
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = charitable
+							FROM = { NOT = { trait = charitable } }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = teach_virtue_charitable
+					add_trait = charitable
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = patient
+							FROM = { NOT = { trait = patient } }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = teach_virtue_patient
+					add_trait = patient
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = kind
+							FROM = { NOT = { trait = kind } }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = teach_virtue_kind
+					add_trait = kind
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = humble
+							FROM = { NOT = { trait = humble } }
+							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+						}
+					}
+					set_character_flag = teach_virtue_humble
+					add_trait = humble
+				}
+			}
+			opinion = {										###opinion mostly serves as a 10 years cooldown ; +10 Opinion
+				who = FROM
+				modifier = opinion_teach_virtue
+				months = 120
+			}
+			FROM = { character_event = { id = MNM.4960 } }
+			character_event = { id = MNM.4961 }
+		}
+
+		revoke_allowed = {
+		always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					AND = {
+						is_close_relative = FROM						###AI will only target landed relatives in the same realm
+						same_realm = FROM
+						OR = {
+							is_landed = yes
+							is_patrician = yes
+						}
+					}
+				}
+			}
+		}
+	}
+}
