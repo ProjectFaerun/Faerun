@@ -56,7 +56,7 @@ letter_event = {
 }
 
 ########################AI JOIN AND AI RANK UP###########################
-#FOR SUN SOUL NOW, CHANGE WITH NEW SOCIETIES
+#FOR SUN SOUL AND LONG DEATH, CHANGE WITH NEW SOCIETIES
 
 character_event = { #force the AI to join a society
   id = MNM.4453
@@ -70,7 +70,7 @@ character_event = { #force the AI to join a society
 				prisoner = no
 				NOT = { trait = incapable }
 				higher_tier_than = BARON
-				society_member_of = monastic_order_sun_soul
+        is_monastic_member_trigger = yes
 				society_rank <= 3
 				society_can_rank_up = yes
 			}
@@ -81,7 +81,7 @@ character_event = { #force the AI to join a society
 				}
 			}
 		}
-		if = { #force the joining event on AI
+		if = { #SUN SOUL AI join event
       limit = {
         ai = yes
         prisoner = no
@@ -90,13 +90,31 @@ character_event = { #force the AI to join a society
         is_in_society = no
         controls_religion = no
         block_general_event_trigger = no
+
+        #society specific conditions below
+        olrox_is_good_religion_trigger = yes
       }
-			character_event = { id = MNM.4454 }
+      character_event = { id = MNM.4454 }
+    }
+    if = { #LONG DEATH AI join event
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+
+        #society specific conditions below
+        is_evil_religion = yes
+      }
+			character_event = { id = MNM.4455 }
 		}
 	}
 }
 
-character_event = { #AI join event
+character_event = { #SUN SOUL AI join event
 	id = MNM.4454
 	hide_window = yes
 
@@ -148,6 +166,89 @@ character_event = { #AI join event
         }
 
         join_society = monastic_order_sun_soul
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+
+character_event = { #LONG DEATH AI join event
+	id = MNM.4455
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = { #meet the requirement
+          can_join_society = monastic_order_long_death
+        }
+        modifier = {
+          factor = 2
+          z_monk = yes
+        }
+        modifier = {
+          factor = 100
+    			has_landed_title = d_long_death
+    		}
+        modifier = {
+          factor = 2
+          OR = {
+            trait = mystic
+            trait = impaler
+          }
+        }
+        modifier = {
+          factor = 2
+          trait = lunatic
+        }
+        modifier = {
+          factor = 2
+          trait = cruel
+        }
+        modifier = {
+          factor = 2
+          trait = envious
+        }
+        modifier = {
+          factor = 2
+          trait = paranoid
+        }
+        modifier = {
+          factor = 0.2
+          OR = {
+            trait = charitable
+            trait = arbitrary
+            trait = craven
+            trait = slothful
+          }
+        }
+
+        join_society = monastic_order_long_death
         random_list = {
           75 = {
             modifier = {
@@ -444,13 +545,33 @@ character_event = {
 					30 = { #Struggle with a vice
 						modifier = {
 							factor = 0
-							trait = temperate
-							trait = charitable
-							trait = diligent
-							#OR = {
-								#religion = hindu
-								#NOT = { trait = lustful }
-							#}
+              OR = {
+                AND = {
+                  trait = temperate
+                  trait = charitable
+                  trait = diligent
+                  trait = chaste
+                  is_good_monastic_member_trigger = yes
+                }
+                AND = {
+                  trait = temperate
+                  OR = {
+                    trait = cruel
+                    trait = envious
+                    trait = impaler
+                  }
+                  trait = diligent
+                  trait = chaste
+                  is_evil_monastic_member_trigger = yes
+                }
+                AND = {
+                  trait = temperate
+                  trait = just
+                  trait = diligent
+                  trait = chaste
+                  is_lawful_neutral_monastic_member_trigger = yes
+                }
+              }
 						}
 						modifier = {
 							factor = 0
@@ -458,22 +579,54 @@ character_event = {
 						}
 						set_character_flag = holy_seclusion_struggled_with_vice
 						random_list = {
-							#10 = {
-								#modifier = { factor = 0 OR = { NOT = { trait = lustful } religion = hindu } }
-								#set_character_flag = holy_seclusion_lustful
-							#}
+							10 = {
+								modifier = { factor = 0 trait = chaste }
+								set_character_flag = holy_seclusion_lustful
+							}
 							10 = {
 								modifier = { factor = 0 trait = temperate }
 								set_character_flag = holy_seclusion_gluttonous
 							}
-							10 = {
-								modifier = { factor = 0 trait = charitable }
-								set_character_flag = holy_seclusion_greedy
-							}
-							10 = {
+              10 = {
 								modifier = { factor = 0 trait = diligent }
 								set_character_flag = holy_seclusion_slothful
 							}
+							10 = {
+								modifier = {
+                  factor = 0
+                  OR = {
+                    trait = charitable
+                    is_evil_monastic_member_trigger = yes
+                    is_lawful_neutral_monastic_member_trigger = yes
+                  }
+                }
+                set_character_flag = holy_seclusion_greedy
+              }
+              10 = {
+                modifier = {
+                  factor = 0
+                  OR = {
+                    trait = cruel
+                    trait = envious
+                    trait = impaler
+                    is_good_monastic_member_trigger = yes
+                    is_lawful_neutral_monastic_member_trigger = yes
+                  }
+                }
+                set_character_flag = holy_seclusion_kind
+              }
+              10 = {
+                modifier = {
+                  factor = 0
+                  OR = {
+                    trait = just
+                    is_good_monastic_member_trigger = yes
+                    is_evil_monastic_member_trigger = yes
+                  }
+                }
+                set_character_flag = holy_seclusion_arbitrary
+              }
+
 						}
 
 						character_event = { id = MNM.4405 }
@@ -792,6 +945,18 @@ character_event = {
 		picture = GFX_evt_recovery
 	}
 
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_kind }
+		text = EVTDESC_4405_KIND
+		picture = GFX_evt_humiliation_prisoner
+	}
+
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_arbitrary }
+		text = EVTDESC_4405_ARBITRARY
+		picture = GFX_evt_judged_by_ruler
+	}
+
 	#Indulge
 	option = {
 		name = {
@@ -809,6 +974,14 @@ character_event = {
 		name = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTA_4405_SLOTHFUL
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTA_4405_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTA_4405_ARBITRARY
 		}
 		if = {
 			limit = { has_character_flag = holy_seclusion_gluttonous }
@@ -898,6 +1071,14 @@ character_event = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTB_4405_SLOTHFUL
 		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTB_4405_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTB_4405_ARBITRARY
+		}
 
 		if = {
 			limit = { has_character_flag = holy_seclusion_greedy }
@@ -977,6 +1158,16 @@ character_event = {
 		text = EVTDESC_4406_SLOTHFUL
 		picture = GFX_evt_recovery
 	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_kind }
+		text = EVTDESC_4406_KIND
+		picture = GFX_evt_humiliation_prisoner
+	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_arbitrary }
+		text = EVTDESC_4406_ARBITRARY
+		picture = GFX_evt_judged_by_ruler
+	}
 
 	immediate = {
 		if = {
@@ -1014,6 +1205,14 @@ character_event = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTA_4406_SLOTHFUL
 		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTA_4406_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTA_4406_ARBITRARY
+		}
 
 		custom_tooltip = {
 			text = EVTOPTA_4406_TOOLTIP
@@ -1036,6 +1235,8 @@ character_event = {
 			clr_character_flag = holy_seclusion_lustful
 			clr_character_flag = holy_seclusion_gluttonous
 			clr_character_flag = holy_seclusion_greedy
+      clr_character_flag = holy_seclusion_kind
+      clr_character_flag = holy_seclusion_arbitrary
 			clr_character_flag = holy_seclusion_slothful
 		}
 	}
@@ -1081,6 +1282,16 @@ character_event = {
 		text = EVTDESC_4407_SLOTHFUL
 		picture = GFX_evt_drunk
 	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_kind }
+		text = EVTDESC_4407_KIND
+		picture = GFX_evt_charity
+	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_arbitrary }
+		text = EVTDESC_4407_ARBITRARY
+		picture = GFX_evt_judged_by_ruler
+	}
 
 	option = {
 		name = {
@@ -1099,6 +1310,14 @@ character_event = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTA_4407_SLOTHFUL
 		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTA_4407_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTA_4407_ARBITRARY
+		}
 
 		custom_tooltip = {
 			text = EVTOPTA_4407_TOOLTIP
@@ -1108,6 +1327,8 @@ character_event = {
 			clr_character_flag = holy_seclusion_lustful
 			clr_character_flag = holy_seclusion_gluttonous
 			clr_character_flag = holy_seclusion_greedy
+      clr_character_flag = holy_seclusion_kind
+      clr_character_flag = holy_seclusion_arbitrary
 			clr_character_flag = holy_seclusion_slothful
 		}
 	}
@@ -1174,6 +1395,18 @@ character_event = {
 		}
 		text = EVTDESC_4408_SLOTHFUL_book
 	}
+  desc = {
+		trigger = {
+			has_character_flag = holy_seclusion_kind
+		}
+		text = EVTDESC_4408_KIND
+	}
+  desc = {
+		trigger = {
+			has_character_flag = holy_seclusion_arbitrary
+		}
+		text = EVTDESC_4408_ARBITRARY
+	}
 
 
 	option = {
@@ -1192,6 +1425,14 @@ character_event = {
 		name = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTA_4408_SLOTHFUL
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTA_4408_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTA_4408_ARBITRARY
 		}
 
 		custom_tooltip = {
@@ -1264,10 +1505,47 @@ character_event = {
 				}
 			}
 			if = {
-				limit = { trait = slothful }
+        limit = { trait = slothful }
+        random = {
+          chance = 50
+          remove_trait_slothful_effect = yes
+        }
+      }
+    }
+
+    if = {
+			limit = { has_character_flag = holy_seclusion_kind }
+			if = {
+				limit = { NOT = { trait = kind } }
 				random = {
 					chance = 50
-					remove_trait_slothful_effect = yes
+					add_trait_cruel_effect = yes
+				}
+			}
+			if = {
+				limit = { trait = kind }
+				random = {
+					chance = 50
+					remove_trait_silently_kind_effect = yes
+				}
+			}
+		}
+
+    if = {
+			limit = { has_character_flag = holy_seclusion_arbitrary }
+
+			if = {
+				limit = { NOT = { trait = arbitrary } }
+				random = {
+					chance = 50
+					add_trait_just_effect = yes
+				}
+			}
+			if = {
+				limit = { trait = arbitrary }
+				random = {
+					chance = 50
+					remove_trait_silently_arbitrary_effect = yes
 				}
 			}
 		}
@@ -1277,6 +1555,8 @@ character_event = {
 			clr_character_flag = holy_seclusion_gluttonous
 			clr_character_flag = holy_seclusion_greedy
 			clr_character_flag = holy_seclusion_slothful
+      clr_character_flag = holy_seclusion_kind
+      clr_character_flag = holy_seclusion_arbitrary
 			clr_character_flag = used_a_book
 		}
 	}
@@ -1322,6 +1602,16 @@ character_event = {
 		text = EVTDESC_4409_SLOTHFUL
 		picture = GFX_evt_drunk
 	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_kind }
+		text = EVTDESC_4409_KIND
+		picture = GFX_evt_died_executed_hanging
+	}
+  desc = {
+		trigger = { has_character_flag = holy_seclusion_arbitrary }
+		text = EVTDESC_4409_ARBITRARY
+		picture = GFX_evt_humiliation_prisoner
+	}
 
 	option = {
 		name = {
@@ -1339,6 +1629,14 @@ character_event = {
 		name = {
 			trigger = { has_character_flag = holy_seclusion_slothful }
 			text = EVTOPTA_4409_SLOTHFUL
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_kind }
+			text = EVTOPTA_4409_KIND
+		}
+    name = {
+			trigger = { has_character_flag = holy_seclusion_arbitrary }
+			text = EVTOPTA_4409_ARBITRARY
 		}
 
 		custom_tooltip = {
@@ -1394,6 +1692,28 @@ character_event = {
 			}
 		}
 
+    if = {
+			limit = { has_character_flag = holy_seclusion_kind }
+			if = {
+				limit = { NOT = { trait = kind } }
+				random = {
+					chance = 30
+					add_trait_kind_effect = yes
+				}
+			}
+		}
+
+    if = {
+			limit = { has_character_flag = holy_seclusion_arbitrary }
+			if = {
+				limit = { NOT = { trait = arbitrary } }
+				random = {
+					chance = 30
+					add_trait_arbitrary_effect = yes
+				}
+			}
+		}
+
 		if = {
 			limit = { is_christian_monastic_member_trigger = yes }
 			add_character_modifier = {
@@ -1419,6 +1739,8 @@ character_event = {
 			clr_character_flag = holy_seclusion_gluttonous
 			clr_character_flag = holy_seclusion_greedy
 			clr_character_flag = holy_seclusion_slothful
+      clr_character_flag = holy_seclusion_kind
+      clr_character_flag = holy_seclusion_arbitrary
 			clr_character_flag = used_a_book
 		}
 	}
@@ -2662,6 +2984,26 @@ character_event = {
 			limit = { has_character_flag = spiritual_guidance_cruel }
 			tooltip = { remove_trait = cruel }
 		}
+    if = {
+			limit = { has_character_flag = spiritual_guidance_kind }
+			tooltip = { remove_trait = kind }
+		}
+    if = {
+			limit = { has_character_flag = spiritual_guidance_charitable }
+			tooltip = { remove_trait = charitable }
+		}
+    if = {
+			limit = { has_character_flag = spiritual_guidance_content }
+			tooltip = { remove_trait = content }
+		}
+    if = {
+			limit = { has_character_flag = spiritual_guidance_arbitrary }
+			tooltip = { remove_trait = arbitrary }
+		}
+    if = {
+			limit = { has_character_flag = spiritual_guidance_deceitful }
+			tooltip = { remove_trait = deceitful }
+		}
 		clr_character_flag = spiritual_guidance_lustful
 		clr_character_flag = spiritual_guidance_gluttonous
 		clr_character_flag = spiritual_guidance_greedy
@@ -2670,6 +3012,11 @@ character_event = {
 		clr_character_flag = spiritual_guidance_envious
 		clr_character_flag = spiritual_guidance_proud
     clr_character_flag = spiritual_guidance_cruel
+    clr_character_flag = spiritual_guidance_kind
+    clr_character_flag = spiritual_guidance_charitable
+    clr_character_flag = spiritual_guidance_content
+    clr_character_flag = spiritual_guidance_arbitrary
+    clr_character_flag = spiritual_guidance_deceitful
 	}
 }
 
@@ -2727,6 +3074,26 @@ character_event = {
 			limit = { has_character_flag = teach_virtue_humble }
 			tooltip = { add_trait = humble }
 		}
+    if = {
+			limit = { has_character_flag = teach_virtue_cruel }
+			tooltip = { add_trait = cruel }
+		}
+    if = {
+			limit = { has_character_flag = teach_virtue_greedy }
+			tooltip = { add_trait = greedy }
+		}
+    if = {
+			limit = { has_character_flag = teach_virtue_ambitious }
+			tooltip = { add_trait = ambitious }
+		}
+    if = {
+			limit = { has_character_flag = teach_virtue_just }
+			tooltip = { add_trait = just }
+		}
+    if = {
+			limit = { has_character_flag = teach_virtue_honest }
+			tooltip = { add_trait = honest }
+		}
 		clr_character_flag = teach_virtue_chaste
 		clr_character_flag = teach_virtue_temperate
 		clr_character_flag = teach_virtue_charitable
@@ -2734,10 +3101,13 @@ character_event = {
 		clr_character_flag = teach_virtue_patient
 		clr_character_flag = teach_virtue_kind
 		clr_character_flag = teach_virtue_humble
+    clr_character_flag = teach_virtue_cruel
+    clr_character_flag = teach_virtue_greedy
+    clr_character_flag = teach_virtue_ambitious
+    clr_character_flag = teach_virtue_just
+    clr_character_flag = teach_virtue_honest
 	}
 }
-
-#XXX UNTIL HERE XXX
 
 ###MISC###
 
@@ -2829,41 +3199,115 @@ character_event = {
 		trigger = { has_character_flag = purity_add_diligent }
 		text = EVTDESC_4400_ADD_DILIGENT
 	}
+  desc = {
+		trigger = { has_character_flag = purity_remove_charitable }
+		text = EVTDESC_4400_REMOVE_CHARITABLE
+	}
+  desc = {
+		trigger = { has_character_flag = purity_remove_kind }
+		text = EVTDESC_4400_REMOVE_KIND
+	}
+  desc = {
+		trigger = { has_character_flag = purity_remove_content }
+		text = EVTDESC_4400_REMOVE_CONTENT
+	}
+  desc = {
+		trigger = { has_character_flag = purity_add_greedy }
+		text = EVTDESC_4400_ADD_GREEDY
+	}
+  desc = {
+		trigger = { has_character_flag = purity_add_cruel }
+		text = EVTDESC_4400_ADD_CRUEL
+	}
+  desc = {
+		trigger = { has_character_flag = purity_add_ambitious }
+		text = EVTDESC_4400_ADD_AMBITIOUS
+	}
+  desc = {
+		trigger = { has_character_flag = purity_remove_arbitrary }
+		text = EVTDESC_4400_REMOVE_ARBITRARY
+	}
+  desc = {
+		trigger = { has_character_flag = purity_add_just }
+		text = EVTDESC_4400_ADD_JUST
+	}
 
 	is_triggered_only = yes
 
 	trigger = {
 		is_monastic_member_trigger = yes
-		OR = {
-			trait = cynical
-			trait = gluttonous
-			trait = greedy
-			trait = slothful
-			trait = envious
-			trait = wroth
-			trait = proud
-			trait = deceitful
-			trait = cruel
-			trait = lustful
-			trait = ambitious
-			NOT = { trait = humble }
-			NOT = { trait = charitable }
-			NOT = { trait = kind }
-			NOT = { trait = temperate }
-			NOT = { trait = honest }
-			NOT = { trait = chaste }
-			NOT = { trait = patient }
-			NOT = { trait = diligent }
-			NOT = { trait = content }
-		}
+    OR = {
+      AND = {
+        is_good_monastic_member_trigger = yes
+        OR = {
+          trait = cynical
+          trait = gluttonous
+          trait = greedy
+          trait = slothful
+          trait = envious
+          trait = wroth
+          trait = proud
+          trait = deceitful
+          trait = cruel
+          trait = lustful
+          trait = ambitious
+          NOT = { trait = humble }
+          NOT = { trait = charitable }
+          NOT = { trait = kind }
+          NOT = { trait = temperate }
+          NOT = { trait = honest }
+          NOT = { trait = chaste }
+          NOT = { trait = patient }
+          NOT = { trait = diligent }
+          NOT = { trait = content }
+        }
+      }
+      AND = {
+        is_evil_monastic_member_trigger = yes
+        OR = {
+          trait = cynical
+          trait = gluttonous
+          trait = charitable
+          trait = slothful
+          trait = kind
+          trait = lustful
+          trait = content
+          NOT = { trait = temperate }
+          NOT = { trait = greedy }
+          NOT = { trait = diligent }
+          NOT = { trait = cruel }
+          NOT = { trait = chaste }
+          NOT = { trait = ambitious }
+        }
+      }
+      AND = {
+        is_lawful_neutral_monastic_member_trigger = yes
+        OR = {
+          trait = cynical
+          trait = gluttonous
+          trait = slothful
+          trait = wroth
+          trait = deceitful
+          trait = lustful
+          trait = arbitrary
+          NOT = { trait = temperate }
+          NOT = { trait = diligent }
+          NOT = { trait = patient }
+          NOT = { trait = honest }
+          NOT = { trait = chaste }
+          NOT = { trait = just }
+        }
+      }
+    }
 	}
 
 	immediate = {
-		#FIRST STAGE
+		#FIRST STAGE GOOD
 		#Removes cynic, gluttonous, greedy, slothful, lustful, envious, wrath, pride, deceitful,
 		#Adds humble, charitable
 		if = {
 			limit = {
+        is_good_monastic_member_trigger = yes
 				OR = {
 					trait = cynical
 					trait = gluttonous
@@ -2878,7 +3322,7 @@ character_event = {
 					NOT = { trait = humble }
 					NOT = { trait = charitable }
 				}
-			}
+      }
 			random_list = {
 				15 = {
 					modifier = { factor = 0 NOT = { trait = cynical } }
@@ -2946,10 +3390,119 @@ character_event = {
 			}
 		}
 
-		#SECOND STAGE
+    #FIRST STAGE EVIL
+		#Removes cynic, gluttonous, charitable, slothful, lustful, kind,
+		#Adds greedy
+		if = {
+			limit = {
+        is_evil_monastic_member_trigger = yes
+				OR = {
+					trait = cynical
+					trait = gluttonous
+					trait = charitable
+					trait = slothful
+					trait = lustful
+					trait = kind
+					NOT = { trait = greedy }
+				}
+      }
+			random_list = {
+				15 = {
+					modifier = { factor = 0 NOT = { trait = cynical } }
+					set_character_flag = purity_remove_cynical
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = gluttonous } }
+					set_character_flag = purity_remove_gluttonous
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = charitable } }
+					set_character_flag = purity_remove_charitable
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = slothful } }
+					set_character_flag = purity_remove_slothful
+				}
+        10 = {
+					modifier = { factor = 0 NOT = { trait = lustful } }
+					set_character_flag = purity_remove_lustful
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = kind } }
+					set_character_flag = purity_remove_kind
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = charitable
+							trait = greedy
+						}
+					}
+					set_character_flag = purity_add_greedy
+				}
+			}
+		}
+
+    #FIRST STAGE LAWFUL
+		#Removes cynic, gluttonous, slothful, lustful, wrath, deceitful,
+		#Adds honest
+		if = {
+			limit = {
+        is_lawful_neutral_monastic_member_trigger = yes
+				OR = {
+					trait = cynical
+					trait = gluttonous
+					trait = slothful
+          trait = lustful
+					trait = wroth
+					trait = deceitful
+					NOT = { trait = honest }
+				}
+      }
+			random_list = {
+				15 = {
+					modifier = { factor = 0 NOT = { trait = cynical } }
+					set_character_flag = purity_remove_cynical
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = gluttonous } }
+					set_character_flag = purity_remove_gluttonous
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = slothful } }
+					set_character_flag = purity_remove_slothful
+				}
+        10 = {
+					modifier = { factor = 0 NOT = { trait = lustful } }
+					set_character_flag = purity_remove_lustful
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = wroth } }
+					set_character_flag = purity_remove_wroth
+				}
+				10 = {
+					modifier = { factor = 0 NOT = { trait = deceitful } }
+					set_character_flag = purity_remove_deceitful
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = honest
+							trait = deceitful
+						}
+					}
+					set_character_flag = purity_add_honest
+				}
+			}
+		}
+
+		#SECOND STAGE GOOD
 		#Add traits chaste, kind, temperate, honest
 		if = {
 			limit = {
+        is_good_monastic_member_trigger = yes
 				NOR = {
 					trait = cynical
 					trait = gluttonous
@@ -2991,11 +3544,91 @@ character_event = {
 				}
 			}
 		}
-		#THIRD STAGE
+
+    #SECOND STAGE EVIL
+		#Add traits chaste, cruel, temperate
+		if = {
+			limit = {
+        is_evil_monastic_member_trigger = yes
+				NOR = {
+					trait = cynical
+					trait = gluttonous
+					trait = slothful
+          trait = lustful
+					trait = kind
+					trait = charitable
+				}
+				trait = greedy
+				NAND = {
+					trait = chaste
+					trait = cruel
+					trait = temperate
+				}
+			}
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						trait = chaste
+					}
+					set_character_flag = purity_add_chaste
+				}
+				10 = {
+					modifier = { factor = 0 trait = cruel }
+					set_character_flag = purity_add_cruel
+				}
+				10 = {
+					modifier = { factor = 0 trait = temperate }
+					set_character_flag = purity_add_temperate
+				}
+			}
+		}
+
+    #SECOND STAGE LAWFUL
+		#Add traits chaste, patient, temperate
+		if = {
+			limit = {
+        is_lawful_neutral_monastic_member_trigger = yes
+				NOR = {
+					trait = cynical
+					trait = gluttonous
+					trait = slothful
+          trait = lustful
+					trait = wroth
+					trait = deceitful
+				}
+				trait = honest
+				NAND = {
+					trait = chaste
+					trait = patient
+					trait = temperate
+				}
+			}
+			random_list = {
+				10 = {
+					modifier = {
+						factor = 0
+						trait = chaste
+					}
+					set_character_flag = purity_add_chaste
+				}
+				10 = {
+					modifier = { factor = 0 trait = patient }
+					set_character_flag = purity_add_patient
+				}
+				10 = {
+					modifier = { factor = 0 trait = temperate }
+					set_character_flag = purity_add_temperate
+				}
+			}
+		}
+
+		#THIRD STAGE GOOD
 		#Removes ambitious
 		#Adds patient, diligent, content
 		if = {
 			limit = {
+        is_good_monastic_member_trigger = yes
 				NOR = {
 					trait = cynical
 					trait = slothful
@@ -3035,6 +3668,83 @@ character_event = {
 				}
 			}
 		}
+
+    #THIRD STAGE EVIL
+		#Removes content
+		#Adds diligent, ambitious
+		if = {
+			limit = {
+        is_evil_monastic_member_trigger = yes
+				NOR = {
+					trait = cynical
+					trait = slothful
+				}
+				trait = greedy
+				trait = chaste
+				trait = cruel
+				trait = temperate
+			}
+
+			random_list = {
+				10 = {
+					modifier = { factor = 0 NOT = { trait = content } }
+					set_character_flag = purity_remove_content
+				}
+				10 = {
+					modifier = {
+						factor =  0
+						OR = {
+							trait = ambitious
+							trait = content
+						}
+					}
+					set_character_flag = purity_add_ambitious
+				}
+				10 = {
+					modifier = { factor = 0 trait = diligent }
+					set_character_flag = purity_add_diligent
+				}
+			}
+		}
+
+    #THIRD STAGE LAWFUL
+		#Removes arbitrary
+		#Adds diligent, just
+		if = {
+			limit = {
+        is_lawful_neutral_monastic_member_trigger = yes
+				NOR = {
+					trait = cynical
+					trait = slothful
+				}
+				trait = chaste
+				trait = patient
+				trait = temperate
+				trait = honest
+			}
+
+			random_list = {
+				10 = {
+					modifier = { factor = 0 NOT = { trait = arbitrary } }
+					set_character_flag = purity_remove_arbitrary
+				}
+				10 = {
+					modifier = {
+						factor =  0
+						OR = {
+							trait = arbitrary
+							trait = just
+						}
+					}
+					set_character_flag = purity_add_just
+				}
+				10 = {
+					modifier = { factor = 0 trait = diligent }
+					set_character_flag = purity_add_diligent
+				}
+			}
+		}
+
 	}
 
 	option = {
@@ -3075,6 +3785,16 @@ character_event = {
 			purity_add_content			= { add_trait = content }
 			purity_add_patient			= { add_trait = patient }
 			purity_add_diligent			= { add_trait = diligent }
+      #EVIL
+      purity_remove_charitable		= { remove_trait = charitable }
+      purity_remove_kind				= { remove_trait = kind }
+      purity_remove_content			= { remove_trait = content }
+      purity_add_greedy		= { add_trait = greedy }
+      purity_add_cruel			= { add_trait = cruel }
+      purity_add_ambitious		= { add_trait = ambitious }
+      #LAWFUL
+      purity_remove_arbitrary		= { remove_trait = arbitrary }
+      purity_add_just	  	= { add_trait = just }
 		}
 
 		clr_character_flag = purity_remove_cynical
@@ -3097,6 +3817,14 @@ character_event = {
 		clr_character_flag = purity_add_content
 		clr_character_flag = purity_add_patient
 		clr_character_flag = purity_add_diligent
+    clr_character_flag = purity_remove_charitable
+    clr_character_flag = purity_remove_kind
+    clr_character_flag = purity_remove_content
+    clr_character_flag = purity_add_greedy
+    clr_character_flag = purity_add_cruel
+    clr_character_flag = purity_add_ambitious
+    clr_character_flag = purity_remove_arbitrary
+    clr_character_flag = purity_add_just
 	}
 }
 

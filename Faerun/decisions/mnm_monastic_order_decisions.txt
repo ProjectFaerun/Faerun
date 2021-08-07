@@ -80,6 +80,10 @@ society_decisions = {
 								trait = dull
 							}
 						}
+						modifier = {
+							factor = 0
+							NOT = { z_monk = yes }
+						}
 						character_event = { id = MNM.4902 }
 					}
 					1 = { # Lose Dull
@@ -106,11 +110,11 @@ society_decisions = {
 					1 = { # Temp +2 Health
 						modifier = {
 							factor = 0
-							NOT = {
-								trait = robust
-								trait = groomed
-								trait = shrewd
-							}
+							NOT = { trait = robust }
+						}
+						modifier = {
+							factor = 0
+							trait = is_fat
 						}
 						character_event = { id = fighterevt.9 }
 					}
@@ -240,6 +244,142 @@ society_decisions = {
 
 		ai_will_do = {
 			factor = 1
+		}
+	}
+
+	# monastic_order_penance = {
+
+		# potential = {
+			# has_dlc = "Mystics"
+			# is_christian_monastic_member_trigger = yes
+			# has_quest = quest_monastic_order_penance
+		# }
+
+		# allow = {
+			# has_quest = quest_monastic_order_penance
+			# custom_tooltip = {
+				# text = monastic_order_penance_allow_tt
+				# OR = {
+					# NOT = { has_character_flag = holy_seclusion_timer }
+					# had_character_flag = { flag = holy_seclusion_timer days = 1000 }
+				# }
+			# }
+		# }
+
+		# effect = {
+			# add_character_modifier = {
+				# name = doing_penance
+				# duration = -1
+			# }
+			# hidden_effect = { character_event = { id = MNM.4403 } }
+		# }
+
+		# revoke_allowed = {
+			# always = no
+		# }
+
+		# ai_will_do = {
+			# factor = 0.1
+
+			# modifier = {
+				# factor = 0.01
+				# war = yes
+			# }
+			# modifier = {
+				# factor = 0.1
+				# OR = {
+					# trait = gregarious
+					# trait = socializer
+				# }
+			# }
+			# modifier = {
+				# factor = 5
+				# is_virtous = yes
+			# }
+		# }
+	# }
+
+	monastic_order_meditation = {
+
+		potential = {
+			has_dlc = "Mystics"
+			is_dharmic_monastic_member_trigger = yes
+			has_quest = quest_monastic_order_meditation
+		}
+
+		allow = {
+			has_quest = quest_monastic_order_meditation
+			custom_tooltip = {
+				text = monastic_order_meditation_allow_tt
+				OR = {
+					NOT = { has_character_flag = holy_seclusion_timer }
+					had_character_flag = { flag = holy_seclusion_timer days = 1000 }
+				}
+			}
+		}
+
+		effect = {
+			add_character_modifier = {
+				name = in_meditation
+				duration = -1
+			}
+			hidden_effect = { character_event = { id = MNM.4403 } }
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.1
+
+			modifier = {
+				factor = 0.01
+				war = yes
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = gregarious
+					trait = socializer
+				}
+			}
+		}
+	}
+
+	monastic_order_rejoin_world = {
+
+		potential = {
+			has_dlc = "Mystics"
+			OR = {
+				has_character_modifier = doing_penance
+				has_character_modifier = in_meditation
+			}
+		}
+
+		allow = {
+			OR = {
+				has_character_modifier = doing_penance
+				has_character_modifier = in_meditation
+			}
+			piety = 100
+		}
+
+		effect = {
+			remove_character_modifier = doing_penance
+			remove_character_modifier = in_meditation
+			hidden_effect = {
+				clr_character_flag = success_seculison_desc_A #Flags from 4426
+				clr_character_flag = success_seculison_desc_B
+				clr_character_flag = success_seculison_desc_C
+			}
+			piety = -100
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 0
 		}
 	}
 
@@ -374,30 +514,60 @@ targetted_decisions = {
 					AND = {
 						trait = greedy #ok for neutral and evil monks
 						FROM = { NOT = { trait = greedy } }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
 					AND = {
 						trait = wroth #ok for evil monks
 						FROM = { NOT = { trait = wroth } }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = {
+							OR = {
+								is_good_monastic_member_trigger = yes
+								is_lawful_neutral_monastic_member_trigger = yes
+							}
+						}
 					}
 					AND = {
 						trait = envious #ok for neutral and evil monks
 						FROM = { NOT = { trait = envious } }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
 					AND = {
-						trait = proud #ok for evil monks
+						trait = proud #ok for neutral and evil monks
 						FROM = { NOT = { trait = proud } }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
 					AND = {
 						trait = cruel #ok for neutral and evil monks
 						FROM = { NOT = { trait = cruel } }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
-					#add kind, charitable and content later as removable sins for evil monks
-					#add arbitrary and deceitful later as removable sins for lawful neutral monks
+					AND = {
+						trait = kind #ok for good and neutral monks
+						FROM = { NOT = { trait = kind } }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						trait = charitable #ok for good and neutral monks
+						FROM = { NOT = { trait = charitable } }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						trait = content #ok for good and neutral monks
+						FROM = { NOT = { trait = content } }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						trait = arbitrary
+						FROM = { NOT = { trait = arbitrary } }
+						FROM = { is_lawful_neutral_monastic_member_trigger = yes }
+					}
+					AND = {
+						trait = deceitful
+						FROM = { NOT = { trait = deceitful } }
+						FROM = { is_lawful_neutral_monastic_member_trigger = yes }
+					}
+					#kind, charitable and content are removable sins for evil monks
+					#arbitrary and deceitful are removable sins for lawful neutral monks
 				}
 			}
 		}
@@ -446,7 +616,7 @@ targetted_decisions = {
 						OR = {
 							NOT = { trait = greedy }
 							FROM = { trait = greedy }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = spiritual_guidance_greedy
@@ -458,7 +628,12 @@ targetted_decisions = {
 						OR = {
 							NOT = { trait = wroth }
 							FROM = { trait = wroth }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = {
+								NOR = {
+									is_good_monastic_member_trigger = yes
+									is_lawful_neutral_monastic_member_trigger = yes
+								}
+							}
 						}
 					}
 					set_character_flag = spiritual_guidance_wroth
@@ -470,7 +645,7 @@ targetted_decisions = {
 						OR = {
 							NOT = { trait = envious }
 							FROM = { trait = envious }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = spiritual_guidance_envious
@@ -482,7 +657,7 @@ targetted_decisions = {
 						OR = {
 							NOT = { trait = proud }
 							FROM = { trait = proud }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = spiritual_guidance_proud
@@ -494,11 +669,71 @@ targetted_decisions = {
 						OR = {
 							NOT = { trait = cruel }
 							FROM = { trait = cruel }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = spiritual_guidance_cruel
 					remove_trait = cruel
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = kind }
+							FROM = { trait = kind }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = spiritual_guidance_kind
+					remove_trait = kind
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = charitable }
+							FROM = { trait = charitable }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = spiritual_guidance_charitable
+					remove_trait = charitable
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = content }
+							FROM = { trait = content }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = spiritual_guidance_content
+					remove_trait = content
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = arbitrary }
+							FROM = { trait = arbitrary }
+							FROM = { NOT = { is_lawful_neutral_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = spiritual_guidance_arbitrary
+					remove_trait = arbitrary
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							NOT = { trait = deceitful }
+							FROM = { trait = deceitful }
+							FROM = { NOT = { is_lawful_neutral_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = spiritual_guidance_deceitful
+					remove_trait = deceitful
 				}
 			}
 			opinion = {										###opinion mostly serves as a 10 years cooldown ; +5 Opinion
@@ -598,25 +833,55 @@ targetted_decisions = {
 					AND = {
 						NOT = { trait = charitable }
 						FROM = { trait = charitable }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
 					AND = {
 						NOT = { trait = patient }
 						FROM = { trait = patient }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = {
+							OR = {
+								is_good_monastic_member_trigger = yes
+								is_lawful_neutral_monastic_member_trigger = yes
+							}
+						}
 					}
 					AND = {
 						NOT = { trait = kind }
 						FROM = { trait = kind }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
 					AND = {
 						NOT = { trait = humble }
 						FROM = { trait = humble }
-						FROM = { society_member_of = monastic_order_sun_soul }
+						FROM = { is_good_monastic_member_trigger = yes }
 					}
-					#add cruel, greedy and ambitious later as virtues for evil monks
-					#add just and h latonester as virtues for lawful neutral monks
+					AND = {
+						NOT = { trait = cruel }
+						FROM = { trait = cruel }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						NOT = { trait = greedy }
+						FROM = { trait = greedy }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						NOT = { trait = ambitious }
+						FROM = { trait = ambitious }
+						FROM = { is_evil_monastic_member_trigger = yes }
+					}
+					AND = {
+						NOT = { trait = just }
+						FROM = { trait = just }
+						FROM = { is_lawful_neutral_monastic_member_trigger = yes }
+					}
+					AND = {
+						NOT = { trait = honest }
+						FROM = { trait = honest }
+						FROM = { is_lawful_neutral_monastic_member_trigger = yes }
+					}
+					#cruel, greedy and ambitious are virtues for evil monks
+					#just and honest are virtues for lawful neutral monks
 				}
 			}
 		}
@@ -665,7 +930,7 @@ targetted_decisions = {
 						OR = {
 							trait = charitable
 							FROM = { NOT = { trait = charitable } }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = teach_virtue_charitable
@@ -677,7 +942,12 @@ targetted_decisions = {
 						OR = {
 							trait = patient
 							FROM = { NOT = { trait = patient } }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = {
+								NOR = {
+									is_good_monastic_member_trigger = yes
+									is_lawful_neutral_monastic_member_trigger = yes
+								}
+							}
 						}
 					}
 					set_character_flag = teach_virtue_patient
@@ -689,7 +959,7 @@ targetted_decisions = {
 						OR = {
 							trait = kind
 							FROM = { NOT = { trait = kind } }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = teach_virtue_kind
@@ -701,11 +971,71 @@ targetted_decisions = {
 						OR = {
 							trait = humble
 							FROM = { NOT = { trait = humble } }
-							FROM = { NOT = { society_member_of = monastic_order_sun_soul } }
+							FROM = { NOT = { is_good_monastic_member_trigger = yes } }
 						}
 					}
 					set_character_flag = teach_virtue_humble
 					add_trait = humble
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = cruel
+							FROM = { NOT = { trait = cruel } }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = teach_virtue_cruel
+					add_trait = cruel
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = greedy
+							FROM = { NOT = { trait = greedy } }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = teach_virtue_greedy
+					add_trait = greedy
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = ambitious
+							FROM = { NOT = { trait = ambitious } }
+							FROM = { NOT = { is_evil_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = teach_virtue_ambitious
+					add_trait = ambitious
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = just
+							FROM = { NOT = { trait = just } }
+							FROM = { NOT = { is_lawful_neutral_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = teach_virtue_just
+					add_trait = just
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						OR = {
+							trait = honest
+							FROM = { NOT = { trait = honest } }
+							FROM = { NOT = { is_lawful_neutral_monastic_member_trigger = yes } }
+						}
+					}
+					set_character_flag = teach_virtue_honest
+					add_trait = honest
 				}
 			}
 			opinion = {										###opinion mostly serves as a 10 years cooldown ; +10 Opinion
