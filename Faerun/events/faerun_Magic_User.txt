@@ -107,145 +107,363 @@ character_event = {
     }
 }
 
-### Repurposed event! ###
+### Look for a Court Mage
+
 character_event = {
-	id = 3021
-	desc = EVTDESC3021
+	id = FMU.0010
+	desc = EVTDESC_FMU_0010
+	picture = GFX_evt_courier
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_character_flag = looking_for_court_mage
+	}
+
+	option = {
+		name = EVTOPTA_FMU_0010
+		hidden_tooltip = { character_event = { id = FMU.0011 days = 10 random = 10 } }
+	}
+}
+
+# Found a Court Mage
+character_event = {
+	id = FMU.0011
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		clr_character_flag = looking_for_court_mage
+		set_character_flag = found_court_mage
+		random_list = { #EACH NEW CHARACTER TYPE requires a DESC and an OPTION in event FMU.0013
+
+			5 = { # Witch
+				modifier = {
+					factor = 0
+					AND = {
+						has_character_flag = got_mage_witch
+						NOT = { had_character_flag = { flag = got_mage_witch days = 3650 } }
+					}
+				}
+				random_list = {
+					50 = { # Same Religion & Culture as ROOT + Attractive
+						create_character = {
+							religion = ROOT
+							culture = ROOT
+							dynasty = none
+							age = 21
+							random_traits = yes
+							female = yes
+							attributes = {
+								learning = 12
+								intrigue = 6
+							}
+							health = 6
+							trait = intricate_webweaver
+							trait = mystic
+							trait = fair
+              trait = journeyman_wizard
+							flag = is_court_mage
+							flag = mage_witch
+						}
+						new_character = {
+							set_character_flag = no_court_invites
+							remove_trait = scholar
+							remove_trait = socializer
+							remove_trait = gamer
+							remove_trait = hedonist
+							remove_trait = duelist
+							remove_trait = hunter
+							remove_trait = strategist
+							remove_trait = administrator
+							remove_trait = architect
+							remove_trait = gardener
+							remove_trait = schemer
+							remove_trait = impaler
+							remove_trait = seducer
+							remove_trait = seductress
+							remove_trait = theologian
+							remove_trait = ugly
+							remove_trait = imbecile
+							remove_trait = slow
+
+							save_event_target_as = recruited_mage_target
+							character_event = { id = FMU.0012 }
+						}
+					}
+					50 = { # Same Religion & Culture as ROOT + Disfigured
+						create_character = {
+							religion = ROOT
+							culture = ROOT
+							dynasty = none
+							age = 53
+							random_traits = yes
+							female = yes
+							attributes = {
+								learning = 8
+								intrigue = 6
+							}
+							health = 6
+							trait = intricate_webweaver
+							trait = mystic
+							trait = disfigured
+              trait = expert_wizard
+							flag = is_court_mage
+							flag = mage_witch
+						}
+						new_character = {
+							set_character_flag = no_court_invites
+							remove_trait = scholar
+							remove_trait = socializer
+							remove_trait = gamer
+							remove_trait = hedonist
+							remove_trait = duelist
+							remove_trait = hunter
+							remove_trait = strategist
+							remove_trait = administrator
+							remove_trait = architect
+							remove_trait = gardener
+							remove_trait = schemer
+							remove_trait = impaler
+							remove_trait = seducer
+							remove_trait = seductress
+							remove_trait = theologian
+							remove_trait = fair
+							remove_trait = imbecile
+							remove_trait = slow
+
+							save_event_target_as = recruited_mage_target
+							character_event = { id = FMU.0012 }
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Court Mage ping
+character_event = {
+	id = FMU.0012
+
+	hide_window = yes
+	hide_new = yes
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { character_event = { id = FMU.0013 } }
+	}
+}
+
+# Notify player of Court Mage
+character_event = {
+	id = FMU.0013
 	picture = GFX_evt_bishop
 	border = GFX_event_normal_frame_religion
 
-	only_playable = yes
-	min_age = 16
-	capable_only = yes
-	prisoner = no
-	religion_group = good_human_pantheon_group
-	ai = no
-	war = no
+	hide_new = yes
 
-	trigger = {
-		OR = {
-			trait = journeyman_cleric
-			trait = expert_cleric
-			trait = master_cleric
-			trait = renowned_cleric
-			trait = legendary_cleric
+	portrait = event_target:recruited_mage_target
+
+	is_triggered_only = yes
+
+
+	desc = {
+		text = EVTDESC_FMU_0013_WITCH
+		picture = GFX_evt_wise_woman
+		trigger = {
+			event_target:recruited_mage_target = { has_character_flag = mage_witch }
 		}
-		trait = chaste
-		in_command = no
-		NOR = {
-			trait = excommunicated
-			trait = cynical
-			any_courtier_or_vassal = {
-				has_character_flag = special_marshal
+	}
+
+
+	option = {
+		name = EVTOPTA_FMU_0013
+		trigger = {
+			event_target:recruited_mage_target = { has_character_flag = mage_witch }
+		}
+		hidden_tooltip = {
+			set_character_flag = got_mage_witch
+			if = {
+				limit = {
+					any_courtier_or_vassal = {
+						liege = { character = ROOT }
+						has_minor_title = title_court_mage
+					}
+				}
+				any_courtier_or_vassal = {
+					limit = {
+						liege = { character = ROOT }
+						has_minor_title = title_court_mage
+					}
+					remove_title = title_court_mage
+				}
 			}
 		}
-		piety = 250
-
-	}
-	mean_time_to_happen = {
-		months = 48
-	}
-	option = {
-		name = EVTOPTA3021
+		piety = -25
 		random_list = {
-			5 = {
-				create_character = {
-					attributes = {
-						learning = 9
-					}
-					dynasty = random
-					religion = triadic
-					age = 50
-					female = 50
-					trait = chaste
-					trait = zealous
-					trait = celibate
-					trait = mastermind_theologian
-					trait = creature_elf
-				}
-				new_character = {
-					set_character_flag = special_marshal
-					piety = 600
-					prestige = 150
-					if = {
-						random_list = {
-							80 = { add_trait = master_cleric }
-							15 = { add_trait = master_druid }
-							5 = { add_trait = master_bard }
-						}
-					}
-					if = {
-						random_list = {
-							60 = { culture = green_elf }
-							20 = { culture = moon_elf }
-							15 = { culture = sun_elf }
-							5 = { culture = drow }
-						}
-					}
-					opinion = {
-						modifier = opinion_loyal_servant
-						who = ROOT
-						years = 10
-					}
-					random_list = {  # Small chance of having some unusual memorable trait
-						1 = { add_trait = pretty }
-						1 = { add_trait = genius }
-						50 = {}
-					}
-				}
+			90 = {
 			}
-			95 = {
-				create_character = {
-					attributes = {
-						learning = 10
-					}
-					dynasty = random
-					culture = ROOT
-					religion = triadic
-					age = 50
-					female = 50
-					trait = chaste
-					trait = zealous
-					trait = celibate
-					trait = mastermind_theologian
-					trait = creature_human
-				}
-				new_character = {
-					set_character_flag = special_marshal
-					piety = 600
-					prestige = 150
-					if = {
-						random_list = {
-							80 = { add_trait = master_cleric }
-							15 = { add_trait = master_druid }
-							5 = { add_trait = master_wizard }
-						}
-					}
-					if = {
-						random_list = {
-							55 = { add_trait = patron_ilmater }
-							15 = { add_trait = patron_lathander }
-							15 = { add_trait = patron_torm }
-							15 = { add_trait = patron_tyr }
-						}
-					}
-					opinion = {
-						modifier = opinion_loyal_servant
-						who = ROOT
-						years = 10
-					}
-					random_list = {  # Small chance of having some unusual memorable trait
-						1 = { add_trait = scarred }
-						1 = { add_trait = genius }
-						50 = {}
-					}
+			10 = {
+				add_trait = infection
+				hidden_tooltip = {
+					character_event = { id = RIP.11001 days = 365 random = 1095 }
 				}
 			}
 		}
-	}
-	option = {
-		name = EVTOPTB3021
-		set_character_flag = special_marshal
-		piety = 25
+		event_target:recruited_mage_target = {
+			show_scope_change = no
+			opinion = {
+				modifier = opinion_glad
+				who = ROOT
+				years = 5
+			}
+			give_minor_title = title_court_mage
+		}
 	}
 }
+
+### Repurposed event! ###
+#character_event = {
+#	id = 3021
+#	desc = EVTDESC3021
+#	picture = GFX_evt_bishop
+#	border = GFX_event_normal_frame_religion
+#
+#	only_playable = yes
+#	min_age = 16
+#	capable_only = yes
+#	prisoner = no
+#	religion_group = good_human_pantheon_group
+#	ai = no
+#	war = no
+#
+#	trigger = {
+#		OR = {
+#			trait = journeyman_cleric
+#			trait = expert_cleric
+#			trait = master_cleric
+#			trait = renowned_cleric
+#			trait = legendary_cleric
+#		}
+#		trait = chaste
+#		in_command = no
+#		NOR = {
+#			trait = excommunicated
+#			trait = cynical
+#			any_courtier_or_vassal = {
+#				has_character_flag = special_marshal
+#			}
+#		}
+#		piety = 250
+#
+#	}
+#	mean_time_to_happen = {
+#		months = 48
+#	}
+#	option = {
+#		name = EVTOPTA3021
+#		random_list = {
+#			5 = {
+#				create_character = {
+#					attributes = {
+#						learning = 9
+#					}
+#					dynasty = random
+#					religion = triadic
+#					age = 50
+#					female = 50
+#					trait = chaste
+#					trait = zealous
+#					trait = celibate
+#					trait = mastermind_theologian
+#					trait = creature_elf
+#				}
+#				new_character = {
+#					set_character_flag = special_marshal
+#					piety = 600
+#					prestige = 150
+#					if = {
+#						random_list = {
+#							80 = { add_trait = master_cleric }
+#							15 = { add_trait = master_druid }
+#							5 = { add_trait = master_bard }
+#						}
+#					}
+#					if = {
+#						random_list = {
+#							60 = { culture = green_elf }
+#							20 = { culture = moon_elf }
+#							15 = { culture = sun_elf }
+#							5 = { culture = drow }
+#						}
+#					}
+#					opinion = {
+#						modifier = opinion_loyal_servant
+#						who = ROOT
+#						years = 10
+#					}
+#					random_list = {  # Small chance of having some unusual memorable trait
+#						1 = { add_trait = pretty }
+#						1 = { add_trait = genius }
+#						50 = {}
+#					}
+#				}
+#			}
+#			95 = {
+#				create_character = {
+#					attributes = {
+#						learning = 10
+#					}
+#					dynasty = random
+#					culture = ROOT
+#					religion = triadic
+#					age = 50
+#					female = 50
+#					trait = chaste
+#					trait = zealous
+#					trait = celibate
+#					trait = mastermind_theologian
+#					trait = creature_human
+#				}
+#				new_character = {
+#					set_character_flag = special_marshal
+#					piety = 600
+#					prestige = 150
+#					if = {
+#						random_list = {
+#							80 = { add_trait = master_cleric }
+#							15 = { add_trait = master_druid }
+#							5 = { add_trait = master_wizard }
+#						}
+#					}
+#					if = {
+#						random_list = {
+#							55 = { add_trait = patron_ilmater }
+#							15 = { add_trait = patron_lathander }
+#							15 = { add_trait = patron_torm }
+#							15 = { add_trait = patron_tyr }
+#						}
+#					}
+#					opinion = {
+#						modifier = opinion_loyal_servant
+#						who = ROOT
+#						years = 10
+#					}
+#					random_list = {  # Small chance of having some unusual memorable trait
+#						1 = { add_trait = scarred }
+#						1 = { add_trait = genius }
+#						50 = {}
+#					}
+#				}
+#			}
+#		}
+#	}
+#	option = {
+#		name = EVTOPTB3021
+#		set_character_flag = special_marshal
+#		piety = 25
+#	}
+#}
