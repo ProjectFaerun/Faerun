@@ -56,7 +56,7 @@ letter_event = {
 }
 
 ########################AI JOIN AND AI RANK UP###########################
-#FOR SUN SOUL AND LONG DEATH, CHANGE WITH NEW SOCIETIES
+#FOR SUN SOUL,LONG DEATH, EMPTY HAND. CHANGE WITH NEW SOCIETIES
 
 character_event = { #force the AI to join a society
   id = MNM.4453
@@ -93,10 +93,15 @@ character_event = { #force the AI to join a society
 
         #society specific conditions below
         olrox_is_good_religion_trigger = yes
+        NOT = {
+          capital_scope = {
+      			region = kara_tur_region
+      		}
+        }
       }
       character_event = { id = MNM.4454 }
     }
-    if = { #LONG DEATH AI join event
+    else_if = { #LONG DEATH AI join event
       limit = {
         ai = yes
         prisoner = no
@@ -108,9 +113,37 @@ character_event = { #force the AI to join a society
 
         #society specific conditions below
         is_evil_religion = yes
+        NOT = {
+          capital_scope = {
+      			region = kara_tur_region
+      		}
+        }
       }
 			character_event = { id = MNM.4455 }
 		}
+    else_if = { #EMPTY HAND AI join event
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+
+        #society specific conditions below
+        capital_scope = {
+          region = kara_tur_region
+        }
+        OR = {
+          culture_group = shou_group
+          culture_group = katakoro_group
+          culture_group = celestial_sea_group
+          culture_group = amaese_group
+        }
+      }
+      character_event = { id = MNM.4456 }
+    }
 	}
 }
 
@@ -249,6 +282,81 @@ character_event = { #LONG DEATH AI join event
         }
 
         join_society = monastic_order_long_death
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+
+character_event = { #EMPTY HAND AI join event
+	id = MNM.4456
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = { #meet the requirement
+          can_join_society = monastic_order_empty_hand
+        }
+        modifier = {
+          factor = 2
+          z_monk = yes
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = mystic
+            trait = scholar
+            trait = duelist
+          }
+        }
+        modifier = {
+          factor = 2
+          trait = erudite
+        }
+        modifier = {
+          factor = 2
+          trait = just
+        }
+        modifier = {
+          factor = 2
+          trait = honest
+        }
+        modifier = {
+          factor = 0.1
+          OR = {
+            trait = deceitful
+            trait = arbitrary
+            trait = slothful
+          }
+        }
+
+        join_society = monastic_order_empty_hand
         random_list = {
           75 = {
             modifier = {
