@@ -1,17 +1,15 @@
 society_decisions = {
 
 	alliance_diplomacy = {
+		is_in_society = yes
 		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 6
 
 		potential = {
 			not_casting = yes
-			#has_dlc = "Mystics"
-				society_rank = {
-				society = lord_alliance
-				rank >= 1
-			}
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 1 }
 		}
 
 		allow = {
@@ -35,7 +33,18 @@ society_decisions = {
 					years = 2
 					hidden = yes
 				}
-				character_event = { id = LA.8000 }
+				if = {
+					limit = {
+						society_member_of = lord_alliance
+					}
+					character_event = { id = LA.8000 }
+				}
+				else_if = {
+					limit = {
+						society_member_of = dales_council
+					}
+					character_event = { id = DAL.8000 }
+				}
 			}
 		}
 
@@ -45,16 +54,14 @@ society_decisions = {
 	}
 
 	alliance_raise_ships = {
+		is_in_society = yes
 		only_playable = yes
 		ai_check_interval = 24
 
 		potential = {
 			not_casting = yes
-			#has_dlc = "Mystics"
-			society_rank = {
-				society = lord_alliance
-				rank >= 3
-			}
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 3 }
 		}
 
 		allow = {
@@ -91,6 +98,7 @@ society_decisions = {
 	}
 
 	alliance_raise_troops = {
+		is_in_society = yes
 		only_playable = yes
 		is_high_prio = yes
 		is_mercenary = yes
@@ -98,11 +106,8 @@ society_decisions = {
 
 		potential = {
 			not_casting = yes
-			#has_dlc = "Mystics"
-			society_rank = {
-				society = lord_alliance
-				rank == 4
-			}
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank == 4 }
 		}
 
 		allow = {
@@ -131,21 +136,49 @@ society_decisions = {
 				modifier = alliance_member
 				years = 10
 			}
-			capital_scope = {
-				ROOT = {
-					spawn_unit = {
-						owner = ROOT
-						province = PREV
-						home = PREV
-						troops = {
-							archers = { 400 400 }
-							pikemen = { 1600 1600 }
-							knights = { 500 500 }
+			if = {
+				limit = {
+					society_member_of = lord_alliance
+				}
+				capital_scope = {
+					ROOT = {
+						spawn_unit = {
+							owner = ROOT
+							province = PREV
+							home = PREV
+							troops = {
+								archers = { 400 400 }
+								pikemen = { 1600 1600 }
+								knights = { 500 500 }
+							}
+							attrition = 1.0
+							disband_on_peace = yes
+							maintenance_multiplier = 1
+							earmark = alliance_troops
 						}
-						attrition = 1.0
-						disband_on_peace = yes
-						maintenance_multiplier = 1
-						earmark = alliance_troops
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					society_member_of = dales_council
+				}
+				capital_scope = {
+					ROOT = {
+						spawn_unit = {
+							owner = ROOT
+							province = PREV
+							home = PREV
+							troops = {
+								archers = { 1500 1500 }
+								light_infantry = { 2500 2500 }
+								light_cavalry = { 1000 1000 }
+							}
+							attrition = 1.0
+							disband_on_peace = yes
+							maintenance_multiplier = 1
+							earmark = council_troops
+						}
 					}
 				}
 			}
@@ -154,7 +187,7 @@ society_decisions = {
 				add_character_modifier = {
 					name = assassins_raise_troops_cooldown
 					hidden = yes
-					months = 6
+					months = 12
 				}
 			}
 			detract_society_currency_major_effect = yes
@@ -171,17 +204,15 @@ society_decisions = {
 	}
 
 	alliance_mediation = {
+		is_in_society = yes
 		is_high_prio = yes
 		only_playable = yes
 		ai_check_interval = 3
 
 		potential = {
 			not_casting = yes
-			#has_dlc = "Mystics"
-			society_rank = {
-				rank >= 1
-				society = lord_alliance
-			}
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 1 }
 		}
 
 		allow = {
@@ -194,7 +225,7 @@ society_decisions = {
 						is_primary_war_defender = yes
 					}
 					attacker = {
-						society_member_of = lord_alliance
+						same_society_as = ROOT
 						is_primary_war_attacker = yes
 					}
 				}
@@ -203,7 +234,18 @@ society_decisions = {
 
 		effect = {
 			detract_society_currency_minor_effect = yes
-			character_event = { id = LA.30000 days = 0 }
+			if = {
+				limit = {
+					society_member_of = lord_alliance
+				}
+				character_event = { id = LA.30000 }
+			}
+			else_if = {
+				limit = {
+					society_member_of = dales_council
+				}
+				character_event = { id = DAL.30000 }
+			}
 		}
 
 		ai_will_do = {
@@ -212,16 +254,15 @@ society_decisions = {
 	}
 
 	call_for_heroes = {
+		is_in_society = yes
 		only_playable = yes
 		ai_check_interval = 6 #check only once every 6 months.
 		potential = {
 			not_casting = yes
 			is_playable = yes
 			is_adult = yes
-			society_rank = {
-				rank >= 2
-				society = lord_alliance
-			}
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 2 }
 			OR = {
 				ai = no
 				any_war = {
