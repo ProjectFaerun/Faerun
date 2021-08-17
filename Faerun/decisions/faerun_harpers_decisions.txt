@@ -247,7 +247,7 @@ society_decisions = { #by Olrox17
 		potential = {
 			not_casting = yes
 			society_rank = {
-				rank = 4
+				rank >= 3
 				society = harpers
 			}
 		}
@@ -288,4 +288,143 @@ society_decisions = { #by Olrox17
 		}
 	}
 
+}
+
+targetted_decisions = {
+	harper_prepared_invasion = {
+		is_in_society = yes
+		only_playable = yes
+		filter = independent_rulers
+		ai_target_filter = independent_rulers
+		ai_check_interval = 48
+
+		from_potential = {
+			society_rank = {
+				rank = 4
+				society = harpers
+			}
+			is_playable = yes
+			NOT = { pacifist = yes }
+			NOT = { trait = patron_eldath }
+			war = no
+			mercenary = no
+			holy_order = no
+			is_incapable = no
+			wealth >= 2
+			NOT = { has_character_flag = harp_prep_invader }
+			NOT = { has_truce = ROOT }
+			realm_size < 50
+			num_of_count_titles_in_realm < 20
+		}
+
+		potential = {
+			NOT = { has_truce = FROM }
+			is_within_diplo_range = FROM
+			independent = yes
+			NOT = { character = FROM }
+			NOT = { is_liege_or_above_of = FROM }
+		}
+
+		allow = {
+			FROM = { has_society_currency_major_trigger = yes }
+			OR = {
+				has_character_modifier = true_villain_modifier
+				AND = {
+					realm_size > 50
+					is_evil_religion = yes
+					NOR = {
+						trait = kind
+						trait = charitable
+					}
+				}
+				AND = {
+					realm_size > 50
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+					NOR = {
+						trait = just
+						trait = charitable
+					}
+				}
+			}
+			custom_tooltip = {
+				text = fr_prepared_invaded_tip
+				NOT = { has_character_flag = prep_inv_target }
+			}
+			any_realm_title = { is_valid_viking_invasion_target = ROOT }
+		}
+
+		effect = {
+			FROM = {
+				detract_society_currency_major_effect = yes
+				increase_visibility_effect = yes
+			}
+			FROM = {
+				save_persistent_event_target = { name = harp_prep_invader_target scope = ROOT }
+				pacifists_lose_piety_effect = yes
+			}
+			custom_tooltip = {
+				text = start_preparing_invasion_TT
+
+				FROM = { set_character_flag = harp_prep_invader }
+				FROM = { add_character_modifier = { name = launched_prepared_invasion years = 2 } } # hidden = yes
+				FROM = { narrative_event = { id = HRP.2 days = 730 } }
+
+				FROM = { character_event = { id = HRP.5 days = 30  } }
+				FROM = { character_event = { id = HRP.10 } }
+			}
+			reverse_opinion = {
+				modifier = preparing_to_invade
+				who = FROM
+				months = 24
+			}
+			opinion = {
+				modifier = preparing_to_invade_me
+				who = FROM
+				months = 24
+			}
+			set_character_flag = prep_inv_target
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    top_liege = {
+                    	num_of_count_titles_in_realm >= 20
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    OR = {
+                    	trait = content
+                    	trait = slothful
+                    	trait = craven
+                    	trait = shy
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = {
+                    trait = ambitious
+	            }
+	        }
+	        modifier = {
+	            factor = 0.1
+	            FROM = {
+                    lower_tier_than = DUKE
+	            }
+	        }
+		}
+	}
 }
