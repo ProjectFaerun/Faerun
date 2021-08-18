@@ -577,7 +577,7 @@ narrative_event = {
         NOT = {
             any_war = {
                 attacker = { character = ROOT }
-                using_cb = viking_invasion # Not Already Invading
+                using_cb = harper_invasion # Not Already Invading
             }
         }
 	}
@@ -643,7 +643,7 @@ character_event = {
 		NOT = {
 			any_war = {
 				defender = { character = ROOT }
-				using_cb = viking_invasion # Declared invasion
+				using_cb = harper_invasion # Declared invasion
 			}
 		}
 	}
@@ -667,8 +667,19 @@ character_event = {
     trigger = {
     	persistent_event_target:harp_prep_invader_target = { NOT = { war_with = ROOT } }
     	persistent_event_target:harp_prep_invader_target = { independent = yes }
-    	persistent_event_target:harp_prep_invader_target = { any_realm_title = { is_valid_viking_invasion_target = PREV } }
-    	persistent_event_target:harp_prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
+    	#persistent_event_target:harp_prep_invader_target = { any_realm_title = { is_valid_viking_invasion_target = PREV } }
+			persistent_event_target:harp_prep_invader_target = {
+				OR = {
+					tier = EMPEROR
+					tier = KING
+					tier = DUKE
+				}
+				any_demesne_title = {
+					higher_tier_than = COUNT
+					controls_religion = no
+				}
+			}
+			persistent_event_target:harp_prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
     }
 
     fail_trigger_effect = {
@@ -719,18 +730,18 @@ character_event = {
                 NOT = {
                     any_war = {
                         attacker = { character = ROOT }
-                        using_cb = viking_invasion # Not Already Invading
+                        using_cb = harper_invasion # Not Already Invading
                     }
                 }
 			}
-			persistent_event_target:harp_prep_invader_target = {
-				random_realm_title = {
-                    limit = { is_valid_viking_invasion_target = PREV }
-                    save_event_target_as = ai_prep_invasion_target
-                }
-			}
+			#persistent_event_target:harp_prep_invader_target = {
+			#	random_realm_title = {
+      #              limit = { is_valid_viking_invasion_target = PREV }
+      #              save_event_target_as = ai_prep_invasion_target
+      #          }
+			#}
 			ROOT = {
-				war = { target = persistent_event_target:harp_prep_invader_target casus_belli = viking_invasion thirdparty_title = event_target:ai_prep_invasion_target tier = KING }
+				war = { target = persistent_event_target:harp_prep_invader_target casus_belli = harper_invasion thirdparty_title = event_target:ai_prep_invasion_target tier = KING }
 			}
 		}
     	random_list = {
@@ -1216,7 +1227,7 @@ character_event = { # Prepared Invasion abort check
                 NOT = {
                     any_war = {
                         attacker = { character = ROOT }
-                        using_cb = viking_invasion # Not Already Invading
+                        using_cb = harper_invasion # Not Already Invading
                     }
                 }
             }
@@ -1242,8 +1253,21 @@ character_event = { # Prepared Invasion Abort Notification for Target
   }
   desc = {
       trigger = {
-      	ROOT = { NOT = { any_realm_title = { real_tier = KING is_valid_viking_invasion_target = PREV } } }
-      	ROOT = { realm_size < 51 }
+      	#ROOT = { NOT = { any_realm_title = { is_valid_viking_invasion_target = PREV } } }
+				ROOT = {
+					NOT = {
+						OR = {
+							tier = EMPEROR
+							tier = KING
+							tier = DUKE
+						}
+						any_demesne_title = {
+							higher_tier_than = COUNT
+							controls_religion = no
+						}
+					}
+				}
+				ROOT = { realm_size < 51 }
       }
       text = fr_prepared_invasion_desc.16f
   }
@@ -1279,7 +1303,20 @@ narrative_event = { # Prepared Invasion Abort Notification
     }
     desc = {
         trigger = {
-        	persistent_event_target:harp_prep_invader_target = { NOT = { any_realm_title = { is_valid_viking_invasion_target = PREV } } }
+        	#persistent_event_target:harp_prep_invader_target = { NOT = { any_realm_title = { is_valid_viking_invasion_target = PREV } } }
+					persistent_event_target:harp_prep_invader_target = {
+						NOT = {
+							OR = {
+								tier = EMPEROR
+								tier = KING
+								tier = DUKE
+							}
+							any_demesne_title = {
+								higher_tier_than = COUNT
+								controls_religion = no
+							}
+						}
+					}
         	persistent_event_target:harp_prep_invader_target = { realm_size < 51 }
         }
         text = HRP_desc.17f
