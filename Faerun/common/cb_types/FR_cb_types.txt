@@ -2491,6 +2491,232 @@ harper_liberation = {
 	}
 }
 
+harper_invasion = {
+	name = CB_NAME_HARPER_INVASION
+	war_name = WAR_NAME_HARPER_INVASION
+	sprite = 12
+	truce_days = 365
+	is_permanent = yes
+	hostile_against_others = yes
+	can_ask_to_join_war = yes
+	allowed_to_target_tributaries = no
+	sort_priority = 3001
+
+	defender_unoccupied_warscore = yes
+
+	can_use = {
+		FROM = {
+			NOT = { culture = monster }
+		}
+		ROOT = {
+			NOT = { culture = monster }
+		}
+		ROOT = {
+			has_opinion_modifier = { who = FROM modifier = preparing_to_invade }
+			FROM = { NOT = { war_with = ROOT } }
+			NOT = { is_liege_or_above = FROM }
+			mercenary = no
+			society_rank = {
+				rank = 4
+				society = harpers
+			}
+		}
+	}
+
+	on_add = {
+		ROOT = { remove_character_modifier = launched_prepared_invasion }
+		hidden_tooltip = { fire_haruspicy_event_effect = yes }
+		if = {
+			limit = { defender = { is_offmap_governor = shou_lung } }
+			attacker = {
+				sound_effect = china_angered_emperor
+				detract_grace_super_huge_effect = yes
+			}
+		}
+	}
+
+	on_success = {
+		FROM = {
+			custom_tooltip = {
+				text = destabilization_harper_success_tt
+				hidden_effect = {
+					any_demesne_title = {
+						limit = {
+							higher_tier_than = COUNT
+							NOT = { controls_religion = yes }
+						}
+						unsafe_destroy_landed_title = THIS
+					}
+				}
+			}
+			prestige = -200
+			hidden_tooltip = {
+				remove_opinion = {
+						who = ROOT
+						modifier = preparing_to_invade_me
+				}
+			}
+		}
+		FROM = { clr_character_flag = prep_inv_target }
+		ROOT = {
+			if = {
+				limit = {
+					FROM = {
+						primary_title = {
+							tier = BARON
+						}
+					}
+				}
+				ROOT = {
+					piety = 25
+					prestige = 50
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						primary_title = {
+							tier = COUNT
+						}
+					}
+				}
+				ROOT = {
+					piety = 50
+					prestige = 100
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						primary_title = {
+							tier = DUKE
+						}
+					}
+				}
+				ROOT = {
+					piety = 75
+					prestige = 150
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						primary_title = {
+							tier = KING
+						}
+					}
+				}
+				ROOT = {
+					piety = 100
+					prestige = 200
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = {
+						primary_title = {
+							tier = EMPEROR
+						}
+					}
+				}
+				ROOT = {
+					piety = 200
+					prestige = 400
+				}
+			}
+			hidden_tooltip = { disband_event_forces = prepared_invasion }
+			hidden_tooltip = {
+				remove_opinion = {
+					who = FROM
+					modifier = preparing_to_invade
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		FROM = {
+			prestige = 100
+			hidden_tooltip = {
+				remove_opinion = {
+						who = ROOT
+						modifier = preparing_to_invade_me
+				}
+			}
+		}
+		FROM = { clr_character_flag = prep_inv_target }
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 100 }
+		}
+		ROOT = {
+			set_character_flag = prepared_invasion_over
+			prestige = -100
+			piety = -50
+			hidden_tooltip = {
+        remove_opinion = {
+            who = FROM
+            modifier = preparing_to_invade
+        }
+			}
+			hidden_tooltip = {
+				disband_event_forces = prepared_invasion
+			}
+		}
+	}
+
+	on_reverse_demand = {
+		ROOT = {
+			set_character_flag = prepared_invasion_over
+			prestige = -200
+			piety = -100
+			hidden_tooltip = {
+	      remove_opinion = {
+	          who = FROM
+	          modifier = preparing_to_invade
+	      }
+			}
+			transfer_scaled_wealth = {
+				to = FROM
+				value = 4.0
+			}
+			hidden_tooltip = {
+				disband_event_forces = prepared_invasion
+			}
+		}
+		FROM = {
+			prestige = 200
+			hidden_tooltip = {
+				remove_opinion = {
+						who = ROOT
+						modifier = preparing_to_invade_me
+				}
+			}
+		}
+		FROM = { clr_character_flag = prep_inv_target }
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_tooltip = { participation_scaled_prestige = 200 }
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+}
+
 evil_sea_county_conquest = {
 	name = CB_NAME_EVIL_SEA_COUNTY_CONQUEST
 	war_name = WAR_NAME_EVIL_SEA_COUNTY_CONQUEST
@@ -3684,7 +3910,7 @@ uthgardt_reclaim_mound = {
 	can_ask_to_join_war = no
 	sort_priority = 692
 	apply_short_occ_mod = no # Do not apply the 'recently_conquered' modifier to Holdings
-	
+
 	can_use = {
 		ROOT = {
 			religion = uthgardt_faith
@@ -3702,13 +3928,13 @@ uthgardt_reclaim_mound = {
 			NOT = { religion = uthgardt_faith }
 		}
 	}
-	
+
 	can_use_gui = {
 		ROOT = {
 			prestige = 100
 		}
 	}
-	
+
 	can_use_title = {
 		OR = {
 			AND = {
@@ -3773,7 +3999,7 @@ uthgardt_reclaim_mound = {
 			}
 		}
 	}
-	
+
 	is_valid = {
 		ROOT = {
 			religion = uthgardt_faith
@@ -3783,13 +4009,13 @@ uthgardt_reclaim_mound = {
 			NOT = { religion = uthgardt_faith }
 		}
 	}
-	
+
 	is_valid_title = {
 		FROM = {
 			has_landed_title = PREV
 		}
 	}
-	
+
 	on_add = {
 		ROOT = {
 			prestige = -100
@@ -3802,7 +4028,7 @@ uthgardt_reclaim_mound = {
 			}
 		}
 	}
-	
+
 	on_success = {
 		any_attacker = {
 			participation_scaled_piety = 100
@@ -3811,7 +4037,7 @@ uthgardt_reclaim_mound = {
 		FROM = { show_scope_change = no piety = -100 }
 		FROM = { show_scope_change = no prestige = -50 }
 	}
-	
+
 	on_success_title = {
 		if = {
 			limit = {
@@ -3823,7 +4049,7 @@ uthgardt_reclaim_mound = {
 			usurp_title_plus_barony_if_unlanded = PREV
 		}
 	}
-	
+
 	on_fail = {
 		ROOT = {
 			show_scope_change = no
@@ -3831,7 +4057,7 @@ uthgardt_reclaim_mound = {
 			prestige = -50
 		}
 	}
-	
+
 	on_reverse_demand = {
 		ROOT = {
 			show_scope_change = no
@@ -3906,7 +4132,7 @@ uthgardt_reclaim_mound = {
 			}
 		}
 	}
-	
+
 	attacker_ai_victory_worth = {
 		factor = -1 # always accept
 	}
