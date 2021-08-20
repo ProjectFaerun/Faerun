@@ -1164,4 +1164,362 @@ decisions = {
 			}
 		}
 	}
+	
+	borrow_money_jews = {
+		only_playable = yes
+		ai_check_interval = 30
+		potential = {
+			is_playable = yes
+			is_nomadic = no
+			has_dlc = "Sons of Abraham"
+			OR = {
+				AND = {
+					culture_group = abeiran_group
+					NOT = {
+						location = {
+							region = laerakond_region
+						}
+					}
+				}
+				culture_group = calishite_group
+				culture_group = chondathan_group
+				culture_group = damaran_group
+				culture_group = illuskan_group
+				culture_group = imaskari_group
+				culture = chultan
+				culture = thinguth
+				culture_group = lantanna_group
+				culture_group = lapal_group
+				culture_group = mulan_group
+				culture_group = netherese_group
+				culture_group = raum_group
+				culture_group = shaaran_group
+				culture_group = tethyrian_group
+				culture_group = turami_group
+			}
+			NOT = { culture = gur }
+			NOT = { government = order_government }
+			NOT = { government = nomadic_tribal_government }
+			NOT = { government = tribal_government }
+		}
+		
+		allow = {
+			OR = {
+				religion_group = christian
+				religion_group = muslim
+				religion_group = zoroastrian_group
+				religion = taoist
+			}
+			prisoner = no
+			NOT = {
+				has_character_modifier = borrowed_from_jews
+				has_character_modifier = expelled_jewish
+			}
+			top_liege = { NOT = { has_character_modifier = expelled_jewish } }
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = borrowed_from_jews
+				duration = -1
+				inherit = yes
+			}
+			wealth = 300
+		}
+		
+		revoke_allowed = {
+			always = no
+		}
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				wealth = 0
+				war = no
+			}
+			modifier = {
+				factor = 0
+				wealth = 200
+				war = yes
+			}			
+			modifier = {
+				factor = 0.1 # Slow it down
+			}
+		}
+	}
+	repay_money_jews = {
+		only_playable = yes
+		ai_check_interval = 6
+		potential = {
+			is_playable = yes
+			NOT = { 
+				has_character_modifier = expelled_jewish
+			}
+			has_character_modifier = borrowed_from_jews
+			has_dlc = "Sons of Abraham"
+		}
+		
+		allow = {
+			wealth = 300
+		}
+		
+		effect = {
+			remove_character_modifier = borrowed_from_jews
+			wealth = -350
+		}
+		
+		revoke_allowed = {
+			always = no
+		}
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				NOT = { wealth = 450 }
+			}
+			modifier = {
+				factor = 0.5 # Slow it down
+			}
+		}
+	}
+	
+	welcome_jews = {
+		only_playable = yes
+		ai_check_interval = 6
+		
+		potential = {
+			#has_dlc = "Sons of Abraham"
+			is_playable = yes
+			NOR = {
+				religion_group = jewish_group 
+				has_character_modifier = expelled_jews_timer
+			}
+			has_character_modifier = expelled_jewish
+			NOT = {
+				government = order_government
+			}
+		}
+		allow = {
+			has_character_modifier = expelled_jewish
+		}
+		effect = {
+			scaled_wealth = -1
+			prestige = 50
+			remove_character_modifier = expelled_jewish
+			if = {
+				limit = {
+					NOT = { trait = zealous }
+					NOT = { trait = sympathy_judaism }
+				}
+				random = {
+					chance = 50
+					add_trait = sympathy_judaism
+				}
+			}
+			custom_tooltip = {
+				text = jews_are_welcome
+			}
+			hidden_tooltip = {
+				character_event = { id = SoA.106 }
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			
+			modifier = {
+				factor = 0.5 # Less likely to do it
+			}
+			modifier = {
+				factor = 0
+				trait = zealous
+			}
+		}
+	}
+	
+	expel_jews = {
+		only_independent = yes
+		ai_check_interval = 60
+		
+		potential = {
+			has_dlc = "Sons of Abraham"
+			is_playable = yes
+			OR = {
+				AND = {
+					independent = yes
+					primary_title = { higher_tier_than = DUKE }
+				}
+				ai = no            # So that it shows on player's list anyway
+			}
+			NOR = {
+				has_character_modifier = expelled_jewish
+				is_nomadic = yes
+			}
+			age = 16
+			NOT = {
+				has_character_flag = currently_considering_expelling_jews
+			}
+			OR = {
+				AND = {
+					culture_group = abeiran_group
+					NOT = {
+						location = {
+							region = laerakond_region
+						}
+					}
+				}
+				culture_group = calishite_group
+				culture_group = chondathan_group
+				culture_group = damaran_group
+				culture_group = illuskan_group
+				culture_group = imaskari_group
+				culture = chultan
+				culture = thinguth
+				culture_group = lantanna_group
+				culture_group = lapal_group
+				culture_group = mulan_group
+				culture_group = netherese_group
+				culture_group = raum_group
+				culture_group = shaaran_group
+				culture_group = tethyrian_group
+				culture_group = turami_group
+			}
+			NOT = { culture = gur }
+			NOT = { government = order_government }
+			NOT = { government = nomadic_tribal_government }
+			NOT = { government = tribal_government }
+		}
+		allow = {
+			independent = yes
+			primary_title = { higher_tier_than = DUKE }
+			conditional_tooltip = {
+				trigger = {
+					any_realm_province = {
+						culture = gur
+					}
+				}
+				NOT = { 
+					any_realm_province = { 
+						culture = gur
+					} 
+				}
+			}
+			conditional_tooltip = {
+				trigger = {
+					any_realm_lord = {
+						culture = gur
+					}
+				}
+				NOT = { 
+					any_realm_lord = { 
+						culture = gur
+					} 
+				}
+			}
+			conditional_tooltip = {
+				trigger = {
+					has_character_flag = epidemic_blame_game
+				}
+
+				custom_tooltip = {
+					text = cannot_expel_jews_during_blame_game_chain_TT
+
+					always = no
+				}
+			}
+			prisoner = no
+			NOT = { trait = incapable }
+		}
+		effect = {
+			prestige = -100
+			scaled_wealth = 2
+			any_realm_character = {
+				limit = { culture = gur }
+				banish = yes
+			}
+			if = {
+				limit = {
+					NOT = { trait = arbitrary }
+					has_character_modifier = borrowed_from_jews
+				}
+				add_trait = arbitrary
+			}
+			if = {
+				limit = { has_character_modifier = borrowed_from_jews }
+				remove_character_modifier = borrowed_from_jews
+			}
+			add_character_modifier = {
+				name = expelled_jewish
+				duration = -1
+				inherit = yes
+			}
+			custom_tooltip = {
+				text = jews_are_expelled
+			}
+			hidden_tooltip = {
+				character_event = { id = SoA.105 }
+				add_character_modifier = {
+					name = expelled_jews_timer
+					duration = 7300
+					hidden = yes
+				}
+			}
+			any_friend = {
+				limit = { culture = gur }
+				remove_friend = ROOT
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			
+			modifier = {
+				factor = 0.05 # Less likely to do it
+			}
+			modifier = {
+				factor = 0
+				any_courtier = {
+					culture = gur
+					reverse_opinion = { who = ROOT value = 20 }
+				}
+			}
+			modifier = {
+				factor = 0
+				any_friend = {
+					culture = gur
+				}
+			}
+			modifier = {
+				factor = 0
+				any_spouse = {
+					culture = gur
+				}
+			}
+			modifier = {
+				factor = 0
+				any_child = {
+					culture = gur
+				}
+			}
+			modifier = {
+				factor = 0
+				trait = kind
+			}
+			modifier = {
+				factor = 0
+				trait = just
+				has_character_modifier = borrowed_from_jews
+			}
+			modifier = {
+				factor = 1.2
+				trait = zealous
+				trait = arbitrary
+			}
+			modifier = {
+				factor = 2
+				has_character_modifier = borrowed_from_jews
+				trait = greedy
+			}
+		}
+	}
 }
