@@ -526,6 +526,847 @@ namespace = HRP
 	  }
 	}
 
+#Invasion events, adapted from PeculiarJard nomadic horde ones
+# Clean up event if no longer harper
+character_event = {
+    id = HRP.1
+    desc = HRP_desc.1
+		picture = GFX_evt_adventurers_2
+    is_triggered_only = yes
+
+		trigger = {
+			has_character_flag = harp_prep_invader
+			NOT = { society_member_of = harpers }
+		}
+
+    immediate = {
+		set_character_flag = prepared_invasion_over
+		remove_character_modifier = launched_prepared_invasion
+		remove_opinion = {
+			who = persistent_event_target:harp_prep_invader_target
+			modifier = preparing_to_invade
+		}
+		persistent_event_target:harp_prep_invader_target = {
+			remove_opinion = {
+				who = ROOT
+				modifier = preparing_to_invade_me
+			}
+    		clr_character_flag = prep_inv_target
+    		character_event = { id = HRP.16 }
+		}
+		disband_event_forces = prepared_invasion
+    }
+	option = {
+		name = {
+			text = EVTOPTB62310
+		}
+	}
+}
+
+# Clean up event if you don't wage a war in 2 years after starting preparations
+narrative_event = {
+	id = HRP.2
+	desc = HRP_desc.2
+	title = HRP_desc.2a
+	picture = GFX_evt_adventurers_2
+	border = GFX_event_narrative_frame_war
+	is_triggered_only = yes
+	has_character_flag = harp_prep_invader
+	trigger = {
+		NOT = { has_character_flag = prepared_invasion_over }
+        NOT = {
+            any_war = {
+                attacker = { character = ROOT }
+                using_cb = harper_invasion # Not Already Invading
+            }
+        }
+	}
+
+	immediate = {
+		set_character_flag = prepared_invasion_over
+		remove_character_modifier = launched_prepared_invasion
+		remove_opinion = {
+			who = persistent_event_target:harp_prep_invader_target
+			modifier = preparing_to_invade
+		}
+		persistent_event_target:harp_prep_invader_target = {
+			remove_opinion = {
+				who = ROOT
+				modifier = preparing_to_invade_me
+			}
+    		clr_character_flag = prep_inv_target
+    		character_event = { id = HRP.16 }
+		}
+		disband_event_forces = prepared_invasion
+	}
+
+	option = {
+		name = {
+			text = EVTOPTB62310
+		}
+		prestige = -200
+	}
+}
+
+# Clean up when a prepared invader dies
+character_event = {
+	id = HRP.3 # HF.49208
+	hide_window = yes
+	is_triggered_only = yes
+	has_character_flag = harp_prep_invader
+
+	immediate = {
+		disband_event_forces = prepared_invasion
+    	persistent_event_target:harp_prep_invader_target = {
+    		clr_character_flag = prep_inv_target
+    		character_event = { id = HRP.16 days = 1 }
+    	}
+	}
+}
+
+# If another CB is used before Prepared Invasion
+# Called from on_action: on_war_started
+# The Attacker is FROM
+character_event = {
+
+	id = HRP.4
+	desc = HRP_desc.4
+  has_character_flag = prep_inv_target
+	picture = GFX_evt_adventurers_2
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	trigger = {
+		FROM = { has_character_flag = harp_prep_invader }
+		ROOT = { has_opinion_modifier = { who = FROM name = preparing_to_invade_me } }
+		NOT = {
+			any_war = {
+				defender = { character = ROOT }
+				using_cb = harper_invasion # Declared invasion
+			}
+		}
+	}
+
+	immediate = {
+		FROM = { narrative_event = { id = HRP.17 }	}
+	}
+
+	option = {
+		name = {
+			text = HRP_desc_opt.4a
+		}
+	}
+}
+
+## Prepared Invasion Ticker ## Adapted from the Reconquista Ticker
+character_event = {
+    id = HRP.5
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	persistent_event_target:harp_prep_invader_target = { NOT = { war_with = ROOT } }
+    	persistent_event_target:harp_prep_invader_target = { independent = yes }
+    	#persistent_event_target:harp_prep_invader_target = { any_realm_title = { is_valid_viking_invasion_target = PREV } }
+			persistent_event_target:harp_prep_invader_target = {
+				OR = {
+					tier = EMPEROR
+					tier = KING
+					tier = DUKE
+				}
+				any_demesne_title = {
+					higher_tier_than = COUNT
+					controls_religion = no
+				}
+			}
+			persistent_event_target:harp_prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
+    }
+
+    fail_trigger_effect = {
+    	character_event = { id = HRP.15 }
+    }
+
+    immediate = {
+		ROOT = { change_variable = { which = prep_invasion_duration value = 1 } }
+		if = {
+			limit = {
+				check_variable = { which = prep_invasion_duration value == 12 }
+			}
+			ROOT = {
+				character_event = { id = HRP.12 }
+			}
+			persistent_event_target:harp_prep_invader_target = {
+				character_event = { id = HRP.12 }
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { which = prep_invasion_duration value == 18 }
+			}
+			ROOT = {
+				character_event = { id = HRP.13 }
+			}
+			persistent_event_target:harp_prep_invader_target = {
+				character_event = { id = HRP.13 }
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { which = prep_invasion_duration value == 22 }
+			}
+			ROOT = {
+				character_event = { id = HRP.14 }
+			}
+			persistent_event_target:harp_prep_invader_target = {
+				character_event = { id = HRP.14 }
+			}
+		}
+		if = {
+			limit = {
+				ai = yes
+				prisoner = no
+				is_incapable = no
+				check_variable = { which = prep_invasion_duration value == 23 }
+                NOT = {
+                    any_war = {
+                        attacker = { character = ROOT }
+                        using_cb = harper_invasion # Not Already Invading
+                    }
+                }
+			}
+			#persistent_event_target:harp_prep_invader_target = {
+			#	random_realm_title = {
+      #              limit = { is_valid_viking_invasion_target = PREV }
+      #              save_event_target_as = ai_prep_invasion_target
+      #          }
+			#}
+			ROOT = {
+				war = { target = persistent_event_target:harp_prep_invader_target casus_belli = harper_invasion thirdparty_title = event_target:ai_prep_invasion_target tier = KING }
+			}
+		}
+    	random_list = {
+    		# Nothing
+    		15 = {
+    		}
+    		# A small force flocks to your banner
+    		15 = {
+                modifier = {
+                    factor = 1.25
+                    martial = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    martial = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    prestige = 1000
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { martial = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { martial = 7 }
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { diplomacy = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { diplomacy = 7 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { prestige = 100 }
+                }
+                modifier = {
+                    factor = 0.75
+                    lower_tier_than = DUKE
+                }
+                modifier = {
+                    factor = 0
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 8.0
+                    }
+                }
+                modifier = {
+                    factor = 0.5
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 4.0
+                    }
+                }
+                modifier = {
+                    factor = 0.25
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 6.0
+                    }
+                }
+    			character_event = { id = HRP.8 }
+    		}
+    		# A significant force flocks to your banner
+    		15 = {
+    			trigger = {
+    			}
+                modifier = {
+                    factor = 1.25
+                    martial = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    martial = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    prestige = 1000
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { martial = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { martial = 7 }
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { diplomacy = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { diplomacy = 7 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { prestige = 100 }
+                }
+                modifier = {
+                    factor = 0.75
+                    lower_tier_than = DUKE
+                }
+                modifier = {
+                    factor = 0
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 8.0
+                    }
+                }
+                modifier = {
+                    factor = 0.5
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 4.0
+                    }
+                }
+                modifier = {
+                    factor = 0.25
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 6.0
+                    }
+                }
+    			character_event = { id = HRP.6 }
+    		}
+    		# A Hero joins your cause with his retinue
+    		2 = {
+                modifier = {
+                    factor = 1.25
+                    martial = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    martial = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 15
+                }
+                modifier = {
+                    factor = 1.25
+                    diplomacy = 20
+                }
+                modifier = {
+                    factor = 1.25
+                    prestige = 1000
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { martial = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { martial = 7 }
+                }
+                modifier = {
+                    factor = 0.75
+                    NOT = { diplomacy = 10 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { diplomacy = 7 }
+                }
+                modifier = {
+                    factor = 0.5
+                    NOT = { prestige = 100 }
+                }
+                modifier = {
+                    factor = 0.75
+                    lower_tier_than = DUKE
+                }
+                modifier = {
+                    factor = 0
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 8.0
+                    }
+                }
+                modifier = {
+                    factor = 0.5
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 4.0
+                    }
+                }
+                modifier = {
+                    factor = 0.25
+                    relative_power = {
+                        who = persistent_event_target:harp_prep_invader_target
+                        power = 6.0
+                    }
+                }
+    			character_event = { id = HRP.7 }
+    		}
+    	}
+    }
+
+    after = {
+    	character_event = { id = HRP.5 days = 30 }
+    }
+}
+
+# Troops flock to your banner
+character_event = {
+	id = HRP.6 # 62320
+	desc = HRP_desc.6
+	picture = GFX_evt_adventurers_3
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA62320
+		capital_scope = {
+			ROOT = {
+				spawn_unit = {
+					province = PREV
+					owner = ROOT
+					match_character = ROOT
+					match_mult = 0.1
+					earmark = prepared_invasion
+					attrition = 1.0
+				}
+				spawn_fleet = {
+					province = closest_to_capital
+					owner = ROOT
+					match_character = ROOT
+					match_mult = 0.1
+					match_min = 7
+					earmark = prepared_invasion
+				}
+			}
+		}
+	}
+}
+
+# A hero and their retinue appear in your court
+character_event = {
+	id = HRP.7 # 62321
+	desc = HRP_desc.7
+	picture = GFX_evt_adventurers_3
+
+	hide_from = yes
+
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA62321
+		capital_scope = {
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = 50
+				age = 30
+				attributes = {
+					martial = 8
+					intrigue = 12
+					diplomacy = 5
+					learning = 5
+					stewardship = 4
+				}
+				trait = brave
+				trait = brilliant_strategist
+			}
+			new_character = {
+				join_society = harpers
+				remove_trait = weak
+				remove_trait = slow
+				remove_trait = idiot
+				remove_trait = imbecile
+				remove_trait = dull
+				remove_trait = delicate
+				random_list = {
+					30 = { religion = joyful }
+					30 = { religion = solar }
+					30 = { religion = inventive }
+					20 = { religion = arcane }
+					20 = { religion = chauntean_faith }
+					20 = { religion = natural }
+					15 = { religion = elven_pantheon }
+					10 = { religion = triadic }
+				}
+				random_list = {
+					20 = { add_trait = expert_ranger }
+					20 = { add_trait = expert_bard }
+					20 = { add_trait = expert_wizard }
+					20 = { add_trait = expert_rogue }
+					20 = { add_trait = expert_fighter }
+				}
+
+				spawn_unit = {
+					province = PREV
+					owner = ROOT
+					match_character = ROOT
+					match_mult = 0.15
+					#earmark = prepared_invasion
+					attrition = 1.0
+				}
+			}
+		}
+
+		spawn_fleet = {
+			province = closest_to_capital
+			owner = ROOT
+			match_character = ROOT
+			match_mult = 0.15
+			match_min = 10
+			earmark = prepared_invasion
+		}
+	}
+}
+
+# A smaller force arrives for the invasion
+character_event = {
+	id = HRP.8 # 62322
+	desc = HRP_desc.6
+	picture = GFX_evt_adventurers_3
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA62320
+		capital_scope = {
+			ROOT = {
+				spawn_unit = {
+					province = PREV
+					owner = ROOT
+					match_character = ROOT
+					match_mult = 0.075
+					earmark = prepared_invasion
+					attrition = 1.0
+				}
+				spawn_fleet = {
+					province = closest_to_capital
+					owner = ROOT
+					match_character = ROOT
+					match_mult = 0.075
+					match_min = 5
+					earmark = prepared_invasion
+				}
+			}
+		}
+	}
+}
+
+## Prepared Invasion Announcement Events ##
+character_event = {
+    id = HRP.9 # Prepared Invasion notification for everyone else
+    title = HRP_desc.9a
+		desc = HRP_desc.9
+		picture = GFX_evt_adventurers
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    option = {
+        name = fr_prepared_invasion_desc_opt.9a
+    }
+    option = {
+        name = fr_prepared_invasion_desc_opt.9b
+        custom_tooltip = { text = prep_inv_opt_out_char_tt }
+				set_character_flag = prep_inv_no_warning
+    }
+    option = {
+        name = fr_prepared_invasion_desc_opt.9c
+        custom_tooltip = { text = prep_inv_opt_out_global_tt }
+				set_global_flag = prep_inv_no_warning
+    }
+}
+
+character_event = { # Prepared Invader's first notification
+    id = HRP.10
+    title = HRP_desc.9a
+		desc = HRP_desc.10
+		picture = GFX_evt_adventurers
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+	immediate = {
+		persistent_event_target:harp_prep_invader_target = { character_event = { id = HRP.11 } }
+		any_player = {
+			limit = {
+				is_within_diplo_range = ROOT
+				NOT = { has_global_flag = prep_inv_no_warning }
+				NOT = { has_character_flag = prep_inv_no_warning }
+				NOT = { character = persistent_event_target:harp_prep_invader_target }
+				NOT = { character = ROOT }
+			}
+			character_event = { id = HRP.9 }
+		}
+	}
+
+
+    option = {
+        name = fr_prepared_invasion_desc_opt.10a
+    }
+}
+
+character_event = { # Prepared Invader Target's first notification
+    id = HRP.11
+    title = HRP_desc.9a
+		desc = HRP_desc.11
+		picture = GFX_evt_adventurers
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+
+    option = {
+        name = fr_prepared_invasion_desc_opt.11a
+    }
+}
+
+character_event = { # Notification for 1 year left
+	id = HRP.12
+	desc = HRP_desc.12
+	picture = GFX_evt_adventurers_3
+
+	is_triggered_only = yes
+
+	option = {
+		name = fr_prepared_invasion_desc_opt.12a
+	}
+}
+
+character_event = { # Notification for 6 months left
+	id = HRP.13
+	desc = HRP_desc.13
+	picture = GFX_evt_adventurers_3
+
+	is_triggered_only = yes
+
+	option = {
+		name = fr_prepared_invasion_desc_opt.12a
+	}
+}
+
+character_event = { # Notification for a month left
+	id = HRP.14
+	desc = HRP_desc.14
+	picture = GFX_evt_adventurers_3
+
+	is_triggered_only = yes
+
+	option = {
+		name = fr_prepared_invasion_desc_opt.12a
+	}
+}
+
+character_event = { # Prepared Invasion abort check
+    id = HRP.15
+		hide_window = yes
+    is_triggered_only = yes
+
+	immediate = {
+		if = {
+            limit = {
+                NOT = { has_character_flag = prepared_invasion_over }
+                NOT = {
+                    any_war = {
+                        attacker = { character = ROOT }
+                        using_cb = harper_invasion # Not Already Invading
+                    }
+                }
+            }
+            narrative_event = { id = HRP.17 }
+        }
+	}
+}
+
+character_event = { # Prepared Invasion Abort Notification for Target
+	id = HRP.16
+	picture = GFX_evt_adventurers_2
+  desc = {
+      trigger = {
+      	FROM = { war_with = ROOT }
+      }
+      text = fr_prepared_invasion_desc.16b
+  }
+  desc = {
+      trigger = {
+      	ROOT = { independent = no }
+      }
+      text = fr_prepared_invasion_desc.16c
+  }
+  desc = {
+      trigger = {
+      	#ROOT = { NOT = { any_realm_title = { is_valid_viking_invasion_target = PREV } } }
+				ROOT = {
+					NOT = {
+						OR = {
+							tier = EMPEROR
+							tier = KING
+							tier = DUKE
+						}
+						any_demesne_title = {
+							higher_tier_than = COUNT
+							controls_religion = no
+						}
+					}
+				}
+				ROOT = { realm_size < 51 }
+      }
+      text = fr_prepared_invasion_desc.16f
+  }
+  desc = {
+      trigger = {
+      	FROM = { is_alive = no }
+      }
+      text = fr_prepared_invasion_desc.16g
+  }
+
+	is_triggered_only = yes
+
+	option = {
+		name = HRP_desc_opt.16a
+	}
+}
+
+narrative_event = { # Prepared Invasion Abort Notification
+    id = HRP.17
+    title = HRP_desc.17a
+		picture = GFX_evt_adventurers_2
+    desc = {
+        trigger = {
+        	persistent_event_target:harp_prep_invader_target = { war_with = ROOT }
+        }
+        text = HRP_desc.17b
+    }
+    desc = {
+        trigger = {
+        	persistent_event_target:harp_prep_invader_target = { independent = no }
+        }
+        text = HRP_desc.17c
+    }
+    desc = {
+        trigger = {
+        	#persistent_event_target:harp_prep_invader_target = { NOT = { any_realm_title = { is_valid_viking_invasion_target = PREV } } }
+					persistent_event_target:harp_prep_invader_target = {
+						NOT = {
+							OR = {
+								tier = EMPEROR
+								tier = KING
+								tier = DUKE
+							}
+							any_demesne_title = {
+								higher_tier_than = COUNT
+								controls_religion = no
+							}
+						}
+					}
+        	persistent_event_target:harp_prep_invader_target = { realm_size < 51 }
+        }
+        text = HRP_desc.17f
+    }
+    border = GFX_event_narrative_frame_war
+    is_triggered_only = yes
+
+	immediate = {
+		set_character_flag = prepared_invasion_over
+		remove_character_modifier = launched_prepared_invasion
+		remove_opinion = {
+			who = persistent_event_target:harp_prep_invader_target
+			modifier = preparing_to_invade
+		}
+		persistent_event_target:harp_prep_invader_target = {
+			remove_opinion = {
+				who = ROOT
+				modifier = preparing_to_invade_me
+			}
+    		clr_character_flag = prep_inv_target
+    		character_event = { id = HRP.16 }
+		}
+		disband_event_forces = prepared_invasion
+	}
+
+	option = {
+		name = {
+			text = EVTOPTB62310
+		}
+		prestige = -200
+	}
+}
+
+# Transfers prepared invasion eligibility on death
+character_event = {
+	id = HRP.18
+	hide_window = yes
+    is_triggered_only = yes
+    has_character_flag = prep_inv_target
+    only_independent = yes
+
+    immediate = {
+    	current_heir = { save_event_target_as = prepared_invasion_target_heir set_character_flag = prep_inv_target }
+    	any_opinion_modifier_target = {
+    		limit = { reverse_has_opinion_modifier = { who = PREV modifier = preparing_to_invade_me } }
+    		save_persistent_event_target = { name = harp_prep_invader_target scope = event_target:prepared_invasion_target_heir }
+    	}
+    }
+}
+
 ########################AI JOIN AND AI RANK UP###########################
 
 character_event = { #force the AI to join a society
