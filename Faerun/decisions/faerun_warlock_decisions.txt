@@ -45,7 +45,7 @@ decisions = {
 			not_casting = yes
 		}
 		allow = {
-			always = yes
+			has_warlock_patron = yes
 		}
 
 		effect = {
@@ -57,4 +57,400 @@ decisions = {
 		}
 	}
 
+	warlock_patron_pick = {
+		ai = no
+		is_high_prio = yes
+		potential = {
+			z_warlock = yes
+			NOT = { has_warlock_patron = yes }
+			not_casting = yes
+		}
+		allow = {
+			always = yes
+		}
+
+		effect = {
+			character_event = { id = WARL.5 }
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	ritual_charm_person_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				AND = {
+					trait = warlock_fey
+					z_warlock = yes
+				}
+				AND = {
+					trait = warlock_old_one
+					z_warlock = yes
+				}
+				AND = {
+					trait = wiz_enchantment
+					z_wizard = yes
+				}
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	ritual_dominate_person_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				AND = {
+					trait = warlock_fey
+					z_warlock = yes
+				}
+				AND = {
+					trait = warlock_old_one
+					z_warlock = yes
+				}
+				AND = {
+					trait = wiz_enchantment
+					z_wizard = yes
+				}
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+}
+
+targeted_decisions = {
+
+	ritual_charm_person = { # This will be a player-only spell because the AI can't really deal with the strategy
+		filter = realm
+		ai_target_filter = none # So the AI will never see this
+		ai = no
+		ai_check_interval = 6000
+
+		from_potential = {
+			OR = {
+				AND = {
+					trait = warlock_fey
+					z_warlock = yes
+				}
+				AND = {
+					trait = warlock_old_one
+					z_warlock = yes
+				}
+				AND = {
+					trait = wiz_enchantment
+					z_wizard = yes
+				}
+			}
+			ai = no
+		}
+
+		potential = {
+			NOT = {
+				is_undead = yes
+			}
+		}
+
+		allow = {
+			FROM = {
+				NOT = { is_foe = ROOT }
+				OR = {
+					AND = {
+						OR = {
+							trait = wizard
+							trait = warlock
+						}
+						wealth = 40
+					}
+					AND = {
+						OR = {
+							trait = trained_wizard
+							trait = trained_warlock
+						}
+						wealth = 35
+					}
+					AND = {
+						OR = {
+							trait = journeyman_wizard
+							trait = journeyman_warlock
+						}
+						wealth = 30
+					}
+					AND = {
+						OR = {
+							trait = expert_wizard
+							trait = expert_warlock
+						}
+						wealth = 25
+					}
+					AND = {
+						OR = {
+							trait = master_wizard
+							trait = master_warlock
+						}
+						wealth = 20
+					}
+					AND = {
+						OR = {
+							trait = renowned_wizard
+							trait = renowned_warlock
+						}
+						wealth = 15
+					}
+					AND = {
+						OR = {
+							trait = legendary_wizard
+							trait = legendary_warlock
+						}
+						wealth = 10
+					}
+				}
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = charm_person_spell
+				}
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = charm_person_spell_after
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				trigger_switch = {
+					on_trigger = trait
+					legendary_wizard = {
+						wealth = -10
+					}
+					legendary_warlock = {
+						wealth = -10
+					}
+					renowned_wizard = {
+						wealth = -15
+					}
+					renowned_warlock = {
+						wealth = -15
+					}
+					master_wizard = {
+						wealth = -20
+					}
+					master_warlock = {
+						wealth = -20
+					}
+					expert_wizard = {
+						wealth = -25
+					}
+					expert_warlock = {
+						wealth = -25
+					}
+					journeyman_wizard = {
+						wealth = -30
+					}
+					journeyman_warlock = {
+						wealth = -30
+					}
+					trained_wizard = {
+						wealth = -35
+					}
+					trained_warlock = {
+						wealth = -35
+					}
+					wizard = {
+						wealth = -40
+					}
+					warlock = {
+						wealth = -40
+					}
+				}
+			}
+			spell_resistance_check = yes
+			opinion = {
+				modifier = charm_person_spell
+				who = FROM
+				months = 3
+			}
+			repeat_event = { id = spellaux.2 days = 90 }
+		}
+	}
+
+	ritual_dominate_person = {
+		only_rulers = yes
+		ai_check_interval = 36
+		filter = realm
+		ai_target_filter = realm
+
+		from_potential = {
+			is_inaccessible_or_incapable_trigger = no
+			OR = {
+				AND = {
+					trait = warlock_fey
+					z_warlock = yes
+				}
+				AND = {
+					trait = warlock_old_one
+					z_warlock = yes
+				}
+				AND = {
+					trait = wiz_enchantment
+					z_wizard = yes
+				}
+			}
+		}
+		potential = {
+			always = yes
+		}
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						OR = {
+							trait = wizard
+							trait = warlock
+						}
+						wealth = 150
+					}
+					AND = {
+						OR = {
+							trait = trained_wizard
+							trait = trained_warlock
+						}
+						wealth = 130
+					}
+					AND = {
+						OR = {
+							trait = journeyman_wizard
+							trait = journeyman_warlock
+						}
+						wealth = 110
+					}
+					AND = {
+						OR = {
+							trait = expert_wizard
+							trait = expert_warlock
+						}
+						wealth = 90
+					}
+					AND = {
+						OR = {
+							trait = master_wizard
+							trait = master_warlock
+						}
+						wealth = 70
+					}
+					AND = {
+						OR = {
+							trait = renowned_wizard
+							trait = renowned_warlock
+						}
+						wealth = 50
+					}
+					AND = {
+						OR = {
+							trait = legendary_wizard
+							trait = legendary_warlock
+						}
+						wealth = 30
+					}
+				}
+			}
+			NOT = {
+				has_opinion_modifier = { who = FROM modifier = mind_control }
+			}
+		}
+		effect = {
+			FROM = {
+				trigger_switch = {
+					on_trigger = trait
+					legendary_wizard = {
+						wealth = -30
+					}
+					legendary_warlock = {
+						wealth = -30
+					}
+					renowned_wizard = {
+						wealth = -50
+					}
+					renowned_warlock = {
+						wealth = -50
+					}
+					master_wizard = {
+						wealth = -70
+					}
+					master_warlock = {
+						wealth = -70
+					}
+					expert_wizard = {
+						wealth = -90
+					}
+					expert_warlock = {
+						wealth = -90
+					}
+					journeyman_wizard = {
+						wealth = -110
+					}
+					journeyman_warlock = {
+						wealth = -110
+					}
+					trained_wizard = {
+						wealth = -130
+					}
+					trained_warlock = {
+						wealth = -130
+					}
+					wizard = {
+						wealth = -150
+					}
+					warlock = {
+						wealth = -150
+					}
+				}
+			}
+			spell_resistance_check = yes
+			opinion = {
+				modifier = mind_control who = FROM years = 2
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
 }
