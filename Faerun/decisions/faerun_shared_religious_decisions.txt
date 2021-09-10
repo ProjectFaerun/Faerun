@@ -124,9 +124,10 @@ decisions = {
 		allow = {
 			piety = 40
 			scaled_wealth = 0.25
-			NOT = {
-				has_character_modifier = in_seclusion
-			}
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
 		}
 		effect = {
 			piety = -40
@@ -231,6 +232,8 @@ decisions = {
 		only_playable = yes
 		
 		potential = {
+			reforming_gov = yes
+			not_casting = yes
 			trait = patron_tyr
 			age = 50
 			faerun_immortal_race_trigger = no
@@ -238,6 +241,10 @@ decisions = {
 		
 		allow = {
 			piety = 400
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
 			custom_tooltip = {
 				text = RESPYCD
 				hidden_tooltip = {
@@ -261,4 +268,273 @@ decisions = {
 			factor = 0.2
 		}
 	}
+	
+	recruit_torm_paladin = {
+		ai = no
+		only_playable = yes
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			trait = patron_torm
+		}
+		allow = {
+			piety = 40
+			scaled_wealth = 0.25
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
+		}
+		effect = {
+			piety = -40
+			scaled_wealth = -0.25
+			hidden_tooltip = {
+				if = {
+					limit = { any_owned_bloodline = { has_bloodline_flag = bloodline_inspire_commanders } }
+					random_list = {
+						95 = {
+							spawn_great_paladin_effect = yes
+						}
+						5 = {
+							spawn_fantastic_paladin_effect = yes
+							new_character = {
+								opinion = {
+			 						modifier = opinion_legendary_commander
+			 						years = 50
+			 		  				who = ROOT
+			 					}
+							}
+						}
+					}
+				}
+				else = {
+					spawn_good_paladin_effect = yes
+				}
+			}
+			custom_tooltip = { text = promoted_commander_TT }
+			character_event = { id = NE.1 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+	torm_tactics = {
+		ai_check_interval = 20
+		
+		potential = {
+			can_have_more_leadership_trait = yes
+			NOR = {
+				trait = shield_of_torm
+				trait = sword_of_torm
+			}
+			trait = patron_torm
+			is_adult = yes
+		}
+		
+		allow = {
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
+			piety = 40
+		}
+		
+		effect = {
+			piety = -40
+			character_event = { id = divrel.3 }
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 2
+				trait = zealous
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 2
+				z_paladin = yes
+			}
+			modifier = {
+				factor = 4
+				OR = {
+					trait = misguided_warrior
+					trait = tough_soldier
+					trait = skilled_tactician
+					trait = brilliant_strategist
+				}
+			}
+		}
+	}
+	
+	torm_divine_death = {
+		ai_check_interval = 36
+		
+		potential = {
+			trait = patron_torm
+			has_global_flag = tot_ended
+		}
+		
+		allow = {
+			is_adult = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
+			month = 8
+			NOT = { month = 9 }
+			custom_tooltip = {
+				text = TORMCD
+			}
+		}
+		
+		effect = {
+			character_event = { id = divrel.7 }
+		}
+		
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = zealous
+			}
+			modifier = {
+				factor = 0.5
+				trait = cynical
+			}
+		}
+	}
+	torm_true_resurrection = {
+		ai_check_interval = 36
+		
+		potential = {
+			trait = patron_torm
+			has_global_flag = tot_ended
+		}
+		
+		allow = {
+			is_adult = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			NOT = { trait = infirm }
+			NOT = { is_inaccessible_trigger = yes }
+			month = 10
+			NOT = { month = 11 }
+		}
+		
+		effect = {
+			character_event = { id = divrel.8 }
+		}
+		
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				trait = zealous
+			}
+			modifier = {
+				factor = 0.5
+				trait = cynical
+			}
+		}
+	}
+}
+
+targeted_decisions = {
+
+	torm_join_war = {
+		ai_check_interval = 30
+		filter = independent_rulers
+		ai_target_filter = independent_rulers
+		
+		from_potential = {
+			trait = patron_torm
+			is_adult = yes
+			has_landed_title = yes
+		}
+		
+		potential = {
+			olrox_is_good_religion_trigger = yes
+		}
+		
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { trait = infirm }
+				NOT = { is_inaccessible_trigger = yes }
+			}
+			war = yes
+			is_primary_war_defender = yes
+		}
+		
+		effect = {
+			save_event_target_as = tormtarget
+			FROM = {
+				join_defender_wars = ROOT
+				piety = 50
+				ROOT = {
+					letter_event = { id = divrel.4 }
+				}
+				character_event = { id = divrel.5 months = 3 }
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 3
+				FROM = { trait = zealous }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = brave }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = craven }
+			}
+			modifier = {
+				factor = 3
+				FROM = {
+					opinion = {
+						who = ROOT
+						value = 25
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = {
+					NOT = {
+						opinion = {
+							who = ROOT
+							value = -25
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				FROM = { is_friend = ROOT }
+			}
+			modifier = {
+				factor = 0
+				FROM = { is_rival = ROOT }
+			}
+		}
+	}
+	
 }
