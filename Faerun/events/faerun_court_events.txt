@@ -2301,11 +2301,11 @@ letter_event = {
 letter_event = {
 	id = 73245
 	desc = EVTDESC73245
-	
+
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA73245 
+		name = EVTOPTA73245
 		prestige = -5
 	}
 }
@@ -2314,15 +2314,15 @@ character_event = {
 	#Immortal suspicions#Repurposed Event#
 	id = FCE.0001
 	desc = EVTDESC_FCE_0001
-	border = GFX_event_normal_frame_intrigue 
+	border = GFX_event_normal_frame_intrigue
 	picture = GFX_evt_suspicious_noble
-	
+
 	only_playable = yes
 	only_capable = yes
-	min_age = 50
+	min_age = 60
 	prisoner = no
-	
-	
+
+
 	immediate = {
 		random_vassal = {
 			limit = {
@@ -2337,10 +2337,10 @@ character_event = {
 					trait = paranoid
 					trait = greedy
 					trait = lunatic
-					immortal = no
-					AND = {
-						is_evil_religion = yes
-						NOT = { trait = content }
+					is_evil_religion = yes
+					NOR = {
+						trait = immortal
+						trait = content
 					}
 				}
 			}
@@ -2353,27 +2353,8 @@ character_event = {
 		ruled_years = 10
 		higher_tier_than = count
 		NOT = { has_character_flag = immortal_crisis }
-		OR = {
-			has_character_modifier = undead_realm_lord
-			trait = creature_beholder
-			trait = creature_devil
-			trait = creature_daemon
-			trait = creature_demon
-			trait = creature_illithid
-			trait = creature_ulitharid
-			trait = creature_yikarian
-			NOR = {
-				religion_group = good_human_pantheon_group
-				religion_group = zakharan_group
-				religion_group = elven_pantheon_group
-				religion_group = karaturan_group
-				religion = dwarven_pantheon
-				religion = gnome_pantheon
-				religion = bahamut
-			}
-		}
 	}
-	
+
 	mean_time_to_happen = {
 		months = 150
 		modifier = {
@@ -2396,10 +2377,20 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_FCE_0001 #React normally.
+		trigger = {
+			OR = {
+				trait = immortal
+				evilcat_is_chosen = yes
+				faerun_immortal_race_trigger = no
+			}
+		}
 		set_character_flag = immortal_crisis
 		event_target:immortal_suspector = {
-			opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
+			opinion = { modifier = immortal_suspicions who = ROOT years = 100 }
 		}
+		ai_chance = {
+      factor = 1
+    }
 	}
 	option = {
 		name = EVTOPTB_FCE_0001 #React diplomatically.
@@ -2415,58 +2406,64 @@ character_event = {
 		random_list = {
 			10 = {
 				event_target:immortal_suspector = {
-					opinion = { modifier = opinion_calmed who = ROOT years = 5 } 
+					opinion = { modifier = opinion_calmed who = ROOT years = 5 }
 				}
 			}
 			10 = {
 				set_character_flag = immortal_crisis
 				event_target:immortal_suspector = {
-					opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
+					opinion = { modifier = immortal_suspicions who = ROOT years = 100 }
 				}
 			}
 		}
+		ai_chance = {
+      factor = 2
+    }
 	}
 	option = {
 		name = EVTOPTC_FCE_0001 #React truthfully.
 		trigger = {
-			OR = {
-				trait = creature_sarrukh
-				trait = creature_angel
-				trait = creature_demon
-				trait = creature_devil
-				trait = creature_daemon
-				trait = creature_genie
-				trait = creature_treant
-				trait = lich
+			faerun_immortal_race_trigger = yes
+			NOR = {
+				trait = immortal
+				evilcat_is_chosen = yes
 			}
 		}
 		random_list = {
 			5 = {
 				event_target:immortal_suspector = {
-					opinion = { modifier = opinion_unconvinced who = ROOT years = 10 } 
+					opinion = { modifier = opinion_unconvinced who = ROOT years = 10 }
 				}
 			}
 			15 = {
 				set_character_flag = immortal_crisis
 				event_target:immortal_suspector = {
-					opinion = { modifier = immortal_suspicions who = ROOT years = 100 } 
+					opinion = { modifier = immortal_suspicions who = ROOT years = 100 }
 				}
 			}
 		}
+		ai_chance = {
+      factor = 2
+    }
 	}
 	option = {
 		name = EVTOPTD_FCE_0001 #React evilly.
 		trigger = {
 			OR = {
-				martial = 20
-				intrigue = 15
-				z_rogue = yes
-				z_shadow = yes
 				trait = impaler
+				trait = cruel
+				trait = arbitrary
+				trait = wroth
+				trait = berserker
 				is_evil_religion = yes
 			}
+			NOR = {
+				trait = kind
+				trait = just
+				trait = patient
+			}
 		}
-		piety = -250
+		piety = -100
 		add_trait = cruel
 		add_trait = lunatic
 		add_trait = arbitrary
@@ -2500,8 +2497,54 @@ character_event = {
 				}
 			}
 		}
+		ai_chance = {
+      factor = 1
+      modifier = {
+        factor = 2
+        trait = stressed
+      }
+      modifier = {
+        factor = 0.5
+        trait = depressed
+      }
+			modifier = {
+        factor = 2
+        trait = lunatic
+      }
+    }
 	}
-	# after = {
-		# character_event = { id = RIP.30317 years = 1 }
-	# }
+	option = {
+		name = EVTOPTE_FCE_0001 #Abdicate and leave forever
+		set_character_flag = immortal_crisis
+		death = {
+			death_reason = death_planes
+		}
+		ai_chance = {
+      factor = 0.5
+      modifier = {
+        factor = 2
+        trait = stressed
+      }
+      modifier = {
+        factor = 2
+        trait = depressed
+      }
+			modifier = {
+        factor = 0.1
+        trait = ambitious
+      }
+			modifier = {
+        factor = 0.5
+        trait = diligent
+      }
+			modifier = {
+        factor = 2
+        trait = content
+      }
+			modifier = {
+        factor = 2
+        trait = slothful
+      }
+    }
+	}
 }
