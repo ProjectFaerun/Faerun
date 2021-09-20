@@ -70,27 +70,69 @@ character_event = {
 
 	option = {
 		name = WARL_2_desc_1
-		trigger = { ai = no }
+		trigger = {
+			ai = no
+			OR = {
+				trait = warlock_fey
+				trait = warlock_celestial
+			}
+		}
 		add_artifact = pseudodragon_familiar
 	}
 	option = {
 		name = WARL_2_desc_2
-		trigger = { ai = no }
+		trigger = {
+			ai = no
+			OR = {
+				trait = warlock_fiend
+				trait = creature_devil
+			}
+		}
 		add_artifact = imp_familiar
 	}
 	option = {
 		name = WARL_2_desc_3
-		trigger = { ai = no }
+		trigger = {
+			ai = no
+			OR = {
+				trait = warlock_old_one
+				trait = creature_beholder
+			}
+		}
 		add_artifact = gazer_familiar
 	}
 	option = {
-		name = WARL_2_desc_other
-		trigger = { ai = no }
-		hidden_tooltip = { character_event = { id = WARL.3 } }
+		name = WARL_3_desc_1
+		trigger = {
+			ai = no
+			OR = {
+				trait = warlock_fiend
+				trait = creature_demon
+			}
+		}
+		add_artifact = quasit_familiar
 	}
 	option = {
-		name = XXX
-		trigger = { ai = yes }
+		name = WARL_3_desc_2
+		trigger = {
+			ai = no
+			trait = warlock_fey
+		}
+		add_artifact = sprite_familiar
+	}
+	option = {
+		name = WARL_3_desc_3
+		trigger = { ai = no }
+		hidden_tooltip = { character_event = { id = WARL.1 } }
+	}
+	option = {
+		trigger = {
+			ai = yes
+			OR = {
+				trait = warlock_fey
+				trait = warlock_celestial
+			}
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -111,8 +153,10 @@ character_event = {
 		add_artifact = pseudodragon_familiar
 	}
 	option = {
-		name = XXX
-		trigger = { ai = yes }
+		trigger = {
+			ai = yes
+			trait = warlock_fiend
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -135,8 +179,10 @@ character_event = {
 		add_artifact = imp_familiar
 	}
 	option = {
-		name = XXX
-		trigger = { ai = yes }
+		trigger = {
+			ai = yes
+			trait = warlock_old_one
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -158,8 +204,10 @@ character_event = {
 		add_artifact = gazer_familiar
 	}
 	option = {
-		name = XXX
-		trigger = { ai = yes }
+		trigger = {
+			ai = yes
+			trait = warlock_fiend
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -182,8 +230,10 @@ character_event = {
 		add_artifact = quasit_familiar
 	}
 	option = {
-		name = XXX
-		trigger = { ai = yes }
+		trigger = {
+			ai = yes
+			trait = warlock_fey
+		}
 		ai_chance = {
 			factor = 10
 			modifier = {
@@ -205,31 +255,7 @@ character_event = {
 	}
 }
 
-character_event = {
-	id = WARL.3
-	desc = WARL_3_desc
-	picture = GFX_evt_fire_imp
-
-	is_triggered_only = yes
-
-	option = {
-		name = WARL_3_desc_1
-		trigger = { ai = no }
-		add_artifact = quasit_familiar
-	}
-	option = {
-		name = WARL_3_desc_2
-		trigger = { ai = no }
-		add_artifact = sprite_familiar
-	}
-	option = {
-		name = WARL_3_desc_3
-		trigger = { ai = no }
-		hidden_tooltip = { character_event = { id = WARL.1 } }
-	}
-}
-
-# Boon selection for AIs
+# Boon and Patron selection for AIs
 character_event = {
 	id = WARL.4
 
@@ -243,26 +269,140 @@ character_event = {
 
 	trigger = {
 		ai = yes
-		OR = {
-			trait = trained_warlock
-			trait = journeyman_warlock
-			trait = expert_warlock
-			trait = master_warlock
-			trait = renowned_warlock
-			trait = legendary_warlock
-		}
-		NOR = {
-			has_artifact = gazer_familiar
-			has_artifact = imp_familiar
-			has_artifact = pseudodragon_familiar
-			has_artifact = quasit_familiar
-			has_artifact = sprite_familiar
-			has_artifact = warlock_pact_weapon
-			has_artifact = warlock_book_shadows
-		}
+		z_warlock = yes
 	}
 
 	option = {
-		character_event = { id = WARL.1 }
+		if = {
+			limit = {
+				NOT = { has_warlock_patron = yes }
+			}
+			character_event = { id = WARL.5 }
+		}
+		if = {
+			limit = {
+				NOR = {
+					has_artifact = gazer_familiar
+					has_artifact = imp_familiar
+					has_artifact = pseudodragon_familiar
+					has_artifact = quasit_familiar
+					has_artifact = sprite_familiar
+					has_artifact = warlock_pact_weapon
+					has_artifact = warlock_book_shadows
+				}
+				OR = {
+					trait = trained_warlock
+					trait = journeyman_warlock
+					trait = expert_warlock
+					trait = master_warlock
+					trait = renowned_warlock
+					trait = legendary_warlock
+				}
+			}
+			character_event = { id = WARL.1 days = 7 }
+		}
+	}
+}
+
+character_event = {
+	id = WARL.5
+	desc = WARL_5_desc
+	picture = GFX_evt_wizard
+
+	is_triggered_only = yes
+
+	trigger = {
+		z_warlock = yes
+		NOT = { has_warlock_patron = yes }
+	}
+
+	option = {
+		name = WARL_5_desc_1
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				OR = {
+					trait = creature_demon
+					trait = creature_devil
+					trait = creature_daemon
+					trait = creature_beholder
+					is_evil_religion = yes
+				}
+			}
+			modifier = {
+				factor = 2
+				olrox_is_good_religion_trigger = yes
+			}
+		}
+		add_trait = warlock_celestial
+	}
+	option = {
+		name = WARL_5_desc_2
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				OR = {
+					trait = creature_beholder
+					olrox_is_good_religion_trigger = yes
+				}
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+			modifier = {
+				factor = 5
+				religion = infernal
+			}
+			modifier = {
+				factor = 5
+				religion = abyssal_cult
+			}
+		}
+		add_trait = warlock_fiend
+	}
+	option = {
+		name = WARL_5_desc_3
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				OR = {
+					trait = creature_demon
+					trait = creature_devil
+				}
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+			modifier = {
+				factor = 5
+				religion_group = aberration_group
+			}
+		}
+		add_trait = warlock_old_one
+	}
+	option = {
+		name = WARL_5_desc_4
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				OR = {
+					trait = creature_devil
+					trait = creature_demon
+					trait = creature_daemon
+					trait = creature_beholder
+				}
+			}
+			modifier = {
+				factor = 5
+				olrox_is_environmental_religion_trigger = yes
+			}
+		}
+		add_trait = warlock_fey
 	}
 }

@@ -286,7 +286,211 @@ targetted_decisions = {
 		}
 	}
 
-	# order_to_take_vows - removed for Faerun
+	# Unhardcoded decision.
+	order_to_take_vows = {
+		only_playable = yes
+		filter = court
+		ai_target_filter = court
+		ai_check_interval = 120 #Check every 120 months
+		
+		from_potential = {
+			is_playable = yes
+			has_regent = no
+			prisoner = no
+			is_adult = yes
+			has_dlc = "Sons of Abraham"
+			AND = { 
+				religion = triadic
+				is_alternate_start = no
+			}
+		}
+		
+		potential = {
+			is_adult = yes
+			is_ruler = no
+			religion = FROM
+			NOR = { 
+				trait = incapable 
+				trait = monk
+			}
+			host = { character = FROM }
+		}
+		
+		allow = {
+			OR = { 
+				AND = { 
+					is_married = no
+					custom_tooltip = {
+						text = NOT_HEIR_TITLE_TT
+						NOT = {
+                        	any_heir_title = { 
+                            	always = yes
+                            }
+                        }
+                    }
+				}
+				prisoner = yes
+				conditional_tooltip = {
+					trigger = { dynasty = FROM }
+					custom_tooltip = { #Matilde's Bloodline
+						text = BLOODLINE_EASIER_VOWS_TOOLTIP
+						AND = { 
+							FROM = { 
+								dynasty = ROOT
+								any_owned_bloodline = {
+									has_bloodline_flag = bloodline_easy_monks
+									bloodline_is_active_for = PREV
+								}
+							}
+							ROOT = { 
+								any_owned_bloodline = {
+									has_bloodline_flag = bloodline_easy_monks
+									bloodline_is_active_for = PREV
+								}
+							}
+						}
+					}
+				}
+			}
+			FROM = { piety = 50 }
+		}
+
+		effect = {
+			FROM = { piety = -50 }
+			add_ascetic_trait_effect = yes
+			add_trait = monk
+			if = {
+				limit = { prisoner = yes }
+				prisoner = no
+			}
+			if = {
+				limit = { is_married = yes }
+				any_spouse = { remove_spouse = ROOT }
+			}
+			if = {
+				limit = { 
+					any_realm_lord = { government = theocracy_government religion = ROOT }
+				}
+				custom_tooltip = { text = tooltip_vows_monk_goes_to_theocracy }
+				hidden_tooltip = {
+					random_realm_lord = { 
+						limit = { government = theocracy_government religion = ROOT }
+						preferred_limit = { 
+							reverse_opinion = { who = FROM value = 20 }
+							vassal_of = FROM
+							same_society_as = ROOT #The one he just joined.
+						} 
+						preferred_limit = { 
+							vassal_of = FROM
+							same_society_as = ROOT #The one he just joined.
+						} 
+						preferred_limit = { 
+							same_society_as = ROOT #The one he just joined.
+						} 
+						preferred_limit = { 
+							vassal_of = FROM
+						} 
+						ROOT = { 
+							move_character = PREV
+						} 
+					}
+				}
+			}
+			if = {
+				limit = { NOR = { trait = zealous dynasty = FROM } }
+				opinion = { modifier = opinion_cloistered_me who = FROM years = 20 }
+			}
+			if = {
+				limit = { NOT = { trait = zealous } dynasty = FROM }
+				opinion = { modifier = opinion_cloistered_me_family who = FROM years = 20 }
+			}
+			if = {
+				limit = { is_child_of = FROM }
+				hidden_tooltip = { FROM = { character_event = { id = HFP.23001 } } }
+			}
+			
+		}
+		
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = { #Hate you too much to just send you off.
+				factor = 0
+				prisoner = yes
+				NOT = { is_child_of = FROM }
+				FROM = { is_benevolent_trigger = no }
+				NOT = {
+					reverse_opinion = {
+						who = FROM
+						value = -20
+					}
+				}
+			}
+			modifier = { #Like him too much to do it.
+				factor = 0
+				reverse_opinion = {
+					who = FROM
+					value = 50
+				}
+			}
+			modifier = { #I'm a good ruler and he is a dynastic heir.
+				factor = 0
+				is_child_of = FROM
+				dynasty = FROM
+				FROM = { is_benevolent_trigger = yes }
+				reverse_opinion = {
+					who = FROM
+					value = 0
+				}
+			}
+			modifier = { #Must protect the line.
+				factor = 5
+				is_child_of = FROM
+				NOT = { dynasty = FROM }
+			}
+			modifier = { #Hate you.
+				factor = 5
+				is_child_of = FROM
+				is_rival = FROM
+			}
+			modifier = { #There are better spares.
+				factor = 20
+				is_child_of = FROM
+				OR = { 
+					has_negative_congenital_trigger = yes
+					has_infertile_trait_trigger = yes
+					has_severe_disability_trigger = yes
+				}
+				FROM = { 
+					any_child = { 
+						is_alive = yes
+						NOR = { 
+							character = ROOT 
+							has_negative_congenital_trigger = yes
+							has_infertile_trait_trigger = yes
+							has_severe_disability_trigger = yes
+						}
+					}
+				}
+			}
+			modifier = { #Must preserve the realm from falling to evil.
+				factor = 5
+				is_evil_trigger = yes
+				FROM = { 
+					is_benevolent_trigger = yes 
+					any_child = { 
+						is_alive = yes
+						NOR = { 
+							character = ROOT 
+							is_evil_trigger = yes
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	send_child_into_hiding = {
 		only_rulers = yes
