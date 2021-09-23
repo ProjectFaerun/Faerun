@@ -1,0 +1,1016 @@
+namespace = frelections
+
+### Merchant Republic Election timers ###            # Thanks to the Guardians of Azeroth team for advice and help
+# on_startup
+# Ping to capital_scope in case Doge is custom character
+character_event = {
+	id = frelections.1
+	
+	is_triggered_only = yes
+	hide_window = yes
+	
+	only_playable = yes
+	is_patrician = yes
+	
+	trigger = {
+		is_save_game = no
+		
+		is_merchant_republic = yes
+		
+		NOT = { has_character_flag = upcoming_elections_flag }
+	}
+	
+	immediate = {
+		capital_scope = { province_event = { id = frelections.2 days = 1 } }
+	}
+}
+# Elections in 10 year
+province_event = {
+	id = frelections.2
+	
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		holder_scope = {
+			if = {
+				limit = {
+					is_merchant_republic = yes
+					NOT = { has_character_flag = upcoming_elections_flag }
+				}
+				log = "(GOVERNMENT) frelections.2 fired for [This.GetBestName]"
+				
+				set_character_flag = upcoming_elections_flag
+				character_event = { id = frelections.4 years = 9 }
+			}
+		}
+	}
+}
+
+# on_new_holder on_new_holder_inheritance on_new_holder_usurpation
+# Elections in 10 year
+character_event = {
+	id = frelections.3
+	
+	is_triggered_only = yes
+	hide_window = yes
+	
+	only_playable = yes
+	is_patrician = yes
+	
+	trigger = {
+		is_merchant_republic = yes
+		
+		NOT = { has_character_flag = upcoming_elections_flag }
+	}
+	
+	immediate = {
+		log = "(GOVERNMENT) frelections.3 fired for [Root.GetBestName]"
+		
+		set_character_flag = upcoming_elections_flag
+		character_event = { id = frelections.4 years = 9 }
+	}
+}
+
+# Elections in 1 year: sends notification to patricians
+character_event = {
+	id = frelections.4
+	
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_merchant_republic = yes
+	}
+	
+	fail_trigger_effect = {
+		clr_character_flag = upcoming_elections_flag
+	}
+	
+	immediate = {
+		primary_title = { save_event_target_as = target_republic }
+		
+		character_event = { id = frelections.13 years = 1 } # delay elections for a year if any patricians are revolting
+		
+		# Notifications
+		character_event = { id = frelections.5 }
+		if = {
+			limit = { ai = no check_variable = { which = mr_incumbency value >= 1 } }
+			character_event = { id = frelections.8 }
+		}		
+		any_vassal = {
+			limit = {
+				NOT = { character = ROOT }
+				
+				is_patrician = yes
+			}
+			character_event = { id = frelections.5 }
+		}
+		any_vassal = {
+			limit = {
+				NOT = { character = ROOT }
+				ai = no
+				is_patrician = yes
+				liege = {
+					check_variable = { which = mr_incumbency value >= 1 }
+				}												
+			}
+			character_event = { id = frelections.12 }
+		}		
+	}
+}
+# Notification of upcoming elections
+character_event = {
+	id = frelections.5
+	desc = EVTDESC_frelections_5
+	picture = GFX_evt_doge_republic
+	border = GFX_event_normal_frame_economy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+# Starts elections, delayed event
+character_event = {
+	id = frelections.6
+	
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = {
+		is_merchant_republic = yes
+	}
+	
+	fail_trigger_effect = {
+		clr_character_flag = upcoming_elections_flag
+	}
+
+	immediate = {
+		log = "(GOVERNMENT) frelections.6 fired for [Root.GetBestName]"
+		primary_title = { save_event_target_as = target_republic }
+		capital_scope = { county = { save_event_target_as = target_city } }
+		
+		clr_character_flag = upcoming_elections_flag
+		
+		add_trait = secret_patrician
+
+		ROOT = { save_event_target_as = mr_elec_original_doge }		
+
+		player_heir = { save_event_target_as = mr_elec_pri_heir }	
+
+		subtract_variable = { which = global_mr_incumbency_neg which = mr_incumbency }	# stacking incumbency penalty for each election won
+		set_variable = { which = global_mr_incumbency_pos which = mr_incumbency }					
+
+		event_target:mr_elec_pri_heir = { prestige = global_mr_incumbency_neg } # -500	
+
+		recalc_succession = yes			
+
+		any_vassal = {
+			if = {								# Keep patricians as patricians in inter-election period
+				limit = { is_patrician = yes }
+				add_trait = secret_patrician
+			}
+			else_if = {							# Mark vassals of previous doge
+				limit = { primary_title = { NOT = { de_jure_liege = event_target:target_city } } }
+				set_character_flag = prev_doge_vassal_flag
+			}
+		}
+		# Keep councilors councilors in inter-election period
+		any_courtier = { 
+			if = {								
+				limit = { has_minor_title = title_councilmember_king }
+				save_event_target_as = prev_doge_councilmember_king_flag
+			}
+			if = {								
+				limit = { has_minor_title = title_councilmember_emperor }
+				save_event_target_as = prev_doge_councilmember_emperor_flag
+			}																		
+		}
+		any_vassal = { 
+			if = {								
+				limit = { has_minor_title = title_councilmember_king }
+				save_event_target_as = prev_doge_councilmember_king_flag
+			}
+			if = {								
+				limit = { has_minor_title = title_councilmember_emperor }
+				save_event_target_as = prev_doge_councilmember_emperor_flag
+			}																		
+		}		
+		job_chancellor = {
+			save_event_target_as = prev_doge_chancellor_flag																	
+		}
+		job_marshal = {
+			save_event_target_as = prev_doge_marshal_flag																	
+		}
+		job_treasurer = {
+			save_event_target_as = prev_doge_treasurer_flag																	
+		}
+		job_spymaster = {
+			save_event_target_as = prev_doge_spymaster_flag																	
+		}
+		job_spiritual = {
+			save_event_target_as = prev_doge_spiritual_flag																	
+		}															
+
+		hold_election = yes	
+
+		event_target:mr_elec_pri_heir = { prestige = global_mr_incumbency_pos }
+
+		set_variable = { which = global_mr_incumbency_neg value = 0 }
+		set_variable = { which = global_mr_incumbency_pos value = 0 }		
+
+		event_target:target_republic = { holder_scope = { save_event_target_as = target_new_doge } }
+
+		
+		if = {
+			limit = { dynasty = event_target:target_new_doge }			
+			ROOT = { event_target:target_new_doge = { this_abdicate_transfer_wealth_to_play_prev_effect = yes } }						
+			event_target:mr_elec_original_doge = { change_variable = { which = mr_incumbency value = 500 } }			
+		}
+
+		remove_trait = secret_patrician		
+
+		event_target:target_republic = { 
+			holder_scope = {
+				remove_trait = secret_patrician
+				any_vassal = {
+					if = {
+						limit = { trait = secret_patrician }
+						remove_trait = secret_patrician
+						set_defacto_liege = ROOT					
+					}
+					if = {
+						limit = { has_character_flag = prev_doge_vassal_flag }
+						clr_character_flag = prev_doge_vassal_flag
+					
+						if = {
+							limit = { lower_tier_than = ROOT }
+							set_defacto_liege = ROOT
+						}
+					}				
+				}
+				any_vassal = {
+                	if = {
+                    	limit = { is_patrician = yes check_variable = { which = mr_incumbency value >= 1 } character = event_target:mr_elec_original_doge }
+                    	divide_variable = { 
+                        	which = mr_incumbency
+                        	value = 2
+                    	}
+                	}
+            	}			
+			}
+		}
+		
+		recalc_succession = yes				
+
+		event_target:target_republic = { holder_scope = { save_event_target_as = target_new_doge } }  	
+		
+
+		event_target:target_new_doge = {
+			character_event = { id = frelections.7 } # Notifications		
+			any_vassal = {
+				limit = {					
+					is_patrician = yes
+				}
+				character_event = { id = frelections.7 } # Notifications
+			}			
+			character_event = { id = frelections.16 } # Reappoint councilors if abdicating to previous doge upon winning re-election			  																		 						
+		}
+	}
+}
+# Notification of held elections
+character_event = {
+	id = frelections.7
+	desc = EVTDESC_frelections_7
+	picture = GFX_evt_doge_republic
+	border = GFX_event_normal_frame_economy
+	
+	is_triggered_only = yes
+
+	portrait = event_target:target_new_doge
+	
+	option = {
+		name = INTERESTING
+	}
+}
+# Calculation for gold needed to overcome incumbency penalty
+character_event = {
+	id = frelections.8
+	desc = EVTDESC_frelections_8
+	picture = GFX_evt_doge_republic
+	border = GFX_event_normal_frame_economy
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		set_variable = { which = global_mr_incumbency_calc which = mr_incumbency }
+		multiply_variable = { which = global_mr_incumbency_calc value = 0.4 }        
+	}
+	
+	option = {
+		name = INTERESTING
+	}
+}
+# mark trade posts for newly generated patrician family to inherit
+character_event = {
+	id = frelections.9	
+	is_triggered_only = yes
+	hide_window = yes
+	is_patrician = yes
+
+	trigger = { 
+		OR = { 
+			NOT = { 
+				current_heir = { 
+				    always = yes 
+				} 
+			}
+ 			player_heir = { 
+			    is_ruler = yes
+			}						
+		} 
+	}
+	
+	immediate = {
+		clear_wealth = yes				
+		if = {
+			limit = {
+				NOT = {				
+					liege = {					 				 
+						any_vassal = {
+							is_patrician = yes 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_1  
+							}	
+						}
+					}
+				}
+				OR = {
+					is_merchant_republic = yes				
+					AND = {
+						is_merchant_republic = no
+						NOT = {										
+							liege = {					 				 
+								any_trade_post = {
+									has_province_flag = new_patrician_inherit_1 
+								}
+							}
+						}
+					}
+				}				
+				NOT = {				
+					any_trade_post = {					 				 
+						has_province_flag = new_patrician_inherit_1 
+					}
+				}													
+			}
+			any_trade_post = {
+				if = {
+					limit = {
+						NOR = {
+							has_province_flag = new_patrician_inherit_1
+							has_province_flag = new_patrician_inherit_2
+							has_province_flag = new_patrician_inherit_3
+							has_province_flag = new_patrician_inherit_4
+							has_province_flag = new_patrician_inherit_5
+						}
+					}	  
+					set_province_flag = new_patrician_inherit_1
+				} 
+			}			
+			break = yes
+		}
+		if = {
+			limit = {
+				NOT = {				
+					liege = {					 				 
+						any_vassal = {
+							is_patrician = yes 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_2 
+							}	
+						}
+					}
+				}
+				OR = {
+					is_merchant_republic = yes				
+					AND = {
+						is_merchant_republic = no
+						NOT = {										
+							liege = {					 				 
+								any_trade_post = {
+									has_province_flag = new_patrician_inherit_2 
+								}
+							}
+						}
+					}
+				}				
+				NOT = {				
+					any_trade_post = {					 				 
+						has_province_flag = new_patrician_inherit_2 
+					}
+				}													
+			}
+			any_trade_post = {
+				if = {
+					limit = {
+						NOR = {
+							has_province_flag = new_patrician_inherit_1
+							has_province_flag = new_patrician_inherit_2
+							has_province_flag = new_patrician_inherit_3
+							has_province_flag = new_patrician_inherit_4
+							has_province_flag = new_patrician_inherit_5
+						}
+					}	  
+					set_province_flag = new_patrician_inherit_2
+				} 
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				NOT = {				
+					liege = {					 				 
+						any_vassal = {
+							is_patrician = yes 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_3  
+							}	
+						}
+					}
+				}
+				OR = {
+					is_merchant_republic = yes				
+					AND = {
+						is_merchant_republic = no
+						NOT = {										
+							liege = {					 				 
+								any_trade_post = {
+									has_province_flag = new_patrician_inherit_3 
+								}
+							}
+						}
+					}
+				}				
+				NOT = {				
+					any_trade_post = {					 				 
+						has_province_flag = new_patrician_inherit_3 
+					}
+				}													
+			}
+			any_trade_post = {
+				if = {
+					limit = {
+						NOR = {
+							has_province_flag = new_patrician_inherit_1
+							has_province_flag = new_patrician_inherit_2
+							has_province_flag = new_patrician_inherit_3
+							has_province_flag = new_patrician_inherit_4
+							has_province_flag = new_patrician_inherit_5
+						}
+					}	  
+					set_province_flag = new_patrician_inherit_3
+				} 
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				NOT = {				
+					liege = {					 				 
+						any_vassal = {
+							is_patrician = yes 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_4  
+							}	
+						}
+					}
+				}
+				OR = {
+					is_merchant_republic = yes				
+					AND = {
+						is_merchant_republic = no
+						NOT = {										
+							liege = {					 				 
+								any_trade_post = {
+									has_province_flag = new_patrician_inherit_4 
+								}
+							}
+						}
+					}
+				}				
+				NOT = {				
+					any_trade_post = {					 				 
+						has_province_flag = new_patrician_inherit_4 
+					}
+				}													
+			}
+			any_trade_post = {
+				if = {
+					limit = {
+						NOR = {
+							has_province_flag = new_patrician_inherit_1
+							has_province_flag = new_patrician_inherit_2
+							has_province_flag = new_patrician_inherit_3
+							has_province_flag = new_patrician_inherit_4
+							has_province_flag = new_patrician_inherit_5
+						}
+					}	  
+					set_province_flag = new_patrician_inherit_4
+				} 
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				NOT = {				
+					liege = {					 				 
+						any_vassal = {
+							is_patrician = yes 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_5  
+							}	
+						}
+					}
+				}
+				OR = {
+					is_merchant_republic = yes				
+					AND = {
+						is_merchant_republic = no
+						NOT = {										
+							liege = {					 				 
+								any_trade_post = {
+									has_province_flag = new_patrician_inherit_5 
+								}
+							}
+						}
+					}
+				}				
+				NOT = {				
+					any_trade_post = {					 				 
+						has_province_flag = new_patrician_inherit_5 
+					}
+				}													
+			}
+			any_trade_post = {
+				if = {
+					limit = {
+						NOR = {
+							has_province_flag = new_patrician_inherit_1
+							has_province_flag = new_patrician_inherit_2
+							has_province_flag = new_patrician_inherit_3
+							has_province_flag = new_patrician_inherit_4
+							has_province_flag = new_patrician_inherit_5
+						}
+					}	  
+					set_province_flag = new_patrician_inherit_5
+				} 
+			}
+			break = yes
+		}								
+	}
+}
+# have newly generated patricians inherit the dissolved family's trade posts
+character_event = {
+	id = frelections.10 
+	is_triggered_only = yes
+	hide_window = yes
+	is_patrician = yes
+
+	trigger = { FROM = { character = no } }
+	
+	immediate = {
+		if = {
+			limit = {
+				OR = { 				 
+					liege = { 
+						any_trade_post = {
+							has_province_flag = new_patrician_inherit_1 
+						}	
+					}
+					liege = {
+						any_vassal = {						 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_1 
+							}
+						}	
+					}					
+				}	
+			}					
+			liege = {
+				any_trade_post = { 
+					limit = { has_province_flag = new_patrician_inherit_1 }
+					seize_trade_post = ROOT
+					clr_province_flag = new_patrician_inherit_1
+				}
+			}
+			liege = {
+				any_vassal = {
+					any_trade_post = { 
+						limit = { has_province_flag = new_patrician_inherit_1 }
+						seize_trade_post = ROOT
+						clr_province_flag = new_patrician_inherit_1
+					}
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				OR = { 				 
+					liege = { 
+						any_trade_post = {
+							has_province_flag = new_patrician_inherit_2 
+						}	
+					}
+					liege = {
+						any_vassal = {						 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_2 
+							}
+						}	
+					}					
+				}	
+			}					
+			liege = {
+				any_trade_post = { 
+					limit = { has_province_flag = new_patrician_inherit_2 }
+					seize_trade_post = ROOT
+					clr_province_flag = new_patrician_inherit_2
+				}
+			}
+			liege = {
+				any_vassal = {
+					any_trade_post = { 
+						limit = { has_province_flag = new_patrician_inherit_2 }
+						seize_trade_post = ROOT
+						clr_province_flag = new_patrician_inherit_2
+					}
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				OR = { 				 
+					liege = { 
+						any_trade_post = {
+							has_province_flag = new_patrician_inherit_3 
+						}	
+					}
+					liege = {
+						any_vassal = {						 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_3 
+							}
+						}	
+					}					
+				}	
+			}					
+			liege = {
+				any_trade_post = { 
+					limit = { has_province_flag = new_patrician_inherit_3 }
+					seize_trade_post = ROOT
+					clr_province_flag = new_patrician_inherit_3
+				}
+			}
+			liege = {
+				any_vassal = {
+					any_trade_post = { 
+						limit = { has_province_flag = new_patrician_inherit_3 }
+						seize_trade_post = ROOT
+						clr_province_flag = new_patrician_inherit_3
+					}
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				OR = { 				 
+					liege = { 
+						any_trade_post = {
+							has_province_flag = new_patrician_inherit_4 
+						}	
+					}
+					liege = {
+						any_vassal = {						 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_4 
+							}
+						}	
+					}					
+				}	
+			}					
+			liege = {
+				any_trade_post = { 
+					limit = { has_province_flag = new_patrician_inherit_4 }
+					seize_trade_post = ROOT
+					clr_province_flag = new_patrician_inherit_4
+				}
+			}
+			liege = {
+				any_vassal = {
+					any_trade_post = { 
+						limit = { has_province_flag = new_patrician_inherit_4 }
+						seize_trade_post = ROOT
+						clr_province_flag = new_patrician_inherit_4
+					}
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				OR = { 				 
+					liege = { 
+						any_trade_post = {
+							has_province_flag = new_patrician_inherit_5 
+						}	
+					}
+					liege = {
+						any_vassal = {						 
+							any_trade_post = {
+								has_province_flag = new_patrician_inherit_5 
+							}
+						}	
+					}					
+				}	
+			}					
+			liege = {
+				any_trade_post = { 
+					limit = { has_province_flag = new_patrician_inherit_5 }
+					seize_trade_post = ROOT
+					clr_province_flag = new_patrician_inherit_5
+				}
+			}
+			liege = {
+				any_vassal = {
+					any_trade_post = { 
+						limit = { has_province_flag = new_patrician_inherit_5 }
+						seize_trade_post = ROOT
+						clr_province_flag = new_patrician_inherit_5
+					}
+				}
+			}
+			break = yes
+		}		
+	}
+}
+# have heir inherit MR incumbency debuff
+character_event = {
+	id = frelections.11  
+	is_triggered_only = yes
+	hide_window = yes
+	is_patrician = yes
+
+	immediate = {
+		if = {
+			limit = { current_heir = { dynasty = ROOT } }
+			set_variable = { which = global_mr_incumbency_trans which = mr_incumbency }
+			current_heir = { set_variable = { which = mr_incumbency which = global_mr_incumbency_trans } }
+		}
+	}
+}
+# Calculation for gold needed to overcome incumbency penalty
+character_event = {
+	id = frelections.12
+	desc = EVTDESC_frelections_12
+	picture = GFX_evt_doge_republic
+	border = GFX_event_normal_frame_economy
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		liege = {
+			set_variable = { which = global_mr_incumbency_calc which = mr_incumbency }
+			multiply_variable = { which = global_mr_incumbency_calc value = 0.4 } 
+		}				       
+	}
+	
+	option = {
+		name = INTERESTING
+	}
+}
+# delay elections for a year if any patricians are revolting
+character_event = {
+	id = frelections.13 
+	hide_window = yes
+	is_patrician = yes	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = { 			 		
+				any_current_enemy = { 
+					liege_before_war = { 
+						character = ROOT
+					}
+					is_patrician = yes
+ 					in_revolt = yes					
+				}
+			}
+			character_event = { id = frelections.14 }			
+		}
+		else = {
+			character_event = { id = frelections.6 }			
+		}								       
+	}
+}
+# loop election delay for every year of a patrician revolt
+character_event = {
+	id = frelections.14
+	
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		is_merchant_republic = yes
+	}
+	
+	fail_trigger_effect = {
+		clr_character_flag = upcoming_elections_flag
+	}
+	
+	immediate = {
+		primary_title = { save_event_target_as = target_republic }
+		
+		character_event = { id = frelections.13 years = 1 } # delay elections if any patricians are revolting
+		
+		# Notifications
+		character_event = { id = frelections.15 }	
+		any_vassal = {
+			limit = {
+				is_patrician = yes
+			}
+			character_event = { id = frelections.15 }
+		}		
+	}
+}
+# Notification of delayed elections
+character_event = {
+	id = frelections.15
+	desc = EVTDESC_frelections_15
+	picture = GFX_evt_doge_republic
+	border = GFX_event_normal_frame_economy
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OK
+	}
+}
+# Reappoint councilors if abdicating to previous doge upon winning re-election
+character_event = {
+	id = frelections.16
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		any_courtier = {		
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}		
+		event_target:prev_doge_chancellor_flag = {
+			give_job_title = job_chancellor			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}
+		event_target:prev_doge_marshal_flag = {
+			give_job_title = job_marshal			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}
+		event_target:prev_doge_treasurer_flag = {
+			give_job_title = job_treasurer			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}
+		event_target:prev_doge_spymaster_flag = {
+			give_job_title = job_spymaster			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}
+		event_target:prev_doge_spiritual_flag = {
+			give_job_title = job_spiritual			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}					
+		}
+		event_target:prev_doge_councilmember_king_flag = {			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}			
+			give_minor_title = title_councilmember_king						
+		}
+		event_target:prev_doge_councilmember_emperor_flag = {			
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_fired_from_council	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_recently_fired	
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited
+			}
+			remove_opinion = {
+				who = event_target:target_new_doge
+				modifier = opinion_inherited_negative
+			}			
+			give_minor_title = title_councilmember_emperor						
+		}																		
+	}		
+}
