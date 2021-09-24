@@ -19,14 +19,14 @@ targetted_decisions = {
 			NOT = { trait = patron_eldath }
 			NOT = { pacifist = yes } 
 			OR = {
-                government = nomadic_tribal_government
-                has_religion_feature = religion_adventuring
-                religion = deities_of_fury
-                religion = martial_faith
-                religion = giant_pantheon
-                religion = vaprak
-                religion = goblin_pantheon
-                religion = orc_pantheon
+				government = nomadic_tribal_government
+				has_religion_feature = religion_adventuring
+				religion = deities_of_fury
+				religion = martial_faith
+				religion = giant_pantheon
+				religion = vaprak
+				religion = goblin_pantheon
+				religion = orc_pantheon
 			}
 			realm_size < 50
 			num_of_count_titles_in_realm < 20 
@@ -44,18 +44,18 @@ targetted_decisions = {
 		allow = {
 			FROM = { prestige = 750 }
 			custom_tooltip = {	
-	        	text = fr_prepared_invaded_tip
-	        	NOT = { has_character_flag = prep_inv_target }
-			}		
-			any_realm_title = { is_valid_viking_invasion_target = ROOT }
+				text = fr_prepared_invaded_tip
+				NOT = { has_character_flag = prep_inv_target }
+			}
+			any_realm_title = { is_valid_viking_invasion_target = ROOT }		
 		}
 
 		effect = {
-            FROM = { prestige = -500 }
-	        FROM = {
-	        	save_persistent_event_target = { name = prep_invader_target scope = ROOT }
-	            pacifists_lose_piety_effect = yes
-	        }
+			FROM = { prestige = -500 }
+			FROM = {
+				save_persistent_event_target = { name = prep_invader_target scope = ROOT }
+				pacifists_lose_piety_effect = yes
+			}
 			custom_tooltip = {
 				text = start_preparing_invasion_TT
 
@@ -66,17 +66,17 @@ targetted_decisions = {
 				FROM = { character_event = { id = fr_prepared_invasion.5 days = 30  } }
 				FROM = { character_event = { id = fr_prepared_invasion.10 } }
 			}
-            reverse_opinion = {
-                modifier = preparing_to_invade
-                who = FROM
-                months = 24
-            }
-            opinion = {
-                modifier = preparing_to_invade_me
-                who = FROM
-                months = 24
-            }			
-            set_character_flag = prep_inv_target
+			reverse_opinion = {
+				modifier = preparing_to_invade
+				who = FROM
+				months = 24
+			}
+			opinion = {
+				modifier = preparing_to_invade_me
+				who = FROM
+				months = 24
+			}
+			set_character_flag = prep_inv_target
 		}
 
 		revoke_allowed = {
@@ -85,40 +85,74 @@ targetted_decisions = {
 
 		ai_will_do = {
 			factor = 1
-	        modifier = {
-	            factor = 0.5
-	        }
-	        modifier = {
-	            factor = 0
-	            FROM = {
-                    top_liege = {
-                    	num_of_count_titles_in_realm >= 20
-                    }
-	            }
-	        }
-	        modifier = {
-	            factor = 0
-	            FROM = {
-                    OR = {
-                    	trait = content
-                    	trait = slothful
-                    	trait = craven
-                    	trait = shy
-                    }
-	            }
-	        }
-	        modifier = {
-	            factor = 2
-	            FROM = {
-                    trait = ambitious
-	            }
-	        }
-	        modifier = {
-	            factor = 0.1
-	            FROM = {
-                    lower_tier_than = DUKE
-	            }
-	        }
+			modifier = {
+				factor = 0.5
+			}
+			modifier = {
+				factor = 0
+				FROM = {
+					top_liege = {
+						num_of_count_titles_in_realm >= 20
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				FROM = {
+					OR = {
+						trait = content
+						trait = slothful
+						trait = craven
+						trait = shy
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				FROM = {
+					trait = ambitious
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					lower_tier_than = DUKE
+				}
+			}
+			modifier = { # Nomads and Hordes prefer closer targets
+				factor = 0.05
+				FROM = {
+					OR = {
+						government = nomadic_tribal_government
+						religion = goblin_pantheon
+						religion = orc_pantheon
+					}
+				}
+				distance_from_realm = { who = FROM value = 350 }								
+			}			
+			modifier = { # Nomads and Hordes won't invade by sea
+				factor = 0
+				FROM = {
+					OR = {
+						government = nomadic_tribal_government
+						religion = goblin_pantheon
+						religion = orc_pantheon
+					}
+				}
+				FROM = {
+					NOT = {
+						capital_scope = {
+							ROOT = {
+								capital_scope = {
+									can_land_path_to = {
+										target = PREVPREV
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
