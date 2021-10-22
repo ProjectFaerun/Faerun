@@ -168,7 +168,7 @@ narrative_event = {
 			trigger = { trait = bhaalspawn }
 		}
 	}
-	
+
 	after = {
 		if = {
 			limit = {
@@ -232,2159 +232,2207 @@ narrative_event = {
 		set_global_flag = return_of_bhaal
 	}
 }
+
 #Bane Returns
-narrative_event = {
-	id = frstory.10
-	title = BANERETURNTITLE.1
-	desc = BaneReturn.1
-	major = yes
+	narrative_event = {
+		id = frstory.8
+		title = BANERETURNTITLE.1
+		desc = BaneReturn.1
+		major = yes
 
-	hide_from = yes
+		hide_from = yes
 
-	picture = GFX_evt_bane_1
+		picture = GFX_evt_bane_1
 
-	only_playable = yes
+		only_playable = yes
 
-	trigger = {
-		date = 1372.2.1
-		NOT = { has_global_flag = bane_returned }
-		has_global_flag = bane_not_dead
-		NOT = {
-			capital_scope = {
-				OR = {
-					region = zakhara_region
-					region = kara_tur_region
+		trigger = {
+			date = 1372.2.1
+			NOT = { has_global_flag = bane_returned }
+			NOT = { has_global_flag = bane_not_dead }
+			NOT = {
+				capital_scope = {
+					OR = {
+						region = zakhara_region
+						region = kara_tur_region
+					}
 				}
 			}
 		}
-	}
 
-	major_trigger = {
-		ai = no
-		NOT = {
-			capital_scope = {
-				OR = {
-					region = zakhara_region
-					region = kara_tur_region
+		major_trigger = {
+			ai = no
+			NOT = {
+				capital_scope = {
+					OR = {
+						region = zakhara_region
+						region = kara_tur_region
+					}
 				}
 			}
 		}
-	}
 
-	mean_time_to_happen = {
-		days = 1
-	}
+		mean_time_to_happen = {
+			days = 1
+		}
 
-	immediate = {
-		any_character = {
-			if = {
-				limit = {
-					trait = patron_iyachtu_xvim
-				}
+		immediate = {
+			any_character = {
 				if = {
 					limit = {
-						NOT = { trait = zealous }
+						trait = patron_iyachtu_xvim
+					}
+					if = {
+						limit = {
+							NOT = { trait = zealous }
+						}
+						remove_trait = patron_iyachtu_xvim
+						add_trait = patron_bane
+					}
+					else = {
+						random = {
+							chance = 50
+							remove_trait = patron_iyachtu_xvim
+							add_trait = patron_bane
+						}
+					}
+				}
+			}
+			c_56006 = { #Fzoul is Chosen
+				remove_trait = avatar
+				remove_nickname = nick_xvim
+				remove_trait = patron_iyachtu_xvim
+				add_trait = chosen_bane
+				add_trait = patron_bane
+			}
+			c_11061 = { death = { death_reason = death_missing } } #Death of Xvim
+		}
+
+		option = {
+			name = {
+				text = EVTOPTA_BANERETURN1
+				trigger = {
+					NOR = {
+						trait = patron_bane
+						trait = chosen_bane
+						trait = patron_iyachtu_xvim
+						religion = dead_three
+						religion = loviatar
+					}
+				}
+			}
+			name = {
+				text = EVTOPTB_BANERETURN1
+				trigger = {
+					OR = {
+						trait = patron_bane
+						trait = chosen_bane
+						trait = patron_iyachtu_xvim
+					}
+				}
+			}
+			name = {
+				text = EVTOPTC_BANERETURN1
+				trigger = {
+					NOR = {
+						trait = patron_bane
+						trait = chosen_bane
+						trait = patron_iyachtu_xvim
+					}
+					OR = {
+						religion = dead_three
+						religion = loviatar
+					}
+				}
+			}
+		}
+
+		after = {
+			set_global_flag = bane_returned
+		}
+	}
+
+	#Sets up Bane's return if starting a game after the canon date of his return
+	character_event = {
+		id = frstory.9
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			date = 1372.4.1
+			NOT = { has_global_flag = bane_returned }
+			NOT = { has_global_flag = bane_not_dead }
+		}
+
+		immediate = {
+			any_character = {
+				if = {
+					limit = {
+						trait = patron_iyachtu_xvim
 					}
 					remove_trait = patron_iyachtu_xvim
 					add_trait = patron_bane
 				}
-				else = {
-					random = {
-						chance = 50
-						remove_trait = patron_iyachtu_xvim
-						add_trait = patron_bane
-					}
-				}
 			}
 		}
-		c_56006 = { #Fzoul is Chosen
-			remove_trait = avatar
-			remove_nickname = nick_xvim
-			remove_trait = patron_iyachtu_xvim
-			add_trait = chosen_bane
-			add_trait = patron_bane
+
+		after = {
+			set_global_flag = bane_returned
 		}
-		c_11061 = { death = { death_reason = death_missing } } #Death of Xvim
 	}
 
-	option = {
-		name = {
-			text = EVTOPTA_BANERETURN1
-			trigger = {
-				NOR = {
-					trait = patron_bane
-					trait = chosen_bane
-					trait = patron_iyachtu_xvim
-					religion = dead_three
-					religion = loviatar
-				}
-			}
+	#Sets up a bane not dead global flag if starting game date is before his canon death
+	character_event = {
+		id = frstory.10
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			NOT = { date = 1358.8.13 }
+			NOT = { has_global_flag = bane_not_dead }
 		}
-		name = {
-			text = EVTOPTB_BANERETURN1
-			trigger = {
-				OR = {
-					trait = patron_bane
-					trait = chosen_bane
-					trait = patron_iyachtu_xvim
-				}
-			}
-		}
-		name = {
-			text = EVTOPTC_BANERETURN1
-			trigger = {
-				NOR = {
-					trait = patron_bane
-					trait = chosen_bane
-					trait = patron_iyachtu_xvim
-				}
-				OR = {
-					religion = dead_three
-					religion = loviatar
-				}
-			}
+
+		immediate = {
+			set_global_flag = bane_not_dead
 		}
 	}
-	
-	after = {
-		set_global_flag = bane_returned
-	}
-}
 
 #The King of Shadows
 
-character_event = {
-	id = frstory.11
-	desc = KINGOFSHADOWS.1
-	picture = GFX_evt_king_of_shadows_1
-	border = GFX_event_normal_frame_war
-	only_rulers = yes
-	major = yes
+	character_event = {
+		id = frstory.11
+		desc = KINGOFSHADOWS.1
+		picture = GFX_evt_king_of_shadows_1
+		border = GFX_event_normal_frame_war
+		only_rulers = yes
+		major = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		date = 1374.2.1
-		ROOT = { has_landed_title = d_neverwinter }
-		NOT = {
-			has_global_flag = king_of_shadows_spawned
-		}
-		NOT = {
-			has_game_rule = {
-				name = minor_story_events
-				value = off
+		trigger = {
+			date = 1374.2.1
+			ROOT = { has_landed_title = d_neverwinter }
+			NOT = {
+				has_global_flag = king_of_shadows_spawned
+			}
+			NOT = {
+				has_game_rule = {
+					name = minor_story_events
+					value = off
+				}
 			}
 		}
-	}
 
-	major_trigger = {
-		ai = no
-		is_within_diplo_range = ROOT
-	}
-
-	immediate = {
-		set_global_flag = king_of_shadows_spawned
-
-		create_character = {
-				random_traits = no
-				name = "King of Shadows"
-				dynasty = 2512 # of Illefarn
-				culture = highcoaster
-				religion = shadow_gods
-				attributes = {
-					learning = 10
-					intrigue = 6
-					martial = 10
-				}
-				trait = creature_construct
-				trait = undead
-				trait = strong
-				trait = giant
-				trait = quick
-				trait = robust
-				trait = lunatic
-				trait = diligent
-				trait = stubborn
-				trait = legendary_wizard
-				trait = immortal
-				trait = mastermind_theologian
-				trait = patron_shar
-				trait = wiz_necromancy
-				trait = unyielding_leader
-				age = 1374
-				immortal_age = 30
-				flag = ai_flag_refuse_conversion
+		major_trigger = {
+			ai = no
+			is_within_diplo_range = ROOT
 		}
-		new_character = {
-			set_graphical_culture = wraith
-			set_character_flag = undead_court
-			set_character_flag = i_am_king_of_shadows
-			add_artifact = lich_phylactery_artf
-			wealth = 500
-			character_event = { id = frstory.12 days = 1 }
-		}
-	}
 
-	option = {
-		name = {
-			text = EVTOPTA_KINGOFSHADOWS_1
-			trigger = {
-				NOR = {
+		immediate = {
+			set_global_flag = king_of_shadows_spawned
+
+			create_character = {
+					random_traits = no
+					name = "King of Shadows"
+					dynasty = 2512 # of Illefarn
+					culture = highcoaster
+					religion = shadow_gods
+					attributes = {
+						learning = 10
+						intrigue = 6
+						martial = 10
+					}
+					trait = creature_construct
 					trait = undead
-					trait = vampire
-					#trait = vampire_spawn
-					trait = lich
-					trait = lich_baelnorn
-				}
+					trait = strong
+					trait = giant
+					trait = quick
+					trait = robust
+					trait = lunatic
+					trait = diligent
+					trait = stubborn
+					trait = legendary_wizard
+					trait = immortal
+					trait = mastermind_theologian
+					trait = patron_shar
+					trait = wiz_necromancy
+					trait = unyielding_leader
+					age = 1374
+					immortal_age = 30
+					flag = ai_flag_refuse_conversion
+			}
+			new_character = {
+				set_graphical_culture = wraith
+				set_character_flag = undead_court
+				set_character_flag = i_am_king_of_shadows
+				add_artifact = lich_phylactery_artf
+				wealth = 500
+				character_event = { id = frstory.12 days = 1 }
 			}
 		}
-		name = {
-			text = EVTOPTB_KINGOFSHADOWS_1
-			trigger = {
-				OR = {
-					trait = undead
-					trait = vampire
-					#trait = vampire_spawn
-					trait = lich
-					trait = lich_baelnorn
+
+		option = {
+			name = {
+				text = EVTOPTA_KINGOFSHADOWS_1
+				trigger = {
+					NOR = {
+						trait = undead
+						trait = vampire
+						#trait = vampire_spawn
+						trait = lich
+						trait = lich_baelnorn
+					}
+				}
+			}
+			name = {
+				text = EVTOPTB_KINGOFSHADOWS_1
+				trigger = {
+					OR = {
+						trait = undead
+						trait = vampire
+						#trait = vampire_spawn
+						trait = lich
+						trait = lich_baelnorn
+					}
 				}
 			}
 		}
 	}
-}
 
-character_event = {
-	id = frstory.12
-	hide_window = yes
+	character_event = {
+		id = frstory.12
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	immediate = {
-		grant_title = k_army_of_shadows
-		#set_government_type = magocratic_feudal_government
-		set_government_type = feudal_government
-		any_demesne_title = {
-			add_law = succ_magic_elective
-		}
-		d_neverwinter = {
-			add_claim = ROOT
-		}
-		c_neverwinter = {
-			add_claim = ROOT
-		}
-		c_mere_of_dead_men = {
-			add_claim = ROOT
-		}
-		k_illefarn = {
-			add_claim = ROOT
-		}
-		character_event = { id = frstory.13 days = 1 }
-	}
-}
-
-character_event = {
-	id = frstory.13
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		d_neverwinter = {
-			holder_scope = {
-				reverse_unsafe_war = {
-					target = ROOT
-					casus_belli = invasion
-					thirdparty = ROOT
-					thirdparty_title = PREV
-				}
-			}
-		}
-		c_mere_of_dead_men = {
-			holder_scope = {
-				reverse_unsafe_war = {
-					target = ROOT
-					casus_belli = invasion
-					thirdparty = ROOT
-					thirdparty_title = PREV
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = on
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					archers = { 100 100 }
-					undead_troops = { 1700 1700 }
-					heavy_infantry = { 100 100 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					archers = { 100 100 }
-					undead_troops = { 1700 1700 }
-					heavy_infantry = { 100 100 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					archers = { 100 100 }
-					undead_troops = { 1700 1700 }
-					heavy_infantry = { 100 100 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = dangerous
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 1600 1600 }
-					light_cavalry = { 400 400 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 1600 1600 }
-					light_cavalry = { 400 400 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 1600 1600 }
-					light_cavalry = { 400 400 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.05
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = lethal
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 3200 3200 }
-					light_cavalry = { 800 800 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 3200 3200 }
-					light_cavalry = { 800 800 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 5
-				home = 9
-				troops = {
-					undead_troops = { 3200 3200 }
-					light_cavalry = { 800 800 }
-				}
-				attrition = 0
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				reinforces = yes
-				reinforce_rate_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			trait = undead
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			trait = undead
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			trait = undead
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-	}
-}
-
-
-#Turns mere of dead men feudal
-character_event = {
-	id = frstory.15
-	hide_window = yes
-	only_rulers = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = i_am_king_of_shadows
-		FROM = {
-			title = c_mere_of_dead_men
-		}
-	}
-
-	immediate = {
-		b_thornhold = {
-			convert_to = castle
-			add_building = ca_wall_1
-			add_building = ca_militia_barracks_1
-			add_building = ca_barracks_1
-			add_building = ca_stable_1
-			add_building = ca_town_1
-		}
-		9 = {
-			culture = highcoaster
-			religion = shadow_gods
-		}
-		ROOT = {
+		immediate = {
+			grant_title = k_army_of_shadows
 			#set_government_type = magocratic_feudal_government
 			set_government_type = feudal_government
 			any_demesne_title = {
 				add_law = succ_magic_elective
 			}
+			d_neverwinter = {
+				add_claim = ROOT
+			}
+			c_neverwinter = {
+				add_claim = ROOT
+			}
+			c_mere_of_dead_men = {
+				add_claim = ROOT
+			}
+			k_illefarn = {
+				add_claim = ROOT
+			}
+			character_event = { id = frstory.13 days = 1 }
 		}
 	}
-	after = {
-		clr_character_flag = i_am_king_of_shadows
+
+	character_event = {
+		id = frstory.13
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			d_neverwinter = {
+				holder_scope = {
+					reverse_unsafe_war = {
+						target = ROOT
+						casus_belli = invasion
+						thirdparty = ROOT
+						thirdparty_title = PREV
+					}
+				}
+			}
+			c_mere_of_dead_men = {
+				holder_scope = {
+					reverse_unsafe_war = {
+						target = ROOT
+						casus_belli = invasion
+						thirdparty = ROOT
+						thirdparty_title = PREV
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = on
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						archers = { 100 100 }
+						undead_troops = { 1700 1700 }
+						heavy_infantry = { 100 100 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						archers = { 100 100 }
+						undead_troops = { 1700 1700 }
+						heavy_infantry = { 100 100 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						archers = { 100 100 }
+						undead_troops = { 1700 1700 }
+						heavy_infantry = { 100 100 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = dangerous
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 1600 1600 }
+						light_cavalry = { 400 400 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 1600 1600 }
+						light_cavalry = { 400 400 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 1600 1600 }
+						light_cavalry = { 400 400 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.05
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = lethal
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 3200 3200 }
+						light_cavalry = { 800 800 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 3200 3200 }
+						light_cavalry = { 800 800 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 5
+					home = 9
+					troops = {
+						undead_troops = { 3200 3200 }
+						light_cavalry = { 800 800 }
+					}
+					attrition = 0
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					reinforces = yes
+					reinforce_rate_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				trait = undead
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				trait = undead
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				trait = undead
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+		}
 	}
-}
+
+
+	#Turns mere of dead men feudal
+	character_event = {
+		id = frstory.15
+		hide_window = yes
+		only_rulers = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_character_flag = i_am_king_of_shadows
+			FROM = {
+				title = c_mere_of_dead_men
+			}
+		}
+
+		immediate = {
+			b_thornhold = {
+				convert_to = castle
+				add_building = ca_wall_1
+				add_building = ca_militia_barracks_1
+				add_building = ca_barracks_1
+				add_building = ca_stable_1
+				add_building = ca_town_1
+			}
+			9 = {
+				culture = highcoaster
+				religion = shadow_gods
+			}
+			ROOT = {
+				#set_government_type = magocratic_feudal_government
+				set_government_type = feudal_government
+				any_demesne_title = {
+					add_law = succ_magic_elective
+				}
+			}
+		}
+		after = {
+			clr_character_flag = i_am_king_of_shadows
+		}
+	}
 
 #Mephistopheles
 
-character_event = {
-	id = frstory.21
-	desc = MEPHISTO.1
-	picture = GFX_evt_mephisto_1
-	border = GFX_event_normal_frame_war
-	only_rulers = yes
-	major = yes
+	character_event = {
+		id = frstory.21
+		desc = MEPHISTO.1
+		picture = GFX_evt_mephisto_1
+		border = GFX_event_normal_frame_war
+		only_rulers = yes
+		major = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		date = 1373.2.1
-		ROOT = { has_landed_title = d_waterdeep }
-		NOT = {
-			has_global_flag = mephistopheles_spawned
+		trigger = {
+			date = 1373.2.1
+			ROOT = { has_landed_title = d_waterdeep }
+			NOT = {
+				has_global_flag = mephistopheles_spawned
+			}
+			NOT = {
+				has_game_rule = {
+					name = minor_story_events
+					value = off
+				}
+			}
 		}
-		NOT = {
-			has_game_rule = {
-				name = minor_story_events
-				value = off
+
+		major_trigger = {
+			ai = no
+			is_within_diplo_range = ROOT
+		}
+
+		immediate = {
+			set_global_flag = mephistopheles_spawned
+			create_character = {
+				random_traits = no
+				name = "Mephistopheles"
+				dynasty = 12851 # of Cania
+				culture = baatezu
+				religion = infernal
+				dna = "bcmbdomadaa"
+				attributes = {
+					learning = 25
+					intrigue = 25
+					martial = 20
+					diplomacy = 20
+					stewardship = 15
+				}
+				trait = creature_fiend
+				add_trait = greater_fiend
+				trait = strong
+				trait = genius
+				trait = wroth
+				trait = gregarious
+				trait = ambitious
+				trait = deceitful
+				trait = cruel
+				trait = expert_wizard
+				trait = immortal
+				trait = elusive_shadow
+				trait = wiz_evocation
+				trait = aggressive_leader
+				age = 1373
+				immortal_age = 30
+				flag = ai_flag_refuse_conversion
+			}
+			new_character = {
+				set_graphical_culture = baatezu
+				create_bloodline = {
+					type = mephisto_bloodline
+				}
+				if = {
+					limit = {
+						NOT = {
+							has_game_rule = {
+								name = devil_worshipers
+								value = none
+							}
+						}
+						NOT = {
+							has_game_rule = {
+								name = secret_cults
+								value = none
+							}
+						}
+					}
+					join_society = the_satanists
+					society_rank_up = {
+						society = the_satanists
+						rank = 3
+					}
+				}
+				wealth = 500
+				hidden_tooltip = {
+					add_rival = 5252
+				}
+				character_event = { id = frstory.22 days = 1 }
+			}
+		}
+
+		option = {
+			name = {
+				text = EVTOPTA_MEPHISTO_1
+				trigger = {
+					NOR = {
+						trait = creature_fiend
+						culture = baatezu
+						culture = cornugon
+						culture = gelugon
+						culture = succubus
+						culture = cambion
+						culture = yugoloth
+						culture = rakshasa
+						religion = infernal
+						secret_religion = infernal
+					}
+				}
+			}
+			name = {
+				text = EVTOPTB_MEPHISTO_1
+				trigger = {
+					OR = {
+						trait = creature_fiend
+						culture = baatezu
+						culture = cornugon
+						culture = gelugon
+						culture = succubus
+						culture = cambion
+						culture = yugoloth
+						culture = rakshasa
+						religion = infernal
+						secret_religion = infernal
+					}
+				}
 			}
 		}
 	}
 
-	major_trigger = {
-		ai = no
-		is_within_diplo_range = ROOT
+	character_event = {
+		id = frstory.22
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			create_title = {
+				tier = DUKE
+				landless = yes
+				temporary = yes
+				culture = baatezu
+				name = "CLAIMANT_ADVENTURE"
+				holder = ROOT
+				adventurer = yes
+			}
+			set_character_flag = duchy_adventurer
+
+			d_waterdeep = {
+				add_claim = ROOT
+			}
+			c_waterdeep = {
+				add_claim = ROOT
+			}
+			character_event = { id = frstory.23 days = 1 }
+		}
 	}
 
-	immediate = {
-		set_global_flag = mephistopheles_spawned
-		create_character = {
-			random_traits = no
-			name = "Mephistopheles"
-			dynasty = 12851 # of Cania
-			culture = baatezu
-			religion = infernal
-			dna = "bcmbdomadaa"
-			attributes = {
-				learning = 25
-				intrigue = 25
-				martial = 20
-				diplomacy = 20
-				stewardship = 15
-			}
-			trait = creature_fiend
-			add_trait = greater_fiend
-			trait = strong
-			trait = genius
-			trait = wroth
-			trait = gregarious
-			trait = ambitious
-			trait = deceitful
-			trait = cruel
-			trait = expert_wizard
-			trait = immortal
-			trait = elusive_shadow
-			trait = wiz_evocation
-			trait = aggressive_leader
-			age = 1373
-			immortal_age = 30
-			flag = ai_flag_refuse_conversion
-		}
-		new_character = {
-			set_graphical_culture = baatezu
-			create_bloodline = {
-				type = mephisto_bloodline
+	character_event = {
+		id = frstory.23
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			d_waterdeep = {
+				holder_scope = {
+					reverse_unsafe_war = {
+						target = ROOT
+						casus_belli = invasion
+						thirdparty = ROOT
+						thirdparty_title = PREV
+					}
+				}
 			}
 			if = {
 				limit = {
-					NOT = {
-						has_game_rule = {
-							name = devil_worshipers
-							value = none
-						}
-					}
-					NOT = {
-						has_game_rule = {
-							name = secret_cults
-							value = none
-						}
+					has_game_rule = {
+						name = minor_story_events
+						value = on
 					}
 				}
-				join_society = the_satanists
-				society_rank_up = {
-					society = the_satanists
-					rank = 3
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 500 500 }
+						light_infantry = { 600 600 }
+						heavy_infantry = { 800 800 }
+						light_cavalry = { 500 500 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 500 500 }
+						light_infantry = { 600 600 }
+						heavy_infantry = { 800 800 }
+						light_cavalry = { 500 500 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 500 500 }
+						light_infantry = { 600 600 }
+						heavy_infantry = { 800 800 }
+						light_cavalry = { 500 500 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
 				}
 			}
-			wealth = 500
-			hidden_tooltip = {
-				add_rival = 5252
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = dangerous
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 440 440 }
+						heavy_infantry = { 1600 1600 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 440 440 }
+						heavy_infantry = { 1600 1600 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 440 440 }
+						heavy_infantry = { 1600 1600 }
+						elemental_troops = { 300 300 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
 			}
-			character_event = { id = frstory.22 days = 1 }
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = lethal
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 880 880 }
+						heavy_infantry = { 3200 3200 }
+						elemental_troops = { 600 600 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 880 880 }
+						heavy_infantry = { 3200 3200 }
+						elemental_troops = { 600 600 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1406
+					home = 1406
+					troops = {
+						archers = { 880 880 }
+						heavy_infantry = { 3200 3200 }
+						elemental_troops = { 600 600 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 1000
+				immortal_age = 30
+			}
+			character_event = { id = frstory.25 years = 1 }
 		}
 	}
 
-	option = {
-		name = {
-			text = EVTOPTA_MEPHISTO_1
-			trigger = {
-				NOR = {
-					trait = creature_fiend
-					culture = baatezu
-					culture = cornugon
-					culture = gelugon
-					culture = succubus
-					culture = cambion
-					culture = yugoloth
-					culture = rakshasa
-					religion = infernal
-					secret_religion = infernal
+	character_event = { #Banishes unlanded or vassalized Mephistopheles
+		id = frstory.25
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			if = {
+				limit = {
+					NOT = { is_ruler = yes }
+					NOT = { independent = yes }
 				}
+				death = { death_reason = death_planes }
 			}
-		}
-		name = {
-			text = EVTOPTB_MEPHISTO_1
-			trigger = {
-				OR = {
-					trait = creature_fiend
-					culture = baatezu
-					culture = cornugon
-					culture = gelugon
-					culture = succubus
-					culture = cambion
-					culture = yugoloth
-					culture = rakshasa
-					religion = infernal
-					secret_religion = infernal
-				}
+			else = {
+				character_event = { id = frstory.25 years = 2 }
 			}
 		}
 	}
-}
-
-character_event = {
-	id = frstory.22
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		create_title = {
-			tier = DUKE
-			landless = yes
-			temporary = yes
-			culture = baatezu
-			name = "CLAIMANT_ADVENTURE"
-			holder = ROOT
-			adventurer = yes
-		}
-		set_character_flag = duchy_adventurer
-
-		d_waterdeep = {
-			add_claim = ROOT
-		}
-		c_waterdeep = {
-			add_claim = ROOT
-		}
-		character_event = { id = frstory.23 days = 1 }
-	}
-}
-
-character_event = {
-	id = frstory.23
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		d_waterdeep = {
-			holder_scope = {
-				reverse_unsafe_war = {
-					target = ROOT
-					casus_belli = invasion
-					thirdparty = ROOT
-					thirdparty_title = PREV
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = on
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 500 500 }
-					light_infantry = { 600 600 }
-					heavy_infantry = { 800 800 }
-					light_cavalry = { 500 500 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 500 500 }
-					light_infantry = { 600 600 }
-					heavy_infantry = { 800 800 }
-					light_cavalry = { 500 500 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 500 500 }
-					light_infantry = { 600 600 }
-					heavy_infantry = { 800 800 }
-					light_cavalry = { 500 500 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = dangerous
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 440 440 }
-					heavy_infantry = { 1600 1600 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 440 440 }
-					heavy_infantry = { 1600 1600 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 440 440 }
-					heavy_infantry = { 1600 1600 }
-					elemental_troops = { 300 300 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = lethal
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 880 880 }
-					heavy_infantry = { 3200 3200 }
-					elemental_troops = { 600 600 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 880 880 }
-					heavy_infantry = { 3200 3200 }
-					elemental_troops = { 600 600 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1406
-				home = 1406
-				troops = {
-					archers = { 880 880 }
-					heavy_infantry = { 3200 3200 }
-					elemental_troops = { 600 600 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = ROOT
-			culture = ROOT
-			female = no
-			age = 1000
-			immortal_age = 30
-		}
-		character_event = { id = frstory.25 years = 1 }
-	}
-}
-
-character_event = { #Banishes unlanded or vassalized Mephistopheles
-	id = frstory.25
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = {
-				NOT = { is_ruler = yes }
-				NOT = { independent = yes }
-			}
-			death = { death_reason = death_planes }
-		}
-		else = {
-			character_event = { id = frstory.25 years = 2 }
-		}
-	}
-}
 
 #The Shadovar
 
-#Spawns Telamont
-character_event = {
-	id = frstory.31
-	desc = SHADOVAR.1
-	picture = GFX_evt_shade_enclave_1
-	border = GFX_event_normal_frame_war
-	only_rulers = yes
-	major = yes
-	
-	is_triggered_only = yes
+	#Spawns Telamont
+	character_event = {
+		id = frstory.31
+		desc = SHADOVAR.1
+		picture = GFX_evt_shade_enclave_1
+		border = GFX_event_normal_frame_war
+		only_rulers = yes
+		major = yes
 
-	trigger = {
-		date = 1371.6.1
-		ROOT = { has_landed_title = c_shoal_of_thirst }
-		NOT = {
-			has_global_flag = shadovar_spawned
-		}
-		NOT = {
-			has_game_rule = {
-				name = minor_story_events
-				value = off
+		is_triggered_only = yes
+
+		trigger = {
+			date = 1371.6.1
+			ROOT = { has_landed_title = c_shoal_of_thirst }
+			NOT = {
+				has_global_flag = shadovar_spawned
 			}
-		}
-	}
-
-	major_trigger = {
-		ai = no
-		NOT = {
-			capital_scope = {
-				OR = {
-					region = zakhara_region
-					region = kara_tur_region
+			NOT = {
+				has_game_rule = {
+					name = minor_story_events
+					value = off
 				}
 			}
 		}
-	}
 
-	immediate = {
-		set_global_flag = shadovar_spawned
-		create_character = {
-				random_traits = no
-				name = "Telamont"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				dna = "alefgvcdbaj"
-				properties = "rj0bh"
-				attributes = {
-					diplomacy = 5
-					martial = 5
-					stewardship = 6
-					intrigue = 7
-					learning = 10
+		major_trigger = {
+			ai = no
+			NOT = {
+				capital_scope = {
+					OR = {
+						region = zakhara_region
+						region = kara_tur_region
+					}
 				}
-				trait = creature_human
-				trait = immortal
-				trait = proud
-				trait = mastermind_theologian
-				trait = genius
-				trait = legendary_wizard
-				trait = ambitious
-				trait = diligent
-				trait = patron_shar
-				trait = wiz_enchantment
-				age = 1372
-				immortal_age = 30
+			}
 		}
-		new_character = {
-			wealth = 500
-			set_character_flag = i_am_telamont
-			character_event = { id = frstory.32 days = 1 }
-		}
-	}
 
-	option = {
-		name = {
-			text = EVTOPTA_SHADOVAR_1
-			trigger = {
-				NOR = {
-					culture = netherese
+		immediate = {
+			set_global_flag = shadovar_spawned
+			create_character = {
+					random_traits = no
+					name = "Telamont"
+					dynasty = 10023 #Duplicate Tanthul
 					culture = shadovar
-				}
+					religion = shadow_gods
+					dna = "alefgvcdbaj"
+					properties = "rj0bh"
+					attributes = {
+						diplomacy = 5
+						martial = 5
+						stewardship = 6
+						intrigue = 7
+						learning = 10
+					}
+					trait = creature_human
+					trait = immortal
+					trait = proud
+					trait = mastermind_theologian
+					trait = genius
+					trait = legendary_wizard
+					trait = ambitious
+					trait = diligent
+					trait = patron_shar
+					trait = wiz_enchantment
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				wealth = 500
+				set_character_flag = i_am_telamont
+				character_event = { id = frstory.32 days = 1 }
 			}
 		}
-		name = {
-			text = EVTOPTB_SHADOVAR_1
-			trigger = {
-				OR = {
-					culture = netherese
-					culture = shadovar
+
+		option = {
+			name = {
+				text = EVTOPTA_SHADOVAR_1
+				trigger = {
+					NOR = {
+						culture = netherese
+						culture = shadovar
+					}
+				}
+			}
+			name = {
+				text = EVTOPTB_SHADOVAR_1
+				trigger = {
+					OR = {
+						culture = netherese
+						culture = shadovar
+					}
 				}
 			}
 		}
 	}
-}
 
-#Creates Duchy
-character_event = {
-	id = frstory.32
-	hide_window = yes
-		
-	is_triggered_only = yes
-	
-	immediate = {
-		create_title = {
-			tier = DUKE
-			landless = yes
-			temporary = yes
-			culture = shadovar
-			name = "CLAIMANT_ADVENTURE"
-			holder = ROOT
-			adventurer = yes
-		}
-		set_character_flag = duchy_adventurer
-		c_shoal_of_thirst = {
-			add_claim = ROOT
-		}
-		character_event = { id = frstory.33 days = 1 }
-	}
-}
+	#Creates Duchy
+	character_event = {
+		id = frstory.32
+		hide_window = yes
 
-#War and troops
-character_event = {
-	id = frstory.33
-	hide_window = yes
-		
-	is_triggered_only = yes
-	
-	immediate = {
-		c_shoal_of_thirst = {
-			holder_scope = {
-				reverse_unsafe_war = {
-					target = ROOT
-					casus_belli = invasion
-					thirdparty = ROOT
-					thirdparty_title = PREV
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = on
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 338 338 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 338 338 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 338 338 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = dangerous
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					pikemen = { 860 860 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					pikemen = { 860 860 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					archers = { 50 50 }
-					pikemen = { 860 860 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = lethal
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					archers = { 100 100 }
-					pikemen = { 1720 1720 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					archers = { 100 100 }
-					pikemen = { 1720 1720 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					archers = { 100 100 }
-					pikemen = { 1720 1720 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		create_character = {
-				name = "Aglarel"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					martial = 8
-					learning = 8
-				}
-				trait = creature_human
-				trait = immortal
-				trait = content
-				trait = journeyman_sorcerer
-				trait = origin_shadow
-				trait = journeyman_fighter
-				trait = trained_cleric
-				trait = martial_cleric
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_character_flag = sorc_originrevealed
-			character_event = { id = sorcinit.1 days = 1 }
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Brennus"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				trait = legendary_wizard
-				trait = genius
-				trait = mastermind_theologian
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				random_traits = no
-				name = "Clariburnus"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					martial = 7
-					learning = 7
-				}
-				trait = creature_human
-				trait = immortal
-				trait = deceitful
-				trait = cruel
-				trait = skilled_tactician
-				trait = master_sorcerer
-				trait = origin_shadow
-				trait = trained_fighter
-				trait = rogue
-				trait = patron_shar
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_character_flag = sorc_originrevealed
-			character_event = { id = sorcinit.1 days = 1 }
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Dethud"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					diplomacy = 7
-					learning = 8
-				}
-				trait = creature_human
-				trait = immortal
-				trait = scholarly_theologian
-				trait = legendary_wizard
-				trait = shy
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Escanor"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				trait = creature_human
-				trait = immortal
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Lamorak"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				trait = mastermind_theologian
-				trait = legendary_wizard
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Malath"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Mattick"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 8
-				}
-				trait = creature_human
-				trait = immortal
-				trait = scholarly_theologian
-				trait = legendary_wizard
-				trait = deceitful
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Melegaunt"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				trait = mastermind_theologian
-				trait = legendary_wizard
-				trait = deceitful
-				trait = fair
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Rivalen"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				trait = scholarly_theologian
-				trait = journeyman_wizard
-				trait = master_cleric
-				trait = zealous
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Vattick"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 9
-				}
-				trait = creature_human
-				trait = immortal
-				trait = mastermind_theologian
-				trait = legendary_wizard
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Yder"
-				dynasty = 10023 #Duplicate Tanthul
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					martial = 8
-					learning = 8
-				}
-				trait = creature_human
-				trait = immortal
-				trait = scholarly_theologian
-				trait = expert_sorcerer
-				trait = origin_shadow
-				trait = expert_fighter
-				trait = content
-				trait = patron_shar
-				random_traits = yes
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			set_character_flag = sorc_originrevealed
-			character_event = { id = sorcinit.1 days = 1 }
-			set_father = ROOT
-		}
-		create_character = {
-				name = "Hadrhune"
-				culture = shadovar
-				religion = shadow_gods
-				attributes = {
-					learning = 10
-				}
-				trait = creature_human
-				trait = immortal
-				trait = mastermind_theologian
-				trait = legendary_wizard
-				trait = cruel
-				trait = ambitious
-				trait = patron_shar
-				age = 1372
-				immortal_age = 30
-		}
-		new_character = {
-			add_artifact = robe_of_archmagi
-		}
-	}
-}
+		is_triggered_only = yes
 
-#Turns shoal of thirst feudal and gives it the Shade wonder
-character_event = {
-	id = frstory.35
-	hide_window = yes
-	only_rulers = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = i_am_telamont
-		FROM = {
-			title = c_shoal_of_thirst
-		}
-	}
-
-	immediate = {
-		b_sister_of_rains = {
-			convert_to = castle
-			add_building = ca_wall_1
-			add_building = ca_militia_barracks_1
-			add_building = ca_barracks_1
-			add_building = ca_stable_1
-			add_building = ca_town_1
-		}
-		1099 = {
-			culture = shadovar
-			religion = shadow_gods
-			build_holding = {
-				title = b_oracakon
-				type = city
+		immediate = {
+			create_title = {
+				tier = DUKE
+				landless = yes
+				temporary = yes
+				culture = shadovar
+				name = "CLAIMANT_ADVENTURE"
 				holder = ROOT
+				adventurer = yes
 			}
-			b_oracakon = {
-				add_building = ct_wall_q_1
-				add_building = ct_wall_1
-				add_building = ct_training_grounds_1
-				add_building = ct_barracks_1
-				add_building = ct_guard_1
-				add_building = ct_marketplace_1
-				add_building = ct_university_1
+			set_character_flag = duchy_adventurer
+			c_shoal_of_thirst = {
+				add_claim = ROOT
 			}
-			build_holding = {
-				title = b_sehaedi
-				type = temple
-				holder = ROOT
-			}
-			b_sehaedi = {
-				add_building = tp_wall_q_1
-				add_building = tp_wall_1
-				add_building = tp_monastery_1
-				add_building = tp_barracks_1
-				add_building = tp_elite_barracks_1
-				add_building = tp_town_1
-			}
-			add_wonder = wonder_shade
-			wonder = {
-				add_wonder_stage = 1
-				add_wonder_stage = 1
-				add_wonder_stage = 1
-				add_wonder_upgrade = upgrade_great_seminars
-				add_wonder_upgrade = upgrade_studded_bastions
-				add_wonder_upgrade = upgrade_soaring_fortresses
-				add_wonder_upgrade = upgrade_wing_of_learning
-				set_description = wonder_shade_desc
-			}
+			character_event = { id = frstory.33 days = 1 }
 		}
-		ROOT = {
-			#set_government_type = magocratic_feudal_government
-			set_government_type = feudal_government
-			any_demesne_title = {
-				add_law = succ_magic_elective
+	}
+
+	#War and troops
+	character_event = {
+		id = frstory.33
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			c_shoal_of_thirst = {
+				holder_scope = {
+					reverse_unsafe_war = {
+						target = ROOT
+						casus_belli = invasion
+						thirdparty = ROOT
+						thirdparty_title = PREV
+					}
+				}
 			}
 			if = {
 				limit = {
-					e_anauroch = {
-						NOT = { has_holder = yes }
+					has_game_rule = {
+						name = minor_story_events
+						value = on
 					}
 				}
-				grant_title = e_anauroch
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 338 338 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 338 338 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 338 338 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
+					merge = yes
+				}
 			}
-			else = {
-				grant_title = k_thultanthar
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = dangerous
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						pikemen = { 860 860 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						pikemen = { 860 860 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						archers = { 50 50 }
+						pikemen = { 860 860 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = lethal
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						archers = { 100 100 }
+						pikemen = { 1720 1720 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						archers = { 100 100 }
+						pikemen = { 1720 1720 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						archers = { 100 100 }
+						pikemen = { 1720 1720 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			create_character = {
+					name = "Aglarel"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						martial = 8
+						learning = 8
+					}
+					trait = creature_human
+					trait = immortal
+					trait = content
+					trait = journeyman_sorcerer
+					trait = origin_shadow
+					trait = journeyman_fighter
+					trait = trained_cleric
+					trait = martial_cleric
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_character_flag = sorc_originrevealed
+				character_event = { id = sorcinit.1 days = 1 }
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Brennus"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					trait = legendary_wizard
+					trait = genius
+					trait = mastermind_theologian
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					random_traits = no
+					name = "Clariburnus"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						martial = 7
+						learning = 7
+					}
+					trait = creature_human
+					trait = immortal
+					trait = deceitful
+					trait = cruel
+					trait = skilled_tactician
+					trait = master_sorcerer
+					trait = origin_shadow
+					trait = trained_fighter
+					trait = rogue
+					trait = patron_shar
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_character_flag = sorc_originrevealed
+				character_event = { id = sorcinit.1 days = 1 }
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Dethud"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						diplomacy = 7
+						learning = 8
+					}
+					trait = creature_human
+					trait = immortal
+					trait = scholarly_theologian
+					trait = legendary_wizard
+					trait = shy
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Escanor"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					trait = creature_human
+					trait = immortal
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Lamorak"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					trait = mastermind_theologian
+					trait = legendary_wizard
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Malath"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Mattick"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 8
+					}
+					trait = creature_human
+					trait = immortal
+					trait = scholarly_theologian
+					trait = legendary_wizard
+					trait = deceitful
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Melegaunt"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					trait = mastermind_theologian
+					trait = legendary_wizard
+					trait = deceitful
+					trait = fair
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Rivalen"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					trait = scholarly_theologian
+					trait = journeyman_wizard
+					trait = master_cleric
+					trait = zealous
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Vattick"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 9
+					}
+					trait = creature_human
+					trait = immortal
+					trait = mastermind_theologian
+					trait = legendary_wizard
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Yder"
+					dynasty = 10023 #Duplicate Tanthul
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						martial = 8
+						learning = 8
+					}
+					trait = creature_human
+					trait = immortal
+					trait = scholarly_theologian
+					trait = expert_sorcerer
+					trait = origin_shadow
+					trait = expert_fighter
+					trait = content
+					trait = patron_shar
+					random_traits = yes
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				set_character_flag = sorc_originrevealed
+				character_event = { id = sorcinit.1 days = 1 }
+				set_father = ROOT
+			}
+			create_character = {
+					name = "Hadrhune"
+					culture = shadovar
+					religion = shadow_gods
+					attributes = {
+						learning = 10
+					}
+					trait = creature_human
+					trait = immortal
+					trait = mastermind_theologian
+					trait = legendary_wizard
+					trait = cruel
+					trait = ambitious
+					trait = patron_shar
+					age = 1372
+					immortal_age = 30
+			}
+			new_character = {
+				add_artifact = robe_of_archmagi
 			}
 		}
 	}
-	after = {
-		clr_character_flag = i_am_telamont
-		if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = on
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 378 378 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 378 378 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					light_infantry = { 150 150 }
-					heavy_infantry = { 300 300 }
-					pikemen = { 378 378 }
-					light_cavalry = { 100 100 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.3
-				cannot_inherit = yes
+
+	#Turns shoal of thirst feudal and gives it the Shade wonder
+	character_event = {
+		id = frstory.35
+		hide_window = yes
+		only_rulers = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_character_flag = i_am_telamont
+			FROM = {
+				title = c_shoal_of_thirst
 			}
 		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = dangerous
+
+		immediate = {
+			b_sister_of_rains = {
+				convert_to = castle
+				add_building = ca_wall_1
+				add_building = ca_militia_barracks_1
+				add_building = ca_barracks_1
+				add_building = ca_stable_1
+				add_building = ca_town_1
+			}
+			1099 = {
+				culture = shadovar
+				religion = shadow_gods
+				build_holding = {
+					title = b_oracakon
+					type = city
+					holder = ROOT
+				}
+				b_oracakon = {
+					add_building = ct_wall_q_1
+					add_building = ct_wall_1
+					add_building = ct_training_grounds_1
+					add_building = ct_barracks_1
+					add_building = ct_guard_1
+					add_building = ct_marketplace_1
+					add_building = ct_university_1
+				}
+				build_holding = {
+					title = b_sehaedi
+					type = temple
+					holder = ROOT
+				}
+				b_sehaedi = {
+					add_building = tp_wall_q_1
+					add_building = tp_wall_1
+					add_building = tp_monastery_1
+					add_building = tp_barracks_1
+					add_building = tp_elite_barracks_1
+					add_building = tp_town_1
+				}
+				add_wonder = wonder_shade
+				wonder = {
+					add_wonder_stage = 1
+					add_wonder_stage = 1
+					add_wonder_stage = 1
+					add_wonder_upgrade = upgrade_great_seminars
+					add_wonder_upgrade = upgrade_studded_bastions
+					add_wonder_upgrade = upgrade_soaring_fortresses
+					add_wonder_upgrade = upgrade_wing_of_learning
+					set_description = wonder_shade_desc
 				}
 			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					pikemen = { 900 900 }
+			ROOT = {
+				#set_government_type = magocratic_feudal_government
+				set_government_type = feudal_government
+				any_demesne_title = {
+					add_law = succ_magic_elective
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					pikemen = { 900 900 }
+				if = {
+					limit = {
+						e_anauroch = {
+							NOT = { has_holder = yes }
+						}
+					}
+					grant_title = e_anauroch
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 100 100 }
-					pikemen = { 900 900 }
+				else = {
+					grant_title = k_thultanthar
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0.2
-				cannot_inherit = yes
 			}
 		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = lethal
+		after = {
+			clr_character_flag = i_am_telamont
+			if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = on
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 378 378 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 378 378 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						light_infantry = { 150 150 }
+						heavy_infantry = { 300 300 }
+						pikemen = { 378 378 }
+						light_cavalry = { 100 100 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.3
+					cannot_inherit = yes
 				}
 			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					pikemen = { 1800 1800 }
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = dangerous
+					}
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						pikemen = { 900 900 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						pikemen = { 900 900 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 100 100 }
+						pikemen = { 900 900 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0.2
+					cannot_inherit = yes
+				}
 			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					pikemen = { 1800 1800 }
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = lethal
+					}
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 1099
-				home = 1099
-				troops = {
-					mages_troops = { 200 200 }
-					pikemen = { 1800 1800 }
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						pikemen = { 1800 1800 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
 				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						pikemen = { 1800 1800 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 1099
+					home = 1099
+					troops = {
+						mages_troops = { 200 200 }
+						pikemen = { 1800 1800 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+				}
 			}
 		}
 	}
-}
 
 #Tchazzar
 
-character_event = {
-	id = frstory.41
-	desc = TCHAZZAR.1
-	picture = GFX_evt_dragon_1
-	border = GFX_event_normal_frame_war
-	only_rulers = yes
-	major = yes
+	character_event = {
+		id = frstory.41
+		desc = TCHAZZAR.1
+		picture = GFX_evt_dragon_1
+		border = GFX_event_normal_frame_war
+		only_rulers = yes
+		major = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	trigger = {
-		date = 1373.12.28
-		ROOT = { has_landed_title = c_cimbar }
-		NOT = {
-			has_global_flag = tchazzar_spawned
-		}
-		NOT = {
-			has_game_rule = {
-				name = minor_story_events
-				value = off
+		trigger = {
+			date = 1373.12.28
+			ROOT = { has_landed_title = c_cimbar }
+			NOT = {
+				has_global_flag = tchazzar_spawned
 			}
-		}
-	}
-
-	major_trigger = {
-		ai = no
-		is_within_diplo_range = ROOT
-	}
-
-	immediate = {
-		set_global_flag = tchazzar_spawned
-		create_character = {
-				random_traits = no
-				name = "Tchazzar"
-				dynasty = 26 # Tchazzar
-				culture = red_dragon
-				religion = chessic
-				attributes = {
-					learning = 14
-					intrigue = 12
-					martial = 10
-					diplomacy = 6
-					stewardship = 8
+			NOT = {
+				has_game_rule = {
+					name = minor_story_events
+					value = off
 				}
-				trait = creature_dragon
-				trait = dragon_ancient
-				trait = fair
-				trait = brilliant
-				trait = skilled_tactician
-				trait = avatar
-				trait = cruel
-				trait = proud
-				trait = greedy
-				trait = wroth
-				trait = sympathy_draconic_group
-				trait = legendary_monk
-				age = 1224
-				immortal_age = 30
-				flag = ai_flag_refuse_conversion
-		}
-		new_character = {
-			create_bloodline = {
-				type = tchazzar_bloodline
 			}
-			set_character_flag = i_am_tchazzar
-			wealth = 500
-			character_event = { id = frstory.42 days = 1 }
 		}
-	}
 
-	option = {
-		name = {
-			text = EVTOPTA_TCHAZZAR_1
-			trigger = {
-				NOR = {
-					trait = creature_dragon
-					culture_group = draconic_culture_group
-					religion = draconic_pantheon
-					secret_religion = draconic_pantheon
+		major_trigger = {
+			ai = no
+			is_within_diplo_range = ROOT
+		}
+
+		immediate = {
+			set_global_flag = tchazzar_spawned
+			create_character = {
+					random_traits = no
+					name = "Tchazzar"
+					dynasty = 26 # Tchazzar
+					culture = red_dragon
 					religion = chessic
-					secret_religion = chessic
-					religion = tiamat
-					secret_religion = tiamat
-				}
-			}
-		}
-		name = {
-			text = EVTOPTB_TCHAZZAR_1
-			trigger = {
-				OR = {
+					attributes = {
+						learning = 14
+						intrigue = 12
+						martial = 10
+						diplomacy = 6
+						stewardship = 8
+					}
 					trait = creature_dragon
-					culture_group = draconic_culture_group
-					religion = draconic_pantheon
-					secret_religion = draconic_pantheon
-					religion = chessic
-					secret_religion = chessic
-					religion = tiamat
-					secret_religion = tiamat
+					trait = dragon_ancient
+					trait = fair
+					trait = brilliant
+					trait = skilled_tactician
+					trait = avatar
+					trait = cruel
+					trait = proud
+					trait = greedy
+					trait = wroth
+					trait = sympathy_draconic_group
+					trait = legendary_monk
+					age = 1224
+					immortal_age = 30
+					flag = ai_flag_refuse_conversion
+			}
+			new_character = {
+				create_bloodline = {
+					type = tchazzar_bloodline
+				}
+				set_character_flag = i_am_tchazzar
+				wealth = 500
+				character_event = { id = frstory.42 days = 1 }
+			}
+		}
+
+		option = {
+			name = {
+				text = EVTOPTA_TCHAZZAR_1
+				trigger = {
+					NOR = {
+						trait = creature_dragon
+						culture_group = draconic_culture_group
+						religion = draconic_pantheon
+						secret_religion = draconic_pantheon
+						religion = chessic
+						secret_religion = chessic
+						religion = tiamat
+						secret_religion = tiamat
+					}
+				}
+			}
+			name = {
+				text = EVTOPTB_TCHAZZAR_1
+				trigger = {
+					OR = {
+						trait = creature_dragon
+						culture_group = draconic_culture_group
+						religion = draconic_pantheon
+						secret_religion = draconic_pantheon
+						religion = chessic
+						secret_religion = chessic
+						religion = tiamat
+						secret_religion = tiamat
+					}
 				}
 			}
 		}
 	}
-}
 
-character_event = {
-	id = frstory.42
-	hide_window = yes
+	character_event = {
+		id = frstory.42
+		hide_window = yes
 
-	is_triggered_only = yes
+		is_triggered_only = yes
 
-	immediate = {
-		create_title = {
-			tier = DUKE
-			landless = yes
-			temporary = yes
-			culture = chromatic
-			name = "CLAIMANT_ADVENTURE"
-			holder = ROOT
-			adventurer = yes
-		}
-		set_character_flag = duchy_adventurer
+		immediate = {
+			create_title = {
+				tier = DUKE
+				landless = yes
+				temporary = yes
+				culture = chromatic
+				name = "CLAIMANT_ADVENTURE"
+				holder = ROOT
+				adventurer = yes
+			}
+			set_character_flag = duchy_adventurer
 
-		k_chessenta = {
-			add_claim = ROOT
+			k_chessenta = {
+				add_claim = ROOT
+			}
+			d_cimbar = {
+				add_claim = ROOT
+			}
+			c_cimbar = {
+				add_claim = ROOT
+			}
+			character_event = { id = frstory.43 days = 1 }
 		}
-		d_cimbar = {
-			add_claim = ROOT
-		}
-		c_cimbar = {
-			add_claim = ROOT
-		}
-		character_event = { id = frstory.43 days = 1 }
-	}
-}
-
-character_event = {
-	id = frstory.43
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		c_cimbar = {
-			holder_scope = {
-				reverse_unsafe_war = {
-					target = ROOT
-					casus_belli = claim_all
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = on
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					light_infantry = { 500 500 }
-					heavy_infantry = { 700 700 }
-					light_cavalry = { 400 400 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					light_infantry = { 500 500 }
-					heavy_infantry = { 700 700 }
-					light_cavalry = { 400 400 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					light_infantry = { 500 500 }
-					heavy_infantry = { 700 700 }
-					light_cavalry = { 400 400 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = dangerous
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					heavy_infantry = { 1220 1220 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					heavy_infantry = { 1220 1220 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 400 400 }
-					heavy_infantry = { 1220 1220 }
-					elemental_troops = { 200 200 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		else_if = {
-			limit = {
-				has_game_rule = {
-					name = minor_story_events
-					value = lethal
-				}
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 800 800 }
-					heavy_infantry = { 2440 2440 }
-					elemental_troops = { 400 400 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 800 800 }
-					heavy_infantry = { 2440 2440 }
-					elemental_troops = { 400 400 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-			spawn_unit = {
-				owner = ROOT
-				province = 671 #adder swamp
-				home = 671 #adder swamp
-				troops = {
-					archers = { 800 800 }
-					heavy_infantry = { 2440 2440 }
-					elemental_troops = { 400 400 }
-				}
-				attrition = 0.5
-				disband_on_peace = no
-				reinforces = yes
-				reinforce_rate_multiplier = 0.1
-				maintenance_multiplier = 0
-				cannot_inherit = yes
-				merge = yes
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = tiamat
-			culture = yugoloth
-			age = 150
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = tiamat
-			culture = yugoloth
-			age = 150
-			immortal_age = 30
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = none
-			religion = tiamat
-			culture = yugoloth
-			age = 150
-			immortal_age = 30
-		}
-		character_event = { id = frstory.45 months = 6 }
-	}
-}
-
-#Make Tchazzar king if there is no king
-character_event = {
-	id = frstory.45
-	hide_window = yes
-	only_rulers = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		has_character_flag = i_am_tchazzar
 	}
 
-	immediate = {
-		ROOT = {
+	character_event = {
+		id = frstory.43
+		hide_window = yes
+
+		is_triggered_only = yes
+
+		immediate = {
+			c_cimbar = {
+				holder_scope = {
+					reverse_unsafe_war = {
+						target = ROOT
+						casus_belli = claim_all
+					}
+				}
+			}
 			if = {
 				limit = {
-					is_ruler = yes
-					k_chessenta = { NOT = { has_holder = yes } }
+					has_game_rule = {
+						name = minor_story_events
+						value = on
+					}
 				}
-				grant_title = k_chessenta
-				clr_character_flag = i_am_tchazzar
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						light_infantry = { 500 500 }
+						heavy_infantry = { 700 700 }
+						light_cavalry = { 400 400 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						light_infantry = { 500 500 }
+						heavy_infantry = { 700 700 }
+						light_cavalry = { 400 400 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						light_infantry = { 500 500 }
+						heavy_infantry = { 700 700 }
+						light_cavalry = { 400 400 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
 			}
-			else = {
-				character_event = { id = frstory.45 months = 6 }
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = dangerous
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						heavy_infantry = { 1220 1220 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						heavy_infantry = { 1220 1220 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 400 400 }
+						heavy_infantry = { 1220 1220 }
+						elemental_troops = { 200 200 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			else_if = {
+				limit = {
+					has_game_rule = {
+						name = minor_story_events
+						value = lethal
+					}
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 800 800 }
+						heavy_infantry = { 2440 2440 }
+						elemental_troops = { 400 400 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 800 800 }
+						heavy_infantry = { 2440 2440 }
+						elemental_troops = { 400 400 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+				spawn_unit = {
+					owner = ROOT
+					province = 671 #adder swamp
+					home = 671 #adder swamp
+					troops = {
+						archers = { 800 800 }
+						heavy_infantry = { 2440 2440 }
+						elemental_troops = { 400 400 }
+					}
+					attrition = 0.5
+					disband_on_peace = no
+					reinforces = yes
+					reinforce_rate_multiplier = 0.1
+					maintenance_multiplier = 0
+					cannot_inherit = yes
+					merge = yes
+				}
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = tiamat
+				culture = yugoloth
+				age = 150
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = tiamat
+				culture = yugoloth
+				age = 150
+				immortal_age = 30
+			}
+			create_random_soldier = {
+				random_traits = yes
+				dynasty = none
+				religion = tiamat
+				culture = yugoloth
+				age = 150
+				immortal_age = 30
+			}
+			character_event = { id = frstory.45 months = 6 }
+		}
+	}
+
+	#Make Tchazzar king if there is no king
+	character_event = {
+		id = frstory.45
+		hide_window = yes
+		only_rulers = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			has_character_flag = i_am_tchazzar
+		}
+
+		immediate = {
+			ROOT = {
+				if = {
+					limit = {
+						is_ruler = yes
+						k_chessenta = { NOT = { has_holder = yes } }
+					}
+					grant_title = k_chessenta
+					clr_character_flag = i_am_tchazzar
+				}
+				else = {
+					character_event = { id = frstory.45 months = 6 }
+				}
 			}
 		}
 	}
-}
 
 #Warlock Knights
 
