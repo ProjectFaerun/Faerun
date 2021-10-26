@@ -1501,7 +1501,10 @@ character_event = {
 	only_capable = yes
 
 	trigger = {
-		society_member_of = harpers
+		OR = {
+			society_member_of = harpers
+			society_member_of = kuo_tan_society
+		}
 		has_any_quest = no
 		NOT = { has_character_modifier = quest_cooldown_timer }
 		NOT = { is_inaccessible_trigger = yes }
@@ -1511,7 +1514,7 @@ character_event = {
 		random_society_member = {
 			limit = {
 				NOT = { character = ROOT }
-				society_member_of = harpers
+				same_society_as = ROOT
 			}
 			save_event_target_as = quest_giver
 		}
@@ -1545,18 +1548,21 @@ character_event = {
         character = ROOT
       }
       prisoner = no
-      OR = {
-        society_member_of = arcane_brotherhood
-        society_member_of = brotherhood_of_true_flame
-        society_member_of = cult_of_the_dragon
-        society_member_of = shadow_thieves
-        society_member_of = night_masks
-        society_member_of = shadow_telflamm
-        society_member_of = twisted_rune
-        society_member_of = eldreth_veluuthra
-        society_member_of = the_satanists
-        society_member_of = black_network
-      }
+			OR = {
+				society_member_of = arcane_brotherhood
+				society_member_of = brotherhood_of_true_flame
+				society_member_of = cult_of_the_dragon
+				society_member_of = shadow_thieves
+				society_member_of = night_masks
+				society_member_of = shadow_telflamm
+				society_member_of = twisted_rune
+				society_member_of = eldreth_veluuthra
+				society_member_of = the_satanists
+				society_member_of = black_network
+				society_member_of = tsui_tong
+				society_member_of = storm_rune_society
+				society_member_of = warlock_knights
+			}
     }
   }
 
@@ -1566,18 +1572,21 @@ character_event = {
         NOT = { is_inaccessible_trigger = yes }
         NOT = { character = ROOT }
         prisoner = no
-        OR = {
-          society_member_of = arcane_brotherhood
-          society_member_of = brotherhood_of_true_flame
-          society_member_of = cult_of_the_dragon
-          society_member_of = shadow_thieves
-          society_member_of = night_masks
-          society_member_of = shadow_telflamm
-          society_member_of = twisted_rune
-          society_member_of = eldreth_veluuthra
-          society_member_of = the_satanists
-          society_member_of = black_network
-        }
+				OR = {
+					society_member_of = arcane_brotherhood
+					society_member_of = brotherhood_of_true_flame
+					society_member_of = cult_of_the_dragon
+					society_member_of = shadow_thieves
+					society_member_of = night_masks
+					society_member_of = shadow_telflamm
+					society_member_of = twisted_rune
+					society_member_of = eldreth_veluuthra
+					society_member_of = the_satanists
+					society_member_of = black_network
+					society_member_of = tsui_tong
+					society_member_of = storm_rune_society
+					society_member_of = warlock_knights
+				}
       }
       save_event_target_as = elimination_target
     }
@@ -1891,5 +1900,231 @@ character_event = {
         }
       }
     }
+	}
+}
+
+
+
+
+########################JOIN KUO-TAN########################
+
+character_event = {
+    id = HRP.200
+		hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = kuo_tan_society } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kuo_tan_society
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = HRP.201 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kuo_tan_society
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = HRP.201 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kuo_tan_society
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = HRP.201 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kuo_tan_society
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = HRP.201 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = HRP.201 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = HRP.201
+		hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = HRP.202 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = HRP.202
+    desc = EVTDESC_kuo_tan_invite
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+	immediate = { set_character_flag = society_join_block }
+
+    option = {
+        name = EVTOPTA_kuo_tan_invite
+
+		join_society = kuo_tan_society
+
+		clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP KUO-TAN###########################
+
+character_event = { #force the AI to join a society
+  id = HRP.210
+  hide_window = yes
+  is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				higher_tier_than = BARON
+				society_member_of = kuo_tan_society
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = HRP.211 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = HRP.211
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_list = {
+			60 = { # do nothing
+			}
+			40 = {
+				trigger = {
+					can_join_society = kuo_tan_society
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						trait = scholar
+						trait = socializer
+						trait = schemer
+					}
+				}
+				modifier = {
+					factor = 2
+					trait = just
+				}
+				modifier = {
+					factor = 2
+					trait = charitable
+				}
+				modifier = {
+					factor = 2
+					trait = patient
+				}
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 2
+					trait = erudite
+				}
+				modifier = {
+					factor = 2
+					trait = kind
+				}
+				modifier = {
+					factor = 2
+					trait = brave
+				}
+				modifier = {
+					factor = 0
+					trait = cruel
+				}
+				modifier = {
+					factor = 0
+					is_evil_trigger = yes
+				}
+				modifier = {
+					factor = 0.5
+					trait = craven
+				}
+				modifier = {
+					factor = 0.2
+					trait = greedy
+				}
+				modifier = {
+					factor = 0.1
+					trait = lich
+				}
+				join_society = kuo_tan_society
+				random_list = {
+					75 = {
+						modifier = {
+							factor = 0
+							society_influence >= 30
+						}
+					}
+					25 = {
+					}
+				}
+				if = { # Make grandmaster is there is none
+					limit = {
+						NOT = {
+							society = {
+								any_society_member = {
+									is_society_grandmaster = yes
+								}
+							}
+						}
+					}
+					set_society_grandmaster = yes
+				}
+			}
+		}
 	}
 }
