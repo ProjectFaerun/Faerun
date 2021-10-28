@@ -1,94 +1,94 @@
 society_decisions = { #by Olrox17
 
-	call_for_heroes_harpers = {
-		is_in_society = yes
-		only_playable = yes
-		ai_check_interval = 6 #check only once every 6 months.
-		potential = {
-			not_casting = yes
-			is_playable = yes
-			is_adult = yes
-			society_rank = {
-				rank >= 2
-				society = harpers
-			}
-			OR = {
-				ai = no
-				any_war = {
-					OR = {
-						any_defender = {
-							character = ROOT
-							is_primary_war_defender = yes
-						}
-						any_attacker = {
-							character = ROOT
-							is_primary_war_attacker = yes
-						}
-					}
-				}
-			}
-		}
-		allow = {
-			has_society_currency_medium_trigger = yes
-			is_inaccessible_trigger = no
-			NOT = { trait = incapable }
-			custom_tooltip = {
-				text = call_for_heroes_cooldown
-				hidden_tooltip = {
-					NOT = {
-						has_character_modifier = call_for_heroes_cooldown
-					}
-				}
-			}
-		}
-		effect = {
-			detract_society_currency_medium_effect = yes
-			increase_visibility_effect = yes
-			add_character_modifier = {
-				modifier = adventurers_boost
-				duration = 365
-			}
-			hidden_effect = {
-				add_character_modifier = {
-					name = call_for_heroes_cooldown
-					years = 2
-					hidden = yes
-				}
-			}
-		}
-		revoke_allowed = {
-			always = no
-		}
-		ai_will_do = {
-			factor = 0.1
-			modifier = {
-				factor = 0.5
-				trait = stubborn
-			}
-			modifier = {
-				factor = 0
-				war = no
-			}
-			modifier = { #I am losing an offensive war
-				factor = 10
-				any_war = {
-					attacker = { character = ROOT }
-					NOT = { war_score = -19 }
-				}
-			}
-			modifier = { #I am losing a defensive war
-				factor = 10
-				any_war = {
-					defender = { character = ROOT }
-					war_score = 20
-				}
-			}
-			modifier = {
-				factor = 2
-				trait = gregarious
-			}
-		}
-	}
+	#call_for_heroes_harpers = {
+	#	is_in_society = yes
+	#	only_playable = yes
+	#	ai_check_interval = 6 #check only once every 6 months.
+	#	potential = {
+	#		not_casting = yes
+	#		is_playable = yes
+	#		is_adult = yes
+	#		society_rank = {
+	#			rank >= 2
+	#			society = harpers
+	#		}
+	#		OR = {
+	#			ai = no
+	#			any_war = {
+	#				OR = {
+	#					any_defender = {
+	#						character = ROOT
+	#						is_primary_war_defender = yes
+	#					}
+	#					any_attacker = {
+	#						character = ROOT
+	#						is_primary_war_attacker = yes
+	#					}
+	#				}
+	#			}
+	#		}
+	#	}
+	#	allow = {
+	#		has_society_currency_medium_trigger = yes
+	#		is_inaccessible_trigger = no
+	#		NOT = { trait = incapable }
+	#		custom_tooltip = {
+	#			text = call_for_heroes_cooldown
+	#			hidden_tooltip = {
+	#				NOT = {
+	#					has_character_modifier = call_for_heroes_cooldown
+	#				}
+	#			}
+	#		}
+	#	}
+	#	effect = {
+	#		detract_society_currency_medium_effect = yes
+	#		increase_visibility_effect = yes
+	#		add_character_modifier = {
+	#			modifier = adventurers_boost
+	#			duration = 365
+	#		}
+	#		hidden_effect = {
+	#			add_character_modifier = {
+	#				name = call_for_heroes_cooldown
+	#				years = 2
+	#				hidden = yes
+	#			}
+	#		}
+	#	}
+	#	revoke_allowed = {
+	#		always = no
+	#	}
+	#	ai_will_do = {
+	#		factor = 0.1
+	#		modifier = {
+	#			factor = 0.5
+	#			trait = stubborn
+	#		}
+	#		modifier = {
+	#			factor = 0
+	#			war = no
+	#		}
+	#		modifier = { #I am losing an offensive war
+	#			factor = 10
+	#			any_war = {
+	#				attacker = { character = ROOT }
+	#				NOT = { war_score = -19 }
+	#			}
+	#		}
+	#		modifier = { #I am losing a defensive war
+	#			factor = 10
+	#			any_war = {
+	#				defender = { character = ROOT }
+	#				war_score = 20
+	#			}
+	#		}
+	#		modifier = {
+	#			factor = 2
+	#			trait = gregarious
+	#		}
+	#	}
+	#}
 
 	sponsor_arts = {
 		is_in_society = yes
@@ -337,6 +337,118 @@ targetted_decisions = {
 		}
 	}
 
+	kuo_tan_become_vassal = {
+		only_independent = yes
+		ai_check_interval = 36
+
+		potential = {
+			e_shou_lung_west_governor = {
+				has_holder = yes
+			}
+		}
+
+		from_potential = {
+			independent = yes
+			mercenary = no
+			holy_order = no
+			is_landed = yes
+			society_member_of = kuo_tan_society
+			society_rank = { rank >= 2 }
+		}
+
+		allow = {
+			show_only_failed_conditions = yes
+			FROM = {
+				show_scope_change = no
+				war = no
+				OR = {
+					custom_tooltip = { #Borders the Western Governate
+						text = shou_lung_grace_become_tributary_allow_governor_neighbor_tt
+						any_neighbor_independent_ruler = {
+							has_landed_title = e_shou_lung_west_governor
+						}
+					}
+					custom_tooltip = { #Borders a shou_lung tributary
+						text = shou_lung_grace_become_tributary_allow_tributary_neighbor_tt
+						any_neighbor_independent_ruler = {
+							suzerain = {
+								has_landed_title = e_shou_lung_west_governor
+							}
+						}
+					}
+					custom_tooltip = { #Borders the eastern edge of the map
+						text = shou_lung_grace_become_tributary_allow_shou_lung_influence_tt
+						any_realm_province = {
+							region = custom_shou_lung_invasion_target_region
+						}
+					}
+					custom_tooltip = { #Within diplo range of shou_lung and has a port in India
+						text = shou_lung_grace_become_tributary_allow_india_tt
+						any_realm_province = {
+							port = yes
+							region = kara_tur_region
+						}
+					}
+				}
+				custom_tooltip = {
+					text = shou_lung_grace_become_tributary_allow_suzerain_tt
+					NOT = {
+						is_tributary = yes
+					}
+				}
+				NOT = { tier = emperor }
+				prisoner = no
+				NOT = { trait = incapable }
+				is_inaccessible_trigger = no
+			}
+		}
+
+		effect = {
+			FROM = {
+				show_scope_change = no
+				set_defacto_liege = ROOT
+				add_society_currency_major_effect = yes
+				sound_effect = china_grace_gain
+				add_offmap_currency = {
+					offmap = shou_lung
+					value = 500
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.01
+			modifier = {
+				factor = 10
+				FROM = { trait = content }
+			}
+			modifier = {
+				factor = 10
+				ROOT = { NOT = { num_of_vassals = 6 } }
+			}
+			modifier = {
+				factor = 0
+				FROM = { trait = ambitious }
+			}
+			modifier = {
+				factor = 0
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0
+				FROM = { NOT = { culture_group = shou_group } }
+			}
+			modifier = {
+				factor = 0
+				FROM = { NOT = { religion_group = karaturan_group } }
+			}
+		}
+	}
+
 }
 
 title_decisions = {
@@ -350,9 +462,15 @@ title_decisions = {
 		filter = owned
 
 		from_potential = {
-			society_rank = {
-				rank >= 1
-				society = harpers
+			OR = {
+				society_rank = {
+					rank >= 1
+					society = harpers
+				}
+				society_rank = {
+					rank >= 2
+					society = kuo_tan_society
+				}
 			}
 		}
 

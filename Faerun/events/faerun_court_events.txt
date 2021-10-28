@@ -2552,3 +2552,280 @@ character_event = {
     }
 	}
 }
+
+# Republic vassal gets notified of long reigning liege
+character_event = {
+	id = FCE.0011
+	desc = EVTDESC_FCE_0011
+	border = GFX_event_normal_frame_intrigue
+	picture = GFX_evt_suspicious_noble
+
+	only_playable = yes
+	only_capable = yes
+	prisoner = no
+
+	is_triggered_only = yes
+
+	trigger = {
+		liege = {
+			ruled_years = 60
+			higher_tier_than = count
+			prisoner = no
+			OR = {
+				government = merchant_republic_government
+				government = democratic_feudal_government
+			}
+			NAND = {
+				war = yes
+				is_primary_war_defender = yes
+			}
+			OR = {
+				NOT = { has_character_flag = long_reigning_doge_notified }
+				had_character_flag = {
+					flag = long_reigning_doge_notified
+					years >= 5
+				}
+			}
+		}
+		OR = {
+			among_most_powerful_vassals = 4
+			is_patrician = yes
+		}
+		independent = no
+	}
+
+	immediate = {
+		liege = {
+			save_event_target_as = long_reigning_doge
+		}
+	}
+
+	option = { #pay cash
+		name = EVTOPTA_FCE_0011
+		trigger = {
+      wealth > 0
+    }
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 2
+				trait = charitable
+			}
+			modifier = {
+				factor = 0.5
+				trait = greedy
+			}
+		}
+		scaled_wealth = -0.3
+		event_target:long_reigning_doge = {
+			character_event = { id = FCE.0012 days = 7 }
+		}
+	}
+	option = { #use diplomacy
+		name = EVTOPTB_FCE_0011
+		tooltip_info = diplomacy
+    trigger = {
+      diplomacy = 15
+    }
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 2
+				trait = proud
+			}
+			modifier = {
+				factor = 0.5
+				trait = humble
+			}
+			modifier = {
+				factor = 2
+				trait = gregarious
+			}
+			modifier = {
+				factor = 0.5
+				trait = shy
+			}
+		}
+		event_target:long_reigning_doge = {
+			character_event = { id = FCE.0012 days = 7 }
+		}
+	}
+	option = { #use intrigue
+		name = EVTOPTC_FCE_0011
+		tooltip_info = intrigue
+    trigger = {
+      intrigue = 15
+    }
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 2
+				trait = deceitful
+			}
+			modifier = {
+				factor = 0.5
+				trait = honest
+			}
+			modifier = {
+				factor = 2
+				trait = arbitrary
+			}
+			modifier = {
+				factor = 0.5
+				trait = just
+			}
+		}
+		event_target:long_reigning_doge = {
+			character_event = { id = FCE.0012 days = 7 }
+		}
+	}
+	option = { #nope
+		name = EVTOPTD_FCE_0011
+		ai_chance = {
+			factor = 20
+			modifier = {
+				factor = 2
+				trait = content
+			}
+			modifier = {
+				factor = 0.5
+				trait = ambitious
+			}
+			modifier = {
+				factor = 0.2
+				trait = envious
+			}
+		}
+		liege = {
+      opinion = {
+        modifier = opinion_glad
+        who = ROOT
+        years = 5
+      }
+    }
+	}
+}
+
+# Long reigning leader of republic asked to step down
+character_event = {
+	id = FCE.0012
+	desc = EVTDESC_FCE_0012
+	picture = GFX_evt_suspicious_noble
+
+	is_triggered_only = yes
+
+	trigger = {
+		ruled_years = 60
+		higher_tier_than = count
+		prisoner = no
+		OR = {
+			government = merchant_republic_government
+			government = democratic_feudal_government
+		}
+		OR = {
+			NOT = { has_character_flag = long_reigning_doge_notified }
+			had_character_flag = {
+				flag = long_reigning_doge_notified
+				years >= 5
+			}
+		}
+	}
+
+	option = { #accept
+		name = EVTOPTA_FCE_0012
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 10
+				trait = incapable
+			}
+			modifier = {
+				factor = 5
+				trait = infirm
+			}
+			modifier = {
+				factor = 3
+				trait = depressed
+			}
+			modifier = {
+				factor = 3
+				trait = stressed
+			}
+			modifier = {
+				factor = 3
+				trait = content
+			}
+			modifier = {
+				factor = 2
+				trait = kind
+			}
+			modifier = {
+				factor = 2
+				trait = humble
+			}
+			modifier = {
+				factor = 2
+				trait = just
+			}
+		}
+		set_character_flag = long_reigning_doge_notified
+		scaled_prestige = 5
+		any_vassal = {
+      opinion = {
+        modifier = opinion_wildly_impressed
+        who = ROOT
+        years = 10
+      }
+    }
+		abdicate = { move = no }
+	}
+
+	option = { #refuse
+		name = EVTOPTB_FCE_0012
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 5
+				trait = lunatic
+			}
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+			modifier = {
+				factor = 2
+				trait = envious
+			}
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 2
+				trait = impaler
+			}
+			modifier = {
+				factor = 2
+				trait = proud
+			}
+			modifier = {
+				factor = 2
+				trait = arbitrary
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+		}
+		set_character_flag = long_reigning_doge_notified
+		scaled_prestige = -5
+		any_vassal = {
+      opinion = {
+        modifier = opinion_extremely_disappointed
+        who = ROOT
+        years = 10
+      }
+    }
+		set_council_malcontent = yes
+	}
+}
