@@ -24,7 +24,7 @@ character_event = {
 		capital_scope = { province_event = { id = frelections.2 days = 1 } }
 	}
 }
-# Elections in 10 year
+# Elections in 12 year
 province_event = {
 	id = frelections.2
 	
@@ -41,14 +41,14 @@ province_event = {
 				log = "(GOVERNMENT) frelections.2 fired for [This.GetBestName]"
 				
 				set_character_flag = upcoming_elections_flag
-				character_event = { id = frelections.4 years = 9 }
+				character_event = { id = frelections.4 years = 11 }
 			}
 		}
 	}
 }
 
 # on_new_holder on_new_holder_inheritance on_new_holder_usurpation
-# Elections in 10 year
+# Elections in 12 year
 character_event = {
 	id = frelections.3
 	
@@ -68,7 +68,7 @@ character_event = {
 		log = "(GOVERNMENT) frelections.3 fired for [Root.GetBestName]"
 		
 		set_character_flag = upcoming_elections_flag
-		character_event = { id = frelections.4 years = 9 }
+		character_event = { id = frelections.4 years = 11 }
 	}
 }
 
@@ -202,7 +202,11 @@ character_event = {
 			ROOT = { event_target:target_new_doge = { this_abdicate_transfer_wealth_to_play_prev_effect = yes } }								
 		}
 
-		remove_trait = secret_patrician		
+		remove_trait = secret_patrician	
+
+		recalc_succession = yes
+
+		event_target:target_republic = { holder_scope = { save_event_target_as = target_new_doge } }
 
 		event_target:target_republic = { 
 			holder_scope = {
@@ -211,35 +215,35 @@ character_event = {
 					if = {
 						limit = { trait = secret_patrician }
 						remove_trait = secret_patrician
-						set_defacto_liege = ROOT					
+						set_defacto_liege = event_target:target_new_doge				
 					}
 					if = {
 						limit = { has_character_flag = prev_doge_vassal_flag }
 						clr_character_flag = prev_doge_vassal_flag
 					
 						if = {
-							limit = { lower_tier_than = ROOT }
-							set_defacto_liege = ROOT
+							limit = { lower_tier_than = event_target:target_new_doge }
+							set_defacto_liege = event_target:target_new_doge
 						}
-					}				
-				}			
+					}
+				}
 			}
 		}
-		
-		recalc_succession = yes				
-
-		event_target:target_republic = { holder_scope = { save_event_target_as = target_new_doge } }  	
-		
 
 		event_target:target_new_doge = {
 			character_event = { id = frelections.7 } # Notifications		
 			any_vassal = {
-				limit = {					
+				limit = {
 					is_patrician = yes
 				}
 				character_event = { id = frelections.7 } # Notifications
-			}			
-			character_event = { id = frelections.16 } # Reappoint councilors if abdicating to previous doge upon winning re-election			  																		 						
+			}
+			if = {
+				limit = {
+					dynasty = ROOT
+				}
+				character_event = { id = frelections.16 } # Reappoint councilors if abdicating to previous doge upon winning re-election
+			}
 		}
 	}
 }
