@@ -2,9 +2,11 @@ targeted_decisions = {
     nomadrule_duel_decision = {
 	    # only_playable = yes
 	    is_high_prio = yes
-		filter = liege
-		ai_target_filter = liege
-		ai_check_interval = 24
+		# filter = liege
+		# ai_target_filter = liege
+		filter = realm
+		ai_target_filter = realm
+		ai_check_interval = 36
 	    diplomacy_icon = GFX_duel_decision
 	    
 	    from_potential = {
@@ -31,7 +33,7 @@ targeted_decisions = {
 	    }
 	    
 	    potential = {
-	        is_liege_of = FROM
+	        # is_liege_of = FROM
 	        primary_title = {
                 higher_tier_than = COUNT
 	        }
@@ -54,13 +56,14 @@ targeted_decisions = {
 	    
 	    allow = {
 	    	FROM = {
-        		OR ={
+        		OR = {
                     is_child_of = ROOT
                     is_parent_of = ROOT
                     sibling = ROOT
                     AND = {
+						vassal_of = ROOT
                         higher_real_tier_than = BARON 
-                        among_most_powerful_vassals = 5
+                        # among_most_powerful_vassals = 5
                     }
         		}
                 NOT = { has_truce = ROOT }
@@ -70,7 +73,12 @@ targeted_decisions = {
 	    	custom_tooltip = {
         		text = both_tribal_tt
         		is_tribal = yes
-        		FROM = { is_tribal = yes }
+        		FROM = { 
+					OR = {
+						is_tribal = yes
+						is_landed = no
+					}
+				}
         	}
         	ROOT = { war = no }
 
@@ -108,12 +116,12 @@ targeted_decisions = {
 	            }	
 	        }
 
-	        # custom_tooltip = {
-	        	# text = duel_tooltip_recent_challenge_tt
-	            # hidden_tooltip = {
-	                # FROM = { NOT = { has_character_modifier = recently_challenged_rule_timer } }	        
-	            # }	
-	        # }
+	        custom_tooltip = {
+	        	text = duel_tooltip_recent_challenge_tt
+	            hidden_tooltip = {
+	                FROM = { NOT = { has_character_modifier = recently_challenged_rule_timer } }	        
+	            }	
+	        }
 
 	        custom_tooltip = {
 	            #text = duel_tooltip_busy
@@ -227,17 +235,19 @@ targeted_decisions = {
 	        }
 	        modifier = {
 	            factor = 0.1
+	            NOT = { ROOT = { trait = craven } }
 	        }
 	        modifier = {
 	            factor = 0.5
+	            NOT = { ROOT = { trait = craven } }
 	            FROM = { NOT = { dynasty = ROOT } }
 	        }
 	        modifier = {
 	            factor = 0
+				NOT = { ROOT = { trait = craven } }
 	            OR = {
                     FROM = { trait = craven }
                     FROM = { trait = content }
-                    FROM = { trait = shy }
 	            }
 	        }
 	        modifier = {
@@ -252,13 +262,14 @@ targeted_decisions = {
                         trait = deceitful
                         trait = arbitrary
                         trait = ambitious
+                        ROOT = { trait = craven }
                         has_opinion_modifier = { modifier = opinion_tyrant who = ROOT }	
                         is_foe = ROOT
                         relative_power = {
                             who = ROOT
-                            power = 0.50
-                        }																														
-	                }									
+                            power = 0.30
+                        }						
+	                }
 	            }
 	        }
 	        modifier = {
@@ -271,6 +282,7 @@ targeted_decisions = {
 	        }
 			modifier = {
 				factor = 0
+				NOT = { ROOT = { trait = craven } }
 				OR = {
 					reverse_opinion = { who = FROM value = 80 }
 					AND = { 
@@ -309,6 +321,15 @@ targeted_decisions = {
 	            FROM = {
                     relative_power = {
                     who = ROOT
+                    power = 0.30
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = {
+                    relative_power = {
+                    who = ROOT
                     power = 0.60
                     }
 	            }
@@ -323,6 +344,290 @@ targeted_decisions = {
 	            }
 	        }
 
+	    }
+	}
+##Decision for claimants in other courts##
+    nomadrule_duel_out_of_court = {
+		filter = close_relatives
+		ai_target_filter = close_relatives
+		ai_check_interval = 60
+	    diplomacy_icon = GFX_duel_decision
+	    
+	    from_potential = {
+    		has_dlc = "Horse Lords"
+    		has_dlc = "Holy Fury"
+	        is_adult = yes
+	        prisoner = no
+			# ai = yes
+
+	        has_regent = no
+	        is_inaccessible_trigger = no
+	    }
+	    
+	    potential = {
+	        primary_title = {
+                higher_tier_than = COUNT
+	        }
+    		government = nomadic_tribal_government
+	    	OR = {
+		    	AND = { #Either you are adult, as well as your target...
+		        	is_adult = yes
+		    		FROM = { is_adult = yes }
+		    	}
+		    	AND = { #Or you are both children! WEIRD!
+		        	is_adult = no
+		    		FROM = { is_adult = no }
+		    	}
+	    	}
+
+	        prisoner = no
+	        NOT = { character = FROM }
+	        is_inaccessible_trigger = no
+	    }
+	    
+	    allow = {
+	    	FROM = {
+        		OR = {
+                    is_child_of = ROOT
+                    is_parent_of = ROOT
+                    sibling = ROOT
+        		}
+                NOT = { has_truce = ROOT }
+                NOT = { obedient = ROOT }
+				OR = {
+					is_landed = no
+					AND = {
+						lower_tier_than = ROOT
+						is_tribal = yes
+						NOT = { same_realm = ROOT }
+						num_of_count_titles_in_realm < 10
+					}
+				}
+                war = no	        
+        	}
+        	ROOT = { war = no }
+
+            #Both are healthy
+            custom_tooltip = {
+                text = duel_tooltip_sickness
+                FROM = {
+                	NOR = { #Not in sickly in bed, but sick if well treated is okay
+                		has_character_modifier = bedridden_illness
+                		has_character_modifier = severe_illness
+						trait = incapable
+					}
+                }
+                ROOT = {
+                    NOR = { #Not in sickly in bed, but sick if well treated is okay
+                		has_character_modifier = bedridden_illness
+                		has_character_modifier = severe_illness
+						trait = incapable
+                    }
+                }
+            }
+              
+	        custom_tooltip = {
+	            text = duel_tooltip_recent_duel
+	            hidden_tooltip = {
+	                FROM = { NOT = { has_character_modifier = recent_duel_timer } }
+	                NOT = { has_character_modifier = recent_duel_timer }
+	            }
+	        }
+
+	        custom_tooltip = {
+	        	text = nomadrule_duel_tooltip_challenged_tt
+	            hidden_tooltip = {
+	                FROM = { NOT = { has_character_flag = nomadrule_duel@ROOT } }	        
+	            }	
+	        }
+
+	        custom_tooltip = {
+	        	text = duel_tooltip_recent_challenge_tt
+	            hidden_tooltip = {
+	                FROM = { NOT = { has_character_modifier = recently_challenged_rule_timer } }	        
+	            }	
+	        }
+
+	        custom_tooltip = {
+	            #text = duel_tooltip_busy
+	            text = duel_tooltip_no_war
+	            hidden_tooltip = {
+	                FROM = {
+	                    #NOT = { has_character_flag = do_not_disturb }
+	                    NOT = { war = yes }
+	                }
+	                #NOT = { has_character_flag = do_not_disturb }
+	                NOT = { war = yes }
+	            }
+	        }
+
+	        trigger_if = {
+	        	limit = {
+					has_character_modifier = has_recently_declined_duel_cooldown
+	        	}
+	        	custom_tooltip = {
+	        		text = opinion_duel_decline_cooldown_tt
+		        	NOT = { 
+		        		has_character_modifier = has_recently_declined_duel_cooldown
+					}
+	        	}
+	        }
+	    }
+	    
+	    effect = {
+	    	#REQUIRED event targets for setting up duel evaluation!
+	    	FROM = { save_event_target_as = combatant_1 } #the person issuing the duel...
+	    	save_event_target_as = combatant_2 #the target of the duel...
+
+	    	apply_degree_of_dishonorable_duel_effect = yes #checks a bunch of age and health statuses...
+	    	apply_any_applicable_harsh_penalties_effect = yes
+
+	    	if = {
+                limit = {
+                    NOT = { 
+                        any_demesne_title = { 
+                            de_jure_vassal_or_below = FROM
+                        }
+                    }
+                }
+                random_demesne_title = {
+					preferred_limit = { tier = emperor }
+					preferred_limit = { tier = king }
+					preferred_limit = { tier = duke }
+                    save_event_target_as = target_title
+                }
+	    	}
+
+	    	else_if = {
+                limit = {
+                    primary_title = { 
+                        NOT = { de_jure_vassal_or_below = FROM }
+                    }
+                }
+                random_demesne_title = {
+                    limit = { de_jure_vassal_or_below = FROM }
+					preferred_limit = { tier = emperor }
+					preferred_limit = { tier = king }
+					preferred_limit = { tier = duke }
+                    save_event_target_as = target_title
+                }
+	    	}
+
+	    	else = {    
+                primary_title = { 
+                    save_event_target_as = target_title
+                }
+	    	}
+
+	        FROM = {
+	        	set_character_flag = nomadrule_duel@ROOT
+	            pacifists_lose_piety_effect = yes
+	            add_character_modifier = {
+	                modifier = recent_duel_timer
+	                duration = 90
+	                hidden = yes
+	            }
+	        }
+
+	        FROM = {
+	        	show_scope_change = no
+	       		increase_troublemaker_status_effect = yes
+	        }
+
+	        hidden_effect = {
+		        FROM = {
+		        	add_character_modifier = {
+		        		modifier = recently_challenged_rule_timer
+		                duration = 90
+		                hidden = yes
+		        	}
+		        }
+	        }
+	        
+	        hidden_tooltip = {
+	            character_event = { id = frduel.1 days = 1 } #Duel evaluation (hidden) + result event as follow-up.
+	        }
+	    }
+	    
+	    revoke_allowed = {
+	        always = no
+	    }
+	    ai_will_do = {
+	        factor = 1
+	        modifier = {
+	            factor = 0
+	            has_character_modifier = declined_prestige_duel_timer #if the target has already declined a duel, AI's won't attempt to duel them while the timer is still
+	        }
+	        modifier = {
+	            factor = 0.1
+	            NOT = { ROOT = { trait = craven } }
+	        }
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    top_liege = {
+						num_of_count_titles_in_realm >= 5
+					}
+					is_ruler = yes
+					NOT = { same_realm = ROOT }
+	            }
+	        }
+	        modifier = {
+	            factor = 0
+	            NOT = { ROOT = { trait = craven } }
+	            OR = {
+                    FROM = { trait = craven }
+                    FROM = { trait = content }
+	            }
+	        }
+	        modifier = {
+	            factor = 0.1
+	            FROM = { is_parent_of = ROOT }
+	        }
+	        modifier = {
+	            factor = 10
+	            ROOT = { trait = craven }
+	        }
+	        modifier = {
+	            factor = 10
+	            FROM = { has_opinion_modifier = { modifier = opinion_tyrant who = ROOT } }
+	        }
+			modifier = {
+				factor = 0
+	            NOT = { ROOT = { trait = craven } }
+				OR = {
+					reverse_opinion = { who = FROM value = 80 }
+					AND = { 
+                        FROM = { is_friend = ROOT }
+                        NOT = { FROM = { is_foe = ROOT } }
+					}
+				}
+			}
+	        modifier = {
+	            factor = 2
+	            FROM = { trait = berserker }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = { trait = brave }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = { trait = wroth }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = { trait = ambitious }
+	        }
+			modifier = {
+				factor = 2
+				reverse_opinion = { who = FROM value = -100 }	
+				NOT =  { reverse_opinion = { who = FROM value = -60 } }				
+			}
+	        modifier = {
+	            factor = 100
+	            FROM = { is_foe = ROOT }
+	        }
 	    }
 	}
 }
