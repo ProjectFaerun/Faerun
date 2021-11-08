@@ -621,7 +621,7 @@ character_event = {
 			add_trait = creature_deep_imaskari
 		}
 		###Now for the allowed bi-racial unions###
-		#drow from elves#
+		#drow + elf = drow#
 		else_if = {
 			limit = {
 				OR = {
@@ -638,46 +638,41 @@ character_event = {
 			add_trait = creature_drow
 			set_graphical_culture = drow
 		}
-		#feyri from elves#
+		#feyri + elf = feyri#
 		else_if = {
 			limit = {
 				OR = {
 					AND = {
 						true_father_even_if_dead = { trait = creature_feyri }
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-							}
-						}
+						mother_even_if_dead = { trait = creature_elf }
 					}
 					AND = {
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-							}
-						}
+						true_father_even_if_dead = { trait = creature_elf }
 						mother_even_if_dead = { trait = creature_feyri }
 					}
 				}
 			}
-			if = {
-				limit = {
-					NOR = {
-						true_father_even_if_dead = { trait = creature_drow }
+			add_trait = creature_feyri
+			set_graphical_culture = feyri
+		}
+		#feyri + drow = draegloth
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_feyri }
 						mother_even_if_dead = { trait = creature_drow }
 					}
+					AND = {
+						true_father_even_if_dead = { trait = creature_drow }
+						mother_even_if_dead = { trait = creature_feyri }
+					}
 				}
-				add_trait = creature_feyri
-				set_graphical_culture = feyri
 			}
-			else = {
-				add_trait = creature_draegloth
-				set_graphical_culture = draegloth
-			}
+			add_trait = creature_draegloth
+			set_graphical_culture = draegloth
 		}
-		#Draegloths and other elves
+		#draegloth + elf or feyri = 50/50 of draegloth or feyri
 		else_if = {
 			limit = {
 				OR = {
@@ -686,7 +681,6 @@ character_event = {
 						true_father_even_if_dead = {
 							OR = {
 								trait = creature_elf
-								trait = creature_drow
 								trait = creature_feyri
 							}
 						}
@@ -696,82 +690,58 @@ character_event = {
 						mother_even_if_dead = {
 							OR = {
 								trait = creature_elf
-								trait = creature_drow
 								trait = creature_feyri
 							}
 						}
 					}
 				}
 			}
-			if = {
-				limit = {
-					NOR = {
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_drow
-								trait = creature_feyri
-							}
-						}
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_drow
-								trait = creature_feyri
-							}
-						}
-					}
+			random_list = {
+				1 = {
+					add_trait = creature_feyri
+					set_graphical_culture = feyri
 				}
-				add_trait = creature_draegloth
-				set_graphical_culture = draegloth
-			}
-			else_if = {
-				limit = {
-					OR = {
-						true_father_even_if_dead = { trait = creature_drow }
-						mother_even_if_dead = { trait = creature_drow }
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_draegloth
-						set_graphical_culture = draegloth
-					}
-					1 = {
-						add_trait = creature_drow
-						add_trait = planetouched
-						set_graphical_culture = drow
-					}
-				}
-			}
-			else = {
-				random_list = {
-					1 = {
-						add_trait = creature_feyri
-						set_graphical_culture = feyri
-					}
-					1 = {
-						add_trait = creature_draegloth
-						set_graphical_culture = draegloth
-					}
+				1 = {
+					add_trait = creature_draegloth
+					set_graphical_culture = draegloth
 				}
 			}
 		}
-		#half-elves out of elves
+		#draegloth + drow = 50/50 of draegloth or drow
 		else_if = {
 			limit = {
 				OR = {
 					AND = {
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-								trait = creature_feyri
-								trait = creature_draegloth
-							}
-						}
+						mother_even_if_dead = { trait = creature_draegloth }
+						true_father_even_if_dead = { trait = creature_drow }
+					}
+					AND = {
+						true_father_even_if_dead = { trait = creature_draegloth }
+						mother_even_if_dead = { trait = creature_drow }
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					add_trait = creature_draegloth
+					set_graphical_culture = draegloth
+				}
+				1 = {
+					add_trait = creature_drow
+					add_trait = planetouched
+					set_graphical_culture = drow
+				}
+			}
+		}
+		#elf + human or half-human (not half-elf!) = half-elf
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_elf }
 						mother_even_if_dead = {
 							OR = { 
 								trait = creature_human
-								trait = creature_half_elf
 								trait = creature_half_dwarf
 								trait = creature_half_orc
 								trait = creature_half_ogre
@@ -788,18 +758,10 @@ character_event = {
 						}
 					}
 					AND = {
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-								trait = creature_feyri
-								trait = creature_draegloth
-							}
-						}
+						mother_even_if_dead = { trait = creature_elf }
 						true_father_even_if_dead = {
 							OR = { 
 								trait = creature_human
-								trait = creature_half_elf
 								trait = creature_half_dwarf
 								trait = creature_half_orc
 								trait = creature_half_ogre
@@ -817,208 +779,416 @@ character_event = {
 					}
 				}
 			}
-			#Half-Elf + Elf has a chance of resulting in a full elf
+			add_trait = creature_half_elf
+			if = {
+				limit = {
+					mother_even_if_dead = { trait = creature_elf }
+				}
+				mother_even_if_dead = { tb_graph_culture_racial = yes }
+			}
+			else = {
+				true_father_even_if_dead = { tb_graph_culture_racial = yes }
+			}
 			if = {
 				limit = {
 					OR = {
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_aasimar
+								trait = creature_genasi
+								trait = creature_tiefling
+								}
+							}
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_aasimar
+								trait = creature_genasi
+								trait = creature_tiefling
+							}
+						}
+					}
+				}
+				add_trait = planetouched
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#drow + human or half-human (not half-elf!) = half-drow
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_drow }
+						mother_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_drow }
+						true_father_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+				}
+			}
+			add_trait = creature_half_elf
+			set_graphical_culture = crinti
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_aasimar
+								trait = creature_genasi
+								trait = creature_tiefling
+								}
+							}
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_aasimar
+								trait = creature_genasi
+								trait = creature_tiefling
+							}
+						}
+					}
+				}
+				add_trait = planetouched
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#feyri + human or half-human (not half-elf!) = 50/50 half-elf or tiefling
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_feyri }
+						mother_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_feyri }
+						true_father_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					add_trait = creature_half_elf
+					set_graphical_culture = sun_elf
+					if = {
+						limit = {
+							OR = {
+								true_father_even_if_dead = {
+									OR = {
+										trait = creature_aasimar
+										trait = creature_genasi
+										trait = creature_tiefling
+										}
+									}
+								mother_even_if_dead = {
+									OR = {
+										trait = creature_aasimar
+										trait = creature_genasi
+										trait = creature_tiefling
+									}
+								}
+							}
+						}
+						add_trait = planetouched
+					}
+				}
+				1 = {
+					add_trait = tiefling
+					set_graphical_culture = tiefling
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#draegloth + human or half-human (not half-elf!) = 50/50 half-drow or tiefling
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_draegloth }
+						mother_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_draegloth }
+						true_father_even_if_dead = {
+							OR = { 
+								trait = creature_human
+								trait = creature_half_dwarf
+								trait = creature_half_orc
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi 
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_half_gnoll
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
+						}
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					add_trait = creature_half_elf
+					set_graphical_culture = crinti
+					if = {
+						limit = {
+							OR = {
+								true_father_even_if_dead = {
+									OR = {
+										trait = creature_aasimar
+										trait = creature_genasi
+										trait = creature_tiefling
+										}
+									}
+								mother_even_if_dead = {
+									OR = {
+										trait = creature_aasimar
+										trait = creature_genasi
+										trait = creature_tiefling
+									}
+								}
+							}
+						}
+						add_trait = planetouched
+					}
+				}
+				1 = {
+					add_trait = tiefling
+					set_graphical_culture = tiefling
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#elf + half-elf = 4/1 half-elf or elf
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_elf }
 						mother_even_if_dead = { trait = creature_half_elf }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_elf }
 						true_father_even_if_dead = { trait = creature_half_elf }
 					}
 				}
-				if = {
-					limit = {
-						OR = {
-							mother_even_if_dead = { trait = creature_elf }
-							true_father_even_if_dead = { trait = creature_elf }
-						}
-					}
-					random_list = {
-						1 = {
-							add_trait = creature_elf
-						}
-						4 = {
-							add_trait = creature_half_elf
-						}
-					}
-					if = {
-						limit = {
-							mother_even_if_dead = { trait = creature_elf }
-						}
-						mother_even_if_dead = { tb_graph_culture_racial = yes }
-					}
-					else = {
-						true_father_even_if_dead = { tb_graph_culture_racial = yes }
-					}
+			}
+			random_list = {
+				1  = {
+					add_trait = creature_elf
 				}
-				else_if = {
-					limit = {
-						OR = {
-							mother_even_if_dead = { trait = creature_drow }
-							true_father_even_if_dead = { trait = creature_drow }
-						}
-					}
-					random_list = {
-						1 = {
-							add_trait = creature_drow
-							set_graphical_culture = drow
-						}
-						4 = {
-							add_trait = creature_drow
-							set_graphical_culture = crinti
-						}
-					}
+				4 = {
+					add_trait = creature_half_elf
 				}
 			}
-			#Draegloth or Feyri results in tieflings with a small chance of full elf
-			else_if = {
+			if = {
 				limit = {
-					OR = {
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_draegloth
-								trait = creature_feyri
-							}
-						}
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_draegloth
-								trait = creature_feyri
-							}
-						}
-					}
+					mother_even_if_dead = { trait = creature_elf }
 				}
-				if = {
-					limit = {
-						OR = {
-							mother_even_if_dead = { trait = creature_feyri }
-							true_father_even_if_dead = { trait = creature_feyri }
-						}
-					}
-					random_list = {
-						1 = {
-							add_trait = creature_elf
-							add_trait = planetouched
-							set_graphical_culture = sun_elf
-						}
-						5 = {
-							add_trait = creature_feyri
-							set_graphical_culture = feyri
-						}
-						20 = {
-							add_trait = creature_tiefling
-							set_graphical_culture = tiefling
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							mother_even_if_dead = { trait = creature_draegloth }
-							true_father_even_if_dead = { trait = creature_draegloth }
-						}
-					}
-					random_list = {
-						1 = {
-							add_trait = creature_drow
-							add_trait = planetouched
-							set_graphical_culture = drow
-						}
-						5 = {
-							add_trait = creature_draegloth
-							set_graphical_culture = draegloth
-						}
-						20 = {
-							add_trait = creature_tiefling
-							set_graphical_culture = tiefling
-						}
-					}
-				}
+				mother_even_if_dead = { tb_graph_culture_racial = yes }
 			}
-			#Fey'ri/Draegloth + the rest have a chance to result in tiefling instead of half-elf
-			else_if = {
-				limit = {
-					OR = {
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_draegloth
-								trait = creature_feyri
-							}
-						}
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_draegloth
-								trait = creature_feyri
-							}
-						}
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_tiefling
-						set_graphical_culture = tiefling
-					}
-					1 = {
-						add_trait = creature_half_elf
-						if = {
-							limit = {
-								OR = {
-									true_father_even_if_dead = { trait = creature_feyri }
-									mother_even_if_dead = { trait = creature_feyri }
-								}
-							}
-							set_graphical_culture = sun_elf
-						}
-						else = {
-							set_graphical_culture = crinti
-						}
-					}
-				}
-			}
-			#This is the rest of the results
 			else = {
-				add_trait = creature_half_elf
-				if = {
-					limit = {
-						mother_even_if_dead = { trait = creature_elf }
+				true_father_even_if_dead = { tb_graph_culture_racial = yes }
+			}
+		}
+		#drow + half-elf = 4/1 half-drow or drow
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_drow }
+						mother_even_if_dead = { trait = creature_half_elf }
 					}
-					mother_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-				else = {
-					true_father_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-				if = {
-					limit = {
-						OR = {
-							true_father_even_if_dead = {
-								OR = {
-									trait = creature_aasimar
-									trait = creature_genasi
-									trait = creature_tiefling
-								}
-							}
-							mother_even_if_dead = {
-								OR = {
-									trait = creature_aasimar
-									trait = creature_genasi
-									trait = creature_tiefling
-								}
-							}
-						}
+					AND = {
+						mother_even_if_dead = { trait = creature_drow }
+						true_father_even_if_dead = { trait = creature_half_elf }
 					}
-					add_trait = planetouched
 				}
-				if = {
-					limit = {
-						OR = {
-							true_father_even_if_dead = { trait = creature_spirit_folk }
-							mother_even_if_dead = { trait = creature_spirit_folk }
-						}
-					}
-					add_trait = feytouched
+			}
+			random_list = {
+				1  = {
+					add_trait = creature_drow
+					set_graphical_culture = drow
+				}
+				4 = {
+					add_trait = creature_half_elf
+					set_graphical_culture = crinti
 				}
 			}
 		}
-		#elves/drow + orcs/ogrillons
+		#feyri + half-elf = 20/5/1 tiefling or feyri or elf
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_feyri }
+						mother_even_if_dead = { trait = creature_half_elf }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_feyri }
+						true_father_even_if_dead = { trait = creature_half_elf }
+					}
+				}
+			}
+			random_list = {
+				1  = {
+					add_trait = creature_elf
+					set_graphical_culture = sun_elf
+				}
+				5 = {
+					add_trait = creature_feyri
+					set_graphical_culture = feyri
+				}
+				20 = {
+					add_trait = creature_tiefling
+					set_graphical_culture = tiefling
+				}
+			}
+		}
+		#draegloth + half-elf = 20/5/1 tiefling or draegloth or drow
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_draegloth }
+						mother_even_if_dead = { trait = creature_half_elf }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_draegloth }
+						true_father_even_if_dead = { trait = creature_half_elf }
+					}
+				}
+			}
+			random_list = {
+				1  = {
+					add_trait = creature_drow
+					set_graphical_culture = drow
+				}
+				5 = {
+					add_trait = creature_draegloth
+					set_graphical_culture = draegloth
+				}
+				20 = {
+					add_trait = creature_tiefling
+					set_graphical_culture = tiefling
+				}
+			}
+		}
+		#elves/drow + orcs/ogrillons = half-orc
 		else_if = {
 			limit = {
 				OR = {
@@ -1055,7 +1225,7 @@ character_event = {
 			add_trait = creature_half_orc
 			set_graphical_culture = orc
 		}
-		#elf/drow/feyri/draegloth + tanarukk
+		#elf/drow/feyri/draegloth + tanarukk = tiefling
 		else_if = {
 			limit = {
 				OR = {
@@ -1086,7 +1256,7 @@ character_event = {
 			add_trait = creature_tiefling
 			set_graphical_culture = tiefling
 		}
-		#feyri/draegloth + orc/ogrillon
+		#feyri/draegloth + orc/ogrillon = tiefling
 		else_if = {
 			else_if = {
 				limit = {
@@ -1126,7 +1296,7 @@ character_event = {
 			}
 		}
 		#small folk
-		#Dwarf + Halfling
+		#Dwarf + Halfling = 50/50 dwarf or halfling
 		else_if = {
 			limit = {
 				OR = {
@@ -1159,7 +1329,7 @@ character_event = {
 				}
 			}
 		}
-		#Dwarf + Gnome
+		#Dwarf + Gnome = 50/50 dwarf or gnome
 		else_if = {
 			limit = {
 				OR = {
@@ -1200,7 +1370,7 @@ character_event = {
 				}
 			}
 		}
-		#Gnome + Halfling
+		#Gnome + Halfling = 50/50 gnome or halfling
 		else_if = {
 			limit = {
 				OR = {
@@ -1233,7 +1403,7 @@ character_event = {
 				}
 			}
 		}
-		#Dwarf + Humans/Half-Humans/Elves
+		#Dwarf + Humans/Half-Humans/Elves = half-dwarf
 		else_if = {
 			limit = {
 				OR = {
@@ -1332,7 +1502,7 @@ character_event = {
 				add_trait = feytouched
 			}
 		}
-		#Halfling + Humans/Half-Humans
+		#Halfling + Humans/Half-Humans = 75/25 halfling or human
 		else_if = {
 			limit = {
 				OR = {
@@ -1421,7 +1591,7 @@ character_event = {
 				add_trait = feytouched
 			}
 		}
-		#Gnome + Humans/Half-Humans
+		#Gnome + Humans/Half-Humans = 75/25 gnome or human
 		else_if = {
 			limit = {
 				OR = {
@@ -1518,25 +1688,17 @@ character_event = {
 				add_trait = feytouched
 			}
 		}
-		#half-orcs from orcs, tanarukks and ogrillons
+		#orc + humans & half-humans (except half-orcs and half-ogres) = half-orc
 		else_if = {
 			limit = {
 				OR = {
 					AND = {
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_orc
-								trait = creature_ogrillon
-								trait = creature_tanarukk
-							}
-						}
+						true_father_even_if_dead = { trait = creature_orc }
 						mother_even_if_dead = {
 							OR = {
 								trait = creature_human
 								trait = creature_half_elf
-								trait = creature_half_orc
 								trait = creature_half_dwarf
-								trait = creature_half_ogre
 								trait = creature_half_giant
 								trait = creature_half_gnoll
 								trait = creature_gith
@@ -1550,20 +1712,12 @@ character_event = {
 						}
 					}
 					AND = {
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_orc
-								trait = creature_ogrillon
-								trait = creature_tanarukk
-							}
-						}
+						mother_even_if_dead = { trait = creature_orc }
 						true_father_even_if_dead = {
 							OR = {
 								trait = creature_human
 								trait = creature_half_elf
-								trait = creature_half_orc
 								trait = creature_half_dwarf
-								trait = creature_half_ogre
 								trait = creature_half_giant
 								trait = creature_half_gnoll
 								trait = creature_gith
@@ -1578,165 +1732,22 @@ character_event = {
 					}
 				}
 			}
-			#Ogrillon + Half Ogre has equal chance of half-orc and ogre
-			if = {
-				limit = {
-					OR = {
-						AND = {
-							true_father_even_if_dead = { trait = creature_ogrillon }
-							mother_even_if_dead = { trait = creature_half_ogre }
-						}
-						AND = {
-							mother_even_if_dead = { trait = creature_ogrillon }
-							true_father_even_if_dead = { trait = creature_half_ogre }
-						}
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_ogre
-						if = {
-							limit = {
-								mother_even_if_dead = { trait = creature_half_ogre }
-							}
-							mother_even_if_dead = { tb_graph_culture_racial = yes }
-						}
-						else = {
-							true_father_even_if_dead = { tb_graph_culture_racial = yes }
-						}
-					}
-					1 = {
-						add_trait = creature_half_orc
-						set_graphical_culture = orc
-					}
-				}
-			}
-			#Orc + Half Ogre has equal chance of half-orc and ogrillon
-			if = {
-				limit = {
-					OR = {
-						AND = {
-							true_father_even_if_dead = { trait = creature_orc }
-							mother_even_if_dead = { trait = creature_half_ogre }
-						}
-						AND = {
-							mother_even_if_dead = { trait = creature_orc }
-							true_father_even_if_dead = { trait = creature_half_ogre }
-						}
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_ogrillon
-						if = {
-							limit = {
-								mother_even_if_dead = { trait = creature_half_ogre }
-							}
-							mother_even_if_dead = { tb_graph_culture_racial = yes }
-						}
-						else = {
-							true_father_even_if_dead = { tb_graph_culture_racial = yes }
-						}
-					}
-					1 = {
-						add_trait = creature_half_orc
-						set_graphical_culture = orc
-					}
-				}
-			}
-			#Orc + Half-Orc has chance of full orc
-			else_if = {
-				limit = {
-					OR = {
-						AND = {
-							true_father_even_if_dead = { trait = creature_orc }
-							mother_even_if_dead = { trait = creature_half_orc }
-						}
-						AND = {
-							mother_even_if_dead = { trait = creature_orc }
-							true_father_even_if_dead = { trait = creature_half_orc }
-						}
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_orc
-					}
-					3 = {
-						add_trait = creature_half_orc
-					}
-				}
-				set_graphical_culture = orc
-			}
-			#Tanarukk + Half-Orc has a chance of full orc, tanarukk or tiefling
-			else_if = {
-				limit = {
-					OR = {
-						AND = {
-							true_father_even_if_dead = { trait = creature_tanarukk }
-							mother_even_if_dead = { trait = creature_half_orc }
-						}
-						AND = {
-							mother_even_if_dead = { trait = creature_tanarukk }
-							true_father_even_if_dead = { trait = creature_half_orc }
-						}
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_tanarukk
-						set_graphical_culture = tanarukk
-					}
-					5 = {
-						add_trait = creature_orc
-						set_graphical_culture = orc
-					}
-					10 = {
-						add_trait = creature_half_orc
-						set_graphical_culture = orc
-					}
-				}
-			}
-			#Tanarukk + the rest has a chance of tiefling instead of half-orc
-			else_if = {
-				limit = {
-					OR = {
-						true_father_even_if_dead = { trait = creature_tanarukk }
-						mother_even_if_dead = { trait = creature_tanarukk }
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_half_orc
-						set_graphical_culture = orc
-					}
-					1 = {
-						add_trait = creature_tiefling
-						set_graphical_culture = tiefling
-					}
-				}
-			}
-			#Orc + rest now
-			else = {
-				add_trait = creature_half_orc
-				set_graphical_culture = orc
-			}
+			add_trait = creature_half_orc
+			set_graphical_culture = orc
 			if = {
 				limit = {
 					OR = {
 						true_father_even_if_dead = {
 							OR = {
-								trait = creature_tanarukk
-								trait = creature_genasi
 								trait = creature_tiefling
+								trait = creature_genasi
 								trait = creature_aasimar
 							}
 						}
-						mother_even_if_dead = {
+						mother_even_if_dead = { 
 							OR = {
-								trait = creature_tanarukk
-								trait = creature_genasi
 								trait = creature_tiefling
+								trait = creature_genasi
 								trait = creature_aasimar
 							}
 						}
@@ -1754,7 +1765,293 @@ character_event = {
 				add_trait = feytouched
 			}
 		}
-		#orcs + gnolls
+		#orc + half-orc = 4/1 half-orc or orc
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_orc }
+						mother_even_if_dead = { trait = half_orc }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_orc }
+						true_father_even_if_dead = { trait = half_orc }
+					}
+				}
+			}
+			random_list = {
+				4 = {
+					add_trait = creature_half_orc
+				}
+				1 = {
+					add_trait = orc
+				}
+			}
+			set_graphical_culture = orc
+		}
+		#orc + half-ogre = 50/50 half-orc or ogrillon
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_orc }
+						mother_even_if_dead = { trait = half_ogre }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_orc }
+						true_father_even_if_dead = { trait = half_ogre }
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					add_trait = creature_half_orc
+					set_graphical_culture = orc
+				}
+				1 = {
+					add_trait = creature_ogrillon
+					set_graphical_culture = ogre
+				}
+			}
+		}
+		#ogrillon + humans & half-humans (except half-orcs and half-ogres) = 50/50 half-orc or half-ogre
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogrillon }
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_human
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_spirit_folk
+								trait = creature_deep_imaskari
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_ogrillon }
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_human
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_spirit_folk
+								trait = creature_deep_imaskari
+							}
+						}
+					}
+				}
+			}
+			random_list = {
+				1 = {
+					add_trait = creature_half_orc
+					set_graphical_culture = orc
+				}
+				1 = {
+					add_trait = creature_half_ogre
+					if = {
+						limit = {
+							mother_even_if_dead = { trait = creature_ogrillon }
+						}
+						mother_even_if_dead = { tb_graph_culture_racial = yes }
+					}
+					else = {
+						true_father_even_if_dead = { tb_graph_culture_racial = yes }
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+							}
+						}
+						mother_even_if_dead = { 
+							OR = {
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+							}
+						}
+					}
+				}
+				add_trait = planetouched
+			}
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#ogrillon + half-orc = 4/1 half-orc or orc
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogrillon }
+						mother_even_if_dead = { trait = half_orc }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_ogrillon }
+						true_father_even_if_dead = { trait = half_orc }
+					}
+				}
+			}
+			random_list = {
+				4 = {
+					add_trait = creature_half_orc
+				}
+				1 = {
+					add_trait = orc
+				}
+			}
+			set_graphical_culture = orc
+		}
+		#ogrillon + half-ogre = 4/4/1 half-ogre or half-orc or ogre
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogrillon }
+						mother_even_if_dead = { trait = half_ogre }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_ogrillon }
+						true_father_even_if_dead = { trait = half_ogre }
+					}
+				}
+			}
+			random_list = {
+				4 = {
+					add_trait = creature_half_orc
+					set_graphical_culture = orc
+				}
+				4 = {
+					add_trait = creature_half_ogre
+					set_graphical_culture = ogre
+				}
+				1 = {
+					add_trait = creature_ogre
+					if = {
+						limit = {
+							mother_even_if_dead = { trait = creature_ogrillon }
+						}
+						mother_even_if_dead = { tb_graph_culture_racial = yes }
+					}
+					else = {
+						true_father_even_if_dead = { tb_graph_culture_racial = yes }
+					}
+				}
+			}
+		}
+		#tanarukk + humans & half-humans (except half-orcs) = tiefling
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_tanarukk }
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_human
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_spirit_folk
+								trait = creature_deep_imaskari
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_tanarukk }
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_human
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_spirit_folk
+								trait = creature_deep_imaskari
+							}
+						}
+					}
+				}
+			}
+			add_trait = creature_tiefling
+			set_graphical_culture = tiefling
+			if = {
+				limit = {
+					OR = {
+						true_father_even_if_dead = { trait = creature_spirit_folk }
+						mother_even_if_dead = { trait = creature_spirit_folk }
+					}
+				}
+				add_trait = feytouched
+			}
+		}
+		#tanarukk + half-orc = 4/1 tiefling or orc
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_tanarukk }
+						mother_even_if_dead = { trait = half_orc }
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_tanarukk }
+						true_father_even_if_dead = { trait = half_orc }
+					}
+				}
+			}
+			random_list = {
+				4 = {
+					add_trait = creature_tiefling
+					set_graphical_culture = tiefling
+				}
+				1 = {
+					add_trait = orc
+					set_graphical_culture = orc
+				}
+			}
+		}
+		#orcs + gnolls = 50/50 orc or gnoll
 		else_if = {
 			limit = {
 				OR = {
@@ -1800,7 +2097,7 @@ character_event = {
 				add_trait = planetouched
 			}
 		}
-		#orcs + goblinoids
+		#orcs + goblin = 3/3/1 orc or goblin or hobgoblin
 		else_if = {
 			limit = {
 				OR = {
@@ -1850,6 +2147,7 @@ character_event = {
 				add_trait = planetouched
 			}
 		}
+		#orcs + hobgoblin = 50/50 orc or hobgoblin
 		else_if = {
 			limit = {
 				OR = {
@@ -1895,6 +2193,7 @@ character_event = {
 				add_trait = planetouched
 			}
 		}
+		#orcs + bugbear = 50/50 orcs or bugbear
 		else_if = {
 			limit = {
 				OR = {
@@ -1940,7 +2239,7 @@ character_event = {
 				add_trait = planetouched
 			}
 		}
-		#half-ogres from ogres
+		#ogre + humans and half-humans (except half-ogre and half-orc) = half-ogre
 		else_if = {
 			limit = {
 				OR = {
@@ -1951,10 +2250,8 @@ character_event = {
 								trait = creature_human
 								trait = creature_half_elf
 								trait = creature_half_dwarf
-								trait = creature_half_orc
 								trait = creature_half_giant
 								trait = creature_half_gnoll
-								trait = creature_half_ogre
 								trait = creature_gith
 								trait = creature_tiefling
 								trait = creature_genasi
@@ -1988,6 +2285,7 @@ character_event = {
 					}
 				}
 			}
+			add_trait = creature_half_ogre
 			if = {
 				limit = {
 					mother_even_if_dead = { trait = creature_ogre }
@@ -1997,63 +2295,6 @@ character_event = {
 			else = {
 				true_father_even_if_dead = { tb_graph_culture_racial = yes }
 			}
-			#Ogre + Half-Ogre has a chance of full ogre
-			if = {
-				limit = {
-					OR = {
-						true_father_even_if_dead = { trait = creature_half_ogre }
-						mother_even_if_dead = { trait = creature_half_ogre }
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_ogre
-					}
-					1 = {
-						add_trait = creature_half_ogre
-					}
-				}
-				if = {
-					limit = {
-						mother_even_if_dead = { trait = creature_ogre }
-					}
-					mother_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-				else = {
-					true_father_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-			}
-			#Ogre + Half-Orc has chance of either half-ogre or ogrillon
-			else_if = {
-				limit = {
-					OR = {
-						true_father_even_if_dead = { trait = creature_half_orc }
-						mother_even_if_dead = { trait = creature_half_orc }
-					}
-				}
-				random_list = {
-					1 = {
-						add_trait = creature_ogrillon
-					}
-					1 = {
-						add_trait = creature_half_ogre
-					}
-				}
-				if = {
-					limit = {
-						mother_even_if_dead = { trait = creature_ogre }
-					}
-					mother_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-				else = {
-					true_father_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-			}
-			#Ogre + the rest
-			else = {
-				add_trait = creature_half_ogre
-			}
-			#misc traits
 			if = {
 				limit = {
 					OR = {
@@ -2087,30 +2328,26 @@ character_event = {
 				add_trait = feytouched
 			}
 		}
-		#ogrillon from ogre
+		#ogre + half-ogre = 4/1 half-ogre or ogre
 		else_if = {
 			limit = {
 				OR = {
 					AND = {
 						true_father_even_if_dead = { trait = creature_ogre }
-						mother_even_if_dead = {
-							OR = {
-								trait = creature_orc
-								trait = creature_tanarukk
-								trait = creature_ogrillon
-							}
-						}
+						mother_even_if_dead = { trait = creature_half_ogre }
 					}
 					AND = {
+						true_father_even_if_dead = { trait = creature_half_ogre }
 						mother_even_if_dead = { trait = creature_ogre }
-						true_father_even_if_dead = {
-							OR = {
-								trait = creature_orc
-								trait = creature_tanarukk
-								trait = creature_ogrillon
-							}
-						}
 					}
+				}
+			}
+			random_list = {
+				4 = { 
+					add_trait = creature_half_ogre
+				}
+				1 = {
+					add_trait = creature_ogre
 				}
 			}
 			if = {
@@ -2122,37 +2359,73 @@ character_event = {
 			else = {
 				true_father_even_if_dead = { tb_graph_culture_racial = yes }
 			}
-			#Ogre + Ogrillon has chance of full ogre
+		}
+		#ogre + half-orc = 50/50 half-ogre or ogrillon
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogre }
+						mother_even_if_dead = { trait = creature_half_orc }
+					}
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogre }
+						mother_even_if_dead = { trait = creature_half_orc }
+					}
+				}
+			}
+			random_list = {
+				1 = { 
+					add_trait = creature_half_ogre
+				}
+				1 = {
+					add_trait = creature_ogrillon
+				}
+			}
 			if = {
 				limit = {
-					OR = {
-						true_father_even_if_dead = { trait = creature_ogrillon }
-						mother_even_if_dead = { trait = creature_ogrillon }
-					}
+					mother_even_if_dead = { trait = creature_ogre }
 				}
-				random_list = {
-					1 = {
-						add_trait = creature_ogre
-					}
-					1 = {
-						add_trait = creature_ogrillon
-					}
-				}
-				if = {
-					limit = {
-						mother_even_if_dead = { trait = creature_ogre }
-					}
-					mother_even_if_dead = { tb_graph_culture_racial = yes }
-				}
-				else = {
-					true_father_even_if_dead = { tb_graph_culture_racial = yes }
-				}
+				mother_even_if_dead = { tb_graph_culture_racial = yes }
 			}
-			#The rest
 			else = {
-				add_trait = creature_ogrillon
+				true_father_even_if_dead = { tb_graph_culture_racial = yes }
 			}
-			#Planetouched
+		}
+		#ogre + orc or tanarukk = ogrillon
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogre }
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_orc
+								trait = creature_tanarukk
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_ogre }
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_orc
+								trait = creature_tanarukk
+							}
+						}
+					}
+				}
+			}
+			add_trait = creature_ogrillon
+			if = {
+				limit = {
+					mother_even_if_dead = { trait = creature_ogre }
+				}
+				mother_even_if_dead = { tb_graph_culture_racial = yes }
+			}
+			else = {
+				true_father_even_if_dead = { tb_graph_culture_racial = yes }
+			}
 			if = {
 				limit = {
 					OR = {
@@ -2163,7 +2436,39 @@ character_event = {
 				add_trait = planetouched
 			}
 		}
-		#ogre + goblin
+		#ogre + ogrillon = 4/1 ogrillon or ogre
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogre }
+						mother_even_if_dead = { trait = creature_ogrillon }
+					}
+					AND = {
+						true_father_even_if_dead = { trait = creature_ogrillon }
+						mother_even_if_dead = { trait = creature_ogre }
+					}
+				}
+			}
+			random_list = {
+				1 = { 
+					add_trait = creature_ogre
+				}
+				4 = {
+					add_trait = creature_ogrillon
+				}
+			}
+			if = {
+				limit = {
+					mother_even_if_dead = { trait = creature_ogre }
+				}
+				mother_even_if_dead = { tb_graph_culture_racial = yes }
+			}
+			else = {
+				true_father_even_if_dead = { tb_graph_culture_racial = yes }
+			}
+		}
+		#ogre/half-ogre + goblin = 50/50 hobgoblin or bugbear
 		else_if = {
 			limit = {
 				OR = {
@@ -2172,7 +2477,6 @@ character_event = {
 							OR = {
 								trait = creature_ogre
 								trait = creature_half_ogre
-								trait = creature_ogrillon
 							}
 						}
 						mother_even_if_dead = { trait = creature_goblin }
@@ -2182,7 +2486,6 @@ character_event = {
 							OR = {
 								trait = creature_ogre
 								trait = creature_half_ogre
-								trait = creature_ogrillon
 							}
 						}
 						true_father_even_if_dead = { trait = creature_goblin }
@@ -2198,7 +2501,7 @@ character_event = {
 				set_graphical_culture = bugbear
 			}
 		}
-		#ogre + hobgoblin
+		#ogre/half-ogre + hobgoblin = hobgoblin
 		else_if = {
 			limit = {
 				OR = {
@@ -2207,7 +2510,6 @@ character_event = {
 							OR = {
 								trait = creature_ogre
 								trait = creature_half_ogre
-								trait = creature_ogrillon
 							}
 						}
 						mother_even_if_dead = { trait = creature_hobgoblin }
@@ -2227,7 +2529,7 @@ character_event = {
 			add_trait = creature_hobgoblin
 			set_graphical_culture = hobgoblin
 		}
-		#ogre + bugbear
+		#ogre/half-ogre + bugbear = bugbear
 		else_if = {
 			limit = {
 				OR = {
@@ -2236,7 +2538,6 @@ character_event = {
 							OR = {
 								trait = creature_ogre
 								trait = creature_half_ogre
-								trait = creature_ogrillon
 							}
 						}
 						mother_even_if_dead = { trait = creature_bugbear }
@@ -2246,7 +2547,6 @@ character_event = {
 							OR = {
 								trait = creature_ogre
 								trait = creature_half_ogre
-								trait = creature_ogrillon
 							}
 						}
 						true_father_even_if_dead = { trait = creature_bugbear }
@@ -2256,7 +2556,7 @@ character_event = {
 			add_trait = creature_bugbear
 			set_graphical_culture = bugbear
 		}
-		#ogre + giant
+		#ogre + giant = 5/1 ogre or giant
 		else_if = {
 			limit = {
 				OR = {
@@ -2297,7 +2597,7 @@ character_event = {
 				}
 			}
 		}
-		#half-ogre/ogrillon + giant
+		#half-ogre/ogrillon + giant = ogre
 		else_if = {
 			limit = {
 				OR = {
@@ -2337,7 +2637,7 @@ character_event = {
 				true_father_even_if_dead = { tb_graph_culture_racial = yes }
 			}
 		}
-		#ogre + minotaur/yikarian
+		#ogres + minotaur/yikarian = 50/50 ogre or minotaur
 		else_if = {
 			limit = {
 				OR = {
@@ -2402,7 +2702,7 @@ character_event = {
 				}
 			}
 		}
-		#ogre + gnoll
+		#ogre + gnoll = 50/50 gnoll or ogre
 		else_if = {
 			limit = {
 				OR = {
@@ -2435,7 +2735,7 @@ character_event = {
 				}
 			}
 		}
-		#goliaths + humans
+		#goliaths + humans = half-giant
 		else_if = {
 			limit = {
 				OR = {
@@ -2452,7 +2752,7 @@ character_event = {
 			add_trait = creature_half_giant
 			human_racial = yes
 		}
-		#goliath + half-giant
+		#goliath + half-giant = 50/50 half-giant or goliath
 		else_if = {
 			limit = {
 				OR = {
@@ -2477,7 +2777,7 @@ character_event = {
 				}
 			}
 		}
-		#goliath + ogre/half-ogre/ogrillon
+		#goliath + ogre/half-ogre/ogrillon = 50/50 goliath or ogre
 		else_if = {
 			limit = {
 				OR = {
@@ -2532,7 +2832,7 @@ character_event = {
 				}
 			}
 		}
-		#goliath + giant
+		#goliath + giant = 5/1 goliath or giant
 		else_if = {
 			limit = {
 				OR = {
@@ -2565,7 +2865,7 @@ character_event = {
 				}
 			}
 		}
-		#minotaurs
+		#minotaur + yikarian = 50/50 minotaur or yikarian
 		else_if = {
 			limit = {
 				OR = {
