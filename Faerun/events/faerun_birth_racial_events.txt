@@ -9,73 +9,16 @@ character_event = {
 	is_triggered_only = yes #on birth
 	
 	trigger = {
-		NOR = {
-			trait = creature_drow
-			trait = creature_elf
-			trait = creature_half_elf
-			trait = creature_feyri
-			trait = creature_treant
-			trait = creature_centaur
-			trait = creature_wemic
-			trait = creature_dwarf
-			trait = creature_giant
-			trait = creature_half_giant
-			trait = creature_gnome
-			trait = creature_gith
-			trait = creature_goblin
-			trait = creature_hobgoblin
-			trait = creature_bugbear
-			trait = creature_gnoll
-			trait = creature_hag
-			trait = creature_halfling
-			trait = creature_human
-			trait = creature_minotaur
-			trait = creature_orc
-			trait = creature_half_orc
-			trait = creature_tanarukk
-			trait = creature_ogre
-			trait = creature_half_ogre
-			trait = creature_ogrillon
-			trait = creature_yikarian
-			trait = creature_pureblood
-			trait = creature_malison
-			trait = creature_abomination
-			trait = creature_lizardfolk
-			trait = creature_naga
-			trait = creature_dragonborn
-			trait = creature_dragon
-			trait = creature_saurial
-			trait = creature_pterafolk
-			trait = creature_kobold
-			trait = creature_tengu
-			trait = creature_monster
-			trait = creature_genasi
-			trait = creature_tiefling
-			trait = creature_aasimar
-			trait = creature_fiend
-			trait = creature_genie
-			trait = creature_sarrukh
-			trait = creature_troll
-			trait = creature_half_dwarf
-			trait = creature_angel
-			trait = creature_goliath
-			trait = creature_aarakocra
-			trait = creature_sahuagin
-			trait = creature_hagspawn
-			trait = creature_lamia
-			trait = creature_kuotoa
-			trait = creature_construct
-			trait = creature_tabaxi
-			trait = creature_satyr
-			trait = creature_spirit_folk
-			trait = creature_hengeyokai
-			trait = creature_draegloth
-			trait = creature_deep_imaskari
+		faerun_any_race = no
 			#has_character_flag = faerun_generated
-		}
 	}
 	
 	option = {
+		trigger = { # Both parents available
+			true_father_even_if_dead = { always = yes }
+			mother_even_if_dead = { always = yes }
+		}
+
 		# Default inheritance of graphical culture.
 		random_list = {
 			1 = {
@@ -972,7 +915,7 @@ character_event = {
 					}
 				}
 				1 = {
-					add_trait = tiefling
+					add_trait = creature_tiefling
 					set_graphical_culture = tiefling
 				}
 			}
@@ -1059,7 +1002,7 @@ character_event = {
 					}
 				}
 				1 = {
-					add_trait = tiefling
+					add_trait = creature_tiefling
 					set_graphical_culture = tiefling
 				}
 			}
@@ -1782,7 +1725,7 @@ character_event = {
 					add_trait = creature_half_orc
 				}
 				1 = {
-					add_trait = orc
+					add_trait = creature_orc
 				}
 			}
 			set_graphical_culture = orc
@@ -1924,7 +1867,7 @@ character_event = {
 					add_trait = creature_half_orc
 				}
 				1 = {
-					add_trait = orc
+					add_trait = creature_orc
 				}
 			}
 			set_graphical_culture = orc
@@ -2044,7 +1987,7 @@ character_event = {
 					set_graphical_culture = tiefling
 				}
 				1 = {
-					add_trait = orc
+					add_trait = creature_orc
 					set_graphical_culture = orc
 				}
 			}
@@ -4560,39 +4503,43 @@ character_event = {
 					AND = {
 						true_father_even_if_dead = { trait = creature_fiend }
 						mother_even_if_dead = {
-							trait = creature_human
-							trait = creature_half_orc
-							trait = creature_half_elf
-							trait = creature_half_dwarf
-							trait = creature_half_ogre
-							trait = creature_half_giant
-							trait = creature_half_gnoll
-							trait = creature_gith
-							trait = creature_tiefling
-							trait = creature_genasi
-							trait = creature_aasimar
-							trait = creature_hagspawn
-							trait = creature_deep_imaskari
-							trait = creature_spirit_folk
+							OR = {
+								trait = creature_human
+								trait = creature_half_orc
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
 						}
 					}
 					AND = {
 						mother_even_if_dead = { trait = creature_fiend }
 						true_father_even_if_dead = {
-							trait = creature_human
-							trait = creature_half_orc
-							trait = creature_half_elf
-							trait = creature_half_dwarf
-							trait = creature_half_ogre
-							trait = creature_half_giant
-							trait = creature_half_gnoll
-							trait = creature_gith
-							trait = creature_tiefling
-							trait = creature_genasi
-							trait = creature_aasimar
-							trait = creature_hagspawn
-							trait = creature_deep_imaskari
-							trait = creature_spirit_folk
+							OR = {
+								trait = creature_human
+								trait = creature_half_orc
+								trait = creature_half_elf
+								trait = creature_half_dwarf
+								trait = creature_half_ogre
+								trait = creature_half_giant
+								trait = creature_half_gnoll
+								trait = creature_gith
+								trait = creature_tiefling
+								trait = creature_genasi
+								trait = creature_aasimar
+								trait = creature_hagspawn
+								trait = creature_deep_imaskari
+								trait = creature_spirit_folk
+							}
 						}
 					}
 				}
@@ -9987,11 +9934,34 @@ character_event = {
 			}
 			add_trait = natural_lycanthrope
 		}
+
+		# Track anyone falling through.
+		if = {
+			limit = { faerun_any_race = no }
+			log = "WARNING: Child [Root.GetFullName] did not get a race assigned!"
+		}
+	}
+
+	option = {
+		trigger = { # One parent available
+			true_father_even_if_dead = { always = yes }
+			NOT = { mother_even_if_dead = { always = yes } }
+		}
+		true_father_even_if_dead = {
+			ROOT = { copy_race_of_prev = yes }
+		}
+	}
+
+	option = {
+		trigger = { # One parent available
+			NOT = { true_father_even_if_dead = { always = yes } }
+			mother_even_if_dead = { always = yes }
+		}
+		mother_even_if_dead = {
+			ROOT = { copy_race_of_prev = yes }
+		}
 	}
 }
-
-
-
 
 #Attempting to stop disallowed racial unions before birth
 character_event = {
