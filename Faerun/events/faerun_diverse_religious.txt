@@ -255,21 +255,53 @@ character_event = {
 			set_graphical_culture = undead_human
 			character_event = { id = divrel.13 days = 15 }
 			save_event_target_as = combatant_1
-			set_character_flag = deadly_duel@ROOT
 		}
 		save_event_target_as = combatant_2
 	}
 	
 	option = {
 		name = DIVREL.12a
-		custom_tooltip = {
-			text = REVDUEL
-			hidden_tooltip = {
-				new_character = {
-					character_event = { id = HFP.10096 }
+		#custom_tooltip = {
+			#text = REVDUEL
+			#hidden_tooltip = {
+				event_target:challenger_2 = {
+					if = { #If they previously offended you, this rectifies that.
+						limit = { 
+							event_target:combatant_1 = {
+								has_opinion_modifier = { who = ROOT modifier = grievously_offended }
+							}
+						}
+						event_target:combatant_1 = {
+							remove_opinion = { who = ROOT modifier = grievously_offended }
+						}
+					}
+					if = {
+						limit = { #Warriors like a warrior who acts like one...
+							is_member_of_any_warrior_lodge_trigger = yes
+						}
+						add_legend_progress_trivial_effect = yes
+					}
+					set_character_flag = add_duel_xp
 				}
-			}
-		}
+				event_target:challenger_1 = {
+					if = {
+						limit = { #Warriors like a warrior who acts like one...
+							is_member_of_any_warrior_lodge_trigger = yes
+						}
+						add_legend_progress_trivial_effect = yes
+					}
+					set_character_flag = add_duel_xp
+					set_character_flag = deadly_duel@event_target:combatant_2
+					reset_duel_timers_effect = yes
+					set_dueling_weapon_effect = yes
+					event_target:combatant_2 = { set_dueling_weapon_effect = yes }
+					set_potential_injury_flag_effect = yes
+					evaluate_duel_result_score_effect = yes
+					evaluate_extra_duel_result_score_effect = yes
+					send_duel_result_event_effect = yes
+				}
+			#}
+		#}
 	}
 }
 
@@ -563,11 +595,96 @@ character_event = {
 	is_triggered_only = yes
 	
 	immediate = {
-		set_character_flag = deadly_duel@ROOT
+		event_target:challenger_2 = {
+			set_character_flag = flag_duel_no_backsies
+		}
 	}
 	
 	option = {
 		name = DIVREL.24a
-		character_event = { id = HFP.10096 }
+		#hidden_tooltip = {
+			event_target:challenger_2 = {
+				if = { #If they previously offended you, this rectifies that.
+					limit = { 
+						event_target:combatant_1 = {
+							has_opinion_modifier = { who = ROOT modifier = grievously_offended }
+						}
+					}
+					event_target:combatant_1 = {
+						remove_opinion = { who = ROOT modifier = grievously_offended }
+					}
+				}
+				if = {
+					limit = { #Warriors like a warrior who acts like one...
+						is_member_of_any_warrior_lodge_trigger = yes
+					}
+					add_legend_progress_trivial_effect = yes
+				}
+				set_character_flag = add_duel_xp
+			}
+				event_target:challenger_2 = {
+					if = { #If they previously offended you, this rectifies that.
+						limit = { 
+							event_target:combatant_1 = {
+								has_opinion_modifier = { who = ROOT modifier = grievously_offended }
+							}
+						}
+						event_target:combatant_1 = {
+							remove_opinion = { who = ROOT modifier = grievously_offended }
+						}
+					}
+					if = {
+						limit = { #Warriors like a warrior who acts like one...
+							is_member_of_any_warrior_lodge_trigger = yes
+						}
+						add_legend_progress_trivial_effect = yes
+					}
+					set_character_flag = add_duel_xp
+				}
+				if = {
+					limit = { #Warriors like a warrior who acts like one...
+						is_member_of_any_warrior_lodge_trigger = yes
+					}
+					add_legend_progress_trivial_effect = yes
+				}
+				set_character_flag = add_duel_xp
+				set_character_flag = deadly_duel@event_target:combatant_2
+				reset_duel_timers_effect = yes
+				set_dueling_weapon_effect = yes
+				event_target:combatant_2 = { set_dueling_weapon_effect = yes }
+				set_potential_injury_flag_effect = yes
+				evaluate_duel_result_score_effect = yes
+				evaluate_extra_duel_result_score_effect = yes
+				send_duel_result_event_effect = yes
+		#}
+	}
+}
+
+character_event = {
+	id = divrel.25
+	desc = DIVREL.25
+	picture = GFX_evt_midwinter_blot_oldgods
+	border = GFX_event_normal_frame_religion
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = DIVREL.25a
+		add_character_modifier = {
+			modifier = blood_festival_mod
+			months = 5
+		}
+		any_character = { # yes, I know. no better way to scope to them, though.
+			limit = {
+				trait = patron_garagos
+				NOT = { character = ROOT }
+				is_within_diplo_range = yes
+			}
+			opinion = {
+				modifier = blood_festival_opinion
+				who = ROOT
+				months = 5
+			}
+		}
 	}
 }
