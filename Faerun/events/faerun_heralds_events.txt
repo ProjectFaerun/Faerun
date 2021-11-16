@@ -205,74 +205,6 @@ character_event = { #AI join event
   }
 }
 
-#######################Rank UP#############################
-
-#Hidden start: Send the rank-up request to the current Grandmaster (delayed event on self, from decision to rank up)
-character_event = {
-	id = HERA.120
-
-	hide_window = yes
-
-	trigger = { #has pressed the button
-		has_character_flag = has_sent_request_to_rank_up
-	}
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = { #if he's still a member
-			limit = { is_in_society = yes }
-			random_society_member = { #will send the request to a random top rank member of the same society
-				limit = {
-					is_society_grandmaster = yes
-					same_society_as = ROOT
-				}
-				character_event = { id = HERA.121 } # send request to Grand Master.
-			}
-		}
-		if = { #if he's not a member
-			limit = { is_in_society = no }
-			clr_character_flag = has_sent_request_to_rank_up
-		}
-	}
-}
-
-#Grandmaster gets the rank-up request
-character_event = {
-	id = HERA.121
-
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:rank_up_target = { letter_event = { id = HERA.122 } } #send it back
-	}
-}
-
-#Grand master approves my request
-letter_event = {
-	id = HERA.122
-	desc = EVTDESC_HERA_122
-	border = GFX_event_letter_frame_war
-
-	trigger = {
-		society_rank < 4 #cannot rank up past 4
-		has_character_flag = has_sent_request_to_rank_up
-	}
-
-	is_triggered_only = yes
-
-	#Rank up approved
-	option = {
-		name = EVTOPTA_HERA_122
-		if = { limit = { society_rank < 4 } #if not max rank, rank up
-			society_rank_up = 1
-		}
-		clr_character_flag = has_sent_request_to_rank_up
-	}
-}
-
 #################################DECISIONS######################################
 
 # start delving
@@ -1121,36 +1053,155 @@ letter_event = {
 	}
 }
 
+###MISSIONS### (start on 1000)
 
-# FOR UNLANDED AI write about a ruler
+#Mission tombola
 character_event = {
-	id = HERA.400
-	desc = EVTDESC_HERA_400
+	id = HERA.1000
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = heralds
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				society_member_of = heralds
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			15 = {
+				character_event = { id = HERA.1001 } #Write about a ruler
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#MISSION: Write about a ruler
+character_event = {
+	id = HERA.1001
+  hide_window = yes
+
+	is_triggered_only = yes
+
+  trigger = {
+    any_independent_ruler = {
+      primary_title = {
+        is_landless_type_title = no
+      }
+      is_landed = yes
+      NOT = { society_member_of = heralds }
+      is_within_diplo_range = ROOT
+    }
+  }
+
+	immediate = {
+    random_independent_ruler = {
+      limit = {
+        primary_title = {
+          is_landless_type_title = no
+        }
+        is_landed = yes
+        NOT = { society_member_of = heralds }
+        is_within_diplo_range = ROOT
+      }
+      save_event_target_as = writing_target
+    }
+    character_event = { id = HERA.1002 }
+	}
+}
+
+#Ping event for quest giver
+character_event = {
+	id = HERA.1002
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { event_target:writing_target = { always = yes } }
+			FROM = { society_quest_event = { id = HERA.1003 days = 7 random = 7 } }
+		}
+	}
+}
+
+#You get your target
+society_quest_event = {
+	id = HERA.1003
+	title = quest_write_about_ruler
+	quest_target = event_target:writing_target
+  desc = EVTDESC_HERA_1003
+
+	trigger = {
+		is_in_society = yes
+		event_target:writing_target = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:writing_target = {
+			set_quest_target = {
+				id = quest_write_about_ruler
+				holder = ROOT
+			}
+		}
+		event_target:writing_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+    character_event = { id = HERA.1004 days = 15 random = 15 }
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+
+#Choose how to write about a ruler
+character_event = {
+	id = HERA.1004
+	desc = EVTDESC_HERA_300
 	picture = GFX_evt_library
 
 	is_triggered_only = yes
 
   trigger = {
-    society_rank = {
-      society = heralds
-      rank = 4
-    }
-    ai = yes
-    is_landed = no
-	}
-
-  immediate = {
-		random_independent_ruler = {
-			limit = {
-				primary_title = {
-					is_landless_type_title = no
-				}
-        is_landed = yes
-        NOT = { society_member_of = heralds }
-        is_within_diplo_range = ROOT
-			}
-			save_event_target_as = writing_target
-		}
+    society_member_of = heralds
 	}
 
 	option = { #Praise, diplomacy
@@ -1169,10 +1220,10 @@ character_event = {
         modifier = { ROOT = { diplomacy = 35 } factor = 1.4 }
         modifier = { ROOT = { diplomacy = 40 } factor = 1.5 }
         modifier = { ROOT = { diplomacy = 50 } factor = 3 }
-        character_event = { id = HERA.301 days = 90 tooltip = EVTTOOLTIP_HERA.301 } #good praise
+        character_event = { id = HERA.1005 days = 90 tooltip = EVTTOOLTIP_HERA.301 } #good praise
       }
       40 = {
-        character_event = { id = HERA.302 days = 90 tooltip = EVTTOOLTIP_HERA.302 } #failed praise
+        character_event = { id = HERA.1006 days = 90 tooltip = EVTTOOLTIP_HERA.302 } #failed praise
       }
     }
 
@@ -1216,10 +1267,10 @@ character_event = {
         modifier = { ROOT = { intrigue = 35 } factor = 1.4 }
         modifier = { ROOT = { intrigue = 40 } factor = 1.5 }
         modifier = { ROOT = { intrigue = 50 } factor = 3 }
-        character_event = { id = HERA.303 days = 90 tooltip = EVTTOOLTIP_HERA.303 } #successful defamation
+        character_event = { id = HERA.1007 days = 90 tooltip = EVTTOOLTIP_HERA.303 } #successful defamation
       }
       40 = {
-        character_event = { id = HERA.304 days = 90 tooltip = EVTTOOLTIP_HERA.304 } #failed defamation
+        character_event = { id = HERA.1008 days = 90 tooltip = EVTTOOLTIP_HERA.304 } #failed defamation
       }
     }
 
@@ -1263,10 +1314,10 @@ character_event = {
         modifier = { ROOT = { learning = 35 } factor = 1.4 }
         modifier = { ROOT = { learning = 40 } factor = 1.5 }
         modifier = { ROOT = { learning = 50 } factor = 3 }
-        character_event = { id = HERA.305 days = 90 tooltip = EVTTOOLTIP_HERA.305 } #good research
+        character_event = { id = HERA.1009 days = 90 tooltip = EVTTOOLTIP_HERA.305 } #good research
       }
       40 = {
-        character_event = { id = HERA.306 days = 90 tooltip = EVTTOOLTIP_HERA.306 } #inaccurate research
+        character_event = { id = HERA.1010 days = 90 tooltip = EVTTOOLTIP_HERA.306 } #inaccurate research
       }
     }
 
@@ -1289,5 +1340,115 @@ character_event = {
         opinion = { who = event_target:writing_target value >= 20 }
       }
     }
+  }
+}
+
+# good praise
+character_event = {
+	id = HERA.1005
+	desc = EVTDESC_HERA_301
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_301
+    clr_quest = quest_write_about_ruler
+		add_society_currency_minor_effect = yes
+    event_target:writing_target = { character_event = { id = HERA.307 } }
+  }
+}
+
+# failed praise
+character_event = {
+	id = HERA.1006
+	desc = EVTDESC_HERA_302
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_302
+    clr_quest = {
+      id = quest_write_about_ruler
+      failure = yes
+    }
+    prestige = -200
+    event_target:writing_target = { character_event = { id = HERA.308 } }
+  }
+}
+
+# successful defamation
+character_event = {
+	id = HERA.1007
+	desc = EVTDESC_HERA_303
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_303
+    clr_quest = quest_write_about_ruler
+		add_society_currency_minor_effect = yes
+    event_target:writing_target = { character_event = { id = HERA.309 } }
+  }
+}
+
+# failed defamation
+character_event = {
+	id = HERA.1008
+	desc = EVTDESC_HERA_304
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_304
+    clr_quest = {
+      id = quest_write_about_ruler
+      failure = yes
+    }
+    prestige = -200
+    event_target:writing_target = { character_event = { id = HERA.310 } }
+  }
+}
+
+# good research
+character_event = {
+	id = HERA.1009
+	desc = EVTDESC_HERA_305
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_305
+    prestige = 100
+    clr_quest = quest_write_about_ruler
+		add_society_currency_medium_effect = yes
+    add_character_modifier = {
+			name = popular_modifier
+			years = 5
+		}
+    event_target:writing_target = { character_event = { id = HERA.311 } }
+  }
+}
+
+# inaccurate research
+character_event = {
+	id = HERA.1010
+	desc = EVTDESC_HERA_306
+	picture = GFX_evt_library
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_HERA_306
+    clr_quest = {
+      id = quest_write_about_ruler
+      failure = yes
+    }
+    prestige = -100
+    event_target:writing_target = { character_event = { id = HERA.312 } }
   }
 }
