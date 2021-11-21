@@ -1,0 +1,3231 @@
+namespace = ADVN
+
+#Difficulty Selection Screen (eventually) & Starting Adventure Tombola
+character_event = {
+	id = ADVN.1
+	desc = EVTDESC_ADVN_1
+	picture = GFX_evt_adventurers
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_ADVN_1
+		random_courtier_or_vassal = {
+			limit = {
+				has_minor_title = title_party_member
+			}
+			set_character_flag = party_member_1
+			save_event_target_as = party_member_1
+		}
+		random_courtier_or_vassal = {
+			limit = {
+				has_minor_title = title_party_member
+				NOT = { has_character_flag = party_member_1 }
+			}
+			set_character_flag = party_member_2
+			save_event_target_as = party_member_2
+		}
+		random_courtier_or_vassal = {
+			limit = {
+				has_minor_title = title_party_member
+				NOR = {
+					has_character_flag = party_member_1
+					has_character_flag = party_member_2
+				}
+			}
+			set_character_flag = party_member_3
+			save_event_target_as = party_member_3
+		}
+		random_courtier_or_vassal = {
+			limit = {
+				has_minor_title = title_party_member
+				NOR = {
+					has_character_flag = party_member_1
+					has_character_flag = party_member_2
+					has_character_flag = party_member_3
+				}
+			}
+			set_character_flag = party_member_4
+			save_event_target_as = party_member_4
+		}
+		hidden_tooltip = {
+			random_list = { #first wilderness event
+				10 = { #random monster
+					character_event = { id = ADVN.2 days = 5 }
+				}
+				#10 = { #natural obstacle
+				#	character_event = { id = ADVN.3 days = 5 }
+				#}
+				#10 = { #negotiate with locals
+				#	character_event = { id = ADVN.4 days = 5 }
+				#}
+				#10 = { #research location
+				#	character_event = { id = ADVN.5 days = 5 }
+				#}
+				#10 = { #sneak past a threat
+				#	character_event = { id = ADVN.6 days = 5 }
+				#}
+				#10 = { #forage
+				#	character_event = { id = ADVN.7 days = 5 }
+				#}
+				#10 = { #lost in the wilderness
+				#	character_event = { id = ADVN.8 days = 5 }
+				#}
+			}
+			random_list = { #second wilderness event
+				10 = { #random monster
+					character_event = { id = ADVN.2 days = 10 }
+				}
+				#10 = { #natural obstacle
+				#	character_event = { id = ADVN.3 days = 10 }
+				#}
+				#10 = { #negotiate with locals
+				#	character_event = { id = ADVN.4 days = 10 }
+				#}
+				#10 = { #research location
+				#	character_event = { id = ADVN.5 days = 10 }
+				#}
+				#10 = { #sneak past a threat
+				#	character_event = { id = ADVN.6 days = 10 }
+				#}
+				#10 = { #forage
+				#	character_event = { id = ADVN.7 days = 10 }
+				#}
+				#10 = { #lost in the wilderness
+				#	character_event = { id = ADVN.8 days = 10 }
+				#}
+			}
+			random_list = { #third wilderness event
+				10 = { #random monster
+					character_event = { id = ADVN.2 days = 15 }
+				}
+				#10 = { #natural obstacle
+				#	character_event = { id = ADVN.3 days = 15 }
+				#}
+				#10 = { #negotiate with locals
+				#	character_event = { id = ADVN.4 days = 15 }
+				#}
+				#10 = { #research location
+				#	character_event = { id = ADVN.5 days = 15 }
+				#}
+				#10 = { #sneak past a threat
+				#	character_event = { id = ADVN.6 days = 15 }
+				#}
+				#10 = { #forage
+				#	character_event = { id = ADVN.7 days = 15 }
+				#}
+				#10 = { #lost in the wilderness
+				#	character_event = { id = ADVN.8 days = 15 }
+				#}
+			}
+			character_event = { #dungeon found
+				id = ADVN.10
+				days = 20
+				random = 2
+			}
+		}
+	}
+}
+
+### Random Monster ###
+character_event = {
+	id = ADVN.2
+	desc = EVTDESC_ADVN_2
+	picture = GFX_evt_carnage_1
+	show_portrait = event_target:combatant_2
+
+	only_playable = yes
+
+	is_triggered_only = yes
+
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		create_random_soldier = {
+			random_traits = yes
+			culture = monster
+			religion = monster_pantheon
+			trait = creature_monster
+			employer = d_red_spears
+		}
+		new_character = {
+			save_event_target_as = combatant_2
+			character_event = { id = ADVN.101 days = 5 }
+			remove_trait = weak
+			remove_trait = slow
+			remove_trait = imbecile
+			remove_trait = idiot
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_2
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_1 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_2
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_2 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_2
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_3 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_2
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_4 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
+#Healing Opportunity & Dungeon Adventure Tombola
+character_event = {
+	id = ADVN.10
+	desc = EVTDESC_ADVN_10
+	picture = GFX_evt_dungeons_1
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		random_list = { #first dungeon event
+			10 = { #random monster
+				character_event = { id = ADVN.2 days = 5 }
+			}
+			#10 = { #trap
+			#	character_event = { id = ADVN.12 days = 5 }
+			#}
+			#10 = { #strange magic
+			#	character_event = { id = ADVN.13 days = 5 }
+			#}
+			#10 = { #sneak past a threat
+			#	character_event = { id = ADVN.14 days = 5 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.15 days = 5 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.16 days = 5 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.17 days = 5 }
+			#}
+		}
+		random_list = { #second dungeon event
+			10 = { #random monster
+				character_event = { id = ADVN.2 days = 10 }
+			}
+			#10 = { #trap
+			#	character_event = { id = ADVN.12 days = 10 }
+			#}
+			#10 = { #strange magic
+			#	character_event = { id = ADVN.13 days = 10 }
+			#}
+			#10 = { #sneak past a threat
+			#	character_event = { id = ADVN.14 days = 10 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.15 days = 10 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.16 days = 10 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.17 days = 10 }
+			#}
+		}
+		random_list = { #third dungeon event
+			10 = { #random monster
+				character_event = { id = ADVN.2 days = 15 }
+			}
+			#10 = { #trap
+			#	character_event = { id = ADVN.12 days = 15 }
+			#}
+			#10 = { #strange magic
+			#	character_event = { id = ADVN.13 days = 15 }
+			#}
+			#10 = { #sneak past a threat
+			#	character_event = { id = ADVN.14 days = 15 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.15 days = 15 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.16 days = 15 }
+			#}
+			#10 = { #
+			#	character_event = { id = ADVN.17 days = 15 }
+			#}
+		}
+
+		character_event = { #final boss
+			id = ADVN.20
+			days = 20
+			random = 2
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_10
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_1 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_1 = { learning = 50 } factor = 3 }
+				modifier = {
+					event_target:party_member_1 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			40 = {
+				modifier = {
+					event_target:party_member_1 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0
+				}
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							NOR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							add_character_modifier = {
+						  		name = adv_fatigue_1
+						  		duration = 60
+						  	}
+						}
+					}
+					else = {
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+									add_character_modifier = {
+											name = adv_fatigue_2
+											duration = 60
+										}
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+											name = adv_fatigue_3
+											duration = 60
+										}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+											name = adv_fatigue_4
+											duration = 60
+										}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+											name = adv_fatigue_5
+											duration = 60
+										}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+											name = adv_fatigue_6
+											duration = 60
+										}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_10
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_2 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_2 = { learning = 50 } factor = 3 }
+				modifier = {
+					event_target:party_member_2 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = {
+					event_target:party_member_2 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0
+				}
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							NOR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							add_character_modifier = {
+						  		name = adv_fatigue_1
+						  		duration = 60
+						  	}
+						}
+					}
+					else = {
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+									add_character_modifier = {
+											name = adv_fatigue_2
+											duration = 60
+										}
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+											name = adv_fatigue_3
+											duration = 60
+										}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+											name = adv_fatigue_4
+											duration = 60
+										}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+											name = adv_fatigue_5
+											duration = 60
+										}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+											name = adv_fatigue_6
+											duration = 60
+										}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_10
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_3 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_3 = { learning = 50 } factor = 3 }
+				modifier = {
+					event_target:party_member_3 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = {
+					event_target:party_member_3 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							NOR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							add_character_modifier = {
+						  		name = adv_fatigue_1
+						  		duration = 60
+						  	}
+						}
+					}
+					else = {
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+									add_character_modifier = {
+											name = adv_fatigue_2
+											duration = 60
+										}
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+											name = adv_fatigue_3
+											duration = 60
+										}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+											name = adv_fatigue_4
+											duration = 60
+										}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+											name = adv_fatigue_5
+											duration = 60
+										}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+											name = adv_fatigue_6
+											duration = 60
+										}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_10
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_4 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_4 = { learning = 50 } factor = 3 }
+				modifier = {
+					event_target:party_member_4 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = {
+					event_target:party_member_4 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							NOR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							add_character_modifier = {
+						  		name = adv_fatigue_1
+						  		duration = 60
+						  	}
+						}
+					}
+					else = {
+						custom_tooltip = { text = adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+									add_character_modifier = {
+											name = adv_fatigue_2
+											duration = 60
+										}
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+											name = adv_fatigue_3
+											duration = 60
+										}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+											name = adv_fatigue_4
+											duration = 60
+										}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+											name = adv_fatigue_5
+											duration = 60
+										}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+											name = adv_fatigue_6
+											duration = 60
+										}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
+#Final Boss
+character_event = {
+	id = ADVN.20
+	desc = EVTDESC_ADVN_20
+	show_portrait = event_target:final_boss
+
+	picture = {
+		trigger = { event_target:final_boss = { culture = orc } }
+		picture = GFX_evt_orcs
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = goblin } }
+		picture = GFX_evt_goblin_1
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = hobgoblin } }
+		picture = GFX_evt_goblin_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = bugbear } }
+		picture = GFX_evt_goblin_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = gnoll } }
+		picture = GFX_evt_gnoll_1
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = ogre } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = kobold } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = drow } }
+		picture = GFX_evt_drow_1
+	}
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		random_list = {
+			30 = {
+				create_random_soldier = {
+					random_traits = yes
+					female = no
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_orc
+					set_graphical_culture = orc
+					culture = orc
+					religion = orc_pantheon
+					trait = journeyman_barbarian
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_goblin
+					set_graphical_culture = goblin
+					culture = goblin
+					religion = goblin_pantheon
+					trait = journeyman_rogue
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_hobgoblin
+					set_graphical_culture = hobgoblin
+					culture = hobgoblin
+					religion = goblin_pantheon
+					trait = journeyman_fighter
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_bugbear
+					set_graphical_culture = bugbear
+					culture = bugbear
+					religion = goblin_pantheon
+					trait = journeyman_ranger
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_gnoll
+					set_graphical_culture = gnoll
+					culture = gnoll
+					religion = abyssal_cult
+					trait = journeyman_barbarian
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_ogre
+					set_graphical_culture = ogre
+					culture = ogre
+					religion = vaprak
+					trait = journeyman_barbarian
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_kobold
+					set_graphical_culture = kobold
+					culture = kobold
+					religion = tiamat
+					trait = journeyman_sorcerer
+				}
+			}
+			10 = {
+				create_random_soldier = {
+					random_traits = yes
+					female = yes
+					attributes = {
+						diplomacy = 8
+						martial = 8
+						stewardship = 6
+						intrigue = 8
+						learning = 8
+					}
+					trait = creature_drow
+					set_graphical_culture = drow
+					culture = drow
+					religion = lolth_cult
+					trait = journeyman_cleric
+				}
+			}
+		}
+		new_character = {
+			save_event_target_as = final_boss
+			save_event_target_as = combatant_2
+			remove_trait = weak
+			remove_trait = slow
+			remove_trait = idiot
+			remove_trait = imbecile
+			remove_trait = dull
+			remove_trait = craven
+			remove_trait = kind
+			remove_trait = charitable
+			character_event = { id = ADVN.102 }
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_20
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_1 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2 }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_20
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_2 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_20
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_3 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_20
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_4 = {
+			if = {
+				limit = {
+					NOR = {
+						has_character_modifier = adv_fatigue_1
+						has_character_modifier = adv_fatigue_2
+						has_character_modifier = adv_fatigue_3
+						has_character_modifier = adv_fatigue_4
+						has_character_modifier = adv_fatigue_5
+						has_character_modifier = adv_fatigue_6
+					}
+				}
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					add_character_modifier = {
+				  		name = adv_fatigue_1
+				  		duration = 60
+				  	}
+				}
+			}
+			else = {
+				custom_tooltip = { text = adventuring_fatigue_tt }
+				hidden_effect = {
+					trigger_switch = {
+						on_trigger = has_character_modifier
+						adv_fatigue_1 = {
+							remove_character_modifier = adv_fatigue_1
+							add_character_modifier = {
+					    		name = adv_fatigue_2
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_2 = {
+							remove_character_modifier = adv_fatigue_2
+							add_character_modifier = {
+					    		name = adv_fatigue_3
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_3 = {
+							remove_character_modifier = adv_fatigue_3
+							add_character_modifier = {
+					    		name = adv_fatigue_4
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_4 = {
+							remove_character_modifier = adv_fatigue_4
+							add_character_modifier = {
+					    		name = adv_fatigue_5
+					    		duration = 60
+					    	}
+						}
+						adv_fatigue_5 = {
+							remove_character_modifier = adv_fatigue_5
+							add_character_modifier = {
+					    		name = adv_fatigue_6
+					    		duration = 60
+					    	}
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+}
+
+#Final Boss keeps fighting
+character_event = {
+	id = ADVN.21
+	desc = EVTDESC_ADVN_21
+	show_portrait = event_target:final_boss
+
+	picture = {
+		trigger = { event_target:final_boss = { culture = orc } }
+		picture = GFX_evt_orcs
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = goblin } }
+		picture = GFX_evt_goblin_1
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = hobgoblin } }
+		picture = GFX_evt_goblin_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = bugbear } }
+		picture = GFX_evt_goblin_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = gnoll } }
+		picture = GFX_evt_gnoll_1
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = ogre } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = kobold } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = drow } }
+		picture = GFX_evt_drow_1
+	}
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_21
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_21
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_21
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_21
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.21 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTE_ADVN_21
+		trigger = {
+			OR = {
+				event_target:party_member_1 = { is_alive = no }
+				event_target:party_member_2 = { is_alive = no }
+				event_target:party_member_3 = { is_alive = no }
+				event_target:party_member_4 = { is_alive = no }
+			}
+		}
+		character_event = { id = ADVN.31 }
+	}
+}
+
+#Good Ending
+character_event = {
+	id = ADVN.30
+	desc = EVTDESC_ADVN_30
+	picture = GFX_evt_adventurers
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:party_member_1 = {
+			wealth = 100
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_magic_item_effect = yes
+			#XP gain block
+				if = {
+					limit = {
+						z_barbarian = yes
+						NOT = { trait = legendary_barbarian }
+					}
+					hidden_tooltip = {
+						change_variable = { which = barbarian_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_bard = yes
+						NOT = { trait = legendary_bard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = bard_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_cleric = yes
+						NOT = { trait = legendary_cleric }
+					}
+					hidden_tooltip = {
+						change_variable = { which = cleric_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_druid = yes
+						NOT = { trait = legendary_druid }
+					}
+					hidden_tooltip = {
+						change_variable = { which = druid_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_fighter = yes
+						NOT = { trait = legendary_fighter }
+					}
+					hidden_tooltip = {
+						change_variable = { which = fighter_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_monk = yes
+						NOT = { trait = legendary_monk }
+					}
+					hidden_tooltip = {
+						change_variable = { which = monk_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_paladin = yes
+						NOT = { trait = legendary_paladin }
+					}
+					hidden_tooltip = {
+						change_variable = { which = paladin_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_ranger = yes
+						NOT = { trait = legendary_ranger }
+					}
+					hidden_tooltip = {
+						change_variable = { which = ranger_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_rogue = yes
+						NOT = { trait = legendary_rogue }
+					}
+					hidden_tooltip = {
+						change_variable = { which = rogue_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_shadow = yes
+						NOT = { trait = legendary_shadow }
+					}
+					hidden_tooltip = {
+						change_variable = { which = shadow_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_sorcerer = yes
+						NOT = { trait = legendary_sorcerer }
+					}
+					hidden_tooltip = {
+						change_variable = { which = sorcerer_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_warlock = yes
+						NOT = { trait = legendary_warlock }
+					}
+					hidden_tooltip = {
+						change_variable = { which = warlock_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_wizard = yes
+						NOT = { trait = legendary_wizard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = wizard_xp value = 100 }
+					}
+				}
+		}
+		event_target:party_member_2 = {
+			wealth = 100
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_magic_item_effect = yes
+			#XP gain block
+				if = {
+					limit = {
+						z_barbarian = yes
+						NOT = { trait = legendary_barbarian }
+					}
+					hidden_tooltip = {
+						change_variable = { which = barbarian_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_bard = yes
+						NOT = { trait = legendary_bard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = bard_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_cleric = yes
+						NOT = { trait = legendary_cleric }
+					}
+					hidden_tooltip = {
+						change_variable = { which = cleric_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_druid = yes
+						NOT = { trait = legendary_druid }
+					}
+					hidden_tooltip = {
+						change_variable = { which = druid_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_fighter = yes
+						NOT = { trait = legendary_fighter }
+					}
+					hidden_tooltip = {
+						change_variable = { which = fighter_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_monk = yes
+						NOT = { trait = legendary_monk }
+					}
+					hidden_tooltip = {
+						change_variable = { which = monk_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_paladin = yes
+						NOT = { trait = legendary_paladin }
+					}
+					hidden_tooltip = {
+						change_variable = { which = paladin_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_ranger = yes
+						NOT = { trait = legendary_ranger }
+					}
+					hidden_tooltip = {
+						change_variable = { which = ranger_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_rogue = yes
+						NOT = { trait = legendary_rogue }
+					}
+					hidden_tooltip = {
+						change_variable = { which = rogue_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_shadow = yes
+						NOT = { trait = legendary_shadow }
+					}
+					hidden_tooltip = {
+						change_variable = { which = shadow_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_sorcerer = yes
+						NOT = { trait = legendary_sorcerer }
+					}
+					hidden_tooltip = {
+						change_variable = { which = sorcerer_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_warlock = yes
+						NOT = { trait = legendary_warlock }
+					}
+					hidden_tooltip = {
+						change_variable = { which = warlock_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_wizard = yes
+						NOT = { trait = legendary_wizard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = wizard_xp value = 100 }
+					}
+				}
+		}
+		event_target:party_member_3 = {
+			wealth = 100
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_magic_item_effect = yes
+			#XP gain block
+				if = {
+					limit = {
+						z_barbarian = yes
+						NOT = { trait = legendary_barbarian }
+					}
+					hidden_tooltip = {
+						change_variable = { which = barbarian_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_bard = yes
+						NOT = { trait = legendary_bard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = bard_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_cleric = yes
+						NOT = { trait = legendary_cleric }
+					}
+					hidden_tooltip = {
+						change_variable = { which = cleric_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_druid = yes
+						NOT = { trait = legendary_druid }
+					}
+					hidden_tooltip = {
+						change_variable = { which = druid_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_fighter = yes
+						NOT = { trait = legendary_fighter }
+					}
+					hidden_tooltip = {
+						change_variable = { which = fighter_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_monk = yes
+						NOT = { trait = legendary_monk }
+					}
+					hidden_tooltip = {
+						change_variable = { which = monk_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_paladin = yes
+						NOT = { trait = legendary_paladin }
+					}
+					hidden_tooltip = {
+						change_variable = { which = paladin_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_ranger = yes
+						NOT = { trait = legendary_ranger }
+					}
+					hidden_tooltip = {
+						change_variable = { which = ranger_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_rogue = yes
+						NOT = { trait = legendary_rogue }
+					}
+					hidden_tooltip = {
+						change_variable = { which = rogue_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_shadow = yes
+						NOT = { trait = legendary_shadow }
+					}
+					hidden_tooltip = {
+						change_variable = { which = shadow_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_sorcerer = yes
+						NOT = { trait = legendary_sorcerer }
+					}
+					hidden_tooltip = {
+						change_variable = { which = sorcerer_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_warlock = yes
+						NOT = { trait = legendary_warlock }
+					}
+					hidden_tooltip = {
+						change_variable = { which = warlock_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_wizard = yes
+						NOT = { trait = legendary_wizard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = wizard_xp value = 100 }
+					}
+				}
+		}
+		event_target:party_member_4 = {
+			wealth = 100
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_magic_item_effect = yes
+			#XP gain block
+				if = {
+					limit = {
+						z_barbarian = yes
+						NOT = { trait = legendary_barbarian }
+					}
+					hidden_tooltip = {
+						change_variable = { which = barbarian_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_bard = yes
+						NOT = { trait = legendary_bard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = bard_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_cleric = yes
+						NOT = { trait = legendary_cleric }
+					}
+					hidden_tooltip = {
+						change_variable = { which = cleric_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_druid = yes
+						NOT = { trait = legendary_druid }
+					}
+					hidden_tooltip = {
+						change_variable = { which = druid_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_fighter = yes
+						NOT = { trait = legendary_fighter }
+					}
+					hidden_tooltip = {
+						change_variable = { which = fighter_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_monk = yes
+						NOT = { trait = legendary_monk }
+					}
+					hidden_tooltip = {
+						change_variable = { which = monk_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_paladin = yes
+						NOT = { trait = legendary_paladin }
+					}
+					hidden_tooltip = {
+						change_variable = { which = paladin_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_ranger = yes
+						NOT = { trait = legendary_ranger }
+					}
+					hidden_tooltip = {
+						change_variable = { which = ranger_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_rogue = yes
+						NOT = { trait = legendary_rogue }
+					}
+					hidden_tooltip = {
+						change_variable = { which = rogue_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_shadow = yes
+						NOT = { trait = legendary_shadow }
+					}
+					hidden_tooltip = {
+						change_variable = { which = shadow_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_sorcerer = yes
+						NOT = { trait = legendary_sorcerer }
+					}
+					hidden_tooltip = {
+						change_variable = { which = sorcerer_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_warlock = yes
+						NOT = { trait = legendary_warlock }
+					}
+					hidden_tooltip = {
+						change_variable = { which = warlock_xp value = 100 }
+					}
+				}
+				if = {
+					limit = {
+						z_wizard = yes
+						NOT = { trait = legendary_wizard }
+					}
+					hidden_tooltip = {
+						change_variable = { which = wizard_xp value = 100 }
+					}
+				}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_30
+		prestige = 100
+		random_magic_item_effect = yes #PLACEHOLDER
+		hidden_tooltip = {
+			remove_character_modifier = sent_adventurers
+		}
+	}
+}
+
+#Bad Ending
+character_event = {
+	id = ADVN.31
+	desc = EVTDESC_ADVN_31
+	picture = GFX_evt_died_battle
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_ADVN_31
+		prestige = -100
+		hidden_tooltip = {
+			remove_character_modifier = sent_adventurers
+			event_target:final_boss = {
+				wealth = 300
+				if = {
+					limit = { NOT = { trait = adventurer } }
+					add_trait = adventurer
+				}
+				random_magic_item_effect = yes
+				#XP gain block
+					if = {
+						limit = {
+							z_barbarian = yes
+							NOT = { trait = legendary_barbarian }
+						}
+						hidden_tooltip = {
+							change_variable = { which = barbarian_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_bard = yes
+							NOT = { trait = legendary_bard }
+						}
+						hidden_tooltip = {
+							change_variable = { which = bard_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_cleric = yes
+							NOT = { trait = legendary_cleric }
+						}
+						hidden_tooltip = {
+							change_variable = { which = cleric_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_druid = yes
+							NOT = { trait = legendary_druid }
+						}
+						hidden_tooltip = {
+							change_variable = { which = druid_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_fighter = yes
+							NOT = { trait = legendary_fighter }
+						}
+						hidden_tooltip = {
+							change_variable = { which = fighter_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_monk = yes
+							NOT = { trait = legendary_monk }
+						}
+						hidden_tooltip = {
+							change_variable = { which = monk_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_paladin = yes
+							NOT = { trait = legendary_paladin }
+						}
+						hidden_tooltip = {
+							change_variable = { which = paladin_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_ranger = yes
+							NOT = { trait = legendary_ranger }
+						}
+						hidden_tooltip = {
+							change_variable = { which = ranger_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_rogue = yes
+							NOT = { trait = legendary_rogue }
+						}
+						hidden_tooltip = {
+							change_variable = { which = rogue_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_shadow = yes
+							NOT = { trait = legendary_shadow }
+						}
+						hidden_tooltip = {
+							change_variable = { which = shadow_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_sorcerer = yes
+							NOT = { trait = legendary_sorcerer }
+						}
+						hidden_tooltip = {
+							change_variable = { which = sorcerer_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_warlock = yes
+							NOT = { trait = legendary_warlock }
+						}
+						hidden_tooltip = {
+							change_variable = { which = warlock_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_wizard = yes
+							NOT = { trait = legendary_wizard }
+						}
+						hidden_tooltip = {
+							change_variable = { which = wizard_xp value = 300 }
+						}
+					}
+			}
+		}
+	}
+}
+
+#Bad Ending Pre-Final Boss
+character_event = {
+	id = ADVN.32
+	desc = EVTDESC_ADVN_32
+	picture = GFX_evt_died_battle
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_ADVN_32
+		prestige = -100
+		hidden_tooltip = {
+			remove_character_modifier = sent_adventurers
+		}
+	}
+}
+
+#Duel event
+character_event = {
+	id = ADVN.100
+	desc = DIVREL.24
+	picture = GFX_evt_melee
+	border = GFX_event_normal_frame_war
+	portrait = event_target:combatant_2
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:combatant_2 = {
+			set_character_flag = flag_duel_no_backsies
+		}
+	}
+
+	option = {
+		name = DIVREL.24a
+		set_character_flag = add_duel_xp
+		set_character_flag = adventure_duel@event_target:combatant_2
+		reset_duel_timers_effect = yes
+		set_dueling_weapon_effect = yes
+		event_target:combatant_2 = { set_dueling_weapon_effect = yes }
+		set_potential_injury_flag_effect = yes
+		evaluate_duel_result_score_effect = yes
+		evaluate_extra_duel_result_score_effect = yes
+		send_duel_result_event_effect = yes
+	}
+}
+
+#Monster Culling
+character_event = {
+	id = ADVN.101
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		death = { death_reason = death_missing }
+	}
+}
+
+#Adventurer title to final boss
+character_event = {
+	id = ADVN.102
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		liege = {
+			primary_title = {
+				holder_scope = {
+					save_event_target_as = previous_liege
+				}
+			}
+			capital_scope = {
+				save_event_target_as = target_province
+				ROOT = {
+					set_defacto_liege = ROOT
+					create_title = {
+						tier = DUKE
+						landless = yes
+						adventurer = yes
+						culture = ROOT
+						name = "CLAIMANT_ADVENTURE"
+						holder = ROOT
+						base_title = THIS
+					}
+					set_character_flag = raiding_adventurer
+					change_variable = { which = global_raiding_adventurer_spawn_by_courtier_MTTH value = 1 }
+					if = {
+						limit = {
+							event_target:previous_liege = {
+								government = nomadic_government
+							}
+						}
+						character_event = { id = HL.105 } #create troops steppe
+					}
+					if = {
+						limit = {
+							event_target:previous_liege = {
+								NOT = { government = nomadic_government }
+							}
+						}
+						character_event = { id = HL.102 } #create troops vikings
+					}
+					create_random_soldier = {
+						random_traits = yes
+						dynasty = none
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 30
+					}
+					create_random_soldier = {
+						random_traits = yes
+						dynasty = none
+						religion = ROOT
+						culture = ROOT
+						female = no
+						age = 25
+					}
+					# Create a fleet, just to be sure
+					spawn_fleet = {
+						province = closest # closest sea zone
+						owner = ROOT
+						disband_on_peace = yes
+						troops =
+						{
+							galleys = { 110 110 }
+						}
+					}
+				}
+			}
+		}
+		character_event = { id = HL.110 days = 1095 } # Ping to see if he's ready to settle, repeating every 3 years.
+	}
+}
+
+#Lose Adventurer trait, gain former adventurer
+character_event = {
+	id = ADVN.103
+	desc = EVTDESC_ADVN_103
+	picture = GFX_evt_tavern_2
+
+	is_triggered_only = yes
+
+	trigger = { NOT = { has_minor_title = title_party_member } }
+
+	option = {
+		name = EVTOPTA_ADVN_103
+		remove_trait = adventurer
+		add_trait = former_adventurer
+	}
+}
