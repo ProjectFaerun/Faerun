@@ -96,20 +96,20 @@ character_event = {
 
 # Sent from event_target:legendary_society (above)
 province_event = {
-    id = HF.12000 
-    is_triggered_only = yes
-    hide_window = yes
-    
-    trigger = {
-    	event_target:legendary_society = { society_has_members = yes }
-    	has_province_flag = initiating_legendary_journey
-    }
+	id = HF.12000 
+	is_triggered_only = yes
+	hide_window = yes
+	
+	trigger = {
+		event_target:legendary_society = { society_has_members = yes }
+		has_province_flag = initiating_legendary_journey
+	}
 
-    fail_trigger_effect = {
-    	if = {
-    		limit = { NOT = { has_province_flag = initiating_legendary_journey } } #@event_target:legendary_society } }
-    		#log = "[LEGENDARY JOURNEY]: Somehow [This.GetName] got event HF.12000, without having the right flag to help [event_target:legendary_society.GetName], so stopped chain before it started."
-    	}
+	fail_trigger_effect = {
+		if = {
+			limit = { NOT = { has_province_flag = initiating_legendary_journey } } #@event_target:legendary_society } }
+			#log = "[LEGENDARY JOURNEY]: Somehow [This.GetName] got event HF.12000, without having the right flag to help [event_target:legendary_society.GetName], so stopped chain before it started."
+		}
 		else = {
 			event_target:legendary_society = {
 				clr_flag = block_society_progress
@@ -117,66 +117,87 @@ province_event = {
 			}
 			#log = "[LEGENDARY JOURNEY]: [This.GetName] got event HF.12000, but found out that [event_target:legendary_society.GetName] has no members left, so stopped chain before it started."
 		}
-    }
+	}
 
-    immediate = {
-        if = {
-            limit = {
-                has_province_flag = initiating_legendary_journey #It has begun...
-                #There are at least two members at rank 4...
-                event_target:legendary_society = {
-	                any_society_member = {
-	                    society_rank == 4
-	                    NOT = { is_inaccessible_trigger = yes }
-	                    NOT = {
-	                        any_bloodline = {
-	                            has_bloodline_flag = legendary_warrior_lodge_bloodline
-	                        }
-	                    }
-	                    count = 2
-	                }
-                }
-            }
-            event_target:legendary_society = {
-	            random_society_member = {
-	                limit = {
-	                    society_rank == 4
-	                    NOT = { is_inaccessible_trigger = yes }
-	                    NOT = {
-	                    	any_bloodline = {
-	                    		has_bloodline_flag = legendary_warrior_lodge_bloodline
-	                    	}
-	                    }
-	                }
-	                preferred_limit = { ai = no } #We'd rather it was a player...
+	immediate = {
+		if = {
+			limit = {
+				has_province_flag = initiating_legendary_journey #It has begun...
+				#There are at least two members at rank 4...
+				event_target:legendary_society = {
+					any_society_member = {
+						society_rank == 4
+						NOT = { is_inaccessible_trigger = yes }
+						NOT = {
+							any_bloodline = {
+								has_bloodline_flag = legendary_warrior_lodge_bloodline
+							}
+						}
+						NOT = { # No active created bloodline in dynasty
+							any_dynasty_member = {
+								any_owned_bloodline = {
+									has_bloodline_flag = legendary_warrior_lodge_bloodline
+								}
+							}
+						}
+						count = 2
+					}
+				}
+			}
+			event_target:legendary_society = {
+				random_society_member = {
+					limit = {
+						society_rank == 4
+						NOT = { is_inaccessible_trigger = yes }
+						NOT = {
+							any_bloodline = {
+								has_bloodline_flag = legendary_warrior_lodge_bloodline
+							}
+						}
+						NOT = { # No active created bloodline in dynasty
+							any_dynasty_member = {
+								any_owned_bloodline = {
+									has_bloodline_flag = legendary_warrior_lodge_bloodline
+								}
+							}
+						}
+					}
+					preferred_limit = { ai = no } #We'd rather it was a player...
 
-	                character_event = { id = HF.12001 } #START: Sends event to a warrior lodge member/hero...
-                    #log = "[LEGENDARY JOURNEY]: Event HF.12000 fired and [This.GetTitledFirstName] is the original hero, who starts it all!"
-                }
-            }
-            clr_province_flag = initiating_legendary_journey
-        }
-        else_if = {
-            limit = {
-                has_province_flag = initiating_legendary_journey #It has begun...
-                #But there are not enough members at rank 4...
-                NOT = {                    
-                    any_society_member = {
-                        society_rank == 4
-                        NOT = { is_inaccessible_trigger = yes }
-                        NOT = {
-                            any_bloodline = {
-                                has_bloodline_flag = legendary_warrior_lodge_bloodline
-                            }
-                        }
-                        count = 2
-                    }
-                }
-            }
-            #log = "[LEGENDARY JOURNEY]: Event HF.12000 fired, but there were not enough members. Checking back in max 265 days."
-            character_event = { id = HF.12000 days = 165 random = 100 } #Check back in a while...
-        }
-    }
+					character_event = { id = HF.12001 } #START: Sends event to a warrior lodge member/hero...
+					#log = "[LEGENDARY JOURNEY]: Event HF.12000 fired and [This.GetTitledFirstName] is the original hero, who starts it all!"
+				}
+			}
+			clr_province_flag = initiating_legendary_journey
+		}
+		else_if = {
+			limit = {
+				has_province_flag = initiating_legendary_journey #It has begun...
+				#But there are not enough members at rank 4...
+				NOT = {
+					any_society_member = {
+						society_rank == 4
+						NOT = { is_inaccessible_trigger = yes }
+						NOT = {
+							any_bloodline = {
+								has_bloodline_flag = legendary_warrior_lodge_bloodline
+							}
+						}
+						NOT = { # No active created bloodline in dynasty
+							any_dynasty_member = {
+								any_owned_bloodline = {
+									has_bloodline_flag = legendary_warrior_lodge_bloodline
+								}
+							}
+						}
+						count = 2
+					}
+				}
+			}
+			#log = "[LEGENDARY JOURNEY]: Event HF.12000 fired, but there were not enough members. Checking back in max 265 days."
+			character_event = { id = HF.12000 days = 165 random = 100 } #Check back in a while...
+		}
+	}
 }
 
 
@@ -199,6 +220,13 @@ character_event = {
             society_rank == 4
             same_society_as = ROOT
             count = 2
+            NOT = { # No active created bloodline in dynasty
+                any_dynasty_member = { 
+                    any_bloodline = {
+                        has_bloodline_flag = legendary_warrior_lodge_bloodline
+                    }
+                }
+            }
         }
     }
 
@@ -260,9 +288,16 @@ character_event = {
                         society_rank == 4
                         NOT = { character = ROOT }
                         NOT = { 
-                        	any_bloodline = {
-                        		has_bloodline_flag = legendary_warrior_lodge_bloodline
-                        	}
+                            any_bloodline = {
+                                has_bloodline_flag = legendary_warrior_lodge_bloodline
+                            }
+                        }
+                        NOT = {
+                            any_dynasty_member = { 
+                                any_bloodline = {
+                                    has_bloodline_flag = legendary_warrior_lodge_bloodline
+                                }
+                            }
                         }
                     }
                     set_character_flag = do_not_disturb
@@ -279,6 +314,13 @@ character_event = {
                         		has_bloodline_flag = legendary_warrior_lodge_bloodline
                         	}
                         }
+                        NOT = {
+                            any_dynasty_member = { 
+                                any_bloodline = {
+                                    has_bloodline_flag = legendary_warrior_lodge_bloodline
+                                }
+                            }
+                        }
                     }
                     set_character_flag = do_not_disturb
                     set_character_flag = call_to_legend_active
@@ -294,6 +336,13 @@ character_event = {
                         	any_bloodline = {
                         		has_bloodline_flag = legendary_warrior_lodge_bloodline
                         	}
+                        }
+                        NOT = {
+                            any_dynasty_member = { 
+                                any_bloodline = {
+                                    has_bloodline_flag = legendary_warrior_lodge_bloodline
+                                }
+                            }
                         }
                     }
                     set_character_flag = do_not_disturb
@@ -3201,7 +3250,7 @@ character_event = {
     is_triggered_only = yes
     trigger = {
     	NOT = { has_character_modifier = pet_hunting_eagle }
-    	any_owned_bloodline = { has_bloodline_flag = bloodline_pet_eagle }
+    	any_owned_bloodline = { has_bloodline_flag = bloodline_pet_eagle bloodline_is_active_for = PREV }
     	is_inaccessible_trigger = no
 		war = no
     }
@@ -3210,7 +3259,7 @@ character_event = {
     	if = {
     		limit = {
     			NOT = { has_character_modifier = pet_hunting_eagle }
-    			any_owned_bloodline = { has_bloodline_flag = bloodline_pet_eagle }
+    			any_owned_bloodline = { has_bloodline_flag = bloodline_pet_eagle bloodline_is_active_for = PREV }
     			OR = {
     				is_inaccessible_trigger = yes
     				war = yes
@@ -3224,6 +3273,7 @@ character_event = {
     	random_owned_bloodline = {
 	    	limit = {
 				has_bloodline_flag = bloodline_pet_eagle
+				bloodline_is_active_for = PREV
 				founder = { NOT = { character = ROOT } }
 			}
 			founder = {
@@ -3283,7 +3333,7 @@ character_event = {
     
     trigger = {
     	NOT = { has_character_modifier = pet_hunting_dog }
-    	any_owned_bloodline = { has_bloodline_flag = bloodline_pet_dog }
+    	any_owned_bloodline = { has_bloodline_flag = bloodline_pet_dog bloodline_is_active_for = PREV }
     	is_inaccessible_trigger = no
 		war = no
     }
@@ -3292,7 +3342,7 @@ character_event = {
     	if = {
     		limit = {
     			NOT = { has_character_modifier = pet_hunting_dog }
-    			any_owned_bloodline = { has_bloodline_flag = bloodline_pet_dog }
+    			any_owned_bloodline = { has_bloodline_flag = bloodline_pet_dog bloodline_is_active_for = PREV }
     			OR = {
     				is_inaccessible_trigger = yes
     				war = yes
@@ -3306,6 +3356,7 @@ character_event = {
     	random_owned_bloodline = {
 	    	limit = {
 				has_bloodline_flag = bloodline_pet_dog
+				bloodline_is_active_for = PREV
 				founder = { NOT = { character = ROOT } }
 			}
 			founder = {

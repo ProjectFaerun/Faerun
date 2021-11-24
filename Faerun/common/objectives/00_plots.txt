@@ -393,6 +393,7 @@ plot_gain_vassal_title = {
 					FROM = {
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_revocation_plot
+							bloodline_is_active_for = PREV
 						}
 					}
 				}
@@ -604,6 +605,7 @@ plot_gain_vassal_title = {
 					FROM = {
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_revocation_plot
+							bloodline_is_active_for = PREV
 						}
 					}
 				}
@@ -793,6 +795,7 @@ plot_kill_character = {
 						trait = deceitful
 						trait = ambitious
 						trait = arbitrary
+						trait = is_clone
 						NOT = { opinion = { who = ROOT value = 0 } }
 					}
 				}
@@ -807,6 +810,7 @@ plot_kill_character = {
 						trait = deceitful
 						trait = ambitious
 						trait = arbitrary
+						trait = is_clone
 						NOT = { opinion = { who = ROOT value = 0 } }
 					}
 				}
@@ -903,6 +907,11 @@ plot_kill_character = {
 					character = ROOT
 				}
 
+				AND = {
+					FROM = { trait = is_clone }
+					ROOT = { is_parent_of = FROM }
+				}
+
 				ROOT = { is_murder_quest_target_of_prev_trigger = yes }
 			}
 		}
@@ -927,6 +936,7 @@ plot_kill_character = {
 			factor = 0.01
 			FROM = {
 				trait = content
+				NOT = { trait = is_clone }
 				NOT = { trait = lunatic }
 				NOT = { trait = possessed }
 			}
@@ -975,7 +985,13 @@ plot_kill_character = {
 			factor = 0
 			their_opinion = { who = FROM value = 25 }
 			NOT = {
-				FROM = { ROOT = { is_murder_quest_target_of_prev_trigger = yes } } #MNM murder missions
+				OR = {
+					FROM = { ROOT = { is_murder_quest_target_of_prev_trigger = yes } } #MNM murder missions
+					AND = {
+						FROM = { trait = is_clone }
+						ROOT = { is_parent_of = FROM }
+					}
+				}
 			}
 		}
 		modifier = {
@@ -986,6 +1002,10 @@ plot_kill_character = {
 					FROM = { trait = envious }
 					FROM = { trait = deceitful }
 					FROM = { trait = ambitious }
+					AND = {
+						FROM = { trait = is_clone }
+						ROOT = { is_parent_of = FROM }
+					}
 					FROM = { ROOT = { is_murder_quest_target_of_prev_trigger = yes } } #MNM murder missions
 				}
 			}
@@ -1045,8 +1065,21 @@ plot_kill_character = {
 			}
 			FROM = {
 				OR = {
-					religion_group = qismaite_group
+					is_muslim_trigger = yes
 					is_evil_religion = yes
+					culture = fomorian
+					AND = {
+						culture = shaaran
+						AND = {
+							NOT = { has_dlc = "Horse Lords" }
+							is_tribal = yes
+						}
+					}
+					religion = orc_pantheon
+					religion = orc_reformed
+					top_liege = { government = nomadic_tribal_government }
+					has_religion_feature = religion_patriarchal
+					has_religion_feature = religion_matriarchal
 				}
 				top_liege = { is_parent_of = FROM }
 			}
@@ -1061,11 +1094,29 @@ plot_kill_character = {
 			}
 			FROM = {
 				OR = {
-					religion_group = qismaite_group
+					is_muslim_trigger = yes
 					is_evil_religion = yes
+					culture = fomorian
+					AND = {
+						culture = shaaran
+						AND = {
+							NOT = { has_dlc = "Horse Lords" }
+							is_tribal = yes
+						}
+					}
+					religion = orc_pantheon
+					religion = orc_reformed
+					top_liege = { government = nomadic_tribal_government }
+					has_religion_feature = religion_patriarchal
+					has_religion_feature = religion_matriarchal
 				}
 				top_liege = { is_parent_of = FROM }
 			}
+		}
+		modifier = {
+			factor = 6.0
+			FROM = { trait = is_clone }
+			ROOT = { is_parent_of = FROM }
 		}
 		modifier = {
 			factor = 2.0
