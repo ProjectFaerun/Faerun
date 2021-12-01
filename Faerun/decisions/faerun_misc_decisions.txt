@@ -92,12 +92,129 @@ decisions = {
 		}
 		allow = {
 			always = no
+			NOT = { num_of_children = 4 } # children are not expendable
+			NOT = { has_character_modifier = recoveringfromchildbirth }
 		}
 		effect = {
 			break = yes
 		}
 		ai_will_do = {
 			factor = 0 # Just to be sure
+		}
+	}
+
+	foster_child = {
+		only_rulers = yes
+		ai_check_interval = 36
+		is_high_prio = yes
+		potential = {
+			not_casting = yes
+			NOT = { primary_title = { has_law = succ_open_elective } }
+			NOT = { has_character_flag = adopting_child }
+			OR = {
+				ai = no
+				NOT = { 
+					any_child = {
+						count = 2
+						is_alive = yes
+					}
+				}
+			}
+		}
+		allow = {
+			NOT = { num_of_children = 4 } # children are not expendable
+			prisoner = no
+			conditional_tooltip = {
+				trigger = { 
+					real_tier = EMPEROR
+				}
+				prestige = 400
+			}
+			conditional_tooltip = {
+				trigger = { 
+					real_tier = KING
+				}
+				prestige = 300
+			}
+			conditional_tooltip = {
+				trigger = { 
+					real_tier = DUKE
+				}
+				prestige = 200
+			}
+			conditional_tooltip = {
+				trigger = { 
+					real_tier = COUNT
+				}
+				prestige = 100
+			}
+			conditional_tooltip = {
+				trigger = { 
+					real_tier = BARON
+				}
+				prestige = 10
+			}
+		}
+		effect = {
+			character_event = { id = fradoption.1 }
+			set_character_flag = adopting_child
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0
+				NOR = {
+					AND = {
+						OR = {
+							AND = {
+								fertility <= 0
+								age >= 40
+							}
+							AND = {
+								fertility <= 0.25
+								age >= 50
+								olrox_not_immortals_trigger = yes
+							}
+							AND = {
+								age >= 60
+								olrox_not_immortals_trigger = yes
+							}
+						}
+						NOT = { has_character_modifier = recoveringfromchildbirth }
+						NAND = {
+							trait = celibate
+							is_monastic_member_trigger = yes
+						}
+					}
+					OR = {
+						AND = {
+							is_female = yes
+							any_spouse = { is_female = yes }
+						}
+						AND = {
+							is_female = no
+							any_spouse = { is_female = no }
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = proud 
+			}
+			modifier = {
+				factor = 0.5
+				trait = paranoid 
+			}
+			modifier = {
+				factor = 2
+				trait = humble
+			}
+			modifier = {
+				factor = 2
+				trait = trusting
+			}
 		}
 	}
 
@@ -132,7 +249,8 @@ targeted_decisions = {
 							religion = pantheist_league
 							religion = muhjari
 							religion = kahin
-							religion = orc_pantheon
+							has_religion_feature = religion_harems
+							has_religion_feature = religion_feature_nogari
 						}
 					}
 					AND = {
@@ -247,6 +365,7 @@ targeted_decisions = {
 		from_potential = {
 			age = 40
 			has_living_children = no
+			NOT = { primary_title = { has_law = succ_open_elective } }
 		}
 		potential = {
 			NOT = { trait = adopted }
@@ -257,6 +376,7 @@ targeted_decisions = {
 		}
 		allow = {
 			FROM = {
+				NOT = { num_of_children = 4 } # children are not expendable
 				OR = {
 					fertility <= 0
 					AND = {
@@ -268,6 +388,9 @@ targeted_decisions = {
 						age >= 60
 						olrox_not_immortals_trigger = yes
 					}
+				}
+				NOT = {
+					has_character_modifier = recoveringfromchildbirth
 				}
 				NAND = {
 					trait = celibate
@@ -304,6 +427,9 @@ targeted_decisions = {
 			}
 			add_trait = adopted
 			dynasty = FROM
+			any_owned_bloodline = {
+				remove_bloodline_member = ROOT
+			}
 			FROM = {
 				recalc_succession = yes
 				if = {
