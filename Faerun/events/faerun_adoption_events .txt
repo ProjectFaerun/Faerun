@@ -1,0 +1,423 @@
+namespace = fradoption
+
+character_event = {
+	id = fradoption.1
+	desc = fradoption_desc.1
+	picture = GFX_evt_birth
+	border = GFX_event_normal_frame_diplomacy
+	prisoner = no
+	is_triggered_only = yes
+	
+	option = { # Similar to me
+		name = fradoption_desc.1a
+		custom_tooltip = { text = adoption_similar_tt }
+		trigger = {
+			NOR = {
+				AND = {
+					culture_group = draconic_culture_group
+					NOR = {
+						culture = dragonspawn
+						culture = dragonborn
+						culture = strixiki
+						culture = vayemniri
+						culture = thymari
+						culture = kobold
+					}
+				}
+				culture_group = celestial_group 
+				culture_group = genie_group
+				culture_group = construct_group
+			}
+		}
+		if = {
+			limit = { real_tier = EMPEROR }
+			prestige = -400
+		}
+		if = {
+			limit = { real_tier = KING }
+			prestige = -300
+		}
+		if = {
+			limit = { real_tier = DUKE }
+			prestige = -200
+		}
+		if = {
+			limit = { real_tier = COUNT }
+			prestige = -100
+		}
+		if = {
+			limit = { real_tier = BARON }
+			prestige = -10
+		}
+		character_event = { id = fradoption.2 }
+	}
+	option = { # a foundling from the local area
+		name = fradoption_desc.1b
+		custom_tooltip = { text = adoption_local_tt }
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				NOR = {
+					AND = {
+						culture_group = draconic_culture_group
+						NOR = {
+							culture = dragonspawn
+							culture = dragonborn
+							culture = strixiki
+							culture = vayemniri
+							culture = thymari
+							culture = kobold
+						}
+					}
+					culture_group = celestial_group 
+					culture_group = genie_group
+					culture_group = construct_group
+				}
+			}
+		}
+		trigger = {
+			capital_scope = {
+				NOR = {
+					culture_group = monster_group
+					culture_group = fiendish_group
+					culture_group = aberration_culture_group
+					culture_group = construct_group
+					culture = treant
+					AND = {
+						culture_group = draconic_culture_group
+						NOR = {
+							culture = dragonspawn
+							culture = dragonborn
+							culture = strixiki
+							culture = vayemniri
+							culture = thymari
+							culture = kobold
+						}
+					}
+					culture_group = celestial_group 
+					culture_group = genie_group
+				}		
+			}
+		}
+		if = {
+			limit = { real_tier = EMPEROR }
+			prestige = -400
+		}
+		if = {
+			limit = { real_tier = KING }
+			prestige = -300
+		}
+		if = {
+			limit = { real_tier = DUKE }
+			prestige = -200
+		}
+		if = {
+			limit = { real_tier = COUNT }
+			prestige = -100
+		}
+		if = {
+			limit = { real_tier = BARON }
+			prestige = -10
+		}
+		character_event = { id = fradoption.3 }
+	}
+	option = { # nevermind
+		name = fradoption_desc.1c
+		clr_character_flag = adopting_child
+		ai_chance = {
+			factor = 0
+		}
+		trigger = {
+		}
+	}
+}
+
+character_event = {
+	id = fradoption.2
+	desc = fradoption_desc.2
+	picture = GFX_evt_birth
+	border = GFX_event_normal_frame_diplomacy
+	prisoner = no
+	is_triggered_only = yes
+	
+	option = { # a boy
+		name = fradoption_desc.2a
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court 		= { clr_character_flag = undead_court set_character_flag = undead_court_skip }
+			vampire_court 		= { clr_character_flag = vampire_court set_character_flag = vampire_court_skip }
+			lycan_court 		= { clr_character_flag = lycan_court set_character_flag = lycan_court_skip }
+			yuanti_court 		= { clr_character_flag = yuanti_court set_character_flag = yuanti_court_skip }
+		}
+		create_character = {
+			culture = ROOT
+			dynasty = ROOT
+			religion = ROOT
+			female = no
+			age = 0
+		}
+		new_character = {
+			character_event = { id = character_trait.1 }
+			character_event = { id = beauty.0 }
+			character_event = { id = intelligence.0 }
+			character_event = { id = strength.0 }
+			character_event = { id = FaerunSorcerer.1 } # Sorceror trait
+			character_event = { id = frmaint.7 } # uthgar totem
+			add_trait = adopted
+			if = {
+				limit = { 
+					FROM = { 
+						is_female = no 
+						is_undead = no
+					}
+				}
+				remove_all_race_traits = yes
+				set_father = FROM
+				father = {
+					ROOT = { copy_race_of_prev = yes }
+				}
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = yes
+						is_undead = no
+					}
+				}
+				remove_all_race_traits = yes
+				set_mother = FROM
+				mother = {
+					ROOT = { copy_race_of_prev = yes }
+				}
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = no 
+						is_undead = yes
+					}
+				}
+				set_father = FROM
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = yes
+						is_undead = yes
+					}
+				}
+				set_mother = FROM
+			}
+			save_event_target_as = adoptee
+			any_owned_bloodline = {
+				remove_bloodline_member = event_target:adoptee
+			}
+		}
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court_skip 		= { clr_character_flag = undead_court_skip set_character_flag = undead_court }
+			vampire_court_skip 		= { clr_character_flag = vampire_court_skip set_character_flag = vampire_court }
+			lycan_court_skip 		= { clr_character_flag = lycan_court_skip set_character_flag = lycan_court }
+			yuanti_court_skip 		= { clr_character_flag = yuanti_court_skip set_character_flag = yuanti_court }
+		}
+		recalc_succession = yes
+		clr_character_flag = adopting_child
+	}
+	option = { # a girl
+		name = fradoption_desc.2b
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court 		= { clr_character_flag = undead_court set_character_flag = undead_court_skip }
+			vampire_court 		= { clr_character_flag = vampire_court set_character_flag = vampire_court_skip }
+			lycan_court 		= { clr_character_flag = lycan_court set_character_flag = lycan_court_skip }
+			yuanti_court 		= { clr_character_flag = yuanti_court set_character_flag = yuanti_court_skip }
+		}
+		create_character = {
+			culture = ROOT
+			dynasty = ROOT
+			religion = ROOT
+			female = yes
+			age = 0
+		}
+		new_character = {
+			character_event = { id = character_trait.1 }
+			character_event = { id = beauty.0 }
+			character_event = { id = intelligence.0 }
+			character_event = { id = strength.0 }
+			character_event = { id = FaerunSorcerer.1 } # Sorceror trait
+			character_event = { id = frmaint.7 } # uthgar totem
+			add_trait = adopted
+			remove_all_race_traits = yes
+			if = {
+				limit = { 
+					FROM = { 
+						is_female = no 
+						is_undead = no
+					}
+				}
+				remove_all_race_traits = yes
+				set_father = FROM
+				father = {
+					ROOT = { copy_race_of_prev = yes }
+				}
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = yes
+						is_undead = no
+					}
+				}
+				remove_all_race_traits = yes
+				set_mother = FROM
+				mother = {
+					ROOT = { copy_race_of_prev = yes }
+				}
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = no 
+						is_undead = yes
+					}
+				}
+				set_father = FROM
+			}
+			else_if = {
+				limit = { 
+					FROM = { 
+						is_female = yes
+						is_undead = yes
+					}
+				}
+				set_mother = FROM
+			}
+			save_event_target_as = adoptee
+			any_owned_bloodline = {
+				remove_bloodline_member = event_target:adoptee
+			}
+		}
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court_skip 		= { clr_character_flag = undead_court_skip set_character_flag = undead_court }
+			vampire_court_skip 		= { clr_character_flag = vampire_court_skip set_character_flag = vampire_court }
+			lycan_court_skip 		= { clr_character_flag = lycan_court_skip set_character_flag = lycan_court }
+			yuanti_court_skip 		= { clr_character_flag = yuanti_court_skip set_character_flag = yuanti_court }
+		}
+		recalc_succession = yes
+		clr_character_flag = adopting_child
+	}
+}
+
+character_event = {
+	id = fradoption.3
+	desc = fradoption_desc.2
+	picture = GFX_evt_birth
+	border = GFX_event_normal_frame_diplomacy
+	prisoner = no
+	is_triggered_only = yes
+	
+	option = { # a boy
+		name = fradoption_desc.2a
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court 		= { clr_character_flag = undead_court set_character_flag = undead_court_skip }
+			vampire_court 		= { clr_character_flag = vampire_court set_character_flag = vampire_court_skip }
+			lycan_court 		= { clr_character_flag = lycan_court set_character_flag = lycan_court_skip }
+			yuanti_court 		= { clr_character_flag = yuanti_court set_character_flag = yuanti_court_skip }
+		}
+		capital_scope = {
+			location = {
+				create_character = {
+					culture = THIS
+					dynasty = ROOT
+					religion = ROOT
+					female = no
+					age = 0
+				}
+				new_character = {
+					character_event = { id = character_trait.1 }
+					character_event = { id = beauty.0 }
+					character_event = { id = intelligence.0 }
+					character_event = { id = strength.0 }
+					character_event = { id = FaerunSorcerer.1 } # Sorceror trait
+					character_event = { id = frmaint.7 } # uthgar totem
+					add_trait = adopted
+					if = {
+						limit = { FROM = { is_female = no } }
+						set_father = FROM
+					}
+					else_if = {
+						limit = { FROM = { is_female = yes } }
+						set_mother = FROM
+					}
+					save_event_target_as = adoptee
+					any_owned_bloodline = {
+						remove_bloodline_member = event_target:adoptee
+					}
+				}
+			}
+		}
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court_skip 		= { clr_character_flag = undead_court_skip set_character_flag = undead_court }
+			vampire_court_skip 		= { clr_character_flag = vampire_court_skip set_character_flag = vampire_court }
+			lycan_court_skip 		= { clr_character_flag = lycan_court_skip set_character_flag = lycan_court }
+			yuanti_court_skip 		= { clr_character_flag = yuanti_court_skip set_character_flag = yuanti_court }
+		}
+		recalc_succession = yes
+		clr_character_flag = adopting_child
+	}
+	option = { # a girl
+		name = fradoption_desc.2b
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court 		= { clr_character_flag = undead_court set_character_flag = undead_court_skip }
+			vampire_court 		= { clr_character_flag = vampire_court set_character_flag = vampire_court_skip }
+			lycan_court 		= { clr_character_flag = lycan_court set_character_flag = lycan_court_skip }
+			yuanti_court 		= { clr_character_flag = yuanti_court set_character_flag = yuanti_court_skip }
+		}
+		capital_scope = {
+			location = {
+				create_character = {
+					culture = THIS
+					dynasty = ROOT
+					religion = ROOT
+					female = yes
+					age = 0
+				}
+				new_character = {
+					character_event = { id = character_trait.1 }
+					character_event = { id = beauty.0 }
+					character_event = { id = intelligence.0 }
+					character_event = { id = strength.0 }
+					character_event = { id = FaerunSorcerer.1 } # Sorceror trait
+					character_event = { id = frmaint.7 } # uthgar totem
+					add_trait = adopted
+					if = {
+						limit = { FROM = { is_female = no } }
+						set_father = FROM
+					}
+					else_if = {
+						limit = { FROM = { is_female = yes } }
+						set_mother = FROM
+					}
+					save_event_target_as = adoptee
+					any_owned_bloodline = {
+						remove_bloodline_member = event_target:adoptee
+					}
+				}
+			}
+		}
+		trigger_switch = {	# removing unintended effects from z_racial_traits
+			on_trigger = has_character_flag
+			undead_court_skip 		= { clr_character_flag = undead_court_skip set_character_flag = undead_court }
+			vampire_court_skip 		= { clr_character_flag = vampire_court_skip set_character_flag = vampire_court }
+			lycan_court_skip 		= { clr_character_flag = lycan_court_skip set_character_flag = lycan_court }
+			yuanti_court_skip 		= { clr_character_flag = yuanti_court_skip set_character_flag = yuanti_court }
+		}
+		recalc_succession = yes
+		clr_character_flag = adopting_child
+	}
+}
