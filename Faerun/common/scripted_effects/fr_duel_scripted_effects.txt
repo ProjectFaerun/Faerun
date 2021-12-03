@@ -167,3 +167,92 @@ apply_nomad_leadership_duel_defeat_effect = {
 		}
 	}
 }
+
+duel_check_for_lycan_infection = {
+	if = {
+		limit = {
+			NOR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+				has_character_flag = werewolf_attack
+				has_character_flag = wererat_attack
+				has_character_flag = weretiger_attack
+				has_character_flag = werecrocodile_attack
+			}
+			OR = {
+				AND = {
+					event_target:combatant_1 = { character = PREV }
+					event_target:combatant_2 = {
+						OR = {
+							trait = natural_lycanthrope
+							trait = afflicted_lycanthrope
+						}
+					}
+				}
+				AND = {
+					event_target:combatant_2 = { character = PREV }
+					event_target:combatant_1 = {
+						OR = {
+							trait = natural_lycanthrope
+							trait = afflicted_lycanthrope
+						}
+					}
+				}
+			}
+		}
+		random = {
+			chance = 20 # too high?
+			if = {
+				limit = {
+					event_target:combatant_1 = {
+						OR = {
+							trait = natural_lycanthrope
+							trait = afflicted_lycanthrope
+						}
+					}
+				}
+				event_target:combatant_1 = {
+					save_event_target_as = lycan_infector
+				}
+			}
+			else = {
+				event_target:combatant_2 = {
+					save_event_target_as = lycan_infector
+				}
+			}
+			if = {
+				limit = {
+					event_target:lycan_infector = {
+						trait = werewolf
+					}
+				}
+				set_character_flag = werewolf_attack
+			}
+			else_if = {
+				limit = {
+					event_target:lycan_infector = {
+						trait = wererat
+					}
+				}
+				set_character_flag = wererat_attack
+			}
+			else_if = {
+				limit = {
+					event_target:lycan_infector = {
+						trait = weretiger
+					}
+				}
+				set_character_flag = weretiger_attack
+			}
+			else_if = {
+				limit = {
+					event_target:lycan_infector = {
+						trait = werecrocodile
+					}
+				}
+				set_character_flag = werecrocodile_attack
+			}
+			character_event = { id = frwerebeast.6 days = 10 }
+		}
+	}
+}
