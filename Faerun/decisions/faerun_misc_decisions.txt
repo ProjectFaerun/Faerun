@@ -110,12 +110,17 @@ decisions = {
 		potential = {
 			not_casting = yes
 			NOT = { primary_title = { has_law = succ_open_elective } }
+			NOR = { 
+				government = divine_feudal_government # lineage determines rule
+				government = chinese_imperial_government
+				government = confucian_bureaucracy
+			}
 			NOT = { has_character_flag = adopting_child }
 			OR = {
 				ai = no
-				NOT = { 
+				NOT = {
 					any_child = {
-						count = 2
+						count = 3
 						is_alive = yes
 					}
 				}
@@ -124,6 +129,75 @@ decisions = {
 		allow = {
 			NOT = { num_of_children = 4 } # children are not expendable
 			prisoner = no
+			is_incapable = no
+			custom_tooltip = {
+				text = adoption_cooldown_tt
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = adopted_foundling }
+						had_character_flag = {
+							flag = adopted_foundling
+							years = 2
+						}
+					}
+				}
+			}
+			OR = {
+				AND = {
+					OR = {
+						fertility <= 0
+						AND = {
+							fertility <= 0.25
+							age >= 40
+							olrox_not_immortals_trigger = yes
+						}
+						AND = {
+							age >= 50
+							olrox_not_immortals_trigger = yes
+						}
+					}
+					NOT = { has_character_modifier = recoveringfromchildbirth }
+					NAND = {
+						trait = celibate
+						is_monastic_member_trigger = yes
+					}
+				}
+				OR = {
+					AND = {
+						is_female = yes
+						any_spouse = { is_female = yes }
+					}
+					AND = {
+						is_female = no
+						any_spouse = { is_female = no }
+					}
+				}
+				AND = {
+					can_marry = no
+					NOR = {
+						is_married = yes
+						is_betrothed = yes
+						is_consort = yes
+					}
+				}
+				custom_tooltip = {
+					text = burgher_5_years_childless_tt
+					hidden_tooltip = {
+						AND = {
+							OR = {
+								government = democratic_feudal_government
+								government = merchant_republic_government
+							}
+							ruled_years = 5
+							NOT = {
+								any_child = {
+									is_alive = yes
+								}
+							}
+						}
+					}
+				}
+			}
 			conditional_tooltip = {
 				trigger = { 
 					real_tier = EMPEROR
@@ -201,48 +275,13 @@ decisions = {
 		}
 		effect = {
 			character_event = { id = fradoption.1 }
-			set_character_flag = adopting_child
+			set_character_flag = adopting_child # to prevent spamming
+			clr_character_flag = adopted_foundling # for cooldown
+			set_character_flag = adopted_foundling
 		}
 		ai_will_do = {
 			factor = 1
 
-			modifier = {
-				factor = 0
-				NOR = {
-					AND = {
-						OR = {
-							AND = {
-								fertility <= 0
-								age >= 40
-							}
-							AND = {
-								fertility <= 0.25
-								age >= 40
-								olrox_not_immortals_trigger = yes
-							}
-							AND = {
-								age >= 50
-								olrox_not_immortals_trigger = yes
-							}
-						}
-						NOT = { has_character_modifier = recoveringfromchildbirth }
-						NAND = {
-							trait = celibate
-							is_monastic_member_trigger = yes
-						}
-					}
-					OR = {
-						AND = {
-							is_female = yes
-							any_spouse = { is_female = yes }
-						}
-						AND = {
-							is_female = no
-							any_spouse = { is_female = no }
-						}
-					}
-				}
-			}
 			modifier = {
 				factor = 0.5
 				trait = proud 
@@ -410,6 +449,11 @@ targeted_decisions = {
 			age = 40
 			has_living_children = no
 			NOT = { primary_title = { has_law = succ_open_elective } }
+			NOR = { 
+				government = divine_feudal_government # lineage determines rule
+				government = chinese_imperial_government
+				government = confucian_bureaucracy
+			}
 		}
 		potential = {
 			NOT = { trait = adopted }
@@ -422,6 +466,18 @@ targeted_decisions = {
 		allow = {
 			FROM = {
 				NOT = { num_of_children = 4 } # children are not expendable
+				custom_tooltip = {
+					text = adoption_cooldown_tt
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = adopted_foundling }
+							had_character_flag = {
+								flag = adopted_foundling
+								years = 2
+							}
+						}
+					}
+				}
 				OR = {
 					fertility <= 0
 					AND = {
@@ -473,6 +529,7 @@ targeted_decisions = {
 				is_consort = yes
 			}
 			prisoner = no
+			is_incapable = no
 		}
 		effect = {
 			if = {
@@ -485,11 +542,14 @@ targeted_decisions = {
 			}
 			add_trait = adopted
 			dynasty = FROM
+			clear_wealth = yes
 			any_owned_bloodline = {
 				remove_bloodline_member = ROOT
 			}
 			FROM = {
 				recalc_succession = yes
+				clr_character_flag = adopted_foundling # for cooldown
+				set_character_flag = adopted_foundling
 				if = {
 					limit = { real_tier = EMPEROR }
 					prestige = -400
