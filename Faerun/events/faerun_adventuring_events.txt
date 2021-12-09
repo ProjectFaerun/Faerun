@@ -1,6 +1,6 @@
 namespace = ADVN
 
-#Difficulty Selection Screen (eventually) & Starting Adventure Tombola
+#Difficulty Selection Screen & Starting Adventure Tombola
 character_event = {
 	id = ADVN.1
 	desc = EVTDESC_ADVN_1
@@ -8,8 +8,7 @@ character_event = {
 
 	is_triggered_only = yes
 
-	option = {
-		name = EVTOPTA_ADVN_1
+	immediate = {
 		random_courtier_or_vassal = {
 			limit = {
 				has_minor_title = title_party_member
@@ -47,6 +46,117 @@ character_event = {
 			}
 			set_character_flag = party_member_4
 			save_event_target_as = party_member_4
+		}
+	}
+
+	option = { #Easy Difficulty
+		name = EVTOPTA_ADVN_1
+		hidden_tooltip = {
+			random_list = { #first wilderness event
+				5 = { #bad weather
+					character_event = { id = ADVN.3 days = 10 }
+					set_character_flag = adv_bad_weather
+				}
+				35 = { #negotiate with locals
+					character_event = { id = ADVN.4 days = 10 }
+				}
+				35 = { #research location
+					character_event = { id = ADVN.5 days = 10 }
+				}
+				10 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 10 }
+				}
+				10 = { #lost in the wilderness
+					character_event = { id = ADVN.8 days = 10 }
+					set_character_flag = adv_got_lost
+				}
+				5 = { #mercenary thugs
+					character_event = { id = ADVN.40 days = 10 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			random_list = { #second wilderness event
+				20 = { #random monster
+					character_event = { id = ADVN.2 days = 20 }
+				}
+				15 = { #bad weather
+					modifier = { has_character_flag = adv_bad_weather factor = 0 }
+					character_event = { id = ADVN.3 days = 20 }
+					set_character_flag = adv_bad_weather
+				}
+				15 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 20 }
+				}
+				15 = { #forage
+					character_event = { id = ADVN.7 days = 20 }
+					set_character_flag = adv_did_forage
+				}
+				15 = { #lost in the wilderness
+					modifier = { has_character_flag = adv_got_lost factor = 0 }
+					character_event = { id = ADVN.8 days = 20 }
+					set_character_flag = adv_got_lost
+				}
+				15 = { #Pinpoint Dungeon
+					character_event = { id = ADVN.9 days = 20 }
+					set_character_flag = adv_did_pinpoint
+				}
+				5 = { #mercenary thugs
+					modifier = { has_character_flag = adv_met_mercs factor = 0 }
+					character_event = { id = ADVN.40 days = 20 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			random_list = { #third wilderness event
+				20 = { #random monster
+					character_event = { id = ADVN.2 days = 30 }
+				}
+				10 = { #bad weather
+					modifier = { has_character_flag = adv_bad_weather factor = 0 }
+					character_event = { id = ADVN.3 days = 30 }
+					set_character_flag = adv_bad_weather
+				}
+				15 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 30 }
+				}
+				20 = { #forage
+					modifier = { has_character_flag = adv_did_forage factor = 0 }
+					character_event = { id = ADVN.7 days = 30 }
+					set_character_flag = adv_did_forage
+				}
+				10 = { #lost in the wilderness
+					modifier = { has_character_flag = adv_got_lost factor = 0 }
+					character_event = { id = ADVN.8 days = 30 }
+					set_character_flag = adv_got_lost
+				}
+				20 = { #Pinpoint Dungeon
+					modifier = { has_character_flag = adv_did_pinpoint factor = 0 }
+					character_event = { id = ADVN.9 days = 30 }
+					set_character_flag = adv_did_pinpoint
+				}
+				5 = { #mercenary thugs
+					modifier = { has_character_flag = adv_met_mercs factor = 0 }
+					character_event = { id = ADVN.40 days = 30 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			character_event = { #dungeon found
+				id = ADVN.10
+				days = 40
+				random = 2
+			}
+		}
+		scaled_wealth = { value = -1 min = -50 max = -200 }
+	}
+
+	option = { #Moderate Difficulty
+		name = EVTOPTB_ADVN_1
+		trigger = {
+			scaled_wealth = {
+				value = 2
+				min = 100
+				max = 400
+			}
+			prestige >= 500
 		}
 		hidden_tooltip = {
 			random_list = { #first wilderness event
@@ -142,6 +252,8 @@ character_event = {
 				random = 2
 			}
 		}
+		set_character_flag = adv_mod_difficulty
+		scaled_wealth = { value = -2 min = -100 max = -400 }
 	}
 }
 
@@ -173,9 +285,18 @@ character_event = {
 			save_event_target_as = combatant_2
 			character_event = { id = ADVN.101 days = 5 }
 			remove_trait = weak
-			remove_trait = slow
+			remove_trait = delicate
+			remove_trait = soft
 			remove_trait = imbecile
 			remove_trait = idiot
+			remove_trait = slow
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				add_trait = robust
+				add_trait = strong
+			}
 		}
 	}
 
@@ -278,6 +399,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -340,6 +462,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -402,6 +525,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -464,6 +588,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -556,6 +681,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -602,6 +728,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -648,6 +775,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -694,6 +822,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -770,6 +899,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -816,6 +946,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -862,6 +993,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -908,6 +1040,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -984,6 +1117,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -1038,6 +1172,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -1092,6 +1227,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -1146,6 +1282,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -1231,6 +1368,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -1293,6 +1431,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -1355,6 +1494,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -1417,6 +1557,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -1510,6 +1651,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -1562,6 +1704,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -1614,6 +1757,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -1666,6 +1810,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -1749,6 +1894,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						is_smart_trigger = yes
@@ -1794,6 +1940,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						is_smart_trigger = yes
@@ -1839,6 +1986,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						is_smart_trigger = yes
@@ -1884,6 +2032,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						is_smart_trigger = yes
@@ -1987,7 +2136,7 @@ character_event = {
 			}
 			12 = { #non-hostile monsters
 				modifier = { has_character_flag = adv_passive_monster factor = 0 }
-				character_event = { id = ADVN.42 days = 10 }
+				character_event = { id = ADVN.42 days = 20 }
 				set_character_flag = adv_passive_monster
 			}
 		}
@@ -2989,6 +3138,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -3051,6 +3201,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -3113,6 +3264,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -3175,6 +3327,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { intrigue = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { intrigue = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { intrigue = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -3267,6 +3420,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -3330,6 +3484,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -3393,6 +3548,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -3456,6 +3612,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { learning = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { learning = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { learning = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
@@ -3565,6 +3722,58 @@ character_event = {
 		trigger = { event_target:final_boss = { trait = undead } }
 		picture = GFX_evt_undead_3
 	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = ogre_magi } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = troll } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = minotaur } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = creature_giant } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = illithid } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = beholder } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = aboleth } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = creature_dragon } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = vampire } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = natural_lycanthrope } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = naga } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = baatezu } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = tanarri } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
 
 	is_triggered_only = yes
 
@@ -3574,7 +3783,8 @@ character_event = {
 
 	immediate = {
 		random_list = {
-			30 = {
+			24 = { #orc
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					female = no
@@ -3591,7 +3801,8 @@ character_event = {
 					trait = journeyman_barbarian
 				}
 			}
-			10 = {
+			8 = { #goblin
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3607,7 +3818,8 @@ character_event = {
 					trait = journeyman_rogue
 				}
 			}
-			10 = {
+			8 = { #hobgoblin
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3623,7 +3835,8 @@ character_event = {
 					trait = journeyman_fighter
 				}
 			}
-			10 = {
+			8 = { #bugbear
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3639,7 +3852,8 @@ character_event = {
 					trait = journeyman_ranger
 				}
 			}
-			10 = {
+			8 = { #gnoll
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3655,7 +3869,8 @@ character_event = {
 					trait = journeyman_barbarian
 				}
 			}
-			10 = {
+			8 = { #ogre
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3671,7 +3886,8 @@ character_event = {
 					trait = journeyman_barbarian
 				}
 			}
-			10 = {
+			8 = { #kobold
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3687,7 +3903,8 @@ character_event = {
 					trait = journeyman_sorcerer
 				}
 			}
-			10 = {
+			8 = { #drow
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					female = yes
@@ -3704,7 +3921,8 @@ character_event = {
 					trait = journeyman_cleric
 				}
 			}
-			10 = {
+			8 = { #sahuagin
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				modifier = {
 					ROOT = {
 						capital_scope = {
@@ -3738,7 +3956,8 @@ character_event = {
 					add_trait = sahuagin_warrior
 				}
 			}
-			10 = {
+			12 = { #undead
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
 				create_random_soldier = {
 					random_traits = yes
 					attributes = {
@@ -3752,15 +3971,247 @@ character_event = {
 					culture = ROOT
 				}
 			}
+
+			7 = { #oni
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_ogre
+					culture = ogre_magi
+					religion = vaprak
+					trait = expert_fighter
+					trait = journeyman_sorcerer
+				}
+			}
+			7 = { #troll
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_troll
+					culture = troll
+					religion = vaprak
+					trait = master_barbarian
+				}
+			}
+			7 = { #minotaur
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_minotaur
+					culture = minotaur
+					religion = abyssal_cult
+					trait = master_barbarian
+					trait = patron_baphomet
+				}
+			}
+			7 = { #giant
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_giant
+					culture = hill_giant
+					religion = giant_pantheon
+				}
+			}
+			7 = { #illithid
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_illithid
+					culture = illithid
+					religion = illithid_pantheon
+					trait = master_sorcerer
+					trait = genius
+				}
+			}
+			7 = { #beholder
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_beholder
+					culture = beholder
+					religion = beholder_pantheon
+					trait = master_sorcerer
+				}
+			}
+			7 = { #aboleth
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_aboleth
+					culture = aboleth
+					religion = faithless
+					trait = master_wizard
+					trait = wiz_abjuration
+					trait = genius
+				}
+			}
+			7 = { #young dragon
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_dragon
+					culture = draconic
+					religion = tiamat
+					trait = dragon_young
+					trait = journeyman_sorcerer
+				}
+			}
+			10 = { #vampire
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 6
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 8
+					}
+					trait = vampire
+					trait = robust
+					trait = shrewd
+					culture = ROOT
+				}
+			}
+			10 = { #lycan
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 6
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 8
+					}
+					trait = creature_human
+					trait = natural_lycanthrope
+					culture = ROOT
+					religion = deities_of_fury
+					trait = patron_malar
+				}
+			}
+			10 = { #naga
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_naga
+					culture = naga
+					religion = scale_cult
+					trait = master_wizard
+					trait = wiz_abjuration
+				}
+			}
+			7 = { #baatezu
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_fiend
+					culture = baatezu
+					religion = infernal
+					trait = master_warlock
+					trait = warlock_fiend
+				}
+			}
+			7 = { #tanarri
+				modifier = { NOT = { has_character_flag = adv_mod_difficulty } factor = 0 }
+				create_random_soldier = {
+					random_traits = yes
+					attributes = {
+						diplomacy = 8
+						martial = 10
+						stewardship = 6
+						intrigue = 8
+						learning = 6
+					}
+					trait = creature_fiend
+					culture = tanarri
+					religion = abyssal_cult
+					trait = master_warlock
+					trait = warlock_fiend
+				}
+			}
 		}
 		new_character = {
 			save_event_target_as = final_boss
 			save_event_target_as = combatant_2
 			remove_trait = weak
-			remove_trait = slow
-			remove_trait = idiot
+			remove_trait = delicate
+			remove_trait = soft
 			remove_trait = imbecile
-			remove_trait = dull
+			remove_trait = idiot
+			remove_trait = slow
 			remove_trait = craven
 			remove_trait = kind
 			remove_trait = charitable
@@ -3807,6 +4258,151 @@ character_event = {
 							add_trait = wiz_necromancy
 						}
 					}
+				}
+				creature_illithid = {
+					random_list = {
+						2 = {
+						}
+						1 = {
+							add_trait = creature_ulitharid
+						}
+					}
+				}
+				creature_dragon = {
+					random_list = {
+						1 = {
+							culture = red_dragon
+							set_graphical_culture = red_dragon
+						}
+						1 = {
+							culture = blue_dragon
+							set_graphical_culture = blue_dragon
+						}
+						1 = {
+							culture = black_dragon
+							set_graphical_culture = black_dragon
+						}
+						1 = {
+							culture = green_dragon
+							set_graphical_culture = green_dragon
+						}
+						1 = {
+							culture = white_dragon
+							set_graphical_culture = white_dragon
+						}
+					}
+				}
+				creature_giant = {
+					random_list = {
+						1 = {
+						}
+						1 = {
+							culture = stone_giant
+							set_graphical_culture = stone_giant
+						}
+						1 = {
+							culture = frost_giant
+							set_graphical_culture = frost_giant
+						}
+						1 = {
+							culture = fire_giant
+							set_graphical_culture = fire_giant
+						}
+						1 = {
+							culture = fog_giant
+							set_graphical_culture = fog_giant
+						}
+					}
+					random_list = {
+						1 = {
+							add_trait = master_cleric
+						}
+						1 = {
+							add_trait = master_barbarian
+						}
+					}
+				}
+				vampire = {
+					random_list = {
+						1 = {
+							religion = dead_three
+						}
+						1 = {
+							religion = shadow_gods
+						}
+						1 = {
+							religion = church_of_cyric
+						}
+						1 = {
+							religion = abyssal_cult
+						}
+						1 = {
+							religion = infernal
+						}
+					}
+					random_list = {
+						1 = {
+							add_trait = master_cleric
+						}
+						1 = {
+							add_trait = master_paladin
+						}
+						1 = {
+							add_trait = master_fighter
+						}
+						1 = {
+							add_trait = master_monk
+						}
+						1 = {
+							add_trait = master_rogue
+						}
+						1 = {
+							add_trait = master_wizard
+							add_trait = wiz_necromancy
+						}
+					}
+				}
+				creature_beholder = {
+					random_list = {
+						2 = {
+						}
+						1 = {
+							add_trait = elder_orb
+							add_trait = giant
+							add_trait = strong
+						}
+					}
+				}
+				natural_lycanthrope = {
+					random_list = {
+						4 = {
+							add_trait = werewolf
+						}
+						3 = {
+							add_trait = wererat
+						}
+						2 = {
+							add_trait = weretiger
+						}
+						1 = {
+							add_trait = werecrocodile
+						}
+					}
+					random_list = {
+						1 = {
+							add_trait = master_fighter
+						}
+						1 = {
+							add_trait = master_barbarian
+						}
+						1 = {
+							add_trait = master_ranger
+						}
+					}
+				}
+				creature_fiend = {
+					set_character_flag = got_warlock_pact_weapon
+					add_artifact = warlock_pact_weapon
 				}
 			}
 		}
@@ -3940,6 +4536,66 @@ character_event = {
 		trigger = { event_target:final_boss = { culture = drow } }
 		picture = GFX_evt_drow_1
 	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = sahuagin } }
+		picture = GFX_evt_sahuagin_1
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = undead } }
+		picture = GFX_evt_undead_3
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = ogre_magi } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = troll } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = minotaur } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = creature_giant } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = illithid } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = beholder } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = aboleth } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = creature_dragon } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = vampire } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { trait = natural_lycanthrope } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = naga } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = baatezu } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
+	picture = {
+		trigger = { event_target:final_boss = { culture = tanarri } }
+		picture = GFX_evt_carnage_1 #PLACEHOLDER
+	}
 
 	is_triggered_only = yes
 
@@ -4051,8 +4707,21 @@ character_event = {
 
 	immediate = {
 		event_target:party_member_1 = {
-			wealth = 100
-			prestige = 100
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				wealth = 200
+				prestige = 200
+				random_major_magic_item_effect = yes
+				mod_adv_xp_effect = yes
+			}
+			else = {
+				wealth = 100
+				prestige = 100
+				random_magic_item_effect = yes
+				easy_adv_xp_effect = yes
+			}
 			if = {
 				limit = { NOT = { trait = adventurer } }
 				add_trait = adventurer
@@ -4071,130 +4740,24 @@ character_event = {
 					#nothing
 				}
 			}
-			random_magic_item_effect = yes #PLACEHOLDER
 			clr_character_flag = party_member_1
-			#XP gain block
-				if = {
-					limit = {
-						z_barbarian = yes
-						NOT = { trait = legendary_barbarian }
-					}
-					hidden_tooltip = {
-						change_variable = { which = barbarian_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_bard = yes
-						NOT = { trait = legendary_bard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = bard_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_cleric = yes
-						NOT = { trait = legendary_cleric }
-					}
-					hidden_tooltip = {
-						change_variable = { which = cleric_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_druid = yes
-						NOT = { trait = legendary_druid }
-					}
-					hidden_tooltip = {
-						change_variable = { which = druid_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_fighter = yes
-						NOT = { trait = legendary_fighter }
-					}
-					hidden_tooltip = {
-						change_variable = { which = fighter_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_monk = yes
-						NOT = { trait = legendary_monk }
-					}
-					hidden_tooltip = {
-						change_variable = { which = monk_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_paladin = yes
-						NOT = { trait = legendary_paladin }
-					}
-					hidden_tooltip = {
-						change_variable = { which = paladin_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_ranger = yes
-						NOT = { trait = legendary_ranger }
-					}
-					hidden_tooltip = {
-						change_variable = { which = ranger_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_rogue = yes
-						NOT = { trait = legendary_rogue }
-					}
-					hidden_tooltip = {
-						change_variable = { which = rogue_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_shadow = yes
-						NOT = { trait = legendary_shadow }
-					}
-					hidden_tooltip = {
-						change_variable = { which = shadow_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_sorcerer = yes
-						NOT = { trait = legendary_sorcerer }
-					}
-					hidden_tooltip = {
-						change_variable = { which = sorcerer_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_warlock = yes
-						NOT = { trait = legendary_warlock }
-					}
-					hidden_tooltip = {
-						change_variable = { which = warlock_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_wizard = yes
-						NOT = { trait = legendary_wizard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = wizard_xp value = 100 }
-					}
-				}
 		}
 		event_target:party_member_2 = {
-			wealth = 100
-			prestige = 100
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				wealth = 200
+				prestige = 200
+				random_major_magic_item_effect = yes
+				mod_adv_xp_effect = yes
+			}
+			else = {
+				wealth = 100
+				prestige = 100
+				random_magic_item_effect = yes
+				easy_adv_xp_effect = yes
+			}
 			if = {
 				limit = { NOT = { trait = adventurer } }
 				add_trait = adventurer
@@ -4213,130 +4776,24 @@ character_event = {
 					#nothing
 				}
 			}
-			random_magic_item_effect = yes #PLACEHOLDER
 			clr_character_flag = party_member_2
-			#XP gain block
-				if = {
-					limit = {
-						z_barbarian = yes
-						NOT = { trait = legendary_barbarian }
-					}
-					hidden_tooltip = {
-						change_variable = { which = barbarian_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_bard = yes
-						NOT = { trait = legendary_bard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = bard_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_cleric = yes
-						NOT = { trait = legendary_cleric }
-					}
-					hidden_tooltip = {
-						change_variable = { which = cleric_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_druid = yes
-						NOT = { trait = legendary_druid }
-					}
-					hidden_tooltip = {
-						change_variable = { which = druid_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_fighter = yes
-						NOT = { trait = legendary_fighter }
-					}
-					hidden_tooltip = {
-						change_variable = { which = fighter_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_monk = yes
-						NOT = { trait = legendary_monk }
-					}
-					hidden_tooltip = {
-						change_variable = { which = monk_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_paladin = yes
-						NOT = { trait = legendary_paladin }
-					}
-					hidden_tooltip = {
-						change_variable = { which = paladin_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_ranger = yes
-						NOT = { trait = legendary_ranger }
-					}
-					hidden_tooltip = {
-						change_variable = { which = ranger_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_rogue = yes
-						NOT = { trait = legendary_rogue }
-					}
-					hidden_tooltip = {
-						change_variable = { which = rogue_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_shadow = yes
-						NOT = { trait = legendary_shadow }
-					}
-					hidden_tooltip = {
-						change_variable = { which = shadow_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_sorcerer = yes
-						NOT = { trait = legendary_sorcerer }
-					}
-					hidden_tooltip = {
-						change_variable = { which = sorcerer_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_warlock = yes
-						NOT = { trait = legendary_warlock }
-					}
-					hidden_tooltip = {
-						change_variable = { which = warlock_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_wizard = yes
-						NOT = { trait = legendary_wizard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = wizard_xp value = 100 }
-					}
-				}
 		}
 		event_target:party_member_3 = {
-			wealth = 100
-			prestige = 100
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				wealth = 200
+				prestige = 200
+				random_major_magic_item_effect = yes
+				mod_adv_xp_effect = yes
+			}
+			else = {
+				wealth = 100
+				prestige = 100
+				random_magic_item_effect = yes
+				easy_adv_xp_effect = yes
+			}
 			if = {
 				limit = { NOT = { trait = adventurer } }
 				add_trait = adventurer
@@ -4355,130 +4812,24 @@ character_event = {
 					#nothing
 				}
 			}
-			random_magic_item_effect = yes #PLACEHOLDER
 			clr_character_flag = party_member_3
-			#XP gain block
-				if = {
-					limit = {
-						z_barbarian = yes
-						NOT = { trait = legendary_barbarian }
-					}
-					hidden_tooltip = {
-						change_variable = { which = barbarian_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_bard = yes
-						NOT = { trait = legendary_bard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = bard_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_cleric = yes
-						NOT = { trait = legendary_cleric }
-					}
-					hidden_tooltip = {
-						change_variable = { which = cleric_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_druid = yes
-						NOT = { trait = legendary_druid }
-					}
-					hidden_tooltip = {
-						change_variable = { which = druid_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_fighter = yes
-						NOT = { trait = legendary_fighter }
-					}
-					hidden_tooltip = {
-						change_variable = { which = fighter_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_monk = yes
-						NOT = { trait = legendary_monk }
-					}
-					hidden_tooltip = {
-						change_variable = { which = monk_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_paladin = yes
-						NOT = { trait = legendary_paladin }
-					}
-					hidden_tooltip = {
-						change_variable = { which = paladin_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_ranger = yes
-						NOT = { trait = legendary_ranger }
-					}
-					hidden_tooltip = {
-						change_variable = { which = ranger_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_rogue = yes
-						NOT = { trait = legendary_rogue }
-					}
-					hidden_tooltip = {
-						change_variable = { which = rogue_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_shadow = yes
-						NOT = { trait = legendary_shadow }
-					}
-					hidden_tooltip = {
-						change_variable = { which = shadow_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_sorcerer = yes
-						NOT = { trait = legendary_sorcerer }
-					}
-					hidden_tooltip = {
-						change_variable = { which = sorcerer_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_warlock = yes
-						NOT = { trait = legendary_warlock }
-					}
-					hidden_tooltip = {
-						change_variable = { which = warlock_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_wizard = yes
-						NOT = { trait = legendary_wizard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = wizard_xp value = 100 }
-					}
-				}
 		}
 		event_target:party_member_4 = {
-			wealth = 100
-			prestige = 100
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				wealth = 200
+				prestige = 200
+				random_major_magic_item_effect = yes
+				mod_adv_xp_effect = yes
+			}
+			else = {
+				wealth = 100
+				prestige = 100
+				random_magic_item_effect = yes
+				easy_adv_xp_effect = yes
+			}
 			if = {
 				limit = { NOT = { trait = adventurer } }
 				add_trait = adventurer
@@ -4497,144 +4848,41 @@ character_event = {
 					#nothing
 				}
 			}
-			random_magic_item_effect = yes #PLACEHOLDER
 			clr_character_flag = party_member_4
-			#XP gain block
-				if = {
-					limit = {
-						z_barbarian = yes
-						NOT = { trait = legendary_barbarian }
-					}
-					hidden_tooltip = {
-						change_variable = { which = barbarian_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_bard = yes
-						NOT = { trait = legendary_bard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = bard_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_cleric = yes
-						NOT = { trait = legendary_cleric }
-					}
-					hidden_tooltip = {
-						change_variable = { which = cleric_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_druid = yes
-						NOT = { trait = legendary_druid }
-					}
-					hidden_tooltip = {
-						change_variable = { which = druid_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_fighter = yes
-						NOT = { trait = legendary_fighter }
-					}
-					hidden_tooltip = {
-						change_variable = { which = fighter_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_monk = yes
-						NOT = { trait = legendary_monk }
-					}
-					hidden_tooltip = {
-						change_variable = { which = monk_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_paladin = yes
-						NOT = { trait = legendary_paladin }
-					}
-					hidden_tooltip = {
-						change_variable = { which = paladin_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_ranger = yes
-						NOT = { trait = legendary_ranger }
-					}
-					hidden_tooltip = {
-						change_variable = { which = ranger_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_rogue = yes
-						NOT = { trait = legendary_rogue }
-					}
-					hidden_tooltip = {
-						change_variable = { which = rogue_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_shadow = yes
-						NOT = { trait = legendary_shadow }
-					}
-					hidden_tooltip = {
-						change_variable = { which = shadow_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_sorcerer = yes
-						NOT = { trait = legendary_sorcerer }
-					}
-					hidden_tooltip = {
-						change_variable = { which = sorcerer_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_warlock = yes
-						NOT = { trait = legendary_warlock }
-					}
-					hidden_tooltip = {
-						change_variable = { which = warlock_xp value = 100 }
-					}
-				}
-				if = {
-					limit = {
-						z_wizard = yes
-						NOT = { trait = legendary_wizard }
-					}
-					hidden_tooltip = {
-						change_variable = { which = wizard_xp value = 100 }
-					}
-				}
 		}
 	}
 
 	option = {
 		name = EVTOPTA_ADVN_30
-		prestige = 100
-
-		random_list = {
-			33 = {
-				random_magic_item_effect = yes
+		if = {
+			limit = {
+				has_character_flag = adv_mod_difficulty
 			}
-			66 = {
-				random_minor_art_object_effect = yes
+			prestige = 200
+			random_list = {
+				33 = {
+					random_major_magic_item_effect = yes
+				}
+				66 = {
+					random_art_object_effect = yes
+				}
+			}
+		}
+		else = {
+			prestige = 100
+			random_list = {
+				33 = {
+					random_magic_item_effect = yes
+				}
+				66 = {
+					random_minor_art_object_effect = yes
+				}
 			}
 		}
 
 		hidden_tooltip = {
 			remove_character_modifier = sent_adventurers
+			clr_character_flag = adv_mod_difficulty
 			clr_character_flag = adv_researched_loc
 			clr_character_flag = adv_negotiated_locals
 			clr_character_flag = adv_bad_weather
@@ -4691,132 +4939,261 @@ character_event = {
 			clr_character_flag = adv_cave_in
 			clr_character_flag = adv_passive_monster
 			event_target:final_boss = {
-				wealth = 300
+				if = {
+					limit = {
+						ROOT = { has_character_flag = adv_mod_difficulty }
+					}
+					wealth = 600
+					random_major_magic_item_effect = yes
+					random_art_object_effect = yes
+					#XP gain block
+						if = {
+							limit = {
+								z_barbarian = yes
+								NOT = { trait = legendary_barbarian }
+							}
+							hidden_tooltip = {
+								change_variable = { which = barbarian_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_bard = yes
+								NOT = { trait = legendary_bard }
+							}
+							hidden_tooltip = {
+								change_variable = { which = bard_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_cleric = yes
+								NOT = { trait = legendary_cleric }
+							}
+							hidden_tooltip = {
+								change_variable = { which = cleric_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_druid = yes
+								NOT = { trait = legendary_druid }
+							}
+							hidden_tooltip = {
+								change_variable = { which = druid_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_fighter = yes
+								NOT = { trait = legendary_fighter }
+							}
+							hidden_tooltip = {
+								change_variable = { which = fighter_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_monk = yes
+								NOT = { trait = legendary_monk }
+							}
+							hidden_tooltip = {
+								change_variable = { which = monk_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_paladin = yes
+								NOT = { trait = legendary_paladin }
+							}
+							hidden_tooltip = {
+								change_variable = { which = paladin_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_ranger = yes
+								NOT = { trait = legendary_ranger }
+							}
+							hidden_tooltip = {
+								change_variable = { which = ranger_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_rogue = yes
+								NOT = { trait = legendary_rogue }
+							}
+							hidden_tooltip = {
+								change_variable = { which = rogue_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_shadow = yes
+								NOT = { trait = legendary_shadow }
+							}
+							hidden_tooltip = {
+								change_variable = { which = shadow_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_sorcerer = yes
+								NOT = { trait = legendary_sorcerer }
+							}
+							hidden_tooltip = {
+								change_variable = { which = sorcerer_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_warlock = yes
+								NOT = { trait = legendary_warlock }
+							}
+							hidden_tooltip = {
+								change_variable = { which = warlock_xp value = 600 }
+							}
+						}
+						if = {
+							limit = {
+								z_wizard = yes
+								NOT = { trait = legendary_wizard }
+							}
+							hidden_tooltip = {
+								change_variable = { which = wizard_xp value = 600 }
+							}
+						}
+				}
+				else = {
+					wealth = 300
+					random_magic_item_effect = yes
+					random_minor_art_object_effect = yes
+					#XP gain block
+						if = {
+							limit = {
+								z_barbarian = yes
+								NOT = { trait = legendary_barbarian }
+							}
+							hidden_tooltip = {
+								change_variable = { which = barbarian_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_bard = yes
+								NOT = { trait = legendary_bard }
+							}
+							hidden_tooltip = {
+								change_variable = { which = bard_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_cleric = yes
+								NOT = { trait = legendary_cleric }
+							}
+							hidden_tooltip = {
+								change_variable = { which = cleric_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_druid = yes
+								NOT = { trait = legendary_druid }
+							}
+							hidden_tooltip = {
+								change_variable = { which = druid_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_fighter = yes
+								NOT = { trait = legendary_fighter }
+							}
+							hidden_tooltip = {
+								change_variable = { which = fighter_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_monk = yes
+								NOT = { trait = legendary_monk }
+							}
+							hidden_tooltip = {
+								change_variable = { which = monk_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_paladin = yes
+								NOT = { trait = legendary_paladin }
+							}
+							hidden_tooltip = {
+								change_variable = { which = paladin_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_ranger = yes
+								NOT = { trait = legendary_ranger }
+							}
+							hidden_tooltip = {
+								change_variable = { which = ranger_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_rogue = yes
+								NOT = { trait = legendary_rogue }
+							}
+							hidden_tooltip = {
+								change_variable = { which = rogue_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_shadow = yes
+								NOT = { trait = legendary_shadow }
+							}
+							hidden_tooltip = {
+								change_variable = { which = shadow_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_sorcerer = yes
+								NOT = { trait = legendary_sorcerer }
+							}
+							hidden_tooltip = {
+								change_variable = { which = sorcerer_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_warlock = yes
+								NOT = { trait = legendary_warlock }
+							}
+							hidden_tooltip = {
+								change_variable = { which = warlock_xp value = 300 }
+							}
+						}
+						if = {
+							limit = {
+								z_wizard = yes
+								NOT = { trait = legendary_wizard }
+							}
+							hidden_tooltip = {
+								change_variable = { which = wizard_xp value = 300 }
+							}
+						}
+				}
 				if = {
 					limit = { NOT = { trait = adventurer } }
 					add_trait = adventurer
 				}
-				random_magic_item_effect = yes
-				random_minor_art_object_effect = yes
-				#XP gain block
-					if = {
-						limit = {
-							z_barbarian = yes
-							NOT = { trait = legendary_barbarian }
-						}
-						hidden_tooltip = {
-							change_variable = { which = barbarian_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_bard = yes
-							NOT = { trait = legendary_bard }
-						}
-						hidden_tooltip = {
-							change_variable = { which = bard_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_cleric = yes
-							NOT = { trait = legendary_cleric }
-						}
-						hidden_tooltip = {
-							change_variable = { which = cleric_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_druid = yes
-							NOT = { trait = legendary_druid }
-						}
-						hidden_tooltip = {
-							change_variable = { which = druid_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_fighter = yes
-							NOT = { trait = legendary_fighter }
-						}
-						hidden_tooltip = {
-							change_variable = { which = fighter_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_monk = yes
-							NOT = { trait = legendary_monk }
-						}
-						hidden_tooltip = {
-							change_variable = { which = monk_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_paladin = yes
-							NOT = { trait = legendary_paladin }
-						}
-						hidden_tooltip = {
-							change_variable = { which = paladin_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_ranger = yes
-							NOT = { trait = legendary_ranger }
-						}
-						hidden_tooltip = {
-							change_variable = { which = ranger_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_rogue = yes
-							NOT = { trait = legendary_rogue }
-						}
-						hidden_tooltip = {
-							change_variable = { which = rogue_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_shadow = yes
-							NOT = { trait = legendary_shadow }
-						}
-						hidden_tooltip = {
-							change_variable = { which = shadow_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_sorcerer = yes
-							NOT = { trait = legendary_sorcerer }
-						}
-						hidden_tooltip = {
-							change_variable = { which = sorcerer_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_warlock = yes
-							NOT = { trait = legendary_warlock }
-						}
-						hidden_tooltip = {
-							change_variable = { which = warlock_xp value = 300 }
-						}
-					}
-					if = {
-						limit = {
-							z_wizard = yes
-							NOT = { trait = legendary_wizard }
-						}
-						hidden_tooltip = {
-							change_variable = { which = wizard_xp value = 300 }
-						}
-					}
 			}
+			clr_character_flag = adv_mod_difficulty
 		}
 	}
 }
@@ -4849,6 +5226,7 @@ character_event = {
 		prestige = -100
 		hidden_tooltip = {
 			remove_character_modifier = sent_adventurers
+			clr_character_flag = adv_mod_difficulty
 			clr_character_flag = adv_researched_loc
 			clr_character_flag = adv_negotiated_locals
 			clr_character_flag = adv_bad_weather
@@ -4896,11 +5274,20 @@ character_event = {
 			save_event_target_as = merc_boss
 			save_event_target_as = combatant_2
 			remove_trait = weak
-			remove_trait = slow
-			remove_trait = idiot
+			remove_trait = delicate
+			remove_trait = soft
 			remove_trait = imbecile
+			remove_trait = idiot
+			remove_trait = slow
 			remove_trait = craven
 			remove_trait = kind
+			if = {
+				limit = {
+					ROOT = { has_character_flag = adv_mod_difficulty }
+				}
+				remove_trait = trained_fighter
+				add_trait = expert_fighter
+			}
 			character_event = { id = frxp.1 }
 			banish = yes
 		}
@@ -4922,6 +5309,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						z_fighter = yes
@@ -4968,6 +5356,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						z_fighter = yes
@@ -5014,6 +5403,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						z_fighter = yes
@@ -5060,6 +5450,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						z_fighter = yes
@@ -5136,6 +5527,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						is_strong_trigger = yes
@@ -5190,6 +5582,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						is_strong_trigger = yes
@@ -5244,6 +5637,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						is_strong_trigger = yes
@@ -5298,6 +5692,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { martial = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { martial = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						is_strong_trigger = yes
@@ -5382,6 +5777,7 @@ character_event = {
 				modifier = { event_target:party_member_1 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_1 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_1 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_1 = {
 						OR = {
@@ -5424,6 +5820,7 @@ character_event = {
 				modifier = { event_target:party_member_2 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_2 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_2 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_2 = {
 						OR = {
@@ -5466,6 +5863,7 @@ character_event = {
 				modifier = { event_target:party_member_3 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_3 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_3 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_3 = {
 						OR = {
@@ -5508,6 +5906,7 @@ character_event = {
 				modifier = { event_target:party_member_4 = { diplomacy = 35 } factor = 1.4 }
 				modifier = { event_target:party_member_4 = { diplomacy = 40 } factor = 1.5 }
 				modifier = { event_target:party_member_4 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
 				modifier = {
 					event_target:party_member_4 = {
 						OR = {
