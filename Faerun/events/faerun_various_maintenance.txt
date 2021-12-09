@@ -57,7 +57,7 @@ character_event = { # Sets various story flags
 			limit = {
 				date = 1357.7.1
 			}
-			set_global_flag = malthiir_coup
+			set_global_flag = maalthiir_coup
 		}
 		if = {
 			limit = {
@@ -1481,6 +1481,620 @@ character_event = {
 		add_character_modifier = {
 			name = known_lycan_modifier
 			duration = -1
+		}
+	}
+}
+
+character_event = {
+	id = frmaint.29
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		c_neverwinter = { # doesn't matter, just to make sure it's a character that will always exist
+			holder_scope = {
+				character = ROOT
+			}
+		}
+		is_save_game = no
+		NOT = {
+			has_game_rule = {
+				name = minor_story_events
+				value = off
+			}
+		}
+	}
+	
+	immediate = {
+		character_event = { id = frmaint.30 }
+	}
+}
+
+character_event = { # needs to be two events so it doesn't double up if a game is reloaded. might be a more elegant way but can't think of it]
+
+	#BIG IMPORTANT NOTE: MONTH CONDITIONS GO FROM 0 to 11
+	
+	id = frmaint.30
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		#to fire again in next hammer (month 1)
+		if = {
+			limit = {
+				month = 0
+				NOT = { month = 1 } # don't want to risk month == 1 not being valid
+			}
+			random_player = {
+				character_event = { id = frmaint.30 years = 1 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 1
+				NOT = { month = 2 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 11 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 2
+				NOT = { month = 3 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 10 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 3
+				NOT = { month = 4 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 9 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 4
+				NOT = { month = 5 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 8 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 5
+				NOT = { month = 6 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 7 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 6
+				NOT = { month = 7 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 6 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 7
+				NOT = { month = 8 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 5 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 8
+				NOT = { month = 9 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 4 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 9
+				NOT = { month = 10 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 3 }
+			}
+		}
+		else_if = {
+			limit = {
+				month = 10
+				NOT = { month = 11 }
+			}
+			random_player = {
+				character_event = { id = frmaint.30 months = 2 }
+			}
+		}
+		else = {
+			random_player = {
+				character_event = { id = frmaint.30 months = 1 }
+			}
+		}
+		
+		#Now events and such, please make sure they are in roughly chronological order. 
+		##Landed Bhaalspawn get event troops if before BG2 ends
+		if = {
+			limit = {
+				NOR = {
+					date = 1369.9.1
+					has_global_flag = bhaalspawn_crisis_ended
+				}
+			}
+			any_landed_ruler = {
+				limit = {
+					NOT = { has_character_flag = bhaalspawn0 }
+					trait = bhaalspawn
+				}
+				character_event = { id = frstory.0 }
+			}
+		}
+		
+		##Moander rampages in Mirtul 1357
+		if = {
+			limit = {
+				year = 1357
+				NOT = { month = 5 }
+				NOT = { has_global_flag = moander_rampaged }
+			}
+			any_landed_ruler = {
+				limit = {
+					has_landed_title = c_yulash
+				}
+				if = {
+					limit = {
+						month = 0
+						NOT = { month = 1 }
+					}
+					character_event = { id = frstory.62 months = 4 }
+				}
+				else_if = {
+					limit = {
+						month = 1
+						NOT = { month = 2 }
+					}
+					character_event = { id = frstory.62 months = 3 }
+				}
+				else_if = {
+					limit = {
+						month = 2
+						NOT = { month = 3 }
+					}
+					character_event = { id = frstory.62 months = 2 }
+				}
+				else_if = {
+					limit = {
+						month = 3
+						NOT = { month = 4 }
+					}
+					character_event = { id = frstory.62 months = 1 }
+				}
+				else = {
+					character_event = { id = frstory.62 }
+				}
+			}
+		}
+		
+		#Maalthiir's coup in Hillsfar in Eleasis 1357
+		if = {
+			limit = {
+				year = 1357
+				NOT = { month = 8 }
+				NOT = { has_global_flag = maalthiir_coup }
+				any_landed_ruler = {
+					has_landed_title = c_hillsfar
+					independent = yes
+					NOT = { character = 56072 }
+				}
+				c_56072 = {
+					is_alive = yes
+					is_landed = no
+				}
+			}
+			any_landed_ruler = {
+				limit = {
+					has_landed_title = c_hillsfar
+				}
+				if = {
+					limit = {
+						month = 0
+						NOT = { month = 1 }
+					}
+					character_event = { id = frstory.70 months = 7 }
+				}
+				else_if = {
+					limit = {
+						month = 1
+						NOT = { month = 2 }
+					}
+					character_event = { id = frstory.70 months = 6 }
+				}
+				else_if = {
+					limit = {
+						month = 2
+						NOT = { month = 3 }
+					}
+					character_event = { id = frstory.70 months = 5 }
+				}
+				else_if = {
+					limit = {
+						month = 3
+						NOT = { month = 4 }
+					}
+					character_event = { id = frstory.70 months = 4 }
+				}
+				else_if = {
+					limit = {
+						month = 4
+						NOT = { month = 5 }
+					}
+					character_event = { id = frstory.70 months = 3 }
+				}
+				else_if = {
+					limit = {
+						month = 5
+						NOT = { month = 6 }
+					}
+					character_event = { id = frstory.70 months = 2 }
+				}
+				else_if = {
+					limit = {
+						month = 6
+						NOT = { month = 7 }
+					}
+					character_event = { id = frstory.70 months = 1 }
+				}
+				else = {
+					character_event = { id = frstory.70 }
+				}
+			}
+		}
+		
+		##Nalavarauthatoryl attacks Cormyr/the Obarskyrs in Mirtul 1371
+		if = {
+			limit = {
+				year = 1371
+				NOT = { month = 5 }
+				NOT = { has_global_flag = nalavara_spawned }
+				any_landed_ruler = {
+					dynasty = 500 #Obarskyr
+					num_of_king_titles >= 1
+				}
+			}
+			if = {
+				limit = {
+					any_landed_ruler = {
+						has_landed_title = k_cormyr
+						dynasty = 500
+					}
+				}
+				any_landed_ruler = {
+					limit = {
+						has_landed_title = k_cormyr
+						dynasty = 500
+					}
+					if = {
+						limit = {
+							month = 0
+							NOT = { month = 1 }
+						}
+						character_event = { id = frstory.56 months = 4 }
+					}
+					else_if = {
+						limit = {
+							month = 1
+							NOT = { month = 2 }
+						}
+						character_event = { id = frstory.56 months = 3 }
+					}
+					else_if = {
+						limit = {
+							month = 2
+							NOT = { month = 3 }
+						}
+						character_event = { id = frstory.56 months = 2 }
+					}
+					else_if = {
+						limit = {
+							month = 3
+							NOT = { month = 4 }
+						}
+						character_event = { id = frstory.56 months = 1 }
+					}
+					else = {
+						character_event = { id = frstory.56 }
+					}
+				}
+			}
+			else = {
+				random_landed_ruler = {
+					limit = {
+						dynasty = 500
+						higher_tier_than = DUKE
+					}
+					if = {
+						limit = {
+							month = 0
+							NOT = { month = 1 }
+						}
+						character_event = { id = frstory.56 months = 4 }
+					}
+					else_if = {
+						limit = {
+							month = 1
+							NOT = { month = 2 }
+						}
+						character_event = { id = frstory.56 months = 3 }
+					}
+					else_if = {
+						limit = {
+							month = 2
+							NOT = { month = 3 }
+						}
+						character_event = { id = frstory.56 months = 2 }
+					}
+					else_if = {
+						limit = {
+							month = 3
+							NOT = { month = 4 }
+						}
+						character_event = { id = frstory.56 months = 1 }
+					}
+					else = {
+						character_event = { id = frstory.56 }
+					}
+				}
+			}
+		}
+		
+		##Shade returns in Hammer 1372
+		if = {
+			limit = {
+				year = 1372
+				NOT = { month = 1 }
+				NOT = { has_global_flag = shadovar_spawned }
+			}
+			any_landed_ruler = {
+				limit = {
+					has_landed_title = c_shoal_of_thirst
+				}
+				character_event = { id = frstory.31 }
+			}
+		}
+		
+		##Bane returns in Alturiak 1372
+		if = {
+			limit = {
+				year = 1372
+				has_global_flag = bane_dead
+				NOT = { month = 2 }
+			}
+			if = {
+				limit = {
+					any_player = {
+						capital_scope = {
+							NOR = {
+								region = zakhara_region
+								region = kara_tur_region
+							}
+						}
+					}
+				}
+				any_player = {
+					if = {
+						limit = {
+							month = 0
+							NOT = { month = 1 }
+						}
+						narrative_event = { id = frstory.8 months = 1 }
+					}
+					else = {
+						narrative_event = { id = frstory.8 }
+					}
+				}
+			}
+			else = {
+				random_playable_ruler = {
+					if = {
+						limit = {
+							month = 0
+							NOT = { month = 1 }
+						}
+						narrative_event = { id = frstory.8 months = 1 }
+					}
+					else = {
+						narrative_event = { id = frstory.8 }
+					}
+				}
+			}
+		}
+		
+		##Mephistopheles in Waterdeep in Alturiak 1373 (Hordes of the Underdark)
+		if = {
+			limit = {
+				year = 1373
+				NOT = { month = 2 }
+				NOT = { has_global_flag = mephistopheles_spawned }
+				#check for Undrentide happening
+			}
+			any_landed_ruler = {
+				limit = {
+					OR = {
+						has_landed_title = d_waterdeep
+						AND = {
+							d_waterdeep = {
+								has_holder = no
+							}
+							has_landed_title = c_waterdeep
+						}
+					}
+				}
+				if = {
+					limit = {
+						month = 0
+						NOT = { month = 1 }
+					}
+					character_event = { id = frstory.21 months = 1 }
+				}
+				else = {
+					character_event = { id = frstory.21 }
+				}
+			}
+		}
+		
+		##Tchazzar returns to Chessenta in Nightal 1374
+		if = {
+			limit = {
+				year = 1374
+				NOT = { has_global_flag = tchazzar_spawned }
+			}
+			any_landed_ruler = {
+				limit = { has_landed_title = c_cimbar }
+				if = {
+					limit = {
+						month = 0
+						NOT = { month = 1 }
+					}
+					character_event = { id = frstory.41 months = 11 }
+				}
+				else_if = {
+					limit = {
+						month = 1
+						NOT = { month = 2 }
+					}
+					character_event = { id = frstory.41 months = 10 }
+				}
+				else_if = {
+					limit = {
+						month = 2
+						NOT = { month = 3 }
+					}
+					character_event = { id = frstory.41 months = 9 }
+				}
+				else_if = {
+					limit = {
+						month = 3
+						NOT = { month = 4 }
+					}
+					character_event = { id = frstory.41 months = 8 }
+				}
+				else_if = {
+					limit = {
+						month = 4
+						NOT = { month = 5 }
+					}
+					character_event = { id = frstory.41 months = 7 }
+				}
+				else_if = {
+					limit = {
+						month = 5
+						NOT = { month = 6 }
+					}
+					character_event = { id = frstory.41 months = 6 }
+				}
+				else_if = {
+					limit = {
+						month = 6
+						NOT = { month = 7 }
+					}
+					character_event = { id = frstory.41 months = 5 }
+				}
+				else_if = {
+					limit = {
+						month = 7
+						NOT = { month = 8 }
+					}
+					character_event = { id = frstory.41 months = 4 }
+				}
+				else_if = {
+					limit = {
+						month = 8
+						NOT = { month = 9 }
+					}
+					character_event = { id = frstory.41 months = 3 }
+				}
+				else_if = {
+					limit = {
+						month = 9
+						NOT = { month = 10 }
+					}
+					character_event = { id = frstory.41 months = 2 }
+				}
+				else_if = {
+					limit = {
+						month = 10
+						NOT = { month = 11 }
+					}
+					character_event = { id = frstory.41 months = 1 }
+				}
+				else = {
+					character_event = { id = frstory.41 }
+				}
+			}
+		}
+		
+		##King of Shadows in Alturiak 1374
+		if = {
+			limit = {
+				year = 1374
+				NOT = { month = 2 }
+				NOT = { has_global_flag = king_of_shadows_spawned }
+				#later will also check if NWN1 has happened!
+			}
+			any_landed_ruler = {
+				limit = {
+					OR = {
+						has_landed_title = d_neverwinter
+						AND = {
+							d_neverwinter = {
+								has_holder = no
+							}
+							has_landed_title = c_neverwinter
+						}
+					}
+				}
+				if = {
+					limit = {
+						month = 0
+						NOT = { month = 1 }
+					}
+					character_event = { id = frstory.11 months = 1 }
+				}
+				else = {
+					character_event = { id = frstory.11 }
+				}
+			}
+		}
+		
+		##Warlock Knights appear in Hammer 1430
+		if = {
+			limit = {
+				year = 1430
+				NOT = { month = 1 }
+				NOT = { has_global_flag = voice_of_telos_not_spawned_yet }
+				#check for Spellplague happening
+			}
+			any_landed_ruler = {
+				limit = {
+					has_landed_title = c_darmshall
+				}
+				character_event = { id = frstory.51 }
+			}
 		}
 	}
 }
