@@ -2111,3 +2111,176 @@ character_event = {
 		}
 	}
 }
+
+character_event = { # preserve some government types on succession
+	id = frmaint.34
+	hide_window = yes
+
+	is_triggered_only = yes
+	
+	trigger = {
+		OR = {
+			is_landed = no
+			lower_tier_than = FROMFROM
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { 
+				FROMFROM = { government = democratic_feudal_government }
+			}
+			set_character_flag = democratic_feudal_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			break = yes
+		}
+		if = {
+			limit = { 
+				FROMFROM = { government = theocracy_government }
+			}
+			set_character_flag = theocracy_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			break = yes
+		}
+		if = {
+			limit = { 
+				FROMFROM = { government = divine_feudal_government }
+			}
+			set_character_flag = divine_feudal_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			break = yes
+		}
+	}
+}
+
+character_event = { # clear flags after succession
+	id = frmaint.35
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		clr_character_flag = democratic_feudal_government_preserve
+		clr_character_flag = theocracy_government_preserve
+		clr_character_flag = divine_feudal_government_preserve
+	}
+}
+
+character_event = { # preserve popular elective for Commonwealths
+	id = frmaint.36
+	hide_window = yes
+
+	is_triggered_only = yes
+	
+	trigger = {
+		OR = {
+			is_landed = no
+			government = republic_government
+			government = democratic_feudal_government
+		}
+	}
+
+	immediate = {
+		character_event = { id = frmaint.37 days = 1 }
+	}
+}
+
+character_event = {
+	id = frmaint.37
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		government = democratic_feudal_government
+	}
+
+	immediate = {
+		any_demesne_title = {
+			limit = {
+				higher_tier_than = BARON
+			}
+			add_law = {
+				law = succ_popular_elective
+				cooldown = no
+				opinion_effect = no
+			}
+		}
+	}
+}
+
+character_event = { # convert baron tier republics and theocracies upon becoming counts
+	id = frmaint.38
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	only_rulers = yes
+	
+	trigger = {
+		OR = {
+			government = republic_government
+			government = baron_theocracy_government
+			AND = {
+				num_of_count_titles_in_realm == 1
+				FROMFROM = { is_liege_of = ROOT }
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = { 
+				num_of_count_titles_in_realm == 1
+				capital_holding = {
+					holding_type = city
+				}
+				NOT = { government = democratic_feudal_government }
+			}
+			set_character_flag = democratic_feudal_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			if = {
+				limit = {
+					is_government_potential = democratic_feudal_government
+				}
+				set_government_type = democratic_feudal_government
+				character_event = { id = frmaint.37 days = 1 }
+			}
+			break = yes
+		}
+		if = {
+			limit = { 
+				num_of_count_titles_in_realm == 1
+				capital_holding = {
+					holding_type = temple
+				}
+				NOT = { government = theocracy_government }
+			}
+			set_character_flag = theocracy_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			if = {
+				limit = {
+					is_government_potential = theocracy_government
+				}
+				set_government_type = theocracy_government
+			}
+			break = yes
+		}
+		if = {
+			limit = { 
+				government = republic_government
+			}
+			set_character_flag = democratic_feudal_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			break = yes
+		}
+		if = {
+			limit = { 
+				government = baron_theocracy_government
+			}
+			set_character_flag = theocracy_government_preserve
+			character_event = { id = frmaint.35 days = 1 }
+			break = yes
+		}
+	}
+}
