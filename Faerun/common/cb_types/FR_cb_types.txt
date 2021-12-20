@@ -6070,7 +6070,50 @@ slay_druid_cb = {
 					add_law = succ_divine_elective
 				}
 			}
-			character_event = { id = frmaint.31 }
+			trigger_switch = {	# removing unintended effects from z_racial_traits
+				on_trigger = has_character_flag
+				undead_court 		= { clr_character_flag = undead_court set_character_flag = undead_court_skip }
+				vampire_court 		= { clr_character_flag = vampire_court set_character_flag = vampire_court_skip }
+				lycan_court 		= { clr_character_flag = lycan_court set_character_flag = lycan_court_skip }
+				yuanti_court 		= { clr_character_flag = yuanti_court set_character_flag = yuanti_court_skip }
+			}
+			random_demesne_title = {
+				limit = { tier = COUNT }
+				location = {
+					create_character = {
+						age = 30
+						random_traits = yes
+						female = random
+						religion = event_target:oldroot
+						culture = event_target:oldroot
+						dynasty = random
+					}
+					new_character = {
+						remove_trait = cynical
+						add_trait = zealous
+						set_character_flag = ai_flag_refuse_conversion
+						save_event_target_as = new_ruler
+					}
+				}
+			}
+			event_target:new_ruler = {			# removing unintended effects from z_racial_traits
+				religion = event_target:oldroot
+				add_trait = patron_malar
+				culture = event_target:oldroot
+			}
+			any_demesne_title = {
+				event_target:new_ruler = {
+					usurp_title = { target = PREV type = invasion }
+				}
+			}
+			trigger_switch = {	# removing unintended effects from z_racial_traits
+				on_trigger = has_character_flag
+				undead_court_skip 		= { clr_character_flag = undead_court_skip set_character_flag = undead_court }
+				vampire_court_skip 		= { clr_character_flag = vampire_court_skip set_character_flag = vampire_court }
+				lycan_court_skip 		= { clr_character_flag = lycan_court_skip set_character_flag = lycan_court }
+				yuanti_court_skip 		= { clr_character_flag = yuanti_court_skip set_character_flag = yuanti_court }
+			}
+			clear_event_target = oldroot
 			death = {
 				death_reason = death_execution
 				killer = ROOT
@@ -6208,6 +6251,7 @@ claws_of_malar_cb = {
 	can_use_gui = {
 		ROOT = { piety = 30 }
 		NOT = { has_character_modifier = malar_blasphemer_defeated }
+		FROM = { NOT = { trait = patron_malar } }
 	}
 
 	can_use = {
@@ -6307,7 +6351,10 @@ claws_of_malar_cb = {
 			}
 		}
 		FROM = {
-			character_event = { id = frmaint.32 }
+			if = {
+				limit = { has_artifact = claws_of_malar }
+				destroy_artifact = claws_of_malar
+			}
 			death = {
 				death_reason = death_execution
 				killer = ROOT
