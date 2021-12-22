@@ -366,8 +366,9 @@ targeted_decisions = {
 				}
 			}
 			ai = yes
+			is_betrothed = no
 			OR = {
-				OR = {
+				AND = {
 					is_married = no
 					is_married_matrilineally = no
 				}
@@ -391,7 +392,10 @@ targeted_decisions = {
 							NOT = { num_of_spouses = 3 }
 							OR = {
 								religion = lapal_faith
-								religion = geomancy
+								AND = {
+									religion = geomancy
+									NOT = { num_of_consorts = 1 }
+								}
 							}
 						}
 					}
@@ -404,10 +408,183 @@ targeted_decisions = {
 				trait = homosexual
 				trait = bisexual
 			}
+			liege= {
+				ROOT = {
+					NOT = { is_primary_heir = PREV }
+				}
+			}
 		}
 		effect = {
 			FROM = { add_spouse = ROOT }
 			FROM = { character_event = { id = 500 } }
+			FROM = {
+				if = {
+					limit = { real_tier = EMPEROR }
+					prestige = -400
+				}
+				if = {
+					limit = { real_tier = KING }
+					prestige = -300
+				}
+				if = {
+					limit = { real_tier = DUKE }
+					prestige = -200
+				}
+				if = {
+					limit = { real_tier = COUNT }
+					prestige = -100
+				}
+				if = {
+					limit = { real_tier = BARON }
+					prestige = -10
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 1 # Will tweak later
+			modifier = {
+				factor = 0.1
+				any_child = {
+					count == 0
+				}
+			}
+		}
+	}
+
+	same_gender_consort = {
+		only_rulers = yes
+		ai_check_interval = 24
+		filter = all
+		ai_target_filter = realm # wish there was a better way, don't want to use "all" for the AI
+
+		from_potential = {
+			OR = {
+				trait = homosexual
+				trait = bisexual
+			}
+			OR = {
+				AND = {
+					NOT = { num_of_consorts = 1 }
+					OR = {
+						religion = deities_of_fury
+						religion = dead_three
+						religion = church_of_cyric
+						religion = beholder_pantheon
+					}
+				}
+				AND = {
+					NOT = { num_of_consorts = 2 }
+					OR = {
+						religion = joyful
+						religion = shadow_gods
+						religion = scale_cult
+						religion = kiaransalee
+						religion = draconic_pantheon
+						religion = goblin_pantheon
+						AND = {
+							religion = goblin_reformed
+							NOT = {
+								has_religion_feature = religion_harems
+							}
+						}
+					}
+				}
+				AND = {
+					NOT = { num_of_consorts = 3 }
+					OR = {
+						government = tribal_government
+						government = nomadic_tribal_government
+						religion = kossuth
+						religion = primordial
+						religion = uthgardt_faith
+						religion = ubtao_worship
+						religion = ghaunadaur
+						religion = abyssal_cult
+						religion = infernal
+						religion = thasmudyanic
+						religion = vaprak
+						religion = ulutiuan
+						religion = toteteohuan
+						religion = yuir
+						religion = orc_pantheon
+						AND = {
+							OR = {
+								religion = ulutiuan_reformed
+								religion = toteteohuan_reformed
+								religion = yuir_reformed
+								religion = orc_reformed
+							}
+							NOT = {
+								has_religion_feature = religion_harems
+							}
+						}
+						AND = {
+							religion_group = karaturan_group
+							NOT = { religion = adama }
+						}
+						AND = {
+							OR = {
+								religion = geomancy
+								religion = lolth_cult
+							}
+							is_female = yes
+						}
+						AND = {
+							religion = tuigan_shamanism
+							is_female = no
+						}
+					}
+				}
+			}
+			NOR = {
+				any_spouse = {
+					character = ROOT
+				}
+				any_consort = {
+					character = ROOT
+				}
+			}
+		}
+		potential = {
+			OR = {
+				AND = {
+					is_female = yes
+					FROM = { is_female = yes }
+				}
+				AND = {
+					is_female = no
+					FROM = { is_female = no }
+				}
+			}
+			is_ruler = no
+			ai = yes
+			is_married = no
+			is_married_matrilineally = no
+			is_consort = no
+			is_betrothed = no
+		}
+		allow = {
+			is_lover = FROM
+			OR = {
+				trait = homosexual
+				trait = bisexual
+			}
+			liege= {
+				ROOT = {
+					NOT = { is_primary_heir = PREV }
+				}
+			}
+			liege= {
+				has_concubinage = yes
+			}
+		}
+		effect = {
+			custom_tooltip = {
+				text = same_gender_consort_effect_tt
+				set_gender = opposite
+				FROM = { add_consort = ROOT }
+				set_gender = opposite
+			}
 			FROM = {
 				if = {
 					limit = { real_tier = EMPEROR }
