@@ -3,10 +3,22 @@ namespace = ADVN
 #Difficulty Selection Screen & Starting Adventure Tombola
 character_event = {
 	id = ADVN.1
-	desc = EVTDESC_ADVN_1
 	picture = GFX_evt_adventurers
 
 	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			NOT = { has_character_flag = adv_vs_host }
+		}
+		text = EVTDESC_ADVN_1
+	}
+	desc = {
+		trigger = {
+			has_character_flag = adv_vs_host
+		}
+		text = EVTDESC_ADVN_1_b
+	}
 
 	immediate = {
 		random_courtier_or_vassal = {
@@ -51,6 +63,9 @@ character_event = {
 
 	option = { #Easy Difficulty
 		name = EVTOPTA_ADVN_1
+		trigger = {
+			NOT = { has_character_flag = adv_vs_host }
+		}
 		hidden_tooltip = {
 			random_list = { #first wilderness event
 				5 = { #bad weather
@@ -157,6 +172,7 @@ character_event = {
 				max = 400
 			}
 			prestige >= 500
+			NOT = { has_character_flag = adv_vs_host }
 		}
 		hidden_tooltip = {
 			random_list = { #first wilderness event
@@ -255,6 +271,95 @@ character_event = {
 		set_character_flag = adv_mod_difficulty
 		scaled_wealth = { value = -2 min = -100 max = -400 }
 	}
+
+	option = { #VS Host
+		name = EVTOPTC_ADVN_1
+		trigger = {
+			has_character_flag = adv_vs_host
+		}
+		FROM = { save_event_target_as = final_boss }
+		hidden_tooltip = {
+			random_list = { #first wilderness event
+				5 = { #bad weather
+					character_event = { id = ADVN.3 days = 10 }
+					set_character_flag = adv_bad_weather
+				}
+				35 = { #negotiate with locals
+					character_event = { id = ADVN.4 days = 10 }
+				}
+				35 = { #persuade local thugs
+					character_event = { id = ADVN.43 days = 10 }
+				}
+				10 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 10 }
+				}
+				15 = { #mercenary thugs
+					character_event = { id = ADVN.40 days = 10 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			random_list = { #second wilderness event
+				20 = { #random monster
+					character_event = { id = ADVN.2 days = 20 }
+				}
+				15 = { #bad weather
+					modifier = { has_character_flag = adv_bad_weather factor = 0 }
+					character_event = { id = ADVN.3 days = 20 }
+					set_character_flag = adv_bad_weather
+				}
+				15 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 20 }
+				}
+				15 = { #forage
+					character_event = { id = ADVN.7 days = 20 }
+					set_character_flag = adv_did_forage
+				}
+				15 = { #Plan Attack
+					character_event = { id = ADVN.44 days = 20 }
+					set_character_flag = adv_did_pinpoint
+				}
+				20 = { #mercenary thugs
+					modifier = { has_character_flag = adv_met_mercs factor = 0 }
+					character_event = { id = ADVN.40 days = 20 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			random_list = { #third wilderness event
+				20 = { #random monster
+					character_event = { id = ADVN.2 days = 30 }
+				}
+				10 = { #bad weather
+					modifier = { has_character_flag = adv_bad_weather factor = 0 }
+					character_event = { id = ADVN.3 days = 30 }
+					set_character_flag = adv_bad_weather
+				}
+				15 = { #sneak past a threat
+					character_event = { id = ADVN.6 days = 30 }
+				}
+				20 = { #forage
+					modifier = { has_character_flag = adv_did_forage factor = 0 }
+					character_event = { id = ADVN.7 days = 30 }
+					set_character_flag = adv_did_forage
+				}
+				20 = { #Plan Attack
+					modifier = { has_character_flag = adv_did_pinpoint factor = 0 }
+					character_event = { id = ADVN.44 days = 30 }
+					set_character_flag = adv_did_pinpoint
+				}
+				15 = { #mercenary thugs
+					modifier = { has_character_flag = adv_met_mercs factor = 0 }
+					character_event = { id = ADVN.40 days = 30 }
+					set_character_flag = adv_met_mercs
+				}
+			}
+			character_event = { #main camp reached
+				id = ADVN.50
+				days = 40
+				random = 2
+			}
+		}
+		scaled_wealth = { value = -0.5 min = -25 max = -100 }
+	}
 }
 
 ### Random Monster ###
@@ -274,28 +379,31 @@ character_event = {
 	}
 
 	immediate = {
-		create_random_soldier = {
-			random_traits = yes
-			culture = monster
-			religion = monster_pantheon
-			trait = creature_monster
-			employer = d_red_spears
-		}
-		new_character = {
-			save_event_target_as = combatant_2
-			character_event = { id = ADVN.101 days = 5 }
-			remove_trait = weak
-			remove_trait = delicate
-			remove_trait = soft
-			remove_trait = imbecile
-			remove_trait = idiot
-			remove_trait = slow
-			if = {
-				limit = {
-					ROOT = { has_character_flag = adv_mod_difficulty }
+		hidden_tooltip = {
+			create_random_soldier = {
+				random_traits = yes
+				culture = monster
+				religion = monster_pantheon
+				trait = creature_monster
+				dynasty = none
+				employer = d_red_spears
+			}
+			new_character = {
+				save_event_target_as = combatant_2
+				character_event = { id = ADVN.101 days = 5 }
+				remove_trait = weak
+				remove_trait = delicate
+				remove_trait = soft
+				remove_trait = imbecile
+				remove_trait = idiot
+				remove_trait = slow
+				if = {
+					limit = {
+						ROOT = { has_character_flag = adv_mod_difficulty }
+					}
+					add_trait = robust
+					add_trait = strong
 				}
-				add_trait = robust
-				add_trait = strong
 			}
 		}
 	}
@@ -308,7 +416,6 @@ character_event = {
 			character_event = { id = ADVN.100 }
 		}
 		event_target:party_member_1 = {
-			#increase_adv_fatigue_effect = yes
 			custom_tooltip = { text = adventuring_fatigue_tt }
 			character_event = { id = ADVN.104 days = 2 }
 		}
@@ -321,7 +428,6 @@ character_event = {
 			character_event = { id = ADVN.100 }
 		}
 		event_target:party_member_2 = {
-			#increase_adv_fatigue_effect = yes
 			custom_tooltip = { text = adventuring_fatigue_tt }
 			character_event = { id = ADVN.104 days = 2 }
 		}
@@ -334,7 +440,6 @@ character_event = {
 			character_event = { id = ADVN.100 }
 		}
 		event_target:party_member_3 = {
-			#increase_adv_fatigue_effect = yes
 			custom_tooltip = { text = adventuring_fatigue_tt }
 			character_event = { id = ADVN.104 days = 2 }
 		}
@@ -347,7 +452,6 @@ character_event = {
 			character_event = { id = ADVN.100 }
 		}
 		event_target:party_member_4 = {
-			#increase_adv_fatigue_effect = yes
 			custom_tooltip = { text = adventuring_fatigue_tt }
 			character_event = { id = ADVN.104 days = 2 }
 		}
@@ -1090,8 +1194,20 @@ character_event = {
 ### Sneak Past Enemy ###
 character_event = {
 	id = ADVN.6
-	desc = EVTDESC_ADVN_6
 	picture = GFX_evt_sneak_attack
+
+	desc = {
+		trigger = {
+			NOT = { has_character_flag = adv_vs_host }
+		}
+		text = EVTDESC_ADVN_6
+	}
+	desc = {
+		trigger = {
+			has_character_flag = adv_vs_host
+		}
+		text = EVTDESC_ADVN_6_b
+	}
 
 	only_playable = yes
 
@@ -1149,7 +1265,15 @@ character_event = {
 					factor = 0.5
 				}
 				custom_tooltip = { text = adv_random_monster_tt }
-				character_event = { id = ADVN.2 days = 1 }
+				if = {
+					limit = {
+						has_character_flag = adv_vs_host
+					}
+					character_event = { id = ADVN.45 days = 1 }
+				}
+				else = {
+					character_event = { id = ADVN.2 days = 1 }
+				}
 				event_target:party_member_1 = {
 					increase_adv_fatigue_effect = yes
 				}
@@ -1204,7 +1328,15 @@ character_event = {
 					factor = 0.5
 				}
 				custom_tooltip = { text = adv_random_monster_tt }
-				character_event = { id = ADVN.2 days = 1 }
+				if = {
+					limit = {
+						has_character_flag = adv_vs_host
+					}
+					character_event = { id = ADVN.45 days = 1 }
+				}
+				else = {
+					character_event = { id = ADVN.2 days = 1 }
+				}
 				event_target:party_member_2 = {
 					increase_adv_fatigue_effect = yes
 				}
@@ -1259,7 +1391,15 @@ character_event = {
 					factor = 0.5
 				}
 				custom_tooltip = { text = adv_random_monster_tt }
-				character_event = { id = ADVN.2 days = 1 }
+				if = {
+					limit = {
+						has_character_flag = adv_vs_host
+					}
+					character_event = { id = ADVN.45 days = 1 }
+				}
+				else = {
+					character_event = { id = ADVN.2 days = 1 }
+				}
 				event_target:party_member_3 = {
 					increase_adv_fatigue_effect = yes
 				}
@@ -1314,7 +1454,15 @@ character_event = {
 					factor = 0.5
 				}
 				custom_tooltip = { text = adv_random_monster_tt }
-				character_event = { id = ADVN.2 days = 1 }
+				if = {
+					limit = {
+						has_character_flag = adv_vs_host
+					}
+					character_event = { id = ADVN.45 days = 1 }
+				}
+				else = {
+					character_event = { id = ADVN.2 days = 1 }
+				}
 				event_target:party_member_4 = {
 					increase_adv_fatigue_effect = yes
 				}
@@ -2141,7 +2289,6 @@ character_event = {
 			}
 		}
 		character_event = { id = ADVN.2 days = 30 } #third dungeon event, always a monster
-
 		character_event = { #final boss
 			id = ADVN.20
 			days = 40
@@ -4698,7 +4845,7 @@ character_event = {
 	}
 }
 
-#Good Ending
+#Good Ending Post-Final Boss
 character_event = {
 	id = ADVN.30
 	desc = EVTDESC_ADVN_30
@@ -4900,6 +5047,7 @@ character_event = {
 		hidden_tooltip = {
 			remove_character_modifier = sent_adventurers
 			clr_character_flag = adv_mod_difficulty
+			clr_character_flag = adv_vs_host
 			clr_character_flag = adv_researched_loc
 			clr_character_flag = adv_negotiated_locals
 			clr_character_flag = adv_bad_weather
@@ -4911,11 +5059,12 @@ character_event = {
 			clr_character_flag = adv_met_mercs
 			clr_character_flag = adv_cave_in
 			clr_character_flag = adv_passive_monster
+			clr_character_flag = adv_talked_mercs
 		}
 	}
 }
 
-#Bad Ending
+#Bad Ending Post-Final Boss
 character_event = {
 	id = ADVN.31
 	desc = EVTDESC_ADVN_31
@@ -4971,6 +5120,7 @@ character_event = {
 			clr_character_flag = adv_met_mercs
 			clr_character_flag = adv_cave_in
 			clr_character_flag = adv_passive_monster
+			clr_character_flag = adv_talked_mercs
 			event_target:final_boss = {
 				if = {
 					limit = {
@@ -5227,6 +5377,7 @@ character_event = {
 				}
 			}
 			clr_character_flag = adv_mod_difficulty
+			clr_character_flag = adv_vs_host
 		}
 	}
 }
@@ -5276,6 +5427,7 @@ character_event = {
 		hidden_tooltip = {
 			remove_character_modifier = sent_adventurers
 			clr_character_flag = adv_mod_difficulty
+			clr_character_flag = adv_vs_host
 			clr_character_flag = adv_researched_loc
 			clr_character_flag = adv_negotiated_locals
 			clr_character_flag = adv_bad_weather
@@ -5287,6 +5439,554 @@ character_event = {
 			clr_character_flag = adv_met_mercs
 			clr_character_flag = adv_cave_in
 			clr_character_flag = adv_passive_monster
+			clr_character_flag = adv_talked_mercs
+		}
+	}
+}
+
+#Host Leader
+character_event = {
+	id = ADVN.33
+	desc = EVTDESC_ADVN_33
+	picture = GFX_evt_large_army
+	portrait = event_target:final_boss
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		event_target:final_boss = {
+			save_event_target_as = combatant_2
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_20
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_1 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2 }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_20
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_2 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_20
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_3 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_20
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_4 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+}
+
+#Host Leader keeps fighting
+character_event = {
+	id = ADVN.34
+	desc = EVTDESC_ADVN_21
+	picture = GFX_evt_large_army
+	portrait = event_target:final_boss
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_21
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_21
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_21
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_21
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			event_target:final_boss = {
+				save_event_target_as = combatant_2
+			}
+			character_event = { id = ADVN.100 }
+		}
+		if = {
+			limit = {
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.34 days = 2  }
+		}
+		else = { #ending
+			character_event = { id = ADVN.35 days = 1  }
+		}
+	}
+	option = {
+		name = EVTOPTE_ADVN_21
+		trigger = {
+			OR = {
+				event_target:party_member_1 = { is_alive = no }
+				event_target:party_member_2 = { is_alive = no }
+				event_target:party_member_3 = { is_alive = no }
+				event_target:party_member_4 = { is_alive = no }
+			}
+		}
+		character_event = { id = ADVN.36 }
+	}
+}
+
+#Good Ending Post-Host Leader
+character_event = {
+	id = ADVN.35
+	desc = EVTDESC_ADVN_35
+	picture = GFX_evt_adventurers
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:party_member_1 = {
+			wealth = 100
+			prestige = 100
+			random_magic_item_effect = yes
+			easy_adv_xp_effect = yes
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_list = { #friendship
+				10 = {
+					add_friend = event_target:party_member_2
+				}
+				10 = {
+					add_friend = event_target:party_member_3
+				}
+				10 = {
+					add_friend = event_target:party_member_4
+				}
+				70 = {
+					#nothing
+				}
+			}
+			clr_character_flag = party_member_1
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_2 = {
+			wealth = 100
+			prestige = 100
+			random_magic_item_effect = yes
+			easy_adv_xp_effect = yes
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_list = { #friendship
+				10 = {
+					add_friend = event_target:party_member_1
+				}
+				10 = {
+					add_friend = event_target:party_member_3
+				}
+				10 = {
+					add_friend = event_target:party_member_4
+				}
+				70 = {
+					#nothing
+				}
+			}
+			clr_character_flag = party_member_2
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_3 = {
+			wealth = 100
+			prestige = 100
+			random_magic_item_effect = yes
+			easy_adv_xp_effect = yes
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_list = { #friendship
+				10 = {
+					add_friend = event_target:party_member_1
+				}
+				10 = {
+					add_friend = event_target:party_member_2
+				}
+				10 = {
+					add_friend = event_target:party_member_4
+				}
+				70 = {
+					#nothing
+				}
+			}
+			clr_character_flag = party_member_3
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_4 = {
+			wealth = 100
+			prestige = 100
+			random_magic_item_effect = yes
+			easy_adv_xp_effect = yes
+			if = {
+				limit = { NOT = { trait = adventurer } }
+				add_trait = adventurer
+			}
+			random_list = { #friendship
+				10 = {
+					add_friend = event_target:party_member_1
+				}
+				10 = {
+					add_friend = event_target:party_member_2
+				}
+				10 = {
+					add_friend = event_target:party_member_3
+				}
+				70 = {
+					#nothing
+				}
+			}
+			clr_character_flag = party_member_4
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_35
+
+		hidden_tooltip = {
+			remove_character_modifier = sent_adventurers
+			clr_character_flag = adv_mod_difficulty
+			clr_character_flag = adv_vs_host
+			clr_character_flag = adv_researched_loc
+			clr_character_flag = adv_negotiated_locals
+			clr_character_flag = adv_bad_weather
+			clr_character_flag = adv_did_forage
+			clr_character_flag = adv_got_lost
+			clr_character_flag = adv_did_pinpoint
+			clr_character_flag = adv_its_a_trap
+			clr_character_flag = adv_strange_magic
+			clr_character_flag = adv_met_mercs
+			clr_character_flag = adv_cave_in
+			clr_character_flag = adv_passive_monster
+			clr_character_flag = adv_talked_mercs
+		}
+	}
+}
+
+#Bad Ending Post-Host Leader
+character_event = {
+	id = ADVN.36
+	desc = EVTDESC_ADVN_36
+	picture = GFX_evt_died_battle
+
+	is_triggered_only = yes
+
+	immediate = {
+		event_target:party_member_1 = {
+			clr_character_flag = party_member_1
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_2 = {
+			clr_character_flag = party_member_2
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_3 = {
+			clr_character_flag = party_member_3
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+		event_target:party_member_4 = {
+			clr_character_flag = party_member_4
+			clr_character_flag = party_member_1_ai_pick
+			clr_character_flag = party_member_2_ai_pick
+			clr_character_flag = party_member_3_ai_pick
+			clr_character_flag = party_member_4_ai_pick
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_36
+
+		add_rival = event_target:final_boss
+		hidden_tooltip = {
+			remove_character_modifier = sent_adventurers
+			clr_character_flag = adv_researched_loc
+			clr_character_flag = adv_negotiated_locals
+			clr_character_flag = adv_bad_weather
+			clr_character_flag = adv_did_forage
+			clr_character_flag = adv_got_lost
+			clr_character_flag = adv_did_pinpoint
+			clr_character_flag = adv_its_a_trap
+			clr_character_flag = adv_strange_magic
+			clr_character_flag = adv_met_mercs
+			clr_character_flag = adv_cave_in
+			clr_character_flag = adv_passive_monster
+			clr_character_flag = adv_talked_mercs
+			event_target:final_boss = {
+				wealth = 300
+				random_magic_item_effect = yes
+				#XP gain block
+					if = {
+						limit = {
+							z_barbarian = yes
+							NOT = { trait = legendary_barbarian }
+						}
+						hidden_tooltip = {
+							change_variable = { which = barbarian_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_bard = yes
+							NOT = { trait = legendary_bard }
+						}
+						hidden_tooltip = {
+							change_variable = { which = bard_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_cleric = yes
+							NOT = { trait = legendary_cleric }
+						}
+						hidden_tooltip = {
+							change_variable = { which = cleric_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_druid = yes
+							NOT = { trait = legendary_druid }
+						}
+						hidden_tooltip = {
+							change_variable = { which = druid_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_fighter = yes
+							NOT = { trait = legendary_fighter }
+						}
+						hidden_tooltip = {
+							change_variable = { which = fighter_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_monk = yes
+							NOT = { trait = legendary_monk }
+						}
+						hidden_tooltip = {
+							change_variable = { which = monk_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_paladin = yes
+							NOT = { trait = legendary_paladin }
+						}
+						hidden_tooltip = {
+							change_variable = { which = paladin_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_ranger = yes
+							NOT = { trait = legendary_ranger }
+						}
+						hidden_tooltip = {
+							change_variable = { which = ranger_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_rogue = yes
+							NOT = { trait = legendary_rogue }
+						}
+						hidden_tooltip = {
+							change_variable = { which = rogue_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_shadow = yes
+							NOT = { trait = legendary_shadow }
+						}
+						hidden_tooltip = {
+							change_variable = { which = shadow_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_sorcerer = yes
+							NOT = { trait = legendary_sorcerer }
+						}
+						hidden_tooltip = {
+							change_variable = { which = sorcerer_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_warlock = yes
+							NOT = { trait = legendary_warlock }
+						}
+						hidden_tooltip = {
+							change_variable = { which = warlock_xp value = 300 }
+						}
+					}
+					if = {
+						limit = {
+							z_wizard = yes
+							NOT = { trait = legendary_wizard }
+						}
+						hidden_tooltip = {
+							change_variable = { which = wizard_xp value = 300 }
+						}
+					}
+			}
+			clr_character_flag = adv_mod_difficulty
+			clr_character_flag = adv_vs_host
 		}
 	}
 }
@@ -5306,6 +6006,7 @@ character_event = {
 
 	trigger = {
 		has_character_modifier = sent_adventurers
+		NOT = { has_character_flag = adv_talked_mercs }
 	}
 
 	immediate = {
@@ -5998,6 +6699,1574 @@ character_event = {
 	}
 }
 
+### Persuade Local Thugs ###
+character_event = {
+	id = ADVN.43
+	desc = EVTDESC_ADVN_43
+	picture = GFX_evt_tavern
+
+	only_playable = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_43
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_1 = { diplomacy = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { diplomacy = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { diplomacy = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { diplomacy = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { diplomacy = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { diplomacy = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { diplomacy = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { diplomacy = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { diplomacy = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { diplomacy = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_1 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_1 = {
+						OR = {
+							z_fighter = yes
+							z_bard = yes
+						}
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_talked_mercs_tt }
+				set_character_flag = adv_talked_mercs
+				event_target:party_member_1 = {
+					increase_adv_fatigue_effect = yes
+					add_character_modifier = {
+						name = popular_modifier
+						years = 5
+					}
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_1 = { diplomacy < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { diplomacy < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { diplomacy < 2 } factor = 1.4 }
+				event_target:party_member_1 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_43
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_2 = { diplomacy = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { diplomacy = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { diplomacy = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { diplomacy = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { diplomacy = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { diplomacy = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { diplomacy = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { diplomacy = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { diplomacy = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { diplomacy = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_2 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_2 = {
+						OR = {
+							z_fighter = yes
+							z_bard = yes
+						}
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_talked_mercs_tt }
+				set_character_flag = adv_talked_mercs
+				event_target:party_member_2 = {
+					increase_adv_fatigue_effect = yes
+					add_character_modifier = {
+						name = popular_modifier
+						years = 5
+					}
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_2 = { diplomacy < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { diplomacy < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { diplomacy < 2 } factor = 1.4 }
+				event_target:party_member_2 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_43
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_3 = { diplomacy = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { diplomacy = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { diplomacy = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { diplomacy = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { diplomacy = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { diplomacy = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { diplomacy = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { diplomacy = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { diplomacy = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { diplomacy = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_3 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_3 = {
+						OR = {
+							z_fighter = yes
+							z_bard = yes
+						}
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_talked_mercs_tt }
+				set_character_flag = adv_talked_mercs
+				event_target:party_member_3 = {
+					increase_adv_fatigue_effect = yes
+					add_character_modifier = {
+						name = popular_modifier
+						years = 5
+					}
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_3 = { diplomacy < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { diplomacy < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { diplomacy < 2 } factor = 1.4 }
+				event_target:party_member_3 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_43
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_4 = { diplomacy = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { diplomacy = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { diplomacy = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { diplomacy = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { diplomacy = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { diplomacy = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { diplomacy = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { diplomacy = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { diplomacy = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { diplomacy = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_4 = { diplomacy = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_4 = {
+						OR = {
+							z_fighter = yes
+							z_bard = yes
+						}
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_talked_mercs_tt }
+				set_character_flag = adv_talked_mercs
+				event_target:party_member_4 = {
+					increase_adv_fatigue_effect = yes
+					add_character_modifier = {
+						name = popular_modifier
+						years = 5
+					}
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_4 = { diplomacy < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { diplomacy < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { diplomacy < 2 } factor = 1.4 }
+				event_target:party_member_4 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
+### Plan Attack ###
+character_event = {
+	id = ADVN.44
+	desc = EVTDESC_ADVN_44
+	picture = GFX_evt_large_army
+
+	only_playable = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+		NOT = { has_character_flag = adv_talked_mercs }
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_44
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_1 = { martial = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { martial = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { martial = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { martial = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { martial = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { martial = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { martial = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { martial = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { martial = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { martial = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_1 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_1 = {
+						is_smart_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_planned_attack_tt }
+				event_target:party_member_1 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_1 = { martial < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { martial < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { martial < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_1 = {
+						is_dumb_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_random_monster_tt }
+				character_event = { id = ADVN.2 days = 1 }
+				event_target:party_member_1 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_44
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_2 = { martial = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { martial = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { martial = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { martial = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { martial = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { martial = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { martial = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { martial = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { martial = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { martial = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_2 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_2 = {
+						is_smart_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_planned_attack_tt }
+				event_target:party_member_2 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_2 = { martial < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { martial < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { martial < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_2 = {
+						is_dumb_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_random_monster_tt }
+				character_event = { id = ADVN.2 days = 1 }
+				event_target:party_member_2 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_44
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_3 = { martial = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { martial = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { martial = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { martial = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { martial = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { martial = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { martial = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { martial = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { martial = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { martial = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_3 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_3 = {
+						is_smart_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_planned_attack_tt }
+				event_target:party_member_3 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_3 = { martial < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { martial < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { martial < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_3 = {
+						is_dumb_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_random_monster_tt }
+				character_event = { id = ADVN.2 days = 1 }
+				event_target:party_member_3 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_44
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_4 = { martial = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { martial = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { martial = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { martial = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { martial = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { martial = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { martial = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { martial = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { martial = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { martial = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_4 = { martial = 50 } factor = 3 }
+				modifier = { has_character_flag = adv_mod_difficulty factor = 0.5 }
+				modifier = {
+					event_target:party_member_4 = {
+						is_smart_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_planned_attack_tt }
+				event_target:party_member_4 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_4 = { martial < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { martial < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { martial < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_4 = {
+						is_dumb_trigger = yes
+					}
+					factor = 5
+				}
+				custom_tooltip = { text = adv_random_monster_tt }
+				character_event = { id = ADVN.2 days = 1 }
+				event_target:party_member_4 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
+### Random Patrol ###
+character_event = {
+	id = ADVN.45
+	desc = EVTDESC_ADVN_45
+	picture = GFX_evt_battle
+	portrait = event_target:combatant_2
+
+	only_playable = yes
+
+	is_triggered_only = yes
+
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		hidden_tooltip = {
+			event_target:final_boss = {
+				create_random_soldier = {
+					random_traits = yes
+					culture = event_target:final_boss
+					religion = event_target:final_boss
+					dynasty = none
+				}
+				new_character = {
+					save_event_target_as = combatant_2
+					character_event = { id = ADVN.101 days = 5 }
+					remove_trait = weak
+					remove_trait = delicate
+					remove_trait = soft
+					remove_trait = imbecile
+					remove_trait = idiot
+					remove_trait = slow
+					if = {
+						limit = {
+							ROOT = { has_character_flag = adv_mod_difficulty }
+						}
+						add_trait = robust
+						add_trait = strong
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_2
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_1 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_2
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		event_target:party_member_2 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_2 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_2
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		event_target:party_member_3 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_3 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_2
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		event_target:party_member_4 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_4 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
+#Healing Opportunity & War Camp Adventure Tombola
+character_event = {
+	id = ADVN.50
+	desc = EVTDESC_ADVN_50
+	picture = GFX_evt_large_army
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		random_list = { #first camp event
+			#10 = { #trap
+			#	character_event = { id = ADVN.12 days = 10 }
+			#	set_character_flag = adv_its_a_trap
+			#}
+			#10 = { #strange magic
+			#	character_event = { id = ADVN.13 days = 10 }
+			#	set_character_flag = adv_strange_magic
+			#}
+			10 = { #sneak past a threat
+				character_event = { id = ADVN.6 days = 10 }
+			}
+			#10 = { #blocked passage
+			#	character_event = { id = ADVN.41 days = 10 }
+			#	set_character_flag = adv_cave_in
+			#}
+			#10 = { #non-hostile monsters
+			#	character_event = { id = ADVN.42 days = 10 }
+			#	set_character_flag = adv_passive_monster
+			#}
+		}
+		random_list = { #second camp event
+			40 = { #random patrol
+				character_event = { id = ADVN.45 days = 20 }
+			}
+			#12 = { #trap
+			#	modifier = { has_character_flag = adv_its_a_trap factor = 0 }
+			#	character_event = { id = ADVN.12 days = 20 }
+			#	set_character_flag = adv_its_a_trap
+			#}
+			#12 = { #strange magic
+			#	modifier = { has_character_flag = adv_strange_magic factor = 0 }
+			#	character_event = { id = ADVN.13 days = 20 }
+			#	set_character_flag = adv_strange_magic
+			#}
+			12 = { #sneak past a threat
+				character_event = { id = ADVN.6 days = 20 }
+			}
+			#12 = { #blocked passage
+			#	modifier = { has_character_flag = adv_cave_in factor = 0 }
+			#	character_event = { id = ADVN.41 days = 20 }
+			#	set_character_flag = adv_cave_in
+			#}
+			#12 = { #non-hostile monsters
+			#	modifier = { has_character_flag = adv_passive_monster factor = 0 }
+			#	character_event = { id = ADVN.42 days = 20 }
+			#	set_character_flag = adv_passive_monster
+			#}
+		}
+		character_event = { id = ADVN.45 days = 30 } #third camp event, always a patrol
+		character_event = { #host leader
+			id = ADVN.33
+			days = 40
+			random = 2
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ADVN_10
+		trigger = { event_target:party_member_1 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_1 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_1 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_1 = { learning = 50 } factor = 3 }
+				modifier = { event_target:party_member_1 = { trait = physician } factor = 5 }
+				modifier = {
+					event_target:party_member_1 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			40 = {
+				modifier = { event_target:party_member_1 = { learning < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_1 = { learning < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_1 = { learning < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_1 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0.5
+				}
+				event_target:party_member_1 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ADVN_10
+		trigger = { event_target:party_member_2 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_2 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_2 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_2 = { learning = 50 } factor = 3 }
+				modifier = { event_target:party_member_2 = { trait = physician } factor = 5 }
+				modifier = {
+					event_target:party_member_2 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = { event_target:party_member_2 = { learning < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_2 = { learning < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_2 = { learning < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_2 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0.5
+				}
+				event_target:party_member_2 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTC_ADVN_10
+		trigger = { event_target:party_member_3 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_3 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_3 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_3 = { learning = 50 } factor = 3 }
+				modifier = { event_target:party_member_3 = { trait = physician } factor = 5 }
+				modifier = {
+					event_target:party_member_3 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_4 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = { event_target:party_member_3 = { learning < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_3 = { learning < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_3 = { learning < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_3 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0.5
+				}
+				event_target:party_member_3 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EVTOPTD_ADVN_10
+		trigger = { event_target:party_member_4 = { is_alive = yes } }
+		random_list = {
+			60 = {
+				modifier = { event_target:party_member_4 = { learning = 12 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 14 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 16 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 18 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning = 20 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 22 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 26 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning = 30 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { learning = 35 } factor = 1.4 }
+				modifier = { event_target:party_member_4 = { learning = 40 } factor = 1.5 }
+				modifier = { event_target:party_member_4 = { learning = 50 } factor = 3 }
+				modifier = { event_target:party_member_4 = { trait = physician } factor = 5 }
+				modifier = {
+					event_target:party_member_4 = {
+						OR = {
+							z_cleric = yes
+							z_druid = yes
+							z_bard = yes
+							AND = {
+								z_warlock = yes
+								trait = warlock_celestial
+							}
+						}
+					}
+					factor = 10
+				}
+
+				event_target:party_member_1 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_2 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+				event_target:party_member_3 = {
+					if = {
+						limit = {
+							OR = {
+								has_character_modifier = adv_fatigue_1
+								has_character_modifier = adv_fatigue_2
+								has_character_modifier = adv_fatigue_3
+								has_character_modifier = adv_fatigue_4
+								has_character_modifier = adv_fatigue_5
+								has_character_modifier = adv_fatigue_6
+							}
+						}
+						custom_tooltip = { text = less_adventuring_fatigue_tt }
+						hidden_effect = {
+							trigger_switch = {
+								on_trigger = has_character_modifier
+								adv_fatigue_1 = {
+									remove_character_modifier = adv_fatigue_1
+								}
+								adv_fatigue_2 = {
+									remove_character_modifier = adv_fatigue_2
+									add_character_modifier = {
+										name = adv_fatigue_1
+										duration = 60
+									}
+								}
+								adv_fatigue_3 = {
+									remove_character_modifier = adv_fatigue_3
+									add_character_modifier = {
+										name = adv_fatigue_2
+										duration = 60
+									}
+								}
+								adv_fatigue_4 = {
+									remove_character_modifier = adv_fatigue_4
+									add_character_modifier = {
+										name = adv_fatigue_3
+										duration = 60
+									}
+								}
+								adv_fatigue_5 = {
+									remove_character_modifier = adv_fatigue_5
+									add_character_modifier = {
+										name = adv_fatigue_4
+										duration = 60
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			40 = {
+				modifier = { event_target:party_member_4 = { learning < 8 } factor = 1.2 }
+				modifier = { event_target:party_member_4 = { learning < 4 } factor = 1.3 }
+				modifier = { event_target:party_member_4 = { learning < 2 } factor = 1.4 }
+				modifier = {
+					event_target:party_member_4 = {
+						OR = {
+							trait = expert_druid
+							trait = expert_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = expert_warlock
+							}
+							trait = expert_bard
+							trait = master_druid
+							trait = master_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = master_warlock
+							}
+							trait = master_bard
+							trait = renowned_druid
+							trait = renowned_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = renowned_warlock
+							}
+							trait = renowned_bard
+							trait = renowned_ranger
+							trait = renowned_paladin
+							trait = legendary_druid
+							trait = legendary_cleric
+							AND = {
+								trait = warlock_celestial
+								trait = legendary_warlock
+							}
+							trait = legendary_bard
+							trait = legendary_ranger
+							trait = legendary_paladin
+						}
+					}
+					factor = 0.5
+				}
+				event_target:party_member_4 = {
+					increase_adv_fatigue_effect = yes
+				}
+			}
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				OR = {
+					event_target:party_member_1 = { is_alive = no }
+					event_target:party_member_2 = { is_alive = no }
+					event_target:party_member_3 = { is_alive = no }
+					event_target:party_member_4 = { is_alive = no }
+				}
+			}
+			character_event = { id = ADVN.32 }
+		}
+	}
+}
+
 #MAINT EVENTS
 
 #Duel event
@@ -6378,6 +8647,9 @@ character_event = {
 
 	option = { #Easy Difficulty
 		name = EVTOPTA_ADVN_1
+		trigger = {
+			NOT = { has_character_flag = adv_vs_host }
+		}
 		ai_chance = {
 			factor = 1
 		}
@@ -6397,6 +8669,7 @@ character_event = {
 				max = 400
 			}
 			prestige >= 500
+			NOT = { has_character_flag = adv_vs_host }
 		}
 		ai_chance = {
 			factor = 0.5
@@ -6423,6 +8696,19 @@ character_event = {
 		character_event = { id = ADVN.205 days = 60 }
 		set_character_flag = adv_mod_difficulty
 		scaled_wealth = { value = -2 min = -100 max = -400 }
+	}
+
+	option = { #VS Host
+		name = EVTOPTA_ADVN_1
+		trigger = {
+			has_character_flag = adv_vs_host
+		}
+		FROM = { save_event_target_as = final_boss }
+		character_event = { id = ADVN.202 days = 15 }
+		character_event = { id = ADVN.203 days = 30 }
+		character_event = { id = ADVN.204 days = 45 }
+		character_event = { id = ADVN.206 days = 60 }
+		scaled_wealth = { value = -0.5 min = -25 max = -100 }
 	}
 }
 
@@ -7247,6 +9533,41 @@ character_event = {
 					add_artifact = warlock_pact_weapon
 				}
 			}
+		}
+		event_target:party_member_1 = {
+			save_event_target_as = combatant_1
+			character_event = { id = ADVN.100 }
+		}
+		event_target:party_member_1 = {
+			custom_tooltip = { text = adventuring_fatigue_tt }
+			character_event = { id = ADVN.104 days = 2 }
+		}
+		if = {
+			limit = { #bad ending
+				event_target:final_boss = { is_alive = yes }
+			}
+			character_event = { id = ADVN.31 days = 1 }
+		}
+		else = { #good ending
+			character_event = { id = ADVN.30 days = 1  }
+		}
+	}
+}
+#Host Leader Fights adv 1
+character_event = {
+	id = ADVN.206
+	hide_window = yes
+	only_playable = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_character_modifier = sent_adventurers
+	}
+
+	immediate = {
+		event_target:final_boss = {
+			save_event_target_as = combatant_2
 		}
 		event_target:party_member_1 = {
 			save_event_target_as = combatant_1
