@@ -698,6 +698,403 @@ character_event = {
 	}
 }
 
+###MISSIONS### (start on 1000)
+
+#Mission tombola (for ALL thieves guilds)
+character_event = {
+	id = STH.1000
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		is_member_of_any_thieves_guild_trigger = yes
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				same_society_as = ROOT
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			15 = { #Smuggling
+				modifier = { factor = 0 ai = yes society_rank >= 3 }
+				character_event = { id = STH.1001 }
+			}
+			1 = { #Heist
+				modifier = {
+					factor = 0
+					NOR = {
+						AND = {
+							society_member_of = shadow_thieves
+							any_demesne_province = {
+								has_province_modifier = shadow_thieves_guild
+							}
+						}
+						AND = {
+							society_member_of = night_masks
+							any_demesne_province = {
+								has_province_modifier = night_masks_guild
+							}
+						}
+						AND = {
+							society_member_of = shadow_telflamm
+							any_demesne_province = {
+								has_province_modifier = shadow_telflamm_guild
+							}
+						}
+					}
+				}
+				if = {
+					limit = {
+						society_member_of = shadow_thieves
+					}
+					character_event = { id = STH.1430 }
+				}
+				if = {
+					limit = {
+						society_member_of = night_masks
+					}
+					character_event = { id = MASK.1430 }
+				}
+				if = {
+					limit = {
+						society_member_of = shadow_telflamm
+					}
+					character_event = { id = TELF.1430 }
+				}
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#Mission Trigger: Smuggling (for ALL thieves guilds)
+character_event = {
+	id = STH.1001
+	hide_window = yes
+
+	trigger = {
+		is_member_of_any_thieves_guild_trigger = yes
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				NOR = {
+					has_non_aggression_pact_with = ROOT
+					same_society_as = ROOT
+				}
+				primary_title = {
+					is_landless_type_title = no
+				}
+				controls_religion = no
+				holy_order = no
+				mercenary = no
+				is_landed = yes
+				is_within_diplo_range = ROOT
+			}
+			save_event_target_as = target_ruler
+		}
+		if = {
+			limit = {
+				event_target:target_ruler = { always = yes }
+				is_within_diplo_range = event_target:target_ruler
+			}
+			event_target:quest_giver = {
+	      character_event = { id = STH.1002 }
+	    }
+		}
+	}
+}
+#Ping event
+character_event = {
+	id = STH.1002
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { society_quest_event = { id = STH.1003 days = 7 random = 7 } }
+	}
+}
+#You get your target realm
+society_quest_event = {
+	id = STH.1003
+	title = quest_thieves_smuggling
+	desc = EVTDESC_STH_1003
+	quest_target = event_target:target_ruler
+
+	trigger = {
+		is_member_of_any_thieves_guild_trigger = yes
+		event_target:target_ruler = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:target_ruler = {
+			set_quest_target = {
+				id = quest_thieves_smuggling
+				holder = ROOT
+			}
+		}
+
+		event_target:target_ruler = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+
+		character_event = { id = STH.1004 days = 20 }
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+		ai_chance = { factor = 0 }
+	}
+}
+#Get past the guards
+character_event = {
+	id = STH.1004
+	desc = EVTDESC_STH_1004
+	picture = GFX_evt_eavesdropping
+	border = GFX_event_normal_frame_intrigue
+
+	trigger = { has_quest = quest_thieves_smuggling }
+	is_triggered_only = yes
+
+	#Bribe
+	option = {
+		trigger = {
+			scaled_wealth = 0.25
+			diplomacy = 15
+		}
+		name = EVTOPTA_STH_1004
+		tooltip_info = diplomacy
+
+		scaled_wealth = { value = -0.25 }
+
+		set_character_flag = bribed_guards
+		character_event = { id = STH.1005 days = 7 }
+	}
+
+	#Stealth
+	option = {
+		trigger = {
+			intrigue = 10
+		}
+		name = EVTOPTB_STH_1004
+		tooltip_info = intrigue
+
+		random_list = {
+			60 = {
+				modifier = { FROM = { intrigue = 12 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 14 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 16 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 18 } factor = 1.2 }
+				modifier = { FROM = { intrigue = 20 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 22 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 26 } factor = 1.3 }
+				modifier = { FROM = { intrigue = 30 } factor = 1.4 }
+				modifier = { FROM = { intrigue = 35 } factor = 1.4 }
+				modifier = { FROM = { intrigue = 40 } factor = 1.5 }
+				modifier = { FROM = { intrigue = 50 } factor = 3 }
+				set_character_flag = sneaked_past_guards
+				character_event = { id = STH.1005 days = 7 tooltip = EVTTOOLTIP_STH.1434 }
+			}
+			40 = {
+				set_character_flag = sneaked_past_guards
+				character_event = { id = STH.1006 days = 7 tooltip = EVTTOOLTIP_STH.1435 } #fail
+			}
+		}
+	}
+
+	#Violence
+	option = {
+		trigger = {
+			combat_rating = 30
+		}
+		name = EVTOPTC_STH_1004
+		tooltip_info = combat_rating
+
+		random_list = {
+			60 = {
+				modifier = { FROM = { combat_rating = 40 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 50 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 60 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 70 } factor = 1.2 }
+				modifier = { FROM = { combat_rating = 80 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 90 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 100 } factor = 1.3 }
+				modifier = { FROM = { combat_rating = 120 } factor = 1.4 }
+				modifier = { FROM = { combat_rating = 140 } factor = 1.4 }
+				modifier = { FROM = { combat_rating = 160 } factor = 1.5 }
+				modifier = { FROM = { combat_rating = 200 } factor = 3 }
+				set_character_flag = killed_guards
+				character_event = { id = STH.1005 days = 7 tooltip = EVTTOOLTIP_STH.1434 }
+			}
+			40 = {
+				set_character_flag = killed_guards
+				character_event = { id = STH.1006 days = 7 tooltip = EVTTOOLTIP_STH.1435 } #fail
+			}
+		}
+	}
+
+	#Bad idea
+	option = {
+		name = EVTOPTD_STH_1004
+		clr_quest = { id = quest_thieves_smuggling failure = yes }
+	}
+}
+#Success
+character_event = {
+    id = STH.1005
+    picture = GFX_evt_shady_meeting
+    border = GFX_event_normal_frame_intrigue
+
+		trigger = { has_quest = quest_thieves_smuggling }
+
+    desc = {
+    	trigger = { has_character_flag = bribed_guards }
+    	text = EVTDESC_STH_1005_A
+    	picture = GFX_evt_shady_meeting
+    }
+    desc = {
+    	trigger = { has_character_flag = sneaked_past_guards }
+    	text = EVTDESC_STH_1005_B
+    	picture = GFX_evt_shadow
+    }
+		desc = {
+    	trigger = { has_character_flag = killed_guards }
+    	text = EVTDESC_STH_1005_C
+    	picture = GFX_evt_bandits
+    }
+
+    is_triggered_only = yes
+
+		option = {
+        name = EVTOPTA_STH_1005
+        clr_quest = quest_thieves_smuggling
+				scaled_wealth = { value = 0.3 }
+				add_society_currency_medium_effect = yes
+    }
+
+    after = {
+			hidden_effect = {
+				clr_character_flag = bribed_guards
+				clr_character_flag = sneaked_past_guards
+				clr_character_flag = killed_guards
+			}
+		}
+}
+#You get caught
+character_event = {
+    id = STH.1006
+    picture = GFX_evt_into_the_dungeon
+    border = GFX_event_normal_frame_intrigue
+
+	trigger = { has_quest = quest_thieves_smuggling }
+
+    desc = {
+    	trigger = {
+    		has_character_flag = sneaked_past_guards
+    	}
+    	text = EVTDESC_STH_1006_A
+    }
+    desc = {
+    	trigger = {
+				has_character_flag = killed_guards
+    	}
+    	text = EVTDESC_STH_1006_B
+    }
+
+    is_triggered_only = yes
+
+    option = {
+        name = EVTOPTA_STH_1006
+
+        event_target:target_ruler = {
+        	if = {
+	        	limit = { is_landed = yes }
+	        	ROOT = { imprison = PREV }
+	        }
+
+	        if = {
+	        	limit = { is_landed = no }
+	        	host = {
+		        	ROOT = { imprison = PREV }
+	        	}
+	        }
+        }
+
+        reverse_opinion = {
+        	who = event_target:target_ruler
+        	modifier = opinion_thief
+        	years = 20
+        }
+        hidden_effect = {
+        	clr_character_flag = sneaked_past_guards
+        	clr_character_flag = killed_guards
+        }
+        clr_quest = { id = quest_thieves_smuggling failure = yes }
+    }
+
+		option = {
+        name = EVTOPTB_STH_1006
+				trigger = {
+					combat_rating = 100
+				}
+				tooltip_info = combat_rating
+
+        reverse_opinion = {
+        	who = event_target:target_ruler
+        	modifier = opinion_thief
+        	years = 20
+        }
+				add_character_modifier = {
+					modifier = true_villain_modifier
+					duration = 3650
+				}
+        hidden_effect = {
+        	clr_character_flag = sneaked_past_guards
+        	clr_character_flag = killed_guards
+        }
+        clr_quest = { id = quest_shadow_heist failure = yes }
+    }
+}
+
+
 #Mission Trigger: Shadow Heist
 character_event = {
 	id = STH.1430
@@ -705,15 +1102,12 @@ character_event = {
 
 	trigger = {
 		society_member_of = shadow_thieves
-		higher_tier_than = BARON
 		any_demesne_province = {
 			has_province_modifier = shadow_thieves_guild
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 400
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		random_independent_ruler = {
@@ -745,7 +1139,6 @@ character_event = {
 		}
 	}
 }
-
 #Ping event for GM
 character_event = {
 	id = STH.1431
@@ -757,7 +1150,6 @@ character_event = {
 		FROM = { society_quest_event = { id = STH.1432 days = 7 } }
 	}
 }
-
 #You get your target realm
 society_quest_event = {
 	id = STH.1432
@@ -807,7 +1199,6 @@ society_quest_event = {
 		ai_chance = { factor = 0 }
 	}
 }
-
 #Get past the guards
 character_event = {
 	id = STH.1433
@@ -904,7 +1295,6 @@ character_event = {
 		clr_quest = { id = quest_shadow_heist failure = yes }
 	}
 }
-
 #You're in
 character_event = {
     id = STH.1434
@@ -975,7 +1365,6 @@ character_event = {
 			}
 		}
 }
-
 #You get caught
 character_event = {
     id = STH.1435
@@ -1051,7 +1440,6 @@ character_event = {
         clr_quest = { id = quest_shadow_heist failure = yes }
     }
 }
-
 #You escape and mission is complete
 character_event = {
     id = STH.1436
@@ -1069,7 +1457,6 @@ character_event = {
 				add_society_currency_minor_effect = yes
     }
 }
-
 
 
 #The Shadow Thieves take Waterdeep
