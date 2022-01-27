@@ -514,9 +514,7 @@ character_event = {
 		}
 	}
 
-	mean_time_to_happen = {
-		months = 120
-	}
+	is_triggered_only = yes
 
 	immediate = {
 		character_event = { id = CDR.6200 }
@@ -596,7 +594,161 @@ character_event = {
     }
 }
 
-###MISSIONS###
+###MISSIONS### (start on 1000)
+
+#Mission tombola
+character_event = {
+	id = CDR.1000
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = cult_of_the_dragon
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				same_society_as = ROOT
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			18 = { #Smuggling
+				modifier = { factor = 0 ai = yes society_rank >= 3 }
+				character_event = { id = CDR.1001 }
+			}
+			2 = { #Cell finds dragon's lair
+				modifier = {
+					factor = 0
+					NOT = {
+						any_demesne_province = {
+							has_province_modifier = secret_cult_cell
+						}
+					}
+				}
+				character_event = { id = CDR.405 }
+			}
+			18 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#Mission Trigger: Smuggling
+character_event = {
+	id = CDR.1001
+	hide_window = yes
+
+	trigger = {
+		society_member_of = cult_of_the_dragon
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				NOR = {
+					has_non_aggression_pact_with = ROOT
+					same_society_as = ROOT
+				}
+				primary_title = {
+					is_landless_type_title = no
+				}
+				controls_religion = no
+				holy_order = no
+				mercenary = no
+				is_landed = yes
+				is_within_diplo_range = ROOT
+			}
+			save_event_target_as = target_ruler
+		}
+		if = {
+			limit = {
+				event_target:target_ruler = { always = yes }
+				is_within_diplo_range = event_target:target_ruler
+			}
+			event_target:quest_giver = {
+	      character_event = { id = CDR.1002 }
+	    }
+		}
+	}
+}
+#Ping event
+character_event = {
+	id = CDR.1002
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { society_quest_event = { id = CDR.1003 days = 7 random = 7 } }
+	}
+}
+#You get your target realm
+society_quest_event = {
+	id = CDR.1003
+	title = quest_thieves_smuggling
+	desc = EVTDESC_CDR_1003
+	quest_target = event_target:target_ruler
+
+	trigger = {
+		society_member_of = cult_of_the_dragon
+		event_target:target_ruler = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:target_ruler = {
+			set_quest_target = {
+				id = quest_thieves_smuggling
+				holder = ROOT
+			}
+		}
+
+		event_target:target_ruler = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+
+		character_event = { id = STH.1004 days = 20 }
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+		ai_chance = { factor = 0 }
+	}
+}
+#More events for smuggling are in the shadow thieves file
 
 #MISSION: Create a dracolich
 character_event = {
@@ -651,7 +803,6 @@ character_event = {
 		}
 	}
 }
-
 #Ping event for GM
 character_event = {
 	id = CDR.6201
@@ -666,7 +817,6 @@ character_event = {
 		}
 	}
 }
-
 #You get your target
 society_quest_event = {
 	id = CDR.6202
@@ -718,7 +868,6 @@ society_quest_event = {
 		ai_chance = { factor = 0 }
 	}
 }
-
 #event for Dragon target
 character_event = {
 	id = CDR.6203
@@ -779,7 +928,6 @@ character_event = {
 		FROM = { character_event = { id = CDR.6205 days = 14 } }
   }
 }
-
 #Success
 character_event = {
   id = CDR.6204
@@ -796,7 +944,6 @@ character_event = {
 		character_event = { id = CDR.301 days = 14 }
 	}
 }
-
 #Fail
 character_event = {
   id = CDR.6205
