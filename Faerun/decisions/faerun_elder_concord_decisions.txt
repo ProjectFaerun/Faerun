@@ -4,6 +4,7 @@ society_decisions = {
 		is_in_society = yes
 		only_playable = yes
 		is_mercenary = yes
+		is_high_prio = yes
 		ai_check_interval = 6
 
 		potential = {
@@ -86,7 +87,7 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			society_member_of = elder_concord
-			society_rank = 4
+			society_rank == 4
 		}
 
 		allow = {
@@ -242,6 +243,80 @@ title_decisions = {
 			modifier = {
 				factor = 0.5
 				FROM = { trait = content }
+			}
+		}
+	}
+
+	plunder_knowledge_wonder = {
+		ai_check_interval = 100
+		only_playable = yes
+		is_in_society = yes
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			society_member_of = elder_concord
+			society_rank == 4
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				war = no
+				independent = yes
+			}
+			location = {
+				OR = {
+					has_wonder = wonder_university
+					has_wonder = wonder_library
+					has_wonder = wonder_netherese_enclave
+					has_wonder = wonder_candlekeep
+					has_wonder = wonder_shade
+				}
+				wonder = {
+					wonder_stage >= 3
+					custom_tooltip = {
+						text = concord_plundered_knowledge_TT
+						NOT = { has_wonder_flag = concord_plundered_knowledge }
+					}
+					is_damaged = no
+					custom_tooltip = {
+						text = concord_original_wonder_owner_TT
+						original_wonder_owner = {
+							NOR = {
+								culture = illithid
+								culture = thoon
+								culture = elder_brain
+								religion = illithid_pantheon
+								trait = creature_illithid
+								trait = creature_ulitharid
+								trait = creature_elder_brain
+							}
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				character_event = {	id = ELDC.2100 days = 30 }
+			}
+			location = {
+				wonder = {
+					set_wonder_flag = concord_plundered_knowledge
+					set_wonder_damaged = yes
+				}
 			}
 		}
 	}
