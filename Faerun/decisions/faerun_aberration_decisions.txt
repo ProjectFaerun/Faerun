@@ -205,78 +205,30 @@ targetted_decisions = {
 			FROM = {
 				OR = {
 					AND = {
-						NOT = {
-							any_child = {
-								is_alive = yes
-								count == 0
-							}
-						}
+						has_living_children = no
 						piety = 50
 					}
 					AND = {
-						any_child = {
-							is_alive = yes
-							count == 1
-						}
-						piety = 75
-					}
-					AND = {
-						any_child = {
-							is_alive = yes
-							count == 2
-						}
-						piety = 150
-					}
-					AND = {
-						any_child = {
-							is_alive = yes
-							count = 3
-						}
-						piety = 250
+						has_living_children = yes
+						piety = 100
 					}
 				}
 			}
 		}
 		effect = {
 			FROM = {
-				#if = { #these child count limits don't seem to be working
-				#	limit = {
-				#		NOT = {
-				#			any_child = {
-				#				is_alive = yes
-				#				count == 0
-				#			}
-				#		}
-				#	}
+				if = {
+					limit = {
+						has_living_children = no
+					}
 					piety = -50
-				#}
-				#else_if = {
-				#	limit = {
-				#		any_child = {
-				#			is_alive = yes
-				#			count == 1
-				#		}
-				#	}
-				#	piety = -75
-				#}
-				#else_if = {
-				#	limit = {
-				#		any_child = {
-				#			is_alive = yes
-				#			count == 2
-				#		}
-				#	}
-				#	piety = -150
-				#}
-				#else_if = {
-				#	limit = {
-				#		any_child = {
-				#			is_alive = yes
-				#			count = 3
-				#		}
-				#	}
-				#	piety = -250
-				#}
+				}
+				else_if = {
+					limit = {
+						has_living_children = yes
+					}
+					piety = -100
+				}
 			}
 			if = {
 				limit = {
@@ -284,7 +236,6 @@ targetted_decisions = {
 				}
 				character_event = { id = aberrationevt.1 }
 			}
-			death = { death_reason = death_ceremorphosis killer = FROM }
 			random_list = {
 				9 = {
 					FROM = {
@@ -296,68 +247,61 @@ targetted_decisions = {
 							religion = FROM
 							culture = FROM
 							dynasty = FROM
+						}
+						new_character = {
+							evilcat_give_random_stats_effect = yes
+							random_list = {
+								9 = { # Nothing
+								}
+								1 = {
+									add_trait = creature_ulitharid
+									add_trait = longevity
+								}
+							}
+							if = {
+								limit = { FROM = { is_female = no } }
+								set_father = FROM
+							}
+							else_if = {
+								limit = { FROM = { is_female = yes } }
+								set_mother = FROM
+							}
 							recalc_succession = yes
 						}
 					}
-					new_character = {
-						evilcat_give_random_stats_effect = yes
-						random_list = {
-							90 = { # Nothing
-							}
-							10 = {
-								add_trait = creature_ulitharid
-								add_trait = longevity
-							}
-						}
-						recalc_succession = yes
-						#if = { # commented out, because they aren't working. Even with them uncommented, he decisions ends up producing kinsmen, not sons/daughters.
-						#	limit = {
-						#		FROM = {
-						#			is_female = yes
-						#		}
-						#	}
-						#	set_mother = FROM
-						#}
-						#else_if = {
-						#	limit = {
-						#		FROM = {
-						#			is_female = no
-						#		}
-						#	}
-						#	set_father = FROM
-						#}
-					}
 				}
 				1 = {
-					#modifier = { #it looks like these modifiers are checking the ceremorphosis target for child count, rather than the illithid's. Doesn't seem to be WAD.
-					#	factor = 3
-					#	any_child = {
-					#		count == 1
-					#	}
-					#}
-					#modifier = {
-					#	factor = 5
-					#	any_child = {
-					#		count == 2
-					#	}
-					#}
-					#modifier = {
-					#	factor = 8
-					#	any_child = {
-					#		count == 3
-					#	}
-					#}
-					#modifier = {
-					#	factor = 20
-					#	any_child = {
-					#		count = 4
-					#	}
-					#}
+					modifier = {
+						factor = 2
+						age > 40
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 50
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 60
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 70
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 80
+						olrox_all_immortals_trigger = no
+					}
 					FROM = {
 						character_event = { id = aberrationevt.2 }
 					}
 				}
 			}
+			death = { death_reason = death_ceremorphosis killer = FROM }
 		}
 		ai_will_do = {
 			factor = 0.05
