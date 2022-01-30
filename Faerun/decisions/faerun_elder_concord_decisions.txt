@@ -1,14 +1,120 @@
 society_decisions = {
+	concord_thrall_army = {
+		is_in_society = yes
+		only_playable = yes
+		is_mercenary = yes
+		is_high_prio = yes
+		ai_check_interval = 6
 
+		potential = {
+			not_casting = yes
+			society_member_of = elder_concord
+			society_rank >= 2
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_minor_trigger = yes
+			conditional_tooltip = {
+				trigger = {
+					has_character_modifier = assassins_raise_troops_cooldown
+				}
+				custom_tooltip = {
+					text = assassins_raise_troops_cooldown_TT
+
+					always = no
+				}
+			}
+		}
+
+		effect = {
+			capital_scope = {
+				ROOT = {
+					spawn_unit = {
+						owner = ROOT
+						province = PREV
+						home = PREV
+						troops = {
+							light_infantry = { 1500 1500 }
+							beast_troops = { 250 250 }
+						}
+						attrition = 1.0
+						disband_on_peace = yes
+						maintenance_multiplier = 1
+						earmark = thrall_troops
+					}
+				}
+			}
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = assassins_raise_troops_cooldown
+					hidden = yes
+					years = 1
+				}
+			}
+			detract_society_currency_minor_effect = yes
+			sound_effect = generic_click_01
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = { #I am losing an offensive war
+				factor = 10
+				any_war = {
+					attacker = { character = ROOT }
+					NOT = { war_score = -19 }
+				}
+			}
+			modifier = { #I am losing a defensive war
+				factor = 10
+				any_war = {
+					defender = { character = ROOT }
+					war_score = 20
+				}
+			}
+		}
+	}
+	concord_brain_golem = {
+		ai_check_interval = 60
+		only_playable = yes
+		is_in_society = yes
+
+		potential = {
+			not_casting = yes
+			society_member_of = elder_concord
+			society_rank == 4
+		}
+
+		allow = {
+			is_adult = yes
+			prisoner = no
+			is_incapable = no
+			NOT = { is_inaccessible_trigger = yes }
+			has_society_currency_major_trigger = yes
+			NOT = { has_character_modifier = brain_golem_bodyguard }
+		}
+
+		effect = {
+			detract_society_currency_major_effect = yes
+			add_character_modifier = {
+				name = brain_golem_bodyguard
+				years = 5
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.5
+				trait = trusting
+			}
+		}
+	}
 }
-
-
-
-
-
-
-
-
 
 title_decisions = {
 	exploit_economy = {
@@ -45,7 +151,7 @@ title_decisions = {
 				}
 			}
 			location = {
-				NOR = { 
+				NOR = {
 					culture = illithid
 					culture = thoon
 					culture = elder_brain
@@ -134,6 +240,79 @@ title_decisions = {
 			modifier = {
 				factor = 0.5
 				FROM = { trait = content }
+			}
+		}
+	}
+	plunder_knowledge_wonder = {
+		ai_check_interval = 100
+		only_playable = yes
+		is_in_society = yes
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			society_member_of = elder_concord
+			society_rank == 4
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				war = no
+				independent = yes
+			}
+			location = {
+				OR = {
+					has_wonder = wonder_university
+					has_wonder = wonder_library
+					has_wonder = wonder_netherese_enclave
+					has_wonder = wonder_candlekeep
+					has_wonder = wonder_shade
+				}
+				wonder = {
+					wonder_stage >= 3
+					custom_tooltip = {
+						text = concord_plundered_knowledge_TT
+						NOT = { has_wonder_flag = concord_plundered_knowledge }
+					}
+					is_damaged = no
+					custom_tooltip = {
+						text = concord_original_wonder_owner_TT
+						original_wonder_owner = {
+							NOR = {
+								culture = illithid
+								culture = thoon
+								culture = elder_brain
+								religion = illithid_pantheon
+								trait = creature_illithid
+								trait = creature_ulitharid
+								trait = creature_elder_brain
+							}
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				character_event = {	id = ELDC.2100 days = 30 }
+			}
+			location = {
+				wonder = {
+					set_wonder_flag = concord_plundered_knowledge
+					set_wonder_damaged = yes
+				}
 			}
 		}
 	}
