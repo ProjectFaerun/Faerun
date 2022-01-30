@@ -213,6 +213,386 @@ character_event = { #AI join event
 }
 
 
+###MISSIONS### (start on 1000)
+
+#Mission tombola
+character_event = {
+	id = ELDC.1000
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = elder_concord
+		has_any_quest = no
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+	}
+
+	immediate = {
+		random_society_member = {
+			limit = {
+				NOT = { character = ROOT }
+				same_society_as = ROOT
+			}
+			save_event_target_as = quest_giver
+		}
+
+		random_list = {
+			10 = { #Raid and loot barony.
+        trigger = { #Ruler should be allowed to loot at all in the first place
+          is_landed = yes
+          is_allowed_to_loot = yes
+          OR = {
+            independent = yes
+            top_liege = {
+              is_allowed_to_loot = yes
+            }
+          }
+          #A lootable province must exist.
+					any_independent_ruler = {
+						NOT = { war_with = ROOT }
+						NOR = {
+							is_liege_of = ROOT
+							has_non_aggression_pact_with = ROOT
+							is_allied_with = ROOT
+							AND = {
+								is_tributary = yes
+								suzerain = {
+									OR = {
+										character = ROOT
+										any_liege = {
+											character = ROOT
+										}
+									}
+								}
+							}
+						}
+            NOT = {
+              distance_from_realm = { who = ROOT value = 50 }
+            }
+						any_realm_province = {
+							is_occupied = no
+							OR = {
+								any_neighbor_province = {
+									owner = { is_liege_or_above = ROOT }
+								}
+								any_neighbor_province = {
+									owner = { character = ROOT }
+								}
+								ROOT = {
+									any_demesne_province = {
+										port = yes
+										TECH_NAVAL = 1
+										OR = {
+											has_building = tb_shipyard_1
+											has_building = ca_shipyard_1
+											has_building = tp_shipyard_1
+											has_building = ct_shipyard_1
+										}
+										can_naval_path_to = PREVPREV
+									}
+								}
+							}
+							capital_holding = { NOT = { holding_type = nomad } }
+							holder_scope = {
+								NOT = {
+									character = ROOT
+								}
+							}
+							holder_scope = {
+								NOT = { same_society_as = ROOT }
+								top_liege = { NOT = { same_society_as = ROOT } }
+							}
+						}
+					}
+        }
+        event_target:quest_giver = {
+          character_event = { id = ELDC.1001 }
+        }
+			}
+			20 = {
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				#Do nothing for AI
+			}
+		}
+	}
+}
+
+#MISSION:Raid a Barony
+#Ping event for the mission
+character_event = {
+	id = ELDC.1001
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { FROM = { society_quest_event = { id = ELDC.1002 days = 7 random = 7 } } }
+}
+#Assign event
+society_quest_event = {
+	id = ELDC.1002
+	desc = EVTDESCELDC_1002
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = elder_concord
+		has_any_quest = no
+		same_society_as = FROM
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+		is_landed = yes
+		is_allowed_to_loot = yes
+		OR = {
+			independent = yes
+			top_liege = {
+				is_allowed_to_loot = yes
+			}
+		}
+	}
+
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				NOT = { war_with = ROOT }
+				NOR = {
+					is_liege_of = ROOT
+					has_non_aggression_pact_with = ROOT
+					is_allied_with = ROOT
+					AND = {
+						is_tributary = yes
+						suzerain = {
+							OR = {
+								character = ROOT
+								any_liege = {
+									character = ROOT
+								}
+							}
+						}
+					}
+				}
+        NOT = {
+          distance_from_realm = { who = ROOT value = 50 }
+        }
+				any_realm_province = {
+					is_occupied = no
+					OR = {
+						any_neighbor_province = {
+							owner = { is_liege_or_above = ROOT }
+						}
+						any_neighbor_province = {
+							owner = { character = ROOT }
+						}
+						ROOT = {
+							any_demesne_province = {
+								port = yes
+								TECH_NAVAL = 1
+								OR = {
+									has_building = tb_shipyard_1
+									has_building = ca_shipyard_1
+									has_building = tp_shipyard_1
+									has_building = ct_shipyard_1
+								}
+								can_naval_path_to = PREVPREV
+							}
+						}
+					}
+					capital_holding = { NOT = { holding_type = nomad } }
+					holder_scope = {
+						NOT = {
+							character = ROOT
+						}
+					}
+					holder_scope = {
+						NOT = { same_society_as = ROOT }
+						top_liege = { NOT = { same_society_as = ROOT } }
+					}
+				}
+			}
+			preferred_limit = {
+				NOR = {
+					is_tribal = yes
+					is_nomadic = yes
+				}
+			}
+			random_realm_province = {
+				limit = {
+					is_occupied = no
+					capital_holding = { NOT = { holding_type = nomad } }
+					OR = {
+						any_neighbor_province = {
+							owner = { is_liege_or_above = ROOT }
+						}
+						any_neighbor_province = {
+							owner = { character = ROOT }
+						}
+						ROOT = {
+							any_demesne_province = {
+								port = yes
+								TECH_NAVAL = 1
+								OR = {
+									has_building = tb_shipyard_1
+									has_building = ca_shipyard_1
+									has_building = tp_shipyard_1
+									has_building = ct_shipyard_1
+								}
+								can_naval_path_to = PREVPREV
+							}
+						}
+					}
+					holder_scope = {
+						NOT = {
+							character = ROOT
+						}
+					}
+					holder_scope = {
+						NOT = { same_society_as = ROOT }
+						top_liege = { NOT = { same_society_as = ROOT } }
+					}
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 50 }
+          }
+					capital_holding = {
+						OR = { #Prefer cities and temples.
+							holding_type = city
+							holding_type = temple
+						}
+					}
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 50 }
+          }
+					capital_holding = {
+						holding_type = castle #Or at least not tribes.
+					}
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 50 }
+          }
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 100 }
+          }
+					capital_holding = {
+						OR = { #Prefer cities and temples.
+							holding_type = city
+							holding_type = temple
+						}
+					}
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 100 }
+          }
+					capital_holding = {
+						holding_type = castle #Or at least not tribes.
+					}
+				}
+				preferred_limit = {
+          NOT = {
+            distance_from_realm = { who = ROOT value = 100 }
+          }
+				}
+				capital_holding = {
+					save_event_target_as = wl_looting_target
+				}
+			}
+		}
+	}
+
+	quest_target = event_target:wl_looting_target
+
+	option = {
+		name = ACCEPT
+		event_target:wl_looting_target = {
+			show_scope_change = no
+			set_quest_target = {
+				id = quest_elder_concord_raid_and_loot
+				holder = ROOT
+			}
+		}
+	}
+	option  = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		add_character_modifier = {
+			name = quest_cooldown_timer
+			hidden = yes
+			days = 1000
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+#on_loot_settlement: Raid the province and end the quest.
+character_event = {
+	id = ELDC.1003
+	desc = EVTDESCELDC_1003
+	picture = GFX_evt_mind_flayers_2
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	trigger = {
+		society_member_of = elder_concord
+		has_quest = quest_elder_concord_raid_and_loot
+		FROM = { is_quest_target_of = ROOT }
+	}
+
+	option = {
+		name = EVTOPTAHF25503
+		clr_quest = quest_elder_concord_raid_and_loot
+		add_society_currency_medium_effect = yes
+		if = {
+			limit = {
+				FROM = {
+					holding_type = tribal
+				}
+			}
+			scaled_wealth = { value = 1.0 min = 20 max = 50 }
+		}
+		if = {
+			limit = {
+				FROM = {
+					holding_type = castle
+				}
+			}
+			scaled_wealth = { value = 1.0 min = 50 max = 150 }
+		}
+		if = {
+			limit = {
+				FROM = {
+					OR = {
+						holding_type = city
+						holding_type = temple
+					}
+				}
+			}
+			scaled_wealth = { value = 1.0 min = 100 max = 250 }
+		}
+		hidden_tooltip = {
+			destroy_random_building = FROM
+			destroy_random_building = FROM
+		}
+	}
+}
+
+
 #################################DECISIONS######################################
 
 # ruthless taxation
