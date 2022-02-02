@@ -83,6 +83,13 @@ letter_event = {
       join_society = elder_concord
       clr_character_flag = society_join_block
     }
+    option = {
+      name = EVTOPTB_ELDC_102
+
+      prestige = -50
+      piety = -50
+      clr_character_flag = society_join_block
+    }
 }
 
 ########################AI JOIN AND AI RANK UP ELDER CONCORD###########################
@@ -122,6 +129,61 @@ character_event = { #force the AI to join a society
       }
 			character_event = { id = ELDC.111 }
 		}
+    random_list = { #chance of events being sent to players that aren't members
+      10 = { #suggesting the joining event to players
+        if = {
+          limit = {
+            ai = no
+            NOT = { trait = incapable }
+            is_adult = yes
+            is_in_society = no
+            block_general_event_trigger = no
+            can_join_society = elder_concord
+          }
+          elder_concord = {
+            random_society_member = {
+              limit = {
+                society_rank == 4
+              }
+              character_event = { id = ELDC.101 }
+            }
+          }
+    		}
+      }
+      10000 = { #annoy illithid in other societies
+        if = {
+          limit = {
+            NOT = { trait = incapable }
+            is_adult = yes
+            is_in_society = yes
+            NOT = { society_member_of = elder_concord }
+            block_general_event_trigger = no
+            religion = illithid_pantheon
+        		OR = {
+        			culture = illithid
+        			culture = thoon
+        			culture = elder_brain
+        		}
+        		OR = {
+        			trait = creature_illithid
+        			trait = creature_ulitharid
+        			trait = creature_elder_brain
+        		}
+        		NOT = { is_undead = yes }
+          }
+          elder_concord = {
+            random_society_member = {
+              limit = {
+                society_rank == 4
+              }
+              character_event = { id = ELDC.112 }
+            }
+          }
+    		}
+      }
+      20 = { # do nothing
+      }
+    }
 	}
 }
 
@@ -212,6 +274,34 @@ character_event = { #AI join event
   }
 }
 
+#Ping for annoy event
+character_event = {
+    id = ELDC.112
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = ELDC.113 } }
+    }
+}
+#annoy illithid in other societies
+letter_event = {
+    id = ELDC.113
+    desc = EVTDESC_ELDC_113
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    option = {
+      name = EVTOPTA_ELDC_113
+      scaled_wealth = -0.08
+      piety = 15
+    }
+    option = {
+      name = EVTOPTB_ELDC_113
+      piety = -25
+    }
+}
+
 
 ###MISSIONS### (start on 1000)
 
@@ -235,7 +325,8 @@ character_event = {
 		random_society_member = {
 			limit = {
 				NOT = { character = ROOT }
-				same_society_as = ROOT
+        society_member_of = elder_concord
+        society_rank == 4
 			}
 			save_event_target_as = quest_giver
 		}
