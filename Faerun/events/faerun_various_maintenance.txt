@@ -23,9 +23,10 @@ character_event = { # Sets various story flags
 	hide_window = yes
 
 	is_triggered_only = yes
+	ai = no
 
 	trigger = {
-		ai = no
+		is_multiplayer_host_character = yes
 		is_save_game = no
 	}
 
@@ -171,6 +172,13 @@ character_event = { # Sets various story flags
 			}
 			clr_global_flag = bhaal_dead
 			set_global_flag = return_of_bhaal
+		}
+	}
+
+	after = {
+		1 = { # Waterdeep
+			province_event = { id = frmaint.30 }
+			province_event = { id = rollofyears.2 }
 		}
 	}
 }
@@ -1223,29 +1231,6 @@ character_event = {
 	}
 }
 
-character_event = {
-	id = frmaint.29
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		c_waterdeep = { # doesn't matter, just to make sure it's a character that will always exist
-			holder_scope = {
-				character = ROOT
-			}
-		}
-		is_save_game = no
-	}
-
-	immediate = {
-		1 = { # Waterdeep
-			province_event = { id = frmaint.30 }
-			province_event = { id = rollofyears.2 }
-		}
-	}
-}
-
 province_event = { # needs to be two events so it doesn't double up if a game is reloaded. might be a more elegant way but can't think of it]
 
 	#BIG IMPORTANT NOTE: MONTH CONDITIONS GO FROM 0 to 11
@@ -1346,14 +1331,17 @@ province_event = { # needs to be two events so it doesn't double up if a game is
 				}
 			}
 			while = {
+				count = 20 #failsafe
 				limit = {
 					bhaalspawn = {
 						NOT = { has_character_flag = bhaalspawn0 }
+						is_alive = yes
 					}
 				}
 				bhaalspawn = {
 					limit = {
 						NOT = { has_character_flag = bhaalspawn0 }
+						is_alive = yes
 					}
 					set_character_flag = bhaalspawn0
 					character_event = { id = frstory.0 }
@@ -1898,7 +1886,7 @@ character_event = { # preserve some government types on succession
 	hide_window = yes
 
 	is_triggered_only = yes
-	
+
 	trigger = {
 		OR = {
 			is_landed = no
@@ -1913,7 +1901,7 @@ character_event = { # preserve some government types on succession
 
 	immediate = {
 		if = {
-			limit = { 
+			limit = {
 				FROMFROM = { government = democratic_feudal_government }
 			}
 			set_character_flag = democratic_feudal_government_preserve
@@ -1921,7 +1909,7 @@ character_event = { # preserve some government types on succession
 			break = yes
 		}
 		if = {
-			limit = { 
+			limit = {
 				FROMFROM = { government = theocracy_government }
 			}
 			set_character_flag = theocracy_government_preserve
@@ -1929,7 +1917,7 @@ character_event = { # preserve some government types on succession
 			break = yes
 		}
 		if = {
-			limit = { 
+			limit = {
 				FROMFROM = { government = divine_feudal_government }
 			}
 			set_character_flag = divine_feudal_government_preserve
@@ -1958,7 +1946,7 @@ character_event = { # preserve elective succession for promoted barons and landl
 	hide_window = yes
 
 	is_triggered_only = yes
-	
+
 	trigger = {
 		OR = {
 			has_character_flag = promoted_received_title
@@ -2024,7 +2012,7 @@ character_event = {
 	hide_window = yes
 
 	is_triggered_only = yes
-	
+
 	trigger = {
 		OR = {
 			government = republic_government
@@ -2036,14 +2024,14 @@ character_event = {
 	immediate = {
 		set_character_flag = promoted_received_title
 		if = {
-			limit = { 
+			limit = {
 				is_landed = no
 			}
 			character_event = { id = frmaint.35 days = 1 }
 			break = yes
 		}
 		if = {
-			limit = { 
+			limit = {
 				government = republic_government
 			}
 			set_character_flag = democratic_feudal_government_preserve
@@ -2051,7 +2039,7 @@ character_event = {
 			break = yes
 		}
 		if = {
-			limit = { 
+			limit = {
 				government = baron_theocracy_government
 			}
 			set_character_flag = theocracy_government_preserve
@@ -2069,7 +2057,7 @@ character_event = {
 	is_triggered_only = yes
 
 	only_playable = yes
-	
+
 	trigger = {
 		primary_title = {
 			OR = {
@@ -2088,14 +2076,14 @@ character_event = {
 character_event = {
 	id = frmaint.40
 	hide_window = yes
-	
+
 	trigger = {
 		has_landed_title = d_slave_revolt
 		war = no
 	}
-	
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		d_slave_revolt = {
 			destroy_landed_title = THIS
