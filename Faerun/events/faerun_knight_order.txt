@@ -272,6 +272,324 @@ character_event = {
     }
 }
 
+#chance of squire giving up
+character_event = {
+	id = KNI.1415
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_member_of_any_knight_order_trigger = yes
+	}
+
+	immediate = {
+
+		#First, check if child wanted to be a warrior in the first place.
+
+		if = {
+			limit = {
+				NOR = {
+					has_education_martial_trigger = yes
+					has_lifestyle_martial_trigger = yes
+					trait = brave
+					trait = rowdy
+					has_focus = focus_ch_struggle
+					has_focus = focus_ed_martial
+					has_focus = focus_war
+					has_focus = focus_hunting
+					has_character_flag = flag_child_is_a_warrior #Only first time.
+				}
+			}
+			random = {
+				chance = 20
+				modifier = {
+					factor = 0.75
+					trait = wroth
+				}
+				modifier = {
+					factor = 0.75
+					trait = haughty
+				}
+				modifier = {
+					factor = 1.5
+					trait = slothful
+				}
+				modifier = {
+					factor = 1.5
+					trait = indolent
+				}
+				modifier = {
+					factor = 1.5
+					trait = fussy
+				}
+				modifier = {
+					factor = 1.75
+					trait = timid
+				}
+				modifier = {
+					factor = 1.5
+					trait = shy
+				}
+				modifier = {
+					factor = 2
+					trait = craven
+				}
+				modifier = {
+					factor = 1.5
+					trait = feeble
+				}
+				modifier = {
+					factor = 1.25
+					trait = sturdy
+				}
+				modifier = {
+					factor = 0.5
+					trait = robust
+				}
+				modifier = {
+					factor = 1.5
+					trait = weak
+				}
+				modifier = {
+					factor = 0.5
+					trait = strong
+				}
+				modifier = {
+					factor = 1.5
+					NOT = { martial = 6 }
+				}
+				modifier = {
+					factor = 1.75
+					NOT = { martial = 3 }
+				}
+				modifier = {
+					factor = 2
+					is_female = yes
+					NOR = {
+						has_religion_feature = religion_matriarchal
+						has_religion_feature = religion_equal
+					}
+				}
+				modifier = {
+					factor = 2
+					is_female = no
+					has_religion_feature = religion_matriarchal
+				}
+				ROOT = { character_event = { id = KNI.1416 days = 100 } } #Child gets event first this time, just in case it's not an AI.
+			}
+		}
+	}
+}
+# The squire was not interested in being a warrior.
+
+character_event = {
+	id = KNI.1416
+	title = EVTTITLEHF25425_NOT_A_FIGHTER
+	desc = {
+		text = EVTDESCAKNI1416
+		trigger = {
+			ROOT = {
+				has_character_flag = flag_prospective_child_warrior_is_lazy
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCBKNI1416
+		trigger = {
+			ROOT = {
+				has_character_flag = flag_prospective_child_warrior_is_scholar
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCCKNI1416
+		trigger = {
+			ROOT = {
+				has_character_flag = flag_prospective_child_warrior_is_lady
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCDKNI1416
+		trigger = {
+			ROOT = {
+				has_character_flag = flag_prospective_child_warrior_is_coward
+			}
+		}
+	}
+
+	picture = GFX_evt_child_reading
+	border = GFX_event_normal_frame_war
+	hide_new = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		#First determine why is that.
+		random_list = {
+			20 = {
+				trigger = {
+					NOR = {
+						trait = diligent
+						trait = conscientious
+					}
+				}
+				modifier = {
+					factor = 2
+					trait = slothful
+				}
+				modifier = {
+					factor = 2
+					trait = indolent
+				}
+				set_character_flag = flag_prospective_child_warrior_is_lazy
+			}
+			20 = {
+				modifier = {
+					factor = 2
+					has_focus = focus_ed_learning
+				}
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 2
+					trait = conscientious
+				}
+				set_character_flag = flag_prospective_child_warrior_is_scholar
+			}
+			20 = {
+				trigger = {
+					OR = {
+						AND = {
+							is_female = yes
+							NOT = { has_religion_feature = religion_matriarchal }
+						}
+						AND = {
+							is_female = no
+							has_religion_feature = religion_matriarchal
+						}
+					}
+				}
+				modifier = {
+					factor = 2
+					trait = groomed
+				}
+				modifier = {
+					factor = 2
+					trait = proud
+				}
+				modifier = {
+					factor = 2
+					trait = fussy
+				}
+				modifier = {
+					factor = 0.5
+					trait = uncouth
+				}
+				set_character_flag = flag_prospective_child_warrior_is_lady
+			}
+			20 = {
+				modifier = {
+					factor = 2.5
+					trait = timid
+				}
+				modifier = {
+					factor = 3
+					trait = craven
+				}
+				set_character_flag = flag_prospective_child_warrior_is_coward
+			}
+
+		}
+	}
+
+	#Complain.
+	#Endure.
+
+	option = {
+		name = EVTOPTAKNI1416
+		hidden_tooltip = { liege = { character_event = { id = KNI.1417 } } } #Inducting Liege receives complaint.
+		ai_chance = { factor = 100 }
+	}
+	option = {
+		name = EVTOPTBKNI1416
+		if = {
+			limit = { NOT = { trait = stressed } }
+			random = { chance = 25 add_trait = stressed }
+		}
+		ai_chance = { factor = 0 }
+	}
+}
+
+# Liege receives complaint.
+character_event = {
+	id = KNI.1417
+	title = EVTTITLEHF25425_NOT_A_FIGHTER
+	desc = {
+		text = EVTDESCAKNI1417
+		trigger = {
+			FROM = {
+				has_character_flag = flag_prospective_child_warrior_is_lazy
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCBKNI1417
+		trigger = {
+			FROM = {
+				has_character_flag = flag_prospective_child_warrior_is_scholar
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCCKNI1417
+		trigger = {
+			FROM = {
+				has_character_flag = flag_prospective_child_warrior_is_lady
+			}
+		}
+	}
+	desc = {
+		text = EVTDESCDKNI1417
+		trigger = {
+			FROM = {
+				has_character_flag = flag_prospective_child_warrior_is_coward
+			}
+		}
+	}
+
+	picture = GFX_evt_child_reading
+	border = GFX_event_normal_frame_war
+	hide_new = yes
+
+	is_triggered_only = yes
+
+  option = { #Who cares, he's not your squire
+    name = EVTOPTAKNI1417
+    trigger = { NOT = { FROM = { has_minor_title = title_squire_knight } } }
+    FROM = {
+      leave_society = yes
+      set_character_flag = flag_child_abandoned_lodge
+    }
+	}
+	option = { #Let your squire go
+    name = EVTOPTBHF25426
+    trigger = { FROM = { has_minor_title = title_squire_knight } }
+    FROM = {
+      leave_society = yes
+      set_character_flag = flag_child_abandoned_lodge
+      remove_title = title_squire_knight
+    }
+    if = {
+			limit = { is_member_of_any_knight_order_trigger = yes }
+			detract_society_currency_minor_effect = yes
+		}
+	}
+}
+
 #############################################
 # RANK 4 POWER - Bloodline
 
