@@ -1021,6 +1021,7 @@ settlement_decisions = {
 					min = 150
 				}
 			}
+			is_tribal = no
 		}
 		effect = {
 			FROM = {
@@ -1059,7 +1060,6 @@ settlement_decisions = {
 		}
 	}
 
-
 	restore_dwarfhold = {
 		is_high_prio = yes
 		ai_check_interval = 100
@@ -1087,25 +1087,82 @@ settlement_decisions = {
 			culture_group = dwarf_group
 		}
 		allow = {
-			FROM = {
-				scaled_wealth = {
-					value = 0.03
-					min = 75
+			location = {
+				OR = {
+					AND = {
+						any_province_holding = {
+							OR = {
+								holding_type = castle
+								holding_type = city
+								holding_type = temple
+							}
+						}
+						FROM = {
+							scaled_wealth = {
+								value = 0.03
+								min = 75
+							}
+						}
+					}
+					FROM = {
+						scaled_wealth = {
+							value = 0.1
+							min = 250
+						}
+					}
 				}
 			}
+			is_tribal = no
 		}
 		effect = {
-			FROM = {
-				scaled_wealth = {
-					value = -0.03
-					min = -75
-				}
-			}
 			location = {
+				if = {
+					limit = {
+						any_province_holding = {
+							OR = {
+								holding_type = castle
+								holding_type = city
+								holding_type = temple
+							}
+						}
+					}
+					FROM = {
+						scaled_wealth = {
+							value = -0.03
+							min = -75
+						}
+					}
+				}
+				else = {
+					FROM = {
+						scaled_wealth = {
+							value = -0.1
+							min = -250
+						}
+					}
+				}
 				remove_province_modifier = ruined_dwarfhold
 				add_province_modifier = {
 					name = dwarfhold_mod
 					duration = -1
+				}
+				if = {
+					limit = {
+						any_province_holding = {
+							NOR = {
+								holding_type = castle
+								holding_type = city
+								holding_type = temple
+							}
+						}
+					}
+					any_province_holding = {
+						limit = {
+							tier = baron
+							holding_type = tribal
+						}
+						convert_to = CASTLE
+					}
 				}
 			}
 		}
