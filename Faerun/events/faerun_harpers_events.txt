@@ -1362,6 +1362,403 @@ character_event = {
     }
 }
 
+#Unlanded AI High Harper asks ruler to depose tyrant
+
+#event for the AI High Harper
+character_event = {
+	id = HRP.500
+	hide_window = yes
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = harpers
+		society_rank == 4
+		is_playable = no
+		NOT = { is_inaccessible_trigger = yes }
+		OR = {
+			NOT = { has_character_flag = instigated_harper_invasion }
+			had_character_flag = { flag = instigated_harper_invasion years = 100 }
+		}
+
+		any_independent_ruler = {
+			NOT = { has_truce = ROOT }
+			is_within_diplo_range = ROOT
+			NOT = { character = ROOT }
+			NOT = { is_liege_or_above_of = ROOT }
+			OR = {
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = undead_realm_lord
+				AND = {
+					OR = {
+						realm_size >= 50
+						num_of_count_titles_in_realm >= 20
+					}
+					OR = {
+						trait = cruel
+						trait = impaler
+						is_evil_religion = yes
+					}
+					NOR = {
+						trait = kind
+						trait = just
+					}
+				}
+			}
+			NOT = { has_character_flag = prep_inv_target }
+			OR = {
+				tier = EMPEROR
+				tier = KING
+				tier = DUKE
+			}
+			any_demesne_title = {
+				higher_tier_than = COUNT
+				controls_religion = no
+			}
+		}
+	}
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				NOT = { has_truce = ROOT }
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
+				NOT = { is_liege_or_above_of = ROOT }
+				OR = {
+					has_character_modifier = true_villain_modifier
+					has_character_modifier = undead_realm_lord
+					AND = {
+						OR = {
+							realm_size >= 50
+							num_of_count_titles_in_realm >= 20
+						}
+						OR = {
+							trait = cruel
+							trait = impaler
+							is_evil_religion = yes
+						}
+						NOR = {
+							trait = kind
+							trait = just
+						}
+					}
+				}
+				NOT = { has_character_flag = prep_inv_target }
+				OR = {
+					tier = EMPEROR
+					tier = KING
+					tier = DUKE
+				}
+				any_demesne_title = {
+					higher_tier_than = COUNT
+					controls_religion = no
+				}
+			}
+			save_event_target_as = harper_invasion_target
+		}
+		random_independent_ruler = {
+			limit = {
+				NOR = {
+					war = yes
+					trait = cruel
+					trait = impaler
+					is_evil_religion = yes
+					has_character_modifier = undead_realm_lord
+					has_character_modifier = true_villain_modifier
+				}
+			}
+			character_event = { id = HRP.501 }
+		}
+	}
+}
+#landed ruler is asked to wage war
+letter_event = {
+	id = HRP.501
+  desc = EVTDESC_HRP_501
+
+	trigger = {
+		event_target:harper_invasion_target = {
+			is_alive = yes
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				war = yes
+			}
+			modifier = {
+				factor = 2
+				relative_power = {
+					who = harper_invasion_target
+					power >= 1
+				}
+			}
+			modifier = {
+				factor = 0.5
+				relative_power = {
+					who = harper_invasion_target
+					power <= 0.4
+				}
+			}
+			modifier = {
+				factor = 0.4
+				relative_power = {
+					who = harper_invasion_target
+					power <= 0.3
+				}
+			}
+			modifier = {
+				factor = 0.3
+				relative_power = {
+					who = harper_invasion_target
+					power <= 0.2
+				}
+			}
+			modifier = {
+				factor = 0.2
+				relative_power = {
+					who = harper_invasion_target
+					power <= 0.1
+				}
+			}
+		}
+		name = ACCEPT
+
+		event_target:harper_invasion_target = {
+			reverse_unsafe_war = {
+				target = ROOT
+				casus_belli = harper_invasion
+			}
+		}
+
+		capital_scope = {
+			tooltip = {
+				ROOT = {
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						attrition = 1.0
+					}
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						attrition = 1.0
+					}
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						attrition = 1.0
+					}
+				}
+			}
+
+			hidden_tooltip = {
+				create_character = {
+					random_traits = yes
+					dynasty = NONE
+					religion = ROOT
+					culture = ROOT
+					female = 50
+					age = 25
+					attributes = {
+						martial = 8
+						intrigue = 12
+						diplomacy = 5
+						learning = 5
+						stewardship = 4
+					}
+					trait = brave
+					trait = brilliant_strategist
+				}
+				new_character = {
+					join_society = harpers
+					remove_trait = weak
+					remove_trait = slow
+					remove_trait = idiot
+					remove_trait = imbecile
+					remove_trait = dull
+					remove_trait = delicate
+					random_list = {
+						30 = { religion = joyful }
+						30 = { religion = solar }
+						30 = { religion = inventive }
+						20 = { religion = arcane }
+						20 = { religion = chauntean_faith }
+						20 = { religion = natural }
+						15 = { religion = elven_pantheon }
+						10 = { religion = triadic }
+					}
+					random_list = {
+						20 = { add_trait = expert_ranger }
+						20 = { add_trait = expert_bard }
+						20 = { add_trait = expert_wizard }
+						20 = { add_trait = expert_rogue }
+						20 = { add_trait = expert_fighter }
+					}
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						earmark = harper_loyalists
+						attrition = 1.0
+						disband_on_peace = yes
+					}
+				}
+				create_character = {
+					random_traits = yes
+					dynasty = NONE
+					religion = ROOT
+					culture = ROOT
+					female = 50
+					age = 30
+					attributes = {
+						martial = 8
+						intrigue = 12
+						diplomacy = 5
+						learning = 5
+						stewardship = 4
+					}
+					trait = brave
+					trait = brilliant_strategist
+				}
+				new_character = {
+					join_society = harpers
+					remove_trait = weak
+					remove_trait = slow
+					remove_trait = idiot
+					remove_trait = imbecile
+					remove_trait = dull
+					remove_trait = delicate
+					random_list = {
+						30 = { religion = joyful }
+						30 = { religion = solar }
+						30 = { religion = inventive }
+						20 = { religion = arcane }
+						20 = { religion = chauntean_faith }
+						20 = { religion = natural }
+						15 = { religion = elven_pantheon }
+						10 = { religion = triadic }
+					}
+					random_list = {
+						20 = { add_trait = expert_ranger }
+						20 = { add_trait = expert_bard }
+						20 = { add_trait = expert_wizard }
+						20 = { add_trait = expert_rogue }
+						20 = { add_trait = expert_fighter }
+					}
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						earmark = harper_loyalists
+						attrition = 1.0
+						disband_on_peace = yes
+					}
+				}
+				create_character = {
+					random_traits = yes
+					dynasty = NONE
+					religion = ROOT
+					culture = ROOT
+					female = 50
+					age = 35
+					attributes = {
+						martial = 8
+						intrigue = 12
+						diplomacy = 5
+						learning = 5
+						stewardship = 4
+					}
+					trait = brave
+					trait = brilliant_strategist
+				}
+				new_character = {
+					join_society = harpers
+					remove_trait = weak
+					remove_trait = slow
+					remove_trait = idiot
+					remove_trait = imbecile
+					remove_trait = dull
+					remove_trait = delicate
+					random_list = {
+						30 = { religion = joyful }
+						30 = { religion = solar }
+						30 = { religion = inventive }
+						20 = { religion = arcane }
+						20 = { religion = chauntean_faith }
+						20 = { religion = natural }
+						15 = { religion = elven_pantheon }
+						10 = { religion = triadic }
+					}
+					random_list = {
+						20 = { add_trait = expert_ranger }
+						20 = { add_trait = expert_bard }
+						20 = { add_trait = expert_wizard }
+						20 = { add_trait = expert_rogue }
+						20 = { add_trait = expert_fighter }
+					}
+					spawn_unit = {
+						province = PREV
+						owner = ROOT
+						match_character = event_target:harper_invasion_target
+						match_mult = 0.17
+						earmark = harper_loyalists
+						attrition = 1.0
+						disband_on_peace = yes
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				society_member_of = harpers
+			}
+			add_society_currency_major_effect = yes
+		}
+
+		event_target:harper_invasion_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+		hidden_tooltip = { FROM = { set_character_flag = instigated_harper_invasion } }
+	}
+	option = {
+		ai_chance = {
+			factor = 1
+			modifier = {
+        factor = 0.5
+        opinion = { who = event_target:harper_invasion_target value <= 0 }
+      }
+			modifier = {
+        factor = 2
+        opinion = { who = event_target:harper_invasion_target value >= 20 }
+      }
+			modifier = {
+        factor = 4
+        opinion = { who = event_target:harper_invasion_target value >= 40 }
+      }
+		}
+		name = DECLINE
+	}
+}
+
+
 ########################AI JOIN AND AI RANK UP###########################
 
 character_event = { #force the AI to join a society
@@ -1537,6 +1934,25 @@ character_event = {
 		random_list = {
 			15 = {
 				character_event = { id = HRP.1001 } #Agent Elimination
+			}
+			20 = { #Unlanded AI High Harper asks ruler to depose tyrant
+				modifier = {
+					factor = 0
+					ai = no
+				}
+				modifier = {
+					factor = 0
+					NOT = { society_member_of = harpers }
+				}
+				modifier = {
+					factor = 0
+					society_rank < 4
+				}
+				modifier = {
+					factor = 0
+					total_years_played < 10
+				}
+				character_event = { id = HRP.500 }
 			}
 			20 = {
 				modifier = {
