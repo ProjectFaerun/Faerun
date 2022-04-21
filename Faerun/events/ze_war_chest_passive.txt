@@ -13,20 +13,48 @@ character_event = {
 	id = ZE.22000
 	desc = EVTDESC_ZE_22000
 	picture = GFX_evt_bribe_accepted
-	
-	is_triggered_only = yes
-	
-	
+
+	is_triggered_only = yes # donate_to_liege, ze_war_chest.txt
+
 	# Thank you!
 	option = {
 		name = EVTOPTA_ZE_22000
-		
+
+		trigger = {
+			FROM = {
+				NAND = {
+					is_friend = ROOT
+					ai = yes
+				}
+			}
+		}
+
+		transfer_scaled_wealth = {
+			from = FROM
+			value = 1
+			min = 200
+			max = 200
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			tooltip = {
+				add_favor = ROOT
+			}
+
+			character_event = {
+				id = ZE.22100
+				days = 3
+			}
+		}
+
 		ai_chance = {
 			factor = 50
 			
 			modifier = {
 				factor = 5
-				NOT = { wealth = 0 }
+				wealth < 0
 			}
 			
 			modifier = {
@@ -46,35 +74,29 @@ character_event = {
 			
 			modifier = {
 				factor = 2
-				NOT = { wealth = 100 }
 				independent = yes
+				wealth < 100
 			}
 		}
-		
-		trigger = {
-			FROM = {
-				NAND = {
-					is_friend = ROOT 
-					ai = yes
-				}
-			}
-		}
-		
-		hidden_tooltip = { 
-			FROM = { character_event = { id = ZE.22100 days = 3 } } 
-		}
-		wealth = 200
-		tooltip = {
-			FROM = {
-				add_favor = ROOT 
-			}
-		}	
 	}
 	
 	# No thanks
 	option = {
 		name = EVTOPTB_ZE_22000
-		
+
+		reverse_opinion = {
+			name = opinion_insulted
+			who = FROM
+			years = 3
+		}
+
+		FROM = {
+			character_event = {
+				id = ZE.22200
+				days = 3
+			}
+		}
+
 		ai_chance = {
 			factor = 50
 			
@@ -100,39 +122,31 @@ character_event = {
 			
 			modifier = {
 				factor = 2
-				wealth = 300
+
 				independent = yes
-			}
-		}
-		
-		hidden_tooltip = {
-			FROM = { character_event = { id = ZE.22200 days = 3 } }
-		}
-		
-		tooltip = {
-			opinion = {
-				who = FROM
-				modifier = opinion_insulted
-				years = 3
+				wealth >= 300
 			}
 		}
 	}
 	
 	option = { # Thank you, friend!
 		name = EVTOPTC_ZE_22000
-		
-		ai_chance = {
-			factor = 100
-		}
-		
+
 		trigger = {
 			FROM = {
-				is_friend = ROOT 
+				is_friend = ROOT
 				ai = yes
 			}
 		}
-		
-		wealth = 200	
+
+		transfer_scaled_wealth = {
+			from = FROM
+			value = 1
+			min = 200
+			max = 200
+		}
+
+		ai_chance = { factor = 100 }
 	}
 }
 
@@ -147,10 +161,8 @@ character_event = {
 	# Offer was accepted
 	option = {
 		name = EXCELLENT
-		
-		ROOT = { 
-			add_favor = FROM 
-		}
+
+		add_favor = FROM
 	}
 }
 
@@ -161,16 +173,19 @@ character_event = {
 	picture = GFX_evt_bribe_declined
 	
 	is_triggered_only = yes
-	
+
+	ai = no
+
 	# Too bad
 	option = {
 		name = EVTOPTA_ZE_22200
-		
-		wealth = 200
-		opinion = {
-			who = FROM
-			modifier = opinion_insulted
-			years = 3
+
+		tooltip = {
+			opinion = {
+				name = opinion_insulted
+				who = FROM
+				years = 3
+			}
 		}
 	}
 }
