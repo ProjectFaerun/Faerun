@@ -85,34 +85,36 @@ detract_grace_super_huge_effect = {
 
 set_shou_lung_boon_cd_effect = {  #added via tribute to shou_lung decisions... Always one year.
 	add_character_modifier = {
-		hidden = yes
 		name = jd_shou_lung_boon_cd
-		days = 365 #If this is changed, edit  shou_lung_offmap_boon_decisions_enabled_trigger_cd_tt
+		years = 1 # If this is changed, edit china_offmap_boon_decisions_enabled_trigger_cd_tt
+		hidden = yes
 	}
 }
 
 set_shou_lung_tribute_cd_effect = { #added via tribute to shou_lung decisions... Always one year.
 	add_character_modifier = {
-		hidden = yes
 		name = jd_shou_lung_tribute_cd
-		days = 365
+		years = 1
+		hidden = yes
 	}
 }
 
 leave_court_for_shou_lung_effect = { # NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to shou_lung, a killer needs to be set (eg: "killer = ROOT")
 	custom_tooltip = {
 		text = will_leave_for_shou_lung_tt
+
+		set_character_flag = ignore_refund
+		death = { death_reason = death_went_to_shou_lung }
 	}
-	set_character_flag = ignore_refund
-	hidden_effect = { death = { death_reason = death_went_to_shou_lung } }
 }
 
 return_to_shou_lung_effect = { # NOTE: this does not set a "killer", meaning if you want them to be ORDERED to go to shou_lung, a killer needs to be set (eg: "killer = ROOT")
 	custom_tooltip = {
 		text = will_return_to_shou_lung_tt
+
+		set_character_flag = ignore_refund
+		death = { death_reason = death_went_to_shou_lung }
 	}
-	set_character_flag = ignore_refund
-	hidden_effect = { death = { death_reason = death_went_back_to_shou_lung } }
 }
 
 # Utilizes shou_lung_war_minimum_commander_martial variable on the current scope to spawn characters with at least that amount of martial skill.
@@ -125,72 +127,79 @@ shou_lung_spawn_commander_effect = {
 		female = no
 		age = 28
 	}
+
 	new_character = {
 		unsafe_give_minor_title = title_commander
-		
-		set_variable = {
-			which = shou_lung_war_minimum_commander_martial
-			which = PREV
-		}
+
 		if = {
 			limit = {
 				NOT = { trait = brilliant_strategist }
 			}
+
+			# Make sure they have a tier 3 or tier 4 education
 			remove_trait = misguided_warrior
 			remove_trait = tough_soldier
-			remove_trait = skilled_tactician
 			add_trait = skilled_tactician
-			# Make sure they have a tier 3 or tier 4 education
 		}
-		random_list = { # Give a chance to get Chinese commander traits
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = master_of_flame }
-				}
-				add_trait = master_of_flame
-			}
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = logistics_expert }
-				}
-				add_trait = logistics_expert
-			}
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = levy_coordinator }
-				}
-				add_trait = levy_coordinator
-			}
-			30 = {
-				trigger = {
-					can_have_more_leadership_traits = yes
-					NOT = { trait = sapper }
-				}
-				add_trait = sapper
-			}
-			90 = {}
-		}
-		while = { # Increase the martial skill with base or martial traits until the minimum is reached
-			limit = {
-				NOT = {
-					martial = shou_lung_war_minimum_commander_martial
-				}
-			}
+
+		# Give a chance to get Chinese commander traits
+		if = {
+			limit = { can_have_more_leadership_traits = yes }
+
 			random_list = {
-				40 = {
-					change_martial = 1
+				30 = {
+					trigger = {
+						NOT = { trait = master_of_flame }
+					}
+
+					add_trait = master_of_flame
 				}
+
+				30 = {
+					trigger = {
+						NOT = { trait = logistics_expert }
+					}
+
+					add_trait = logistics_expert
+				}
+
+				30 = {
+					trigger = {
+						NOT = { trait = levy_coordinator }
+					}
+
+					add_trait = levy_coordinator
+				}
+
+				30 = {
+					trigger = {
+						NOT = { trait = sapper }
+					}
+
+					add_trait = sapper
+				}
+
+				90 = { }
+			}
+		}
+
+		# Increase the martial skill with base or martial traits until the minimum is reached
+		while = {
+			limit = { martial < local_shou_lung_war_minimum_commander_martial }
+
+			random_list = {
+				40 = { change_martial = 1 }
+
 				5 = {
-					trigger = { 
-						NOR = { 
+					trigger = {
+						NOR = {
 							trait = strong
 							trait = robust
+
 							calc_true_if = {
-								amount = 3
-								trait = strong 
+								amount >= 3
+
+								trait = strong
 								trait = robust 
 								trait = shrewd 
 								trait = duelist 
@@ -211,7 +220,8 @@ shou_lung_spawn_commander_effect = {
 							trait = strong
 							trait = robust
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -233,7 +243,8 @@ shou_lung_spawn_commander_effect = {
 							trait = shrewd
 							trait = genius
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -257,7 +268,8 @@ shou_lung_spawn_commander_effect = {
 							trait = strategist
 							trait = architect
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -281,7 +293,8 @@ shou_lung_spawn_commander_effect = {
 							trait = strategist
 							trait = architect
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -305,7 +318,8 @@ shou_lung_spawn_commander_effect = {
 							trait = strategist
 							trait = architect
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -329,7 +343,8 @@ shou_lung_spawn_commander_effect = {
 							trait = strategist
 							trait = architect
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -350,7 +365,8 @@ shou_lung_spawn_commander_effect = {
 						NOR = { 
 							trait = diligent
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -371,7 +387,8 @@ shou_lung_spawn_commander_effect = {
 						NOR = { 
 							trait = brave
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -392,7 +409,8 @@ shou_lung_spawn_commander_effect = {
 						NOR = { 
 							trait = ambitious
 							calc_true_if = {
-								amount = 3
+								amount >= 3
+
 								trait = strong 
 								trait = robust 
 								trait = shrewd 
@@ -422,7 +440,7 @@ shou_lung_war_spawn_troops_effect = {
 		limit = {
 			check_variable = {
 				which = shou_lung_war_troop_quantity
-				value = 1
+				value >= 1
 			}
 		}
 		change_variable = {	
