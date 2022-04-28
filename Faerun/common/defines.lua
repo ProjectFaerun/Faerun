@@ -1303,7 +1303,7 @@ NMilitary = {
 	OCCUPATION_PENALTY_MONTHS_DIFFERENT_CULTURE = 60,
 	OCCUPATION_PENALTY_MONTHS_DIFFERENT_CULTUREGROUP = 120,
 
-	LOOTED_MODIFIER_MONTHS = 36,					-- How long pagan looting lasts
+	LOOTED_MODIFIER_MONTHS = 72,					-- How long pagan looting lasts
 	LOOT_TAX_MULTIPLIER = 1.5,						-- Base gold looted from raided holdings is (tax * LOOT_TAX_MULTIPLIER) + (total building value * LOOT_BUILDING_MULTIPLIER)
 	LOOT_BUILDING_MULTIPLIER = 0.02,				-- Extra gold looted from raided holdings, from buildings (LOOT_BUILDING_MULTIPLIER * building built cost)
 	LOOT_HOLDING_DEST_MIN_SAFE = 4,					-- there is a 1 in LOOT_HOLDING_DESTRUCTION_ODDS chance that
