@@ -2030,7 +2030,7 @@ character_event = { # Hunt Apostates meta event
 					has_character_modifier = under_suspicion
 				}
 
-				# Someone with a secret religion
+				# Someone with a secret religion and in a society
 				any_realm_character = {
 					prisoner = no
 					NOT = { character = ROOT } # Don't catch yourself
@@ -2054,6 +2054,7 @@ character_event = { # Hunt Apostates meta event
 					religion = PREV
 					age = 16
 					has_secret_religion_trait_trigger = yes
+					is_in_society = yes #to catch only organized cults
 				}
 
 				# A devil worshiper, and I'm amazingly good at my job # also criminal society members and Harpers
@@ -2151,6 +2152,31 @@ character_event = { # Hunt Apostates meta event
 					}
 				}
 
+				# Someone with a secret religion
+				any_realm_character = {
+					prisoner = no
+					NOT = { character = ROOT } # Don't catch yourself
+					NOT = { character = PREV } # Don't catch your liege
+					NOT = { has_roots_secret_religion_truly_trigger = yes } # If you share the same secret religion, dont catch them
+					NOT = { has_prevs_secret_religion_truly_trigger = yes } # If they share secret religion with the liege, dont catch them
+					NOT = {
+						reverse_has_opinion_modifier = {
+							modifier = opinion_accused_apostate
+							who = PREV
+						}
+					}
+					NOT = {
+						higher_tier_than = BARON
+					}
+					age = 16
+					has_secret_religion_trait_trigger = yes
+					is_in_society = no
+					NOR = {
+						has_character_modifier = highly_suspect
+						has_character_modifier = under_suspicion
+					}
+				}
+
 				# Someone random, and I'm incompetent
 				any_realm_character = {
 					prisoner = no
@@ -2229,7 +2255,7 @@ character_event = { # Hunt Apostates meta event
 				set_character_flag = apostate_extremely_suspect
 			}
 
-			# Moderatley suspect people
+			# Moderateley suspect people
 			random_realm_character = {
 				limit = {
 					prisoner = no
@@ -2259,7 +2285,7 @@ character_event = { # Hunt Apostates meta event
 				set_character_flag = apostate_moderate_suspect
 			}
 
-			# Characters with a secret religion
+			# Characters with a secret religion and in a society
 			random_realm_character = {
 				limit = {
 					prisoner = no
@@ -2284,6 +2310,7 @@ character_event = { # Hunt Apostates meta event
 					religion = event_target:my_liege
 					age = 16
 					has_secret_religion_trait_trigger = yes
+					is_in_society = yes #to catch only organized cults
 				}
 				save_event_target_as = suspected_apostate
 				set_character_flag = apostate_secret_religion
@@ -2381,6 +2408,39 @@ character_event = { # Hunt Apostates meta event
 				}
 				save_event_target_as = no_suspicion
 				set_character_flag = apostate_no_suspicion
+			}
+
+			# Characters with a secret religion
+			random_realm_character = {
+				limit = {
+					ROOT = {
+						trait = zealous
+					}
+					prisoner = no
+					NOT = { character = ROOT } # Don't catch yourself
+					NOT = { character = event_target:my_liege } # Don't catch your liege
+					NOT = { has_roots_secret_religion_truly_trigger = yes } # If you share the same secret religion, dont catch them
+					NOT = { has_prevs_secret_religion_truly_trigger = yes } # If they share secret religion with the liege, dont catch them
+					NOT = {
+						reverse_has_opinion_modifier = {
+							modifier = opinion_accused_apostate
+							who = event_target:my_liege
+						}
+					}
+					NOT = {
+						higher_tier_than = BARON
+					}
+					age = 16
+					has_secret_religion_trait_trigger = yes
+					is_in_society = no
+					NOR = {
+						is_devil_worshiper_trigger = yes
+						has_character_modifier = highly_suspect
+						has_character_modifier = under_suspicion
+					}
+				}
+				save_event_target_as = suspected_apostate
+				set_character_flag = apostate_secret_religion
 			}
 
 			# Innocent person!
@@ -4207,13 +4267,27 @@ character_event = { # Outcome event
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:suspected_apostate }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = yes
+			}
 		}
 		text = MNM.70110.d.suspected_apostate
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:no_suspicion }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = no
+			}
+		}
+		text = MNM.70110.d.suspected_apostate2
+	}
+	desc = {
+		trigger = {
+			event_target:accused_apostate = {
+				character = event_target:no_suspicion
+			}
 		}
 		text = MNM.70110.d.no_suspicion
 	}
@@ -4387,13 +4461,27 @@ character_event = { # What does the liege wish to do with the apostate?
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:suspected_apostate }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = yes
+			}
 		}
 		text = MNM.70200.d.suspected_apostate
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:no_suspicion }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = no
+			}
+		}
+		text = MNM.70200.d.suspected_apostate2
+	}
+	desc = {
+		trigger = {
+			event_target:accused_apostate = {
+				character = event_target:no_suspicion
+			}
 		}
 		text = MNM.70200.d.no_suspicion
 	}
@@ -4437,6 +4525,14 @@ character_event = { # What does the liege wish to do with the apostate?
 			modifier = {
 				factor = 0
 				event_target:accused_apostate = { dynasty = ROOT }
+			}
+			modifier = {
+				factor = 0
+				NOT = { trait = zealous }
+				event_target:accused_apostate = {
+					character = event_target:suspected_apostate
+					is_in_society = no
+				}
 			}
 		}
 
@@ -4545,6 +4641,14 @@ character_event = { # What does the liege wish to do with the apostate?
 				factor = 5
 				event_target:accused_apostate = {
 					dynasty = ROOT
+				}
+			}
+			modifier = {
+				factor = 0
+				NOT = { trait = zealous }
+				event_target:accused_apostate = {
+					character = event_target:suspected_apostate
+					is_in_society = no
 				}
 			}
 		}
