@@ -12,84 +12,88 @@ remove_patrons_effect = {
 end_inaccessibility_effect = {
 	if = {
 		limit = { trait = in_hiding }
-		remove_trait = in_hiding
 
+		remove_trait = in_hiding
 		clr_character_flag = do_not_disturb
 
 		add_character_modifier = {
 			name = went_out_of_hiding_timer
-			duration = 180
+			months = 6
 			hidden = yes
 		}
-		hidden_tooltip = { character_event = { id = CM.6400 } } # Notify plotters and family
+
+		character_event = { id = CM.6400 } # Notify plotters and family
 	}
+
 	if = {
-		limit = { has_character_modifier = in_seclusion }
+		limit = { in_seclusion = yes }
 
 		remove_character_modifier = in_seclusion
 
 		if = {
 			limit = { is_ruler = yes }
 
-			clr_character_flag = do_not_disturb
-			clr_character_flag = exposed_to_outside
-			clr_character_flag = seclusion_piling_corpses
-			clr_character_flag = seclusion_lazy_seduction
-			clr_character_flag = seclusion_nightmares
-			clr_character_flag = seclusion_gained_friend
-			clr_character_flag = seclusion_child_has_lover
-			clr_character_flag = seclusion_tunnel
-			clr_character_flag = seclusion_food_events
-
-			custom_tooltip = { text = open_the_gates_info_tooltip }
-
 			add_character_modifier = {
 				name = recently_opened_gates
-				duration = 365
+				years = 1
 			}
-			hidden_tooltip = {
+
+			custom_tooltip = {
+				text = open_the_gates_info_tooltip
+
+				clr_character_flag = do_not_disturb
+				clr_character_flag = exposed_to_outside
+				clr_character_flag = seclusion_piling_corpses
+				clr_character_flag = seclusion_lazy_seduction
+				clr_character_flag = seclusion_nightmares
+				clr_character_flag = seclusion_gained_friend
+				clr_character_flag = seclusion_child_has_lover
+				clr_character_flag = seclusion_tunnel
+				clr_character_flag = seclusion_food_events
 				clr_character_flag = seclusion_events_on
-				character_event = { id = RIP.11557 days = 40 random = 20} #clears starvation modifiers
+
+				character_event = {
+					id = RIP.11557 # Clears starvation modifiers
+					days = 40
+					random = 20
+				}
+
 				any_courtier = {
 					clr_character_flag = seclusion_events_on
 					remove_character_modifier = in_seclusion
-					character_event = { id = RIP.11557 days = 40 random = 20} #clears starvation modifiers
+
+					character_event = {
+						id = RIP.11557 # Clears starvation modifiers
+						days = 40
+						random = 20
+					}
 				}
+
 				any_vassal = {
 					limit = {
-						OR = {
-							is_councillor = yes
-							has_minor_title = title_councilmember_king
-							has_minor_title = title_councilmember_emperor
-						}
+						is_voter = yes
 						is_landed = yes
-						liege = { character = ROOT }
-						NOT = {
-							has_character_modifier = in_seclusion
+						in_seclusion = no
+
+						host = {
+							NOT = { character = ROOT }
 						}
-						host = { NOT = { character = ROOT } }
 					}
+
 					force_host = ROOT
 				}
 			}
+
 			if = { # Rejoin your liege's court if both of you are not in seclusion
 				limit = {
-					OR = {
-						is_councillor = yes
-						has_minor_title = title_councilmember_king
-						has_minor_title = title_councilmember_emperor
-					}
-					NOT = {
-						liege = {
-							has_character_modifier = in_seclusion
-						}
+					is_voter = yes
+
+					liege = {
+						in_seclusion = no
 					}
 				}
-				liege = {
-					ROOT = {
-						force_host = PREV
-					}
-				}
+
+				force_host = liege
 			}
 		}
 	}
@@ -515,9 +519,10 @@ impregnate_effect = {
 
 will_not_marry_effect = {
 	add_character_modifier = {
-		modifier = will_not_marry
+		name = will_not_marry
 		duration = -1
 	}
+
 	add_trait = cannot_marry
 }
 
@@ -545,13 +550,39 @@ remove_prison_reason_effect = {
 
 add_cat_effect = {
 	if = {
-		limit =  { NOT = { has_character_modifier = pet_cat } }
+		limit = {
+			NOT = { has_character_modifier = pet_cat }
+		}
+
 		add_character_modifier = {
 			name = pet_cat
 			duration = -1
 		}
-		hidden_tooltip = { character_event = { id = 77802 days = 3000 random = 2000 } } # Cat dies
-		hidden_tooltip = { character_event = { id = 77861 days = 30 random = 100 } } # Cat & dog
+
+		character_event = {
+			id = 77802 # Cat dies
+			days = 3000
+			random = 2000
+		}
+
+		character_event = {
+			id = 77861 # Cat & dog
+			days = 30
+			random = 100
+		}
+	}
+}
+
+add_pet_owl_effect = {
+	add_character_modifier = {
+		name = pet_owl
+		duration = -1
+	}
+
+	character_event = {
+		id = 77800 # Owl dies
+		days = 3500
+		random = 2000
 	}
 }
 
@@ -749,32 +780,76 @@ remove_education_effect = {
 }
 
 random_accident_death_effect = {
-	tooltip = { death = { death_reason = death_accident } }
-	hidden_effect = {
-		random_list = {
-			10 = {
-				modifier = { factor = 0 host = { capital_scope = { region = northern_zakhara_region } } }
-				death = { death_reason = death_accident_drowning }
+	tooltip = {
+		death = {
+			death_reason = death_accident
+		}
+	}
+
+	random_list = {
+		10 = {
+			trigger	= {
+				host = {
+					capital_scope = {
+						NOT = { region = northern_zakhara_region }
+					}
+				}
 			}
-			10 = {
-				modifier = { factor = 0 host = { capital_scope = { region = northern_zakhara_region } } }
-				death = { death_reason = death_accident_bear }
+
+			death = {
+				death_reason = death_accident_drowning
 			}
-			10 = {
-				death = { death_reason = death_accident_boar }
+		}
+
+		10 = {
+			trigger = {
+				host = {
+					capital_scope = {
+						NOT = { region = northern_zakhara_region }
+					}
+				}
 			}
-			10 = {
-				death = { death_reason = death_accident_fall }
+
+			death = {
+				death_reason = death_accident_bear
 			}
-			10 = {
-				death = { death_reason = death_accident_arrow }
+		}
+
+		10 = {
+			death = {
+				death_reason = death_accident_boar
 			}
-			10 = {
-				death = { death_reason = death_accident_snakes }
+		}
+
+		10 = {
+			death = {
+				death_reason = death_accident_fall
 			}
-			10 = {
-				modifier = { factor = 0 host = { capital_scope = { region = world_india } } }
-				death = { death_reason = death_accident_tiger }
+		}
+
+		10 = {
+			death = {
+				death_reason = death_accident_arrow
+			}
+		}
+
+		10 = {
+			death = {
+				death_reason = death_accident_snakes
+			}
+		}
+
+		10 = {
+			trigger = {
+				host = {
+					capital_scope = {
+						region = world_india
+					}
+				}
+			}
+
+			death = {
+				death_reason = death_accident_tiger
 			}
 		}
 	}
@@ -797,194 +872,6 @@ print_scope_effect = {
 	log = "- Event_target:test_target2: [test_target2.GetName][test_target2.GetBestName]"
 	log = "- Event_target:test_target3: [test_target3.GetName][test_target3.GetBestName]"
 	log = "------------------------------"
-}
-
-add_sympathy_for_prevs_true_religion_effect = {
-	if = {
-		limit = {
-			PREV = { true_religion_group_good_human_pantheon_group_trigger = yes }
-			NOT = { religion_group = good_human_pantheon_group }
-		}
-		add_trait = sympathy_good_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_wild_human_pantheon_group_trigger = yes }
-			NOT = { religion_group = wild_human_pantheon_group }
-		}
-		add_trait = sympathy_wild_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_humanoid_group_trigger = yes }
-			NOT = { religion_group = humanoid_group }
-		}
-		add_trait = sympathy_humanoid_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_evil_human_pantheon_group_trigger = yes }
-			NOT = { religion_group = evil_human_pantheon_group }
-		}
-		add_trait = sympathy_evil_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_qismaite_group_trigger = yes }
-			NOT = { religion_group = qismaite_group }
-		}
-		add_trait = sympathy_qismaite_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_karaturan_group_trigger = yes }
-			NOT = { religion_group = karaturan_group }
-		}
-		add_trait = sympathy_karaturan_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_elven_pantheon_group_trigger = yes }
-			NOT = { religion_group = elven_pantheon_group }
-		}
-		add_trait = sympathy_elven_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_drow_pantheon_trigger = yes }
-			NOT = { religion_group = drow_pantheon }
-		}
-		add_trait = sympathy_drow_pantheon
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_dwarven_pantheon_group_trigger = yes }
-			NOT = { religion_group = dwarven_pantheon_group }
-		}
-		add_trait = sympathy_dwarven_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_giant_pantheon_group_trigger = yes }
-			NOT = { religion_group = giant_pantheon_group }
-		}
-		add_trait = sympathy_giant_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_draconic_group_trigger = yes }
-			NOT = { religion_group = draconic_group }
-		}
-		add_trait = sympathy_draconic_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_unenlightened_group_trigger = yes }
-			NOT = { religion_group = unenlightened_group }
-		}
-		add_trait = sympathy_unenlightened_group
-	}
-	else_if = {
-		limit = {
-			PREV = { true_religion_group_atheist_group_trigger = yes }
-			NOT = { religion_group = atheist_group }
-		}
-		add_trait = sympathy_atheist_group
-	}
-}
-
-add_sympathy_for_prevs_open_religion_effect = {
-	if = {
-		limit = {
-			PREV = { religion_group = good_human_pantheon_group }
-			NOT = { religion_group = good_human_pantheon_group }
-		}
-		add_trait = sympathy_good_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = wild_human_pantheon_group }
-			NOT = { religion_group = wild_human_pantheon_group }
-		}
-		add_trait = sympathy_wild_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = humanoid_group }
-			NOT = { religion_group = humanoid_group }
-		}
-		add_trait = sympathy_humanoid_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = evil_human_pantheon_group }
-			NOT = { religion_group = evil_human_pantheon_group }
-		}
-		add_trait = sympathy_evil_human_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = qismaite_group }
-			NOT = { religion_group = qismaite_group }
-		}
-		add_trait = sympathy_qismaite_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = karaturan_group }
-			NOT = { religion_group = karaturan_group }
-		}
-		add_trait = sympathy_karaturan_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = elven_pantheon_group }
-			NOT = { religion_group = elven_pantheon_group }
-		}
-		add_trait = sympathy_elven_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = drow_pantheon }
-			NOT = { religion_group = drow_pantheon }
-		}
-		add_trait = sympathy_drow_pantheon
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = dwarven_pantheon_group }
-			NOT = { religion_group = dwarven_pantheon_group }
-		}
-		add_trait = sympathy_dwarven_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = giant_pantheon_group }
-			NOT = { religion_group = giant_pantheon_group }
-		}
-		add_trait = sympathy_giant_pantheon_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = draconic_group }
-			NOT = { religion_group = draconic_group }
-		}
-		add_trait = sympathy_draconic_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = unenlightened_group }
-			NOT = { religion_group = unenlightened_group }
-		}
-		add_trait = sympathy_unenlightened_group
-	}
-	else_if = {
-		limit = {
-			PREV = { religion_group = atheist_group }
-			NOT = { religion_group = atheist_group }
-		}
-		add_trait = sympathy_atheist_group
-	}
 }
 
 add_trait_for_prevs_secret_religion_society_effect = {
@@ -1039,14 +926,6 @@ event_target_old_religion_from_flag_effect = {
 			# save_event_target_as = old_religion
 		# }
 	# }
-}
-
-add_pet_owl_effect = {
-	add_character_modifier = {
-		name = pet_owl
-		duration = -1
-	}
-	hidden_tooltip = { character_event = { id = 77800 days = 3500 random = 2000 } } # Owl dies
 }
 
 add_mission_succeed_influence_effect = {
@@ -2696,30 +2575,34 @@ spawn_elder_effect = {
 	}
 }
 
-#Raiding adventurer war declaration effect
+# Raiding adventurer war declaration effect
 raiding_adventurer_war_declaration_effect = {
-	custom_tooltip = { text = raiding_adventurer_war_declaration_tooltip }
+	custom_tooltip = {
+		text = raiding_adventurer_war_declaration_tooltip
 
-	event_target:selling_province = {
-		event_target:raiding_adventurer = {
-			unsafe_war = {
-				target = PREVPREV
-				casus_belli = duchy_adventure
-				thirdparty_title = PREV
-				tier = DUKE
+		event_target:selling_province = {
+			duchy = {
+				save_event_target_as = target_duchy
 			}
-			any_army = {
-				set_can_toggle_looting = yes
-				set_looting = no
+
+			event_target:raiding_adventurer = {
+				unsafe_war = {
+					target = PREVPREV
+					casus_belli = duchy_adventure
+					thirdparty_title = event_target:target_duchy
+				}
+
+				any_army = {
+					set_can_toggle_looting = yes
+					set_looting = no
+				}
 			}
 		}
-	}
 
-	clr_character_flag = adventurer_unsafe_duchy_war
-	clr_character_flag = adventurer_safe_duchy_war
-	clr_character_flag = negotiating_with_adventurer
+		clr_character_flag = adventurer_unsafe_duchy_war
+		clr_character_flag = adventurer_safe_duchy_war
+		clr_character_flag = negotiating_with_adventurer
 
-	hidden_effect = {
 		event_target:raiding_adventurer = {
 			clr_character_flag = raiding_adventurer
 		}
@@ -2762,53 +2645,6 @@ root_secret_religion_provinces_convert_effect = {
 }
 
 # random_coronation_events_effect - removed
-
-# Referenced by Alternate Start religion feature generation
-reset_religion_features_effect = {
-	set_peace_piety_gain = 0
-	set_pacifist = no
-	set_convert_other_groups = 2
-	set_convert_same_group = 2
-	set_peace_prestige_loss = no
-	set_ai_aggression = 1
-	set_unit_modifier = {}
-	set_unit_home_modifier = {}
-	set_hard_to_convert = no
-	set_raised_vassal_opinion_loss = yes
-	set_piety_loss_for_attacking_same_religion = no
-	set_max_wives = 1
-	set_max_consorts = 0
-	set_feminist = no
-	set_heir_designation = no
-	set_short_reign_opinion_year_mult = -1000
-	set_jizya_tax = no
-	set_can_retire_to_monastery = no
-	set_can_excommunicate = no
-	set_can_grant_divorce = no
-	set_can_grant_invasion_cb = no
-	set_can_grant_claim = no
-	set_can_call_crusade = no
-	set_pc_marriage = no
-	set_bs_marriage = no
-	set_psc_marriage = yes
-	set_cousin_marriage = yes
-	set_seafaring = no
-	set_allow_looting = no
-	set_allow_rivermovement = no
-	set_autocephaly = no
-	set_pentarchy = no
-	set_divine_blood = no
-	set_uses_decadence = no
-	set_can_have_antipopes = no
-	set_priests_can_marry = no
-	set_priests_can_inherit = yes
-	set_ignores_defensive_attrition = no
-	set_defensive_attrition = no
-	clear_intermarry = no
-	set_character_modifier = {}
-	clear_intermarry = yes
-	set_allows_matrilineal_marriage = yes
-}
 
 random_antagonizer_slander_roll_effect = {
 	random_list = {
@@ -3416,38 +3252,45 @@ clr_ABC_desc_flag_effect = {
 	clr_character_flag = desc_C
 }
 
-#Find someone to reference... (event_target:my_beloved)
+# Find someone to reference... (event_target:my_beloved)
 # NOTE: might be platonic, children, etc
 save_beloved_character_effect = {
 	if = {
-		limit = { #In case you have a spouse outside of your realm...
+		limit = { # In case you have a spouse outside of your realm...
 			is_married = yes
+
 			any_spouse = {
+				is_landed = yes
 				ROOT_possibly_romantically_interested_trigger = yes
 				root_has_terrible_opinion_modifier_of_this_trigger = no
-				is_landed = yes
 			}
 		}
+
 		random_spouse = {
 			limit = {
+				is_landed = yes
 				ROOT_possibly_romantically_interested_trigger = yes
 				root_has_terrible_opinion_modifier_of_this_trigger = no
-				is_landed = yes
 			}
+
 			save_event_target_as = my_beloved
 		}
 	}
-	else = { #In case you do not...
+	else = { # In case you do not...
 		any_courtier_or_vassal = {
 			limit = {
-				NOT = { character = event_target:enemy_commander }
-				NOT = { character = event_target:enemy_liege }
+				NOR = {
+					character = event_target:enemy_commander
+					character = event_target:enemy_liege
+				}
 			}
-			score_value = { #Prioritizes selecting some kind of loved person...
+
+			score_value = {
 				value = 1
 				beloved_target_selection_score = yes
 			}
-			#Effect:
+
+			# Effect:
 			save_event_target_as = my_beloved
 		}
 	}
@@ -3487,124 +3330,6 @@ reset_flag_lifestyle_sway_event_effect = {
 	clr_character_flag = sway_scholar
 	clr_character_flag = sway_steward
 	clr_character_flag = sway_torture
-}
-
-apply_cosmopolian_on_start_effect = {
-	religion_authority = {
-		modifier = cosmopolitan_religion
-		years = 1000
-	}
-	any_playable_ruler = {
-		limit = { NOT = { distance_from_realm = { who = ROOT value = 200 } } }
-		add_intermarry = ROOT
-		ROOT = { add_intermarry = PREV }
-	}
-	any_neighbor_independent_ruler = {
-		add_intermarry = ROOT
-		ROOT = { add_intermarry = PREV }
-	}
-}
-apply_dogmatic_on_start_effect = {
-	religion_authority = {
-		modifier = dogmatic_religion
-		years = 1000
-	}
-	remove_intermarry = triadic
-	remove_intermarry = arcane
-	remove_intermarry = rasallesian
-	remove_intermarry = chessic
-	remove_intermarry = mercantile
-	remove_intermarry = inventive
-	remove_intermarry = joyful
-	remove_intermarry = lapal_faith
-	remove_intermarry = calishite_faith
-	remove_intermarry = chauntean_faith
-	remove_intermarry = mulhorandi_faith
-	remove_intermarry = untheric_faith
-	remove_intermarry = halfling_pantheon
-	remove_intermarry = solar
-	remove_intermarry = deities_of_fury
-	remove_intermarry = natural
-	remove_intermarry = kossuth
-	remove_intermarry = geomancy
-	remove_intermarry = primordial
-	remove_intermarry = tuigan_shamanism
-	remove_intermarry = martial_faith
-	remove_intermarry = uthgardt_faith
-	remove_intermarry = dead_three
-	remove_intermarry = shadow_gods
-	remove_intermarry = ghaunadaur
-	remove_intermarry = church_of_cyric
-	remove_intermarry = abyssal_cult
-	remove_intermarry = loviatar
-	remove_intermarry = infernal
-	remove_intermarry = scale_cult
-	remove_intermarry = loviatar
-	remove_intermarry = thasmudyanic
-	remove_intermarry = ten_thousand_gods
-	remove_intermarry = qisma
-	remove_intermarry = pantheist_league
-	remove_intermarry = adama
-	remove_intermarry = muhjari
-	remove_intermarry = kahin
-	remove_intermarry = padhran
-	remove_intermarry = the_path
-	remove_intermarry = chung_tao
-	remove_intermarry = nine_travelers
-	remove_intermarry = elven_pantheon
-	remove_intermarry = asathalfinare
-	remove_intermarry = sylvan
-	remove_intermarry = eilistraee
-	remove_intermarry = lolth_cult
-	remove_intermarry = vhaeraun
-	remove_intermarry = kiaransalee
-	remove_intermarry = dwarven_pantheon
-	remove_intermarry = laduguer
-	remove_intermarry = gnome_pantheon
-	remove_intermarry = urdlen
-	remove_intermarry = giant_pantheon
-	remove_intermarry = vaprak
-	remove_intermarry = goblin_pantheon
-	remove_intermarry = orc_pantheon
-	remove_intermarry = monster_pantheon
-	remove_intermarry = faceless_god
-	remove_intermarry = draconic_pantheon
-	remove_intermarry = tiamat
-	remove_intermarry = bahamut
-	remove_intermarry = pagan
-	# remove_intermarry = ubtao_reformed
-	remove_intermarry = ubtao_worship
-	remove_intermarry = ulutiuan_reformed
-	remove_intermarry = ulutiuan
-	remove_intermarry = earthmother_reformed
-	remove_intermarry = earthmother
-	remove_intermarry = nogari_reformed
-	remove_intermarry = nogari
-	remove_intermarry = toteteohuan_reformed
-	remove_intermarry = toteteohuan
-	remove_intermarry = yuir_reformed
-	remove_intermarry = yuir
-	remove_intermarry = jaziri_reformed
-	remove_intermarry = jaziri
-	remove_intermarry = faithless
-	remove_intermarry = entropy
-	remove_intermarry = blue_flame
-	remove_intermarry = beholder_pantheon
-	remove_intermarry = illithid_pantheon
-
-	remove_intermarry = humanoid_group
-	remove_intermarry = good_human_pantheon_group
-	remove_intermarry = evil_human_pantheon_group
-	remove_intermarry = qismaite_group
-	remove_intermarry = karaturan_group
-	remove_intermarry = elven_pantheon_group
-	remove_intermarry = drow_pantheon
-	remove_intermarry = dwarven_pantheon_group
-	remove_intermarry = giant_pantheon_group
-	remove_intermarry = monster_group
-	remove_intermarry = draconic_group
-	remove_intermarry = atheist_group
-	remove_intermarry = aberration_group
 }
 
 spawn_debutante_effect = {
@@ -4229,932 +3954,410 @@ WL_ritual_hunt_flavor_events_effect = {
 }
 
 stable_attribute_improvement_effect = {
-	hidden_tooltip = { #Chance of Education trait improvement or burnout case.
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_character_flag = flag_training_diplomacy_attribute
-				}
-			}
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { #Education improvement.
-						trigger = { #Education Improvement only unlocked by synergy.
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-								has_religion_feature = religion_feature_ulutiuan
-								has_religion_feature = religion_feature_goblin_good
-							}
-							OR = {
-								trait = naive_appeaser
-								trait = underhanded_rogue
-								trait = charismatic_negotiator
-							}
+	hidden_effect = {
+		event_target:scoped_improvement_target = {
+			random_list = {
+				20 = { # Education improvement
+					trigger = {
+						has_character_flag = flag_training_diplomacy_attribute
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+							has_religion_feature = religion_feature_ulutiuan
+							has_religion_feature = religion_feature_goblin_good
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = diplomacy character = event_target:scoped_improvement_target value = 3 }
-							}
+
+						OR = {
+							trait = naive_appeaser
+							trait = underhanded_rogue
+							trait = charismatic_negotiator
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = diplomacy character = event_target:scoped_improvement_target value = 6 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = diplomacy character = event_target:scoped_improvement_target value = 9 }
-							}
-						}
-						character_event = { id = HF.23761 days = 15 random = 15 }
 					}
-					20 = { #Burnout
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 2 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 4 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 5 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 8 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 12 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-						character_event = { id = HF.23762 days = 15 random = 15 }
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
 					}
-					80 = { #Nothing.
+
+					mult_modifier = {
+						factor = 1.5
+
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 3
+							}
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 6
+							}
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						event_target:scoped_improvement_ruler = {
+							attribute_diff = {
+								attribute = diplomacy
+								character = event_target:scoped_improvement_target
+								value >= 9
+							}
+						}
 					}
 				}
-			}
-		}
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					OR = {
-						has_character_flag = flag_training_martial_attribute
-						has_character_flag = flag_training_combat_rating
+
+				20 = {
+					trigger = {
+						# Education improvement
+						OR = {
+							has_character_flag = flag_training_martial_attribute
+							has_character_flag = flag_training_combat_rating
+						}
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+							has_religion_feature = religion_feature_ulutiuan
+							has_religion_feature = religion_feature_goblin_good
+						}
+
+						OR = {
+							trait = misguided_warrior
+							trait = tough_soldier
+							trait = skilled_tactician
+						}
+					}
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = martial
+							character = event_target:scoped_improvement_ruler
+							value <= 9
+						}
 					}
 				}
-			}
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { #Education improvement.
-						trigger = { #Education Improvement only unlocked by synergy.
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-								has_religion_feature = religion_feature_ulutiuan
-								has_religion_feature = religion_feature_goblin_good
-							}
-							OR = {
-								trait = misguided_warrior
-								trait = tough_soldier
-								trait = skilled_tactician
-							}
+
+				20 = {
+					trigger = {
+						# Education improvement
+						has_character_flag = flag_training_stewardship_attribute
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+							has_religion_feature = religion_feature_ulutiuan
+							has_religion_feature = religion_feature_goblin_good
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = martial character = event_target:scoped_improvement_target value = 3 }
-							}
+
+						OR = {
+							trait = indulgent_wastrel
+							trait = thrifty_clerk
+							trait = fortune_builder
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = martial character = event_target:scoped_improvement_target value = 6 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = martial character = event_target:scoped_improvement_target value = 9 }
-							}
-						}
-						character_event = { id = HF.23761 days = 15 random = 15 }
 					}
-					20 = { #Burnout
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 2 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 4 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 5 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 8 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 12 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 30
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 35
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 40
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 45
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								age = 50
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-						character_event = { id = HF.23762 days = 15 random = 15 }
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
 					}
-					80 = { #Nothing.
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = stewardship
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
 					}
 				}
-			}
-		}
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_character_flag = flag_training_stewardship_attribute
-				}
-			}
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { #Education improvement.
-						trigger = { #Education Improvement only unlocked by synergy.
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-								has_religion_feature = religion_feature_ulutiuan
-								has_religion_feature = religion_feature_goblin_good
-							}
-							OR = {
-								trait = indulgent_wastrel
-								trait = thrifty_clerk
-								trait = fortune_builder
-							}
+
+				20 = {
+					trigger = {
+						# Education improvement
+						has_character_flag = flag_training_intrigue_attribute
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+							has_religion_feature = religion_feature_ulutiuan
+							has_religion_feature = religion_feature_goblin_good
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = stewardship character = event_target:scoped_improvement_target value = 3 }
-							}
+
+						OR = {
+							trait = amateurish_plotter
+							trait = flamboyant_schemer
+							trait = intricate_webweaver
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = stewardship character = event_target:scoped_improvement_target value = 6 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = stewardship character = event_target:scoped_improvement_target value = 9 }
-							}
-						}
-						character_event = { id = HF.23761 days = 15 random = 15 }
 					}
-					20 = { #Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = { #Never first time.
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 2 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 4 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 5 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 8 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 12 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 30
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 35
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 40
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 45
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								age = 50
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-						character_event = { id = HF.23762 days = 15 random = 15 }
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
 					}
-					80 = { #Nothing.
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = intrigue
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
 					}
 				}
-			}
-		}
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_character_flag = flag_training_intrigue_attribute
-				}
-			}
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { #Education improvement.
-						trigger = { #Education Improvement only unlocked by synergy.
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-								has_religion_feature = religion_feature_ulutiuan
-								has_religion_feature = religion_feature_goblin_good
-							}
-							OR = {
-								trait = amateurish_plotter
-								trait = flamboyant_schemer
-								trait = intricate_webweaver
-							}
+
+				20 = {
+					trigger = {
+						# Education improvement
+						has_character_flag = flag_training_learning_attribute
+
+						# Education Improvement only unlocked by synergy
+						OR = {
+							has_religion_feature = religion_meritocratic
+							has_religion_feature = religion_matriarchal
+							has_religion_feature = religion_patriarchal
+							has_religion_feature = religion_feature_ulutiuan
+							has_religion_feature = religion_feature_goblin_good
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = intrigue character = event_target:scoped_improvement_target value = 3 }
-							}
+
+						OR = {
+							trait = detached_priest
+							trait = martial_cleric
+							trait = scholarly_theologian
 						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = intrigue character = event_target:scoped_improvement_target value = 6 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = intrigue character = event_target:scoped_improvement_target value = 9 }
-							}
-						}
-						character_event = { id = HF.23761 days = 15 random = 15 }
 					}
-					20 = { #Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = { #Never first time.
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 2 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 4 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 5 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 8 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 12 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 30
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 35
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 40
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 45
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								age = 50
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-						character_event = { id = HF.23762 days = 15 random = 15 }
+
+					character_event = {
+						id = HF.23761
+						days = 15
+						random = 15
 					}
-					80 = { #Nothing.
+
+					mult_modifier = {
+						factor = 1.5
+						event_target:scoped_improvement_ruler = {
+							has_religion_feature = religion_meritocratic # More pressure
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 6
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						attribute_diff = {
+							attribute = learning
+							character = event_target:scoped_improvement_target
+							value <= 9
+						}
 					}
 				}
-			}
-		}
-		if = {
-			limit = {
-				event_target:scoped_improvement_target = {
-					has_character_flag = flag_training_learning_attribute
+
+				20 = { # Burnout
+					trigger = {
+						check_variable = {
+							which = burnout_count
+							value >= 1 # Never first time
+						}
+					}
+
+					character_event = {
+						id = HF.23762
+						days = 15
+						random = 15
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 2
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 3
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						check_variable = {
+							which = burnout_count
+							value >= 4
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.75
+
+						check_variable = {
+							which = burnout_count
+							value >= 5
+						}
+					}
+
+					mult_modifier = {
+						factor = 2
+
+						check_variable = {
+							which = burnout_count
+							value >= 8
+						}
+					}
+
+					mult_modifier = {
+						factor = 2
+
+						check_variable = {
+							which = burnout_count
+							value >= 12
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						trait = slothful
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						trait = stressed
+					}
+
+					mult_modifier = {
+						factor = 1.75
+						trait = depressed
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						is_ill = yes
+					}
+
+					mult_modifier = {
+						factor = 0.75
+						trait = diligent
+					}
 				}
-			}
-			event_target:scoped_improvement_target = {
-				random_list = {
-					20 = { #Education improvement.
-						trigger = { #Education Improvement only unlocked by synergy.
-							OR = {
-								has_religion_feature = religion_meritocratic
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_patriarchal
-								has_religion_feature = religion_feature_ulutiuan
-								has_religion_feature = religion_feature_goblin_good
-							}
-							OR = {
-								trait = detached_priest
-								trait = martial_cleric
-								trait = scholarly_theologian
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								OR = {
-									has_religion_feature = religion_meritocratic #More pressure.
-									has_religion_feature = religion_feature_ulutiuan
-									has_religion_feature = religion_feature_goblin_good
-								}
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = learning character = event_target:scoped_improvement_target value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = learning character = event_target:scoped_improvement_target value = 6 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								NOT = { character = event_target:scoped_improvement_target }
-								attribute_diff = { attribute = learning character = event_target:scoped_improvement_target value = 9 }
-							}
-						}
-						character_event = { id = HF.23761 days = 15 random = 15 }
-					}
-					20 = { #Burnout
-						trigger = {
-							event_target:scoped_improvement_ruler = { #Never first time.
-								check_variable = { which = burnout_count value = 1 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 2 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 3 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 4 }
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 5 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 8 }
-							}
-						}
-						modifier = {
-							factor = 2
-							event_target:scoped_improvement_ruler = {
-								check_variable = { which = burnout_count value = 12 }
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = slothful
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = stressed
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								trait = depressed
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								is_ill = yes
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = diligent
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 30
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								age = 35
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 40
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								age = 45
-							}
-						}
-						modifier = {
-							factor = 1.75
-							event_target:scoped_improvement_ruler = {
-								age = 50
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = slow
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = imbecile
-							}
-						}
-						modifier = {
-							factor = 1.5
-							event_target:scoped_improvement_ruler = {
-								trait = inbred
-							}
-						}
-						modifier = {
-							factor = 1.25
-							event_target:scoped_improvement_ruler = {
-								trait = dull
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = shrewd
-							}
-						}
-						modifier = {
-							factor = 0.85
-							event_target:scoped_improvement_ruler = {
-								trait = quick
-							}
-						}
-						modifier = {
-							factor = 0.75
-							event_target:scoped_improvement_ruler = {
-								trait = genius
-							}
-						}
-						character_event = { id = HF.23762 days = 15 random = 15 }
-					}
-					80 = { #Nothing.
-					}
+
+				80 = {
+					# Nothing
 				}
 			}
 		}
