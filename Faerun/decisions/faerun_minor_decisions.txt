@@ -61,13 +61,37 @@ decisions = {
 			}
 		}
 		allow = {
-			wealth = 50
-			piety = 50
+			OR = {
+				AND = {
+					wealth = 50
+					piety = 50
+				}
+				AND = {
+					OR = {
+						has_character_modifier = rel_diversity_mod
+						has_character_modifier = total_diversity_mod
+					}
+					wealth = 25
+					piety = 25
+				}
+			}
 			NOT = { has_character_modifier = took_wounds }
 		}
 		effect = {
-			wealth = -50
-			piety = -50
+			if = {
+				limit = {
+					OR = {
+						has_character_modifier = rel_diversity_mod
+						has_character_modifier = total_diversity_mod
+					}
+				}
+				wealth = -25
+				piety = -25
+			}
+			else = {
+				wealth = -50
+				piety = -50
+			}
 			if = {
 				limit = {
 					trait = mangled
@@ -84,6 +108,65 @@ decisions = {
 				break = yes
 			}
 			remove_trait = wounded
+		}
+	}
+
+	regenerate_decision = {
+		only_playable = yes # performance reasons
+		ai_check_interval = 36
+		potential = {
+			OR = {
+				has_character_modifier = rel_diversity_mod
+				has_character_modifier = total_diversity_mod
+			}
+			is_maimed_trigger = yes
+			NOT = { trait = mangled }
+			prisoner = no
+			not_casting = yes
+			reforming_gov = yes
+			NOR = {
+				religion = faithless
+				religion = blue_flame
+			}
+		}
+		allow = {
+			wealth = 100
+			piety = 50
+			NOT = { has_character_modifier = took_wounds }
+		}
+		effect = {
+			wealth = -100
+			piety = -50
+			custom_tooltip = {
+				text = ALLREGENERATED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+					remove_trait = disfigured
+					remove_trait = one_legged
+					remove_trait = one_handed
+					remove_trait = eunuch
+					if = {
+						limit = {
+							AND = {
+								trait = creature_beholder
+								OR = {
+									z_wizard = yes
+									z_bard = yes
+									z_warlock = yes
+								}
+							}
+						}
+						remove_trait = blinded
+						add_trait = one_eyed
+					}
+					else = {
+						remove_trait = one_eyed
+						remove_trait = blinded
+					}
+				}
+			}
 		}
 	}
 
@@ -105,12 +188,36 @@ decisions = {
 			}
 		}
 		allow = {
-			wealth = 100
-			piety = 50
+			OR = {
+				AND = {
+					wealth = 100
+					piety = 50
+				}
+				AND = {
+					OR = {
+						has_character_modifier = rel_diversity_mod
+						has_character_modifier = total_diversity_mod
+					}
+					wealth = 50
+					piety = 25
+				}
+			}
 		}
 		effect = {
-			wealth = -100
-			piety = -50
+			if = {
+				limit = {
+					OR = {
+						has_character_modifier = rel_diversity_mod
+						has_character_modifier = total_diversity_mod
+					}
+				}
+				wealth = -50
+				piety = -25
+			}
+			else = {
+				wealth = -100
+				piety = -50
+			}
 			custom_tooltip = {
 				text = ONEDISEASECURED
 				hidden_tooltip = {
