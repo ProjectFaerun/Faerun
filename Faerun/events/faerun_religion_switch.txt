@@ -3190,7 +3190,6 @@ character_event = {
 		}
 	}
 }
-
 # Public or secret
 character_event = {
 	id = rlg_chg.2
@@ -3247,7 +3246,6 @@ character_event = {
 		}
 	}
 }
-
 # 2nd Player Options Religion List
 character_event = {
 	id = rlg_chg.3
@@ -3604,7 +3602,6 @@ character_event = {
 			character_event = { id = rlg_chg.2 } #choice of going public
 		}
 }
-
 # 3rd Player Options Religion List
 character_event = {
 	id = rlg_chg.4
@@ -3949,4 +3946,348 @@ character_event = {
 			}
 			character_event = { id = rlg_chg.2 } #choice of going public
 		}
+}
+
+#Diversity Modifiers
+character_event = {
+	id = rlg_chg.10
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	only_playable = yes
+	#only_independent = yes #Unsure
+
+	trigger = {
+		NOR = {
+			holy_order = yes
+			culture = monster
+			religion = monster_pantheon
+		}
+		higher_real_tier_than = COUNT
+	}
+
+	immediate = {
+		export_to_variable = {
+			which = local_number_of_prov
+			value = num_of_count_titles_in_realm
+		}
+		divide_variable = {
+		    which = local_number_of_prov
+		    value = 1.65
+		}
+		if = { #culture diversity activate
+			limit = {
+				AND = {
+					num_culture_realm_provs = {
+					    culture = ROOT
+					    value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { culture = ROOT }
+					}
+					any_realm_province = { culture = ROOT }
+				}
+				NAND = {
+					num_religion_realm_provs = {
+							religion = ROOT
+							value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { religion = ROOT }
+					}
+					any_realm_province = { religion = ROOT }
+				}
+				NOR = {
+					has_character_modifier = cult_diversity_mod
+					has_character_modifier = total_diversity_mod
+					has_character_modifier = undead_realm_lord
+				}
+			}
+			character_event = { id = rlg_chg.11 }
+		}
+		else_if = { #religion diversity activate
+			limit = {
+				NAND = {
+					num_culture_realm_provs = {
+					    culture = ROOT
+					    value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { culture = ROOT }
+					}
+					any_realm_province = { culture = ROOT }
+				}
+				AND = {
+					num_religion_realm_provs = {
+							religion = ROOT
+							value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { religion = ROOT }
+					}
+					any_realm_province = { religion = ROOT }
+				}
+				NOR = {
+					has_character_modifier = rel_diversity_mod
+					has_character_modifier = total_diversity_mod
+					has_law = revoke_title_law_2
+				}
+			}
+			character_event = { id = rlg_chg.12 }
+		}
+		else_if = { #combined diversity activate
+			limit = {
+				num_culture_realm_provs = {
+				    culture = ROOT
+				    value <= local_number_of_prov
+				}
+				any_vassal = {
+					is_powerful_vassal = yes
+					NOT = { culture = ROOT }
+				}
+				any_realm_province = { culture = ROOT }
+				num_religion_realm_provs = {
+						religion = ROOT
+						value <= local_number_of_prov
+				}
+				any_vassal = {
+					is_powerful_vassal = yes
+					NOT = { religion = ROOT }
+				}
+				any_realm_province = { religion = ROOT }
+				NOR = {
+					has_character_modifier = total_diversity_mod
+					has_law = revoke_title_law_2
+					has_character_modifier = undead_realm_lord
+				}
+			}
+			character_event = { id = rlg_chg.13 }
+		}
+		if = { #strip culture diversity
+			limit = {
+				has_character_modifier = cult_diversity_mod
+				OR = {
+					has_character_modifier = undead_realm_lord
+					NAND = {
+						num_culture_realm_provs = {
+						    culture = ROOT
+						    value <= local_number_of_prov
+						}
+						any_vassal = {
+							is_powerful_vassal = yes
+							NOT = { culture = ROOT }
+						}
+						any_realm_province = { culture = ROOT }
+					}
+				}
+			}
+			character_event = { id = rlg_chg.14 }
+		}
+		else_if = { #strip religion diversity
+			limit = {
+				has_character_modifier = rel_diversity_mod
+				OR = {
+					has_law = revoke_title_law_2
+					NAND = {
+						num_religion_realm_provs = {
+								religion = ROOT
+								value <= local_number_of_prov
+						}
+						any_vassal = {
+							is_powerful_vassal = yes
+							NOT = { religion = ROOT }
+						}
+						any_realm_province = { religion = ROOT }
+					}
+				}
+			}
+			character_event = { id = rlg_chg.15 }
+		}
+		else_if = { #strip combined diversity
+			limit = {
+				has_character_modifier = total_diversity_mod
+				OR = {
+					has_law = revoke_title_law_2
+					has_character_modifier = undead_realm_lord
+					NAND = {
+						num_culture_realm_provs = {
+								culture = ROOT
+								value <= local_number_of_prov
+						}
+						any_vassal = {
+							is_powerful_vassal = yes
+							NOT = { culture = ROOT }
+						}
+						any_realm_province = { culture = ROOT }
+						num_religion_realm_provs = {
+								religion = ROOT
+								value <= local_number_of_prov
+						}
+						any_vassal = {
+							is_powerful_vassal = yes
+							NOT = { religion = ROOT }
+						}
+						any_realm_province = { religion = ROOT }
+					}
+				}
+			}
+			character_event = { id = rlg_chg.16 }
+		}
+	}
+}
+character_event = { #culture diversity activate
+	id = rlg_chg.11
+	desc = RLG_CHG_11_DESC
+	picture = GFX_evt_festival_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_11_DESC_1
+		add_character_modifier = {
+			name = cult_diversity_mod
+			duration = -1
+		}
+	}
+}
+character_event = { #religion diversity activate
+	id = rlg_chg.12
+	desc = RLG_CHG_12_DESC
+	picture = GFX_evt_festival_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_12_DESC_1
+		add_character_modifier = {
+			name = rel_diversity_mod
+			duration = -1
+		}
+	}
+}
+character_event = { #combined diversity activate
+	id = rlg_chg.13
+	desc = RLG_CHG_13_DESC
+	picture = GFX_evt_festival_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_13_DESC_1
+		remove_character_modifier = cult_diversity_mod
+		remove_character_modifier = rel_diversity_mod
+		add_character_modifier = {
+			name = total_diversity_mod
+			duration = -1
+		}
+	}
+}
+character_event = { #strip culture diversity
+	id = rlg_chg.14
+	desc = RLG_CHG_14_DESC
+	picture = GFX_evt_riders_night_hf
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_14_DESC_1
+		remove_character_modifier = cult_diversity_mod
+	}
+}
+character_event = { #strip religion diversity
+	id = rlg_chg.15
+	desc = RLG_CHG_15_DESC
+	picture = GFX_evt_riders_night_hf
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_15_DESC_1
+		remove_character_modifier = rel_diversity_mod
+	}
+}
+character_event = { #strip combined diversity
+	id = rlg_chg.16
+	desc = RLG_CHG_16_DESC
+	picture = GFX_evt_riders_night_hf
+
+	is_triggered_only = yes
+
+	option = {
+		name = RLG_CHG_16_DESC_1
+		remove_character_modifier = total_diversity_mod
+		if = { #culture diversity activate
+			limit = {
+				AND = {
+					num_culture_realm_provs = {
+					    culture = ROOT
+					    value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { culture = ROOT }
+					}
+					any_realm_province = { culture = ROOT }
+				}
+				NAND = {
+					num_religion_realm_provs = {
+							religion = ROOT
+							value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { religion = ROOT }
+					}
+					any_realm_province = { religion = ROOT }
+				}
+				NOR = {
+					has_character_modifier = cult_diversity_mod
+					has_character_modifier = total_diversity_mod
+				}
+			}
+			add_character_modifier = {
+				name = cult_diversity_mod
+				duration = -1
+			}
+		}
+		else_if = { #religion diversity activate
+			limit = {
+				NAND = {
+					num_culture_realm_provs = {
+					    culture = ROOT
+					    value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { culture = ROOT }
+					}
+					any_realm_province = { culture = ROOT }
+				}
+				AND = {
+					num_religion_realm_provs = {
+							religion = ROOT
+							value <= local_number_of_prov
+					}
+					any_vassal = {
+						is_powerful_vassal = yes
+						NOT = { religion = ROOT }
+					}
+					any_realm_province = { religion = ROOT }
+				}
+				NOR = {
+					has_character_modifier = rel_diversity_mod
+					has_character_modifier = total_diversity_mod
+				}
+			}
+			add_character_modifier = {
+				name = rel_diversity_mod
+				duration = -1
+			}
+		}
+	}
 }

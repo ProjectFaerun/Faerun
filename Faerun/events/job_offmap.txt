@@ -2030,7 +2030,7 @@ character_event = { # Hunt Apostates meta event
 					has_character_modifier = under_suspicion
 				}
 
-				# Someone with a secret religion
+				# Someone with a secret religion and in a society
 				any_realm_character = {
 					prisoner = no
 					NOT = { character = ROOT } # Don't catch yourself
@@ -2054,6 +2054,7 @@ character_event = { # Hunt Apostates meta event
 					religion = PREV
 					age = 16
 					has_secret_religion_trait_trigger = yes
+					is_in_society = yes #to catch only organized cults
 				}
 
 				# A devil worshiper, and I'm amazingly good at my job # also criminal society members and Harpers
@@ -2088,55 +2089,93 @@ character_event = { # Hunt Apostates meta event
 						OR = {
 							learning = 16
 							intrigue = 16
-                            z_wizard = yes
-                            z_cleric = yes
-                            z_paladin = yes
-                            z_rogue = yes
-                            z_shadow = yes
-                            z_legendary_class = yes
-							AND = {
-								learning = 12
-								society_member_of = harpers
-								}
+							z_wizard = yes
+							z_cleric = yes
+							z_paladin = yes
+							z_rogue = yes
+							z_shadow = yes
+							z_legendary_class = yes
 							AND = {
 								intrigue = 12
 								society_member_of = harpers
-								}
-                            AND = {
-								learning = 12
-								society_member_of = lord_alliance
-								}
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = kuo_tan_society
+							}
 							AND = {
 								intrigue = 12
 								society_member_of = lord_alliance
-								}
-							AND = {
-								learning = 12
-								society_member_of = shadow_thieves
-								}
+							}
 							AND = {
 								intrigue = 12
 								society_member_of = shadow_thieves
-								}
-                            AND = {
-								learning = 12
-								society_member_of = black_network
-								}
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = night_masks
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = shadow_telflamm
+							}
 							AND = {
 								intrigue = 12
 								society_member_of = black_network
-								}
-                            AND = {
-								learning = 12
-								society_member_of = arcane_brotherhood
-								}
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = tsui_tong
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = storm_rune_society
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = warlock_knights
+							}
+
 							AND = {
 								intrigue = 12
 								society_member_of = arcane_brotherhood
-								}
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = brotherhood_of_true_flame
+							}
+							AND = {
+								intrigue = 12
+								society_member_of = twisted_rune
 							}
 						}
 					}
+				}
+
+				# Someone with a secret religion
+				any_realm_character = {
+					prisoner = no
+					NOT = { character = ROOT } # Don't catch yourself
+					NOT = { character = PREV } # Don't catch your liege
+					NOT = { has_roots_secret_religion_truly_trigger = yes } # If you share the same secret religion, dont catch them
+					NOT = { has_prevs_secret_religion_truly_trigger = yes } # If they share secret religion with the liege, dont catch them
+					NOT = {
+						reverse_has_opinion_modifier = {
+							modifier = opinion_accused_apostate
+							who = PREV
+						}
+					}
+					NOT = {
+						higher_tier_than = BARON
+					}
+					age = 16
+					has_secret_religion_trait_trigger = yes
+					is_in_society = no
+					NOR = {
+						has_character_modifier = highly_suspect
+						has_character_modifier = under_suspicion
+					}
+				}
 
 				# Someone random, and I'm incompetent
 				any_realm_character = {
@@ -2216,7 +2255,7 @@ character_event = { # Hunt Apostates meta event
 				set_character_flag = apostate_extremely_suspect
 			}
 
-			# Moderatley suspect people
+			# Moderateley suspect people
 			random_realm_character = {
 				limit = {
 					prisoner = no
@@ -2246,7 +2285,7 @@ character_event = { # Hunt Apostates meta event
 				set_character_flag = apostate_moderate_suspect
 			}
 
-			# Characters with a secret religion
+			# Characters with a secret religion and in a society
 			random_realm_character = {
 				limit = {
 					prisoner = no
@@ -2271,6 +2310,7 @@ character_event = { # Hunt Apostates meta event
 					religion = event_target:my_liege
 					age = 16
 					has_secret_religion_trait_trigger = yes
+					is_in_society = yes #to catch only organized cults
 				}
 				save_event_target_as = suspected_apostate
 				set_character_flag = apostate_secret_religion
@@ -2368,6 +2408,39 @@ character_event = { # Hunt Apostates meta event
 				}
 				save_event_target_as = no_suspicion
 				set_character_flag = apostate_no_suspicion
+			}
+
+			# Characters with a secret religion
+			random_realm_character = {
+				limit = {
+					ROOT = {
+						trait = zealous
+					}
+					prisoner = no
+					NOT = { character = ROOT } # Don't catch yourself
+					NOT = { character = event_target:my_liege } # Don't catch your liege
+					NOT = { has_roots_secret_religion_truly_trigger = yes } # If you share the same secret religion, dont catch them
+					NOT = { has_prevs_secret_religion_truly_trigger = yes } # If they share secret religion with the liege, dont catch them
+					NOT = {
+						reverse_has_opinion_modifier = {
+							modifier = opinion_accused_apostate
+							who = event_target:my_liege
+						}
+					}
+					NOT = {
+						higher_tier_than = BARON
+					}
+					age = 16
+					has_secret_religion_trait_trigger = yes
+					is_in_society = no
+					NOR = {
+						is_devil_worshiper_trigger = yes
+						has_character_modifier = highly_suspect
+						has_character_modifier = under_suspicion
+					}
+				}
+				save_event_target_as = suspected_apostate
+				set_character_flag = apostate_secret_religion
 			}
 
 			# Innocent person!
@@ -2863,15 +2936,7 @@ character_event = { # Hunt Apostates meta event
                 event_target:highly_suspected_society_member = { society_member_of = harpers }
                 event_target:my_liege = {
                             OR = {
-	                            religion_group = good_human_pantheon_group
-	                            religion_group = qismaite_group
-	                            religion_group = karaturan_group
-	                            religion_group = elven_pantheon_group
-	                            religion_group = humanoid_group
-	                            religion = dwarven_pantheon
-	                            religion = gnome_pantheon
-	                            religion = adama
-															religion = bahamut
+	                            olrox_is_good_religion_trigger = yes
                             AND = {
 	                            religion = draconic_pantheon
                                 OR = {
@@ -2898,15 +2963,7 @@ character_event = { # Hunt Apostates meta event
                 event_target:suspected_society_member = { society_member_of = harpers }
                 event_target:my_liege = {
                             OR = {
-	                            religion_group = good_human_pantheon_group
-	                            religion_group = qismaite_group
-	                            religion_group = karaturan_group
-	                            religion_group = elven_pantheon_group
-	                            religion_group = humanoid_group
-	                            religion = dwarven_pantheon
-	                            religion = gnome_pantheon
-	                            religion = adama
-															religion = bahamut
+	                            olrox_is_good_religion_trigger = yes
                             AND = {
 	                            religion = draconic_pantheon
                                 OR = {
@@ -3127,11 +3184,18 @@ character_event = { # Hunt Apostates meta event
 						factor = 1.25
 						OR = {
 							society_member_of = harpers
+							society_member_of = kuo_tan_society
 							society_member_of = shadow_thieves
-                            society_member_of = black_network
-                            society_member_of = lord_alliance
-                            society_member_of = arcane_brotherhood
-							}
+							society_member_of = night_masks
+							society_member_of = shadow_telflamm
+							society_member_of = black_network
+							society_member_of = tsui_tong
+							society_member_of = storm_rune_society
+							society_member_of = warlock_knights
+							society_member_of = lord_alliance
+							society_member_of = arcane_brotherhood
+							society_member_of = brotherhood_of_true_flame
+						}
 					}
 					modifier = {
 						factor = 1.3
@@ -3155,15 +3219,7 @@ character_event = { # Hunt Apostates meta event
                 event_target:no_suspicion = { society_member_of = harpers }
                 event_target:my_liege = {
                             OR = {
-	                            religion_group = good_human_pantheon_group
-	                            religion_group = qismaite_group
-	                            religion_group = karaturan_group
-	                            religion_group = elven_pantheon_group
-	                            religion_group = humanoid_group
-	                            religion = dwarven_pantheon
-	                            religion = gnome_pantheon
-	                            religion = adama
-															religion = bahamut
+	                            olrox_is_good_religion_trigger = yes
                             AND = {
 	                            religion = draconic_pantheon
                                 OR = {
@@ -3275,11 +3331,18 @@ character_event = { # Hunt Apostates meta event
 						factor = 1.25
 						OR = {
 							society_member_of = harpers
+							society_member_of = kuo_tan_society
 							society_member_of = shadow_thieves
-                            society_member_of = black_network
-                            society_member_of = lord_alliance
-                            society_member_of = arcane_brotherhood
-							}
+							society_member_of = night_masks
+							society_member_of = shadow_telflamm
+							society_member_of = black_network
+							society_member_of = tsui_tong
+							society_member_of = storm_rune_society
+							society_member_of = warlock_knights
+							society_member_of = lord_alliance
+							society_member_of = arcane_brotherhood
+							society_member_of = brotherhood_of_true_flame
+						}
                     }
 					modifier = {
 						factor = 1.3
@@ -3523,11 +3586,18 @@ character_event = { # Hunt Apostates meta event
 						factor = 1.25
 						OR = {
 							society_member_of = harpers
+							society_member_of = kuo_tan_society
 							society_member_of = shadow_thieves
-                            society_member_of = black_network
-                            society_member_of = lord_alliance
-                            society_member_of = arcane_brotherhood
-							}
+							society_member_of = night_masks
+							society_member_of = shadow_telflamm
+							society_member_of = black_network
+							society_member_of = tsui_tong
+							society_member_of = storm_rune_society
+							society_member_of = warlock_knights
+							society_member_of = lord_alliance
+							society_member_of = arcane_brotherhood
+							society_member_of = brotherhood_of_true_flame
+						}
 					}
 					modifier = {
 						factor = 1.3
@@ -3751,11 +3821,18 @@ character_event = { # Hunt Apostates meta event
 						factor = 1.25
 						OR = {
 							society_member_of = harpers
+							society_member_of = kuo_tan_society
 							society_member_of = shadow_thieves
-                            society_member_of = black_network
-                            society_member_of = lord_alliance
-                            society_member_of = arcane_brotherhood
-							}
+							society_member_of = night_masks
+							society_member_of = shadow_telflamm
+							society_member_of = black_network
+							society_member_of = tsui_tong
+							society_member_of = storm_rune_society
+							society_member_of = warlock_knights
+							society_member_of = lord_alliance
+							society_member_of = arcane_brotherhood
+							society_member_of = brotherhood_of_true_flame
+						}
                     }
 					modifier = {
 						factor = 1.3
@@ -4190,13 +4267,27 @@ character_event = { # Outcome event
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:suspected_apostate }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = yes
+			}
 		}
 		text = MNM.70110.d.suspected_apostate
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:no_suspicion }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = no
+			}
+		}
+		text = MNM.70110.d.suspected_apostate2
+	}
+	desc = {
+		trigger = {
+			event_target:accused_apostate = {
+				character = event_target:no_suspicion
+			}
 		}
 		text = MNM.70110.d.no_suspicion
 	}
@@ -4370,13 +4461,27 @@ character_event = { # What does the liege wish to do with the apostate?
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:suspected_apostate }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = yes
+			}
 		}
 		text = MNM.70200.d.suspected_apostate
 	}
 	desc = {
 		trigger = {
-			event_target:accused_apostate = { character = event_target:no_suspicion }
+			event_target:accused_apostate = {
+				character = event_target:suspected_apostate
+				is_in_society = no
+			}
+		}
+		text = MNM.70200.d.suspected_apostate2
+	}
+	desc = {
+		trigger = {
+			event_target:accused_apostate = {
+				character = event_target:no_suspicion
+			}
 		}
 		text = MNM.70200.d.no_suspicion
 	}
@@ -4385,6 +4490,10 @@ character_event = { # What does the liege wish to do with the apostate?
 
 	option = { # Execute them!
 		name = MNM.70200.a
+
+		trigger = {
+			olrox_is_good_religion_trigger = no
+		}
 
 		ai_chance = {
 			factor = 40
@@ -4409,32 +4518,29 @@ character_event = { # What does the liege wish to do with the apostate?
 				factor = 2
 				trait = arbitrary
 			}
-            modifier = {
+			modifier = {
 				factor = 30
-                OR = {
-				religion_group = evil_human_pantheon_group
-                religion_group = giant_pantheon_group
-                religion_group = aberration_group
-                religion = uthgardt_faith
-                religion = calishite_faith
-                religion = lolth_cult
-                religion = laduguer
-                religion = entropy
-                }
+				is_evil_religion = yes
 			}
-			# modifier = {
-				# factor = 100
-				# trait = zealous
-			# }
+			modifier = {
+				factor = 0
+				event_target:accused_apostate = { dynasty = ROOT }
+			}
+			modifier = {
+				factor = 0
+				NOT = { trait = zealous }
+				event_target:accused_apostate = {
+					character = event_target:suspected_apostate
+					is_in_society = no
+				}
+			}
 		}
-
-		# piety = 10
 
 		tooltip = {
 			event_target:accused_apostate = {
 				show_scope_change = no
 				death = {
-					death_reason = death_execution_burning
+					death_reason = death_execution
 					killer = ROOT
 				}
 			}
@@ -4522,6 +4628,10 @@ character_event = { # What does the liege wish to do with the apostate?
 				trait = kind
 			}
 			modifier = {
+				factor = 2
+				trait = just
+			}
+			modifier = {
 				factor = 3
 				event_target:accused_apostate = {
 					ai = no
@@ -4533,19 +4643,13 @@ character_event = { # What does the liege wish to do with the apostate?
 					dynasty = ROOT
 				}
 			}
-            modifier = {
-				factor = 50
-                OR = {
-				religion_group = good_human_pantheon_group
-                religion_group = qismaite_group
-                religion_group = karaturan_group
-                religion_group = elven_pantheon_group
-                religion = dwarven_pantheon
-                religion = gnome_pantheon
-                religion = faithless
-                religion = adama
-                religion_group = humanoid_group
-                }
+			modifier = {
+				factor = 0
+				NOT = { trait = zealous }
+				event_target:accused_apostate = {
+					character = event_target:suspected_apostate
+					is_in_society = no
+				}
 			}
 		}
 
@@ -4604,27 +4708,6 @@ character_event = { # What does the liege wish to do with the apostate?
 
 		ai_chance = {
 			factor = 100
-
-			# modifier = {
-				# factor = 0
-				# NOT = {
-					# trait = trusting
-				# }
-			# }
-            modifier = {
-				factor = 50
-                OR = {
-				religion_group = good_human_pantheon_group
-                religion_group = qismaite_group
-                religion_group = karaturan_group
-                religion_group = elven_pantheon_group
-                religion = dwarven_pantheon
-                religion = gnome_pantheon
-                religion = faithless
-                religion = adama
-                religion_group = humanoid_group
-                }
-			}
 		}
 
 		hidden_tooltip = {
@@ -4679,29 +4762,11 @@ character_event = { # What does the liege wish to do with the apostate?
 		ai_chance = {
 			factor = 10
 
-			# modifier = {
-				# factor = 0
-				# NOT = {
-					# trait = trusting
-				# }
-			# }
-            modifier = {
+			modifier = {
 				factor = 60
-                OR = {
-				religion_group = good_human_pantheon_group
-                religion_group = qismaite_group
-                religion_group = karaturan_group
-                religion_group = elven_pantheon_group
-                religion = dwarven_pantheon
-                religion = gnome_pantheon
-                religion = faithless
-                religion = adama
-                religion_group = humanoid_group
-                }
+				trait = kind
 			}
 		}
-
-		# piety = -10
 
 		hidden_tooltip = {
 			event_target:accused_apostate = {
@@ -4724,7 +4789,7 @@ character_event = { # What does the liege wish to do with the apostate?
 character_event = { # The Apostate reacts to Execution
 	id = MNM.70300
 	desc = MNM.70300.d
-	picture = GFX_evt_witch_burning
+	picture = GFX_evt_beheading
 	border = GFX_event_normal_frame_religion
 
 	is_triggered_only = yes
@@ -4735,7 +4800,7 @@ character_event = { # The Apostate reacts to Execution
 			is_devil_worshiper_trigger = yes
 		}
 		death = {
-			death_reason = death_execution_burning
+			death_reason = death_execution
 			killer = FROM
 		}
 		hidden_tooltip = { # Inform players that fellow society member has been executed
@@ -4761,7 +4826,7 @@ character_event = { # The Apostate reacts to Execution
 			is_devil_worshiper_trigger = no
 		}
 		death = {
-			death_reason = death_execution_burning
+			death_reason = death_execution
 			killer = FROM
 		}
 		hidden_tooltip = { # Inform players that fellow society member has been executed
@@ -4959,7 +5024,7 @@ character_event = { # Player society members are informed that a fellow member h
 			}
 		}
 		text = MNM.70400.d.executed
-		picture = GFX_evt_witch_burning
+		picture = GFX_evt_beheading
 	}
 	desc = {
 		trigger = {
