@@ -1,0 +1,697 @@
+############################################################
+##################### Duel System V.02 #####################
+############################################################
+
+# Separated into new file, because there was just too much...
+# Mostly chronologically used! As in, the higher up in the file,
+# the earlier in the progress of a duel chain of some kind is where it's used.
+
+# apply_degree_of_dishonorable_duel_effect
+# apply_any_applicable_harsh_penalties_effect
+
+# reset_duel_timers_effect
+
+# set_dueling_weapon_effect
+
+# evaluate_duel_result_score_effect
+# evaluate_extra_duel_result_score_effect
+# set_potential_injury_flag_effect
+# send_duel_result_event_effect
+
+# set_winner_flags_and_save_opponent_effect
+# set_loser_flags_and_save_opponent_effect
+
+# apply_selected_duel_injury_effect
+# apply_duel_wounded_effect
+# apply_random_minor_injury_effect
+
+# apply_generic_duel_victory_effect
+# apply_generic_duel_defeat_effect
+
+# handle_claim_duel_result_effect
+# remove_all_claims_for_combatant_1_effect
+# remove_all_claims_for_combatant_2_effect
+# apply_merciful_modifier_effect
+
+# handle_warrior_lodge_induction_effect
+
+# handle_poison_effect
+
+# clean_up_after_duel_effect
+# clr_duel_missions_effect
+# rank_up_to_hero_level_effect
+# send_notifications_after_champion_stand_in_effect
+# clr_duel_flags_effect
+
+# spread_cowardice_trait_effect
+# increase_cowardly_status_effect
+# increase_troublemaker_status_effect
+# increase_duel_exp_modifier_effect
+# increase_battle_experience_effect
+# add_one_battlefield_experience_modifier
+# small_chance_for_one_battlefield_experience_modifier
+# add_one_duel_experience_modifier
+# small_chance_for_one_duel_experience_modifier
+# big_chance_for_one_duel_experience_modifier
+
+# reset_warrior_lodge_joining_chain_effect
+
+# find_cannon_fodder_commander_effect
+# find_commander_to_the_rescue_effect
+# duel_enemy_commander_effect
+# apply_battlefield_duel_opinions_effect
+# add_battle_PTSD_effect
+# disallow_new_battle_events_effect
+# allow_new_battle_events_effect
+# clr_battle_nickname_flags_effect
+
+# apply_opinion_reward_effect
+
+# debug_battle_death_counter_effect
+# set_battle_duels_option_flag_effect
+
+# Needs to be run in the scope of the *opponent* (combatant_2) to check things correctly
+apply_degree_of_dishonorable_duel_effect = {
+	if = {
+		limit = { # As long as the person issuing the duel does not have a mission to duel this target...
+			NAND = {
+				is_quest_target_of = event_target:combatant_1
+
+				event_target:combatant_1 = {
+					OR = {
+						has_quest = quest_warrior_lodge_duel_honor
+						has_quest = quest_warrior_lodge_duel_deadly
+					}
+				}
+			}
+		}
+
+		# Major dishonor
+		if = {
+			limit = {
+				OR = {
+					AND = { #target is old (but not immortal)...
+						practical_age > 80
+						NOT = { olrox_all_immortals_trigger = yes }
+					}
+					AND = { # Target is a child, while attacker is adult...
+						is_adult = no
+						event_target:combatant_1 = { is_adult = yes }
+					}
+
+					AND = { # Target is less than ten years old (while attacker is not)...
+						age < 10
+						event_target:combatant_1 = { age >= 10 }
+					}
+
+					AND = { # Target has a *serious* disease and has NOT been treated *well* for it...
+						character_disease_trigger = yes
+						well_treated_for_disease_trigger = no
+					}
+
+					AND = { # Target has ANY disease, and has been *badly* treated for it...
+						is_ill = yes
+						poorly_treated_for_disease_trigger = yes # This should exclude lovers_pox (as it doesn't get treated)
+					}
+
+					has_injury_trigger = yes			# Target has an injury (wounded, or severly injured)...
+					has_severe_disability_trigger = yes	# Target has serious disability... (blind, mangled, etc)
+
+					# Target has any disease, and has not been treated/treated well for it,
+					# but is ALSO suffering from something from the medium category...
+					AND = {
+						OR = {
+							character_disease_trigger = yes
+
+							OR = { # lovers_pox excluded
+								trait = scurvy
+								trait = dancing_plague
+								trait = ill
+								trait = leper
+							}
+						}
+
+						well_treated_for_disease_trigger = no
+
+						OR = {
+							AND = {
+								practical_age >= 60 #target is old
+								NOT = { olrox_all_immortals_trigger = yes }
+							}
+							is_maimed_trigger = yes				# Has a maimed trait
+							has_medium_disability_trigger = yes # Limits the character to some extent
+						}
+					}
+				}
+			}
+
+			custom_tooltip = {
+				text = dishonorable_duel_major_tooltip
+
+				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
+					any_realm_character = {
+						limit = {
+							OR = {
+								trait = honest
+								trait = kind
+								trait = just
+							}
+
+							NOT = { character = event_target:combatant_1 }
+						}
+
+						opinion = {
+							name = opinion_dishonorable_duel_major
+							who = event_target:combatant_1
+							years = 3
+						}
+					}
+				}
+			}
+		}
+
+		# Medium dishonor
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						practical_age >= 60 #target is old
+						NOT = { olrox_all_immortals_trigger = yes }
+					}
+					has_medium_disability_trigger = yes # Limits the character to some extent
+					character_disease_trigger = yes		# Target has a *serious* disease (disregarding treatments)
+
+					# Target has any disease, and has not been treated/treated well for it, while ALSO suffering from something minor...
+					AND = {
+						OR = {
+							character_disease_trigger = yes
+
+							OR = { # lovers_pox excluded
+								trait = scurvy
+								trait = dancing_plague
+								trait = ill
+								trait = leper
+							}
+						}
+
+						well_treated_for_disease_trigger = no
+
+						OR = {
+							AND = {
+								practical_age >= 50 #target is old
+								NOT = { olrox_all_immortals_trigger = yes }
+							}
+							is_maimed_trigger = yes #has a maimed trait
+						}
+					}
+				}
+			}
+
+			custom_tooltip = {
+				text = dishonorable_duel_medium_tooltip
+
+				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
+					any_realm_character = {
+						limit = {
+							OR = {
+								trait = honest
+								trait = kind
+								trait = just
+							}
+
+							NOT = { character = event_target:combatant_1 }
+						}
+
+						opinion = {
+							name = opinion_dishonorable_duel
+							who = event_target:combatant_1
+							years = 3
+						}
+					}
+				}
+			}
+		}
+
+		# Minor dishonor
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						practical_age >= 50 #target is old
+						NOT = { olrox_all_immortals_trigger = yes }
+					}
+					is_maimed_trigger = yes # Has a maimed trait
+					has_bruises_trigger = yes
+				}
+			}
+
+			custom_tooltip = {
+				text = dishonorable_duel_minor_tooltip
+
+				event_target:combatant_1 = { # Hand out opinion malus with appropriate realm characters..
+					any_realm_character = {
+						limit = {
+							OR = {
+								trait = honest
+								trait = kind
+								trait = just
+							}
+
+							NOT = { character = event_target:combatant_1 }
+						}
+
+						opinion = {
+							name = opinion_dishonorable_duel_minor
+							who = event_target:combatant_1
+							years = 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+apply_any_applicable_harsh_penalties_effect = {
+	if = {
+		limit = {
+			NOT = {
+				has_game_rule = {
+					name = dueling
+					value = unrestricted
+				}
+			}
+		}
+
+		if = { # If BOTH a female target and a priest...!
+			limit = {
+				is_female = yes
+				is_priest = yes
+				is_member_of_roots_warrior_lodge_trigger = no
+				is_member_of_any_knight_order_trigger = no
+
+				# FROM and ROOT do NOT both have gender equality in some form
+				NAND = {
+					OR = {
+						trait = brave
+						gender_equality_trigger = yes
+						religion_group = humanoid_group
+						is_nomadic = yes
+					}
+
+					event_target:combatant_1 = { # Same as FROM in this case
+						OR = {
+							gender_equality_trigger = yes
+							religion_group = humanoid_group
+							is_nomadic = yes
+						}
+					}
+				}
+
+				event_target:combatant_1 = {
+					NOT = { religion_group = humanoid_group }
+				}
+			}
+
+			custom_tooltip = { text = dueling_inappropriate_target_tt }
+
+			# Instead of blocking the action completely...
+			event_target:combatant_1 = {
+				show_scope_change = no
+
+				give_nickname = nick_priest_hater
+
+				add_character_modifier = {
+					name = uncivilized_dueler
+					years = 10
+				}
+			}
+		}
+
+		else_if = { # If you're fighting a woman, and it'd be frowned upon within your religion/culture/laws because patriarchy
+			limit = {
+				is_female = yes
+				is_member_of_roots_warrior_lodge_trigger = no
+				is_member_of_any_knight_order_trigger = no
+
+				# FROM and ROOT do NOT both have gender equality of some form
+				NAND = {
+					OR = {
+						trait = brave
+						gender_equality_trigger = yes
+						religion_group = humanoid_group
+						is_nomadic = yes
+					}
+
+					event_target:combatant_1 = { # Same as FROM in this case
+						OR = {
+							gender_equality_trigger = yes
+							religion_group = humanoid_group
+							is_nomadic = yes
+						}
+					}
+				}
+			}
+
+			custom_tooltip = { text = dueling_inappropriate_target_tt }
+
+			# Instead of blocking the action completely...
+			event_target:combatant_1 = {
+				show_scope_change = no
+
+				add_character_modifier = {
+					name = uncivilized_dueler
+					years = 10
+				}
+			}
+		}
+
+		else_if = { # If they are a priest of some kind, while challenger is not pagan (as pagans don't care), fighting priests is frowned upon...
+			limit = {
+				is_priest = yes
+				is_member_of_any_warrior_lodge_trigger = no
+				is_member_of_any_knight_order_trigger = no
+
+				event_target:combatant_1 = {
+					NOT = { religion_group = pagan_group }
+				}
+			}
+
+			custom_tooltip = { text = dueling_inappropriate_target_tt }
+
+			event_target:combatant_1 = {
+				show_scope_change = no
+
+				add_character_modifier = {
+					name = uncivilized_dueler
+					years = 5
+				}
+
+				give_nickname = nick_priest_hater
+			}
+		}
+	}
+}
+
+# Makes sure duelers can't choose to fight each other more often than once a year (from the duel_decision)...
+# Also clears duel victory modifiers from before (if any present)
+# ROOT is combatant_1
+reset_duel_timers_effect = {
+	if = {
+		limit = { NOT = { has_character_modifier = recent_duel_timer } }
+
+		add_character_modifier = {
+			name = recent_duel_timer
+			months = 6
+			hidden = yes
+		}
+	}
+
+	if = {
+		limit = { has_character_modifier = recent_duel_victory }
+		remove_character_modifier = recent_duel_victory
+	}
+
+	event_target:combatant_2 = {
+		if = {
+			limit = { NOT = { has_character_modifier = recent_duel_timer } }
+
+			add_character_modifier = {
+				name = recent_duel_timer
+				months = 6
+				hidden = yes
+			}
+		}
+
+		if = {
+			limit = { has_character_modifier = recent_duel_victory }
+			remove_character_modifier = recent_duel_victory
+		}
+	}
+}
+
+set_dueling_weapon_effect = {
+	if = { # First check if this a serious duel with real weapons or not...
+		limit = { has_character_flag = mock_duel }
+
+		# So you don't fight a practice duel with the Staff of Moses
+	#	clear_event_target = dueling_weapon
+
+		# Clear all old weapons (if any)
+		clr_character_flag = weapon_is_sword
+		clr_character_flag = weapon_is_scimitar
+		clr_character_flag = weapon_is_axe
+		clr_character_flag = weapon_is_mace
+		clr_character_flag = weapon_is_spear
+		clr_character_flag = weapon_is_staff
+		clr_character_flag = weapon_is_hand
+
+		# Select a weapon...
+		random_list = {
+			10 = {
+				trigger = {
+					olrox_artifact_smallblades_requirement = yes
+					NOR = {
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				set_character_flag = weapon_is_sword
+			}
+			10 = {
+				trigger = {
+					OR = {
+						olrox_artifact_martial_requirement = yes
+						z_bard = yes
+						z_cleric = yes
+						z_druid = yes
+						z_monk = yes
+						z_warlock = yes
+						zz_class = no
+					}
+					NOR = {
+						z_rogue = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				set_character_flag = weapon_is_spear
+			}
+			10 = {
+				trigger = {
+					NOR = {
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				set_character_flag = weapon_is_staff
+			}
+			10 = {
+				trigger = { NOT = { trait = one_handed } } #probably shouldn't use both hands...
+				set_character_flag = weapon_is_hand
+			}
+		}
+	}
+	else_if = { # If not, check if you have an artifact you can use...
+		limit = {
+			any_artifact = {
+				is_dueling_weapon_artifact_and_equipped = yes
+			}
+		}
+
+		random_artifact = {
+			limit = { is_dueling_weapon_artifact_and_equipped = yes }
+
+			if = {
+				limit = {
+					event_target:combatant_1 = {
+						character = PREVPREV
+					}
+				}
+
+				save_event_target_as = dueling_weapon_1 # For loc purposes, kept separate
+			}
+			else = { # Means you're the defender/combatant_2
+				save_event_target_as = dueling_weapon_2 # For loc purposes, kept separate
+			}
+		}
+
+		# Clear all old weapons (if any)
+		clr_character_flag = weapon_is_sword
+		clr_character_flag = weapon_is_scimitar
+		clr_character_flag = weapon_is_axe
+		clr_character_flag = weapon_is_mace
+		clr_character_flag = weapon_is_spear
+		clr_character_flag = weapon_is_staff
+		clr_character_flag = weapon_is_hand
+	}
+
+	else_if = { # If no artifact, check that you haven't already used a real weapon before...
+		limit = {
+			NOR = {
+				has_character_flag = weapon_is_sword
+				has_character_flag = weapon_is_scimitar
+				has_character_flag = weapon_is_axe
+				has_character_flag = weapon_is_mace
+				has_character_flag = weapon_is_spear
+			}
+		}
+
+		# Clear mock weapons (if any)
+		clr_character_flag = weapon_is_staff
+		clr_character_flag = weapon_is_hand
+
+		# Select a weapon...
+		random_list = {
+			10 = {
+				trigger = {
+					olrox_artifact_smallblades_requirement = yes
+					NOR = {
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						z_bard = yes
+						z_shadow = yes
+					}
+				}
+				modifier = {
+					factor = 2
+					OR = {
+						culture_group = high_elf_group
+						culture = yuanti
+					}
+				}
+				set_character_flag = weapon_is_sword
+			}
+			10 = {
+				trigger = {
+					olrox_artifact_scimitar_requirement = yes
+					NOR = {
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				set_character_flag = weapon_is_scimitar
+			}
+			10 = {
+				trigger = {
+					OR = {
+						olrox_artifact_martial_requirement = yes
+						culture_group = dwarf_group
+					}
+					NOR = {
+						z_rogue = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				modifier = {
+					factor = 2
+					z_barbarian = yes
+				}
+				modifier = {
+					factor = 2
+					culture_group = dwarf_group
+				}
+				set_character_flag = weapon_is_axe
+			}
+			10 = {
+				trigger = {
+					OR = {
+						olrox_artifact_martial_requirement = yes
+						z_bard = yes
+						z_cleric = yes
+						z_druid = yes
+						z_warlock = yes
+						zz_class = no
+					}
+					NOR = {
+						z_rogue = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				modifier = {
+					factor = 3
+					z_cleric = yes
+				}
+				set_character_flag = weapon_is_mace
+			}
+			10 = {
+				trigger = {
+					OR = {
+						olrox_artifact_martial_requirement = yes
+						z_bard = yes
+						z_cleric = yes
+						z_druid = yes
+						z_monk = yes
+						z_warlock = yes
+						zz_class = no
+					}
+					NOR = {
+						z_rogue = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				modifier = {
+					factor = 2
+					culture_group = fish_group
+				}
+				set_character_flag = weapon_is_spear
+			}
+			20 = {
+				trigger = {
+					olrox_artifact_martial_requirement = no
+					OR = {
+						z_bard = yes
+						z_cleric = yes
+						z_druid = yes
+						z_monk = yes
+						z_sorcerer = yes
+						z_warlock = yes
+						z_wizard = yes
+					}
+					NOR = {
+						z_rogue = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+					}
+				}
+				set_character_flag = weapon_is_staff
+			}
+			20 = {
+				trigger = {
+					OR = {
+						z_monk = yes
+						trait = creature_dragon
+						trait = creature_beholder
+						trait = creature_naga
+						trait = creature_troll
+					}
+				}
+				set_character_flag = weapon_is_hand
+			}
+		}
+	}
+	else = {
+		# Do nothing, use the weapon-flag you already have! :)
+	}
+}
+
+#### DUELING OUTCOME EVALUATION ### DO NOT TOUCH
+# ROOT is challenger
+# FROM is target of duel
