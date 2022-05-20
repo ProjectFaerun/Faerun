@@ -99,424 +99,6 @@ end_inaccessibility_effect = {
 	}
 }
 
-#Impregnation and venereal disease handling between event_target:sex_partner and THIS. Used in THIS scope.
-unprotected_sex_effect_event_target = {
-	random = {
-		chance = 50
-		venereal_disease_effect_event_target = yes
-	}
-	random = {
-		chance = 10
-		modifier = {
-			factor = 2
-			is_fertile_trigger = yes
-		}
-		modifier = {
-			factor = 2
-			event_target:sex_partner = { is_fertile_trigger = yes }
-		}
-		modifier = {
-			factor = 0.5
-			is_infertile_trigger = yes
-		}
-		modifier = {
-			factor = 0.5
-			event_target:sex_partner = { is_infertile_trigger = yes }
-		}
-		impregnate_effect_event_target = yes
-	}
-}
-
-#Transfers venereal diseases between event_target:sex_partner and THIS.
-venereal_disease_effect_event_target = {
-	#Great pox and aztec disease for sex_partner
-	if = {
-		limit = {
-			NOR = {
-				event_target:sex_partner = { has_character_flag = developing_illness }
-				event_target:sex_partner = { has_character_flag = disease_not_serious }
-			}
-		}
-
-		if = {
-			limit = { trait = syphilitic }
-			event_target:sex_partner = { give_syphilitic_effect = yes }
-		}
-		if = {
-			limit = { trait = has_aztec_disease }
-			event_target:sex_partner = { give_has_aztec_disease_effect = yes }
-		}
-	}
-
-	#Great pox and aztec disease for THIS
-	if = {
-		limit = {
-			NOR = {
-				has_character_flag = developing_illness
-				has_character_flag = disease_not_serious
-			}
-		}
-
-		if = {
-			limit = { event_target:sex_partner = { trait = syphilitic } }
-			give_syphilitic_effect = yes
-		}
-		if = {
-			limit = { event_target:sex_partner = { trait = has_aztec_disease } }
-			give_has_aztec_disease_effect = yes
-		}
-	}
-
-	#Lover's pox
-	if = {
-		limit = {
-			OR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-			NOR = {
-				event_target:sex_partner = { trait = lovers_pox }
-				event_target:sex_partner = { has_character_modifier = minor_disease_herpes }
-			}
-		}
-		hidden_tooltip = { event_target:sex_partner = { character_event = { id = 6359 days = 15 random = 5 } } }
-	}
-	if = {
-		limit = {
-			OR = {
-				event_target:sex_partner = { trait = lovers_pox }
-				event_target:sex_partner = { has_character_modifier = minor_disease_herpes }
-			}
-			NOR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-		}
-		hidden_tooltip = { character_event = { id = 6359 days = 15 random = 5 } }
-	}
-}
-
-#Tries to impregnate either event_target:sex_partner or THIS if all conditions are met
-impregnate_effect_event_target = {
-	if = {
-		limit = { is_opposite_sex = event_target:sex_partner }
-
-		#If THIS is a female which can get pregnant
-		if = {
-			limit = {
-				is_female = yes
-				NOT = { age = 45 }
-				is_pregnant = no
-				health = 3
-				event_target:sex_partner = { NOT = { trait = eunuch } }
-			}
-
-			#THIS is not consort/spouse of anyone or is consort/spouse of event_target:sex_partner
-			if = {
-				limit = {
-					OR = {
-						AND = {
-							is_married = no
-							is_consort = no
-						}
-						AND = {
-							is_consort = yes
-							consort = { character = event_target:sex_partner }
-						}
-						AND = {
-							is_married = yes
-							spouse = { character = event_target:sex_partner }
-						}
-					}
-				}
-				event_target:sex_partner = { impregnate = PREV }
-			}
-
-			#THIS is consort/spouse of someone else than event_target:sex_partner
-			if = {
-				limit = {
-					OR = {
-					 	AND = {
-					 		is_married = yes
-					 		NOT = { spouse = { character = event_target:sex_partner } }
-					 	}
-					 	AND = {
-					 		is_consort = yes
-					 		NOT = { consort = { character = event_target:sex_partner } }
-					 	}
-					}
-				}
-				event_target:sex_partner = { impregnate_cuckoo = PREV }
-			}
-		}
-
-		#If event_target:sex_partner is a female which can get pregnant
-		if = {
-			limit = {
-				event_target:sex_partner = {
-					is_female = yes
-					NOT = { age = 45 }
-					is_pregnant = no
-					health = 3
-					PREV = { NOT = { trait = eunuch } }
-				}
-			}
-
-			#event_target:sex_partner is not consort/spouse of anyone or is consort/spouse of THIS
-			if = {
-				limit = {
-					event_target:sex_partner = {
-						OR = {
-							AND = {
-								is_married = no
-								is_consort = no
-							}
-							AND = {
-								is_consort = yes
-								consort = { character = PREVPREV }
-							}
-							AND = {
-								is_married = yes
-								spouse = { character = PREVPREV }
-							}
-						}
-					}
-				}
-				impregnate = event_target:sex_partner
-			}
-
-			#event_target:sex_partner is consort/spouse of someone else than THIS
-			if = {
-				limit = {
-					event_target:sex_partner = {
-						OR = {
-						 	AND = {
-						 		is_married = yes
-						 		NOT = { spouse = { character = PREVPREV } }
-						 	}
-						 	AND = {
-						 		is_consort = yes
-						 		NOT = { consort = { character = PREVPREV } }
-						 	}
-						}
-					}
-				}
-
-				impregnate_cuckoo = event_target:sex_partner
-			}
-		}
-	}
-}
-
-#Impregnation and venereal disease handling between FROM and ROOT. Used in ROOT scope.
-unprotected_sex_effect = {
-	random = {
-		chance = 50
-		venereal_disease_effect = yes
-	}
-	random = {
-		chance = 10
-		modifier = {
-			factor = 2
-			is_fertile_trigger = yes
-		}
-		modifier = {
-			factor = 2
-			FROM = { is_fertile_trigger = yes }
-		}
-		modifier = {
-			factor = 0.5
-			is_infertile_trigger = yes
-		}
-		modifier = {
-			factor = 0.5
-			FROM = { is_infertile_trigger = yes }
-		}
-		impregnate_effect = yes
-	}
-}
-
-#Transfers venereal diseases between FROM and ROOT
-venereal_disease_effect = {
-	#Great pox and aztec disease for FROM
-	if = {
-		limit = {
-			NOR = {
-				FROM = { has_character_flag = developing_illness }
-				FROM = { has_character_flag = disease_not_serious }
-			}
-		}
-
-		if = {
-			limit = { trait = syphilitic }
-			FROM = { give_syphilitic_effect = yes }
-		}
-		if = {
-			limit = { trait = has_aztec_disease }
-			FROM = { give_has_aztec_disease_effect = yes }
-		}
-	}
-
-	#Great pox and aztec disease for ROOT
-	if = {
-		limit = {
-			NOR = {
-				has_character_flag = developing_illness
-				has_character_flag = disease_not_serious
-			}
-		}
-
-		if = {
-			limit = { FROM = { trait = syphilitic } }
-			give_syphilitic_effect = yes
-		}
-		if = {
-			limit = { FROM = { trait = has_aztec_disease } }
-			give_has_aztec_disease_effect = yes
-		}
-	}
-
-	#Lover's pox
-	if = {
-		limit = {
-			OR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-			NOR = {
-				FROM = { trait = lovers_pox }
-				FROM = { has_character_modifier = minor_disease_herpes }
-			}
-		}
-		hidden_tooltip = { FROM = { character_event = { id = 6359 days = 15 random = 5 } } }
-	}
-	if = {
-		limit = {
-			OR = {
-				FROM = { trait = lovers_pox }
-				FROM = { has_character_modifier = minor_disease_herpes }
-			}
-			NOR = {
-				trait = lovers_pox
-				has_character_modifier = minor_disease_herpes
-			}
-		}
-		hidden_tooltip = { character_event = { id = 6359 days = 15 random = 5 } }
-	}
-}
-
-#Tries to impregnate either ROOT or FROM if all conditions are met
-impregnate_effect = {
-	if = {
-		limit = { is_opposite_sex = FROM }
-
-		#If ROOT is a female which can get pregnant
-		if = {
-			limit = {
-				is_female = yes
-				NOT = { age = 45 }
-				is_pregnant = no
-				health = 3
-				FROM = { NOT = { trait = eunuch } }
-			}
-
-			#ROOT is not consort/spouse of anyone or is consort/spouse of FROM
-			if = {
-				limit = {
-					OR = {
-						AND = {
-							is_married = no
-							is_consort = no
-						}
-						AND = {
-							is_consort = yes
-							consort = { character = FROM }
-						}
-						AND = {
-							is_married = yes
-							spouse = { character = FROM }
-						}
-					}
-				}
-				FROM = { impregnate = ROOT }
-			}
-
-			#ROOT is consort/spouse of someone else than FROM
-			if = {
-				limit = {
-					OR = {
-					 	AND = {
-					 		is_married = yes
-					 		NOT = { spouse = { character = FROM } }
-					 	}
-					 	AND = {
-					 		is_consort = yes
-					 		NOT = { consort = { character = FROM } }
-					 	}
-					}
-				}
-				FROM = { impregnate_cuckoo = ROOT }
-			}
-		}
-
-		#If FROM is a female which can get pregnant
-		if = {
-			limit = {
-				FROM = {
-					is_female = yes
-					NOT = { age = 45 }
-					is_pregnant = no
-					health = 3
-					ROOT = { NOT = { trait = eunuch } }
-				}
-			}
-
-			#FROM is not consort/spouse of anyone or is consort/spouse of ROOT
-			if = {
-				limit = {
-					FROM = {
-						OR = {
-							AND = {
-								is_married = no
-								is_consort = no
-							}
-							AND = {
-								is_consort = yes
-								consort = { character = ROOT }
-							}
-							AND = {
-								is_married = yes
-								spouse = { character = ROOT }
-							}
-						}
-					}
-				}
-				impregnate = FROM
-			}
-
-			#FROM is consort/spouse of someone else than ROOT
-			if = {
-				limit = {
-					FROM = {
-						OR = {
-						 	AND = {
-						 		is_married = yes
-						 		NOT = { spouse = { character = ROOT } }
-						 	}
-						 	AND = {
-						 		is_consort = yes
-						 		NOT = { consort = { character = ROOT } }
-						 	}
-						}
-					}
-				}
-
-				impregnate_cuckoo = FROM
-			}
-		}
-	}
-}
-
 will_not_marry_effect = {
 	add_character_modifier = {
 		name = will_not_marry
@@ -591,170 +173,60 @@ remove_secret_religion_trait_effect = {
 	clear_secret_religion = yes
 }
 
-add_society_currency_trivial_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 10
-	}
-}
-
-add_society_currency_tiny_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 50
-	}
-}
-
-add_society_currency_minor_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 100
-	}
-}
-
-add_society_currency_medium_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 200
-	}
-}
-
-add_society_currency_major_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 300
-	}
-}
-
-add_society_currency_large_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 500
-	}
-}
-
-add_society_currency_massive_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = 1000
-	}
-}
-
-detract_society_currency_trivial_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = -15
-	}
-}
-
-detract_society_currency_tiny_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = -50
-	}
-}
-
-detract_society_currency_minor_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = -150
-	}
-}
-
-detract_society_currency_medium_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = -300
-	}
-}
-
-detract_society_currency_major_effect = {
-	if = {
-		limit = { is_in_society = yes }
-		change_society_currency = -500
-	}
-}
-
-join_prev_warrior_lodge_society_effect = {
-	if = {
-		limit = { PREV = { society_member_of = warrior_lodge_uthgardt } }
-		join_society = warrior_lodge_uthgardt
-	}
-	else_if = {
-		limit = { PREV = { society_member_of = warrior_lodge_orcs } }
-		join_society = warrior_lodge_orcs
-	}
-	else_if = {
-		limit = { PREV = { society_member_of = warrior_lodge_goblins } }
-		join_society = warrior_lodge_goblins
-	}
-	else_if = {
-		limit = { PREV = { society_member_of = warrior_lodge_rashemen } }
-		join_society = warrior_lodge_rashemen
-	}
-	else_if = {
-		limit = { PREV = { society_member_of = warrior_lodge_elven } }
-		join_society = warrior_lodge_elven
-	}
-	else_if = {
-		limit = { PREV = { society_member_of = warrior_lodge_dwarven } }
-		join_society = warrior_lodge_dwarven
-	}
-}
-give_this_warrior_lodge_religion_effect = { #Mostly for spawned characters.
-	if = {
-		limit = {
-			society_member_of = warrior_lodge_uthgardt
-		}
-		religion = uthgardt_faith
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_orcs
-			NOT = { has_global_flag = orc_reformation }
-		}
-		religion = orc_pantheon
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_orcs
-			has_global_flag = orc_reformation
-		}
-		religion = orc_reformed
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_goblins
-			NOT = { has_global_flag = goblin_reformation }
-		}
-		religion = goblin_pantheon
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_goblins
-			has_global_flag = goblin_reformation
-		}
-		religion = goblin_reformed
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_rashemen
-		}
-		religion = rasallesian
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_elven
-		}
-		religion = elven_pantheon
-	}
-	else_if = {
-		limit = {
-			society_member_of = warrior_lodge_dwarven
-		}
-		religion = dwarven_pantheon
-	}
-}
+# give_this_warrior_lodge_religion_effect = { #Mostly for spawned characters.
+	# if = {
+		# limit = {
+			# society_member_of = warrior_lodge_uthgardt
+		# }
+		# religion = uthgardt_faith
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_orcs
+			# NOT = { has_global_flag = orc_reformation }
+		# }
+		# religion = orc_pantheon
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_orcs
+			# has_global_flag = orc_reformation
+		# }
+		# religion = orc_reformed
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_goblins
+			# NOT = { has_global_flag = goblin_reformation }
+		# }
+		# religion = goblin_pantheon
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_goblins
+			# has_global_flag = goblin_reformation
+		# }
+		# religion = goblin_reformed
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_rashemen
+		# }
+		# religion = rasallesian
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_elven
+		# }
+		# religion = elven_pantheon
+	# }
+	# else_if = {
+		# limit = {
+			# society_member_of = warrior_lodge_dwarven
+		# }
+		# religion = dwarven_pantheon
+	# }
+# }
 
 remove_education_effect = {
 	remove_trait = naive_appeaser
@@ -928,27 +400,6 @@ event_target_old_religion_from_flag_effect = {
 	# }
 }
 
-add_mission_succeed_influence_effect = {
-	add_society_modifier = 	{
-		modifier = successful_mission
-		years = 10
-	}
-}
-
-add_mission_fail_influence_effect = {
-	add_society_modifier = 	{
-		modifier = failed_mission
-		years = 10
-	}
-}
-
-add_mission_decline_influence_effect = {
-	add_society_modifier = 	{
-		modifier = declined_mission
-		years = 2
-	}
-}
-
 # removed Zodiac effects
 
 flip_secret_religious_community_provinces = {
@@ -965,1613 +416,6 @@ flip_secret_religious_community_provinces = {
 				# }
 			# }
 		# }
-	}
-}
-
-clean_up_after_leaving_society_effect = {
-	hidden_effect = {
-		clr_character_flag = do_not_disturb
-		remove_character_modifier = quest_cooldown_timer
-
-		#Powers, Missions and Interactions: the Assassins
-		#quest_the_assassins_assassination
-		#quest_the_assassins_collect_debt
-		#quest_the_assassins_convert_province
-		#quest_the_assassins_occupy_holding
-		#quest_the_assassins_protege
-		# clr_character_flag = ongoing_recruitment
-		# clr_character_flag = approves_of_shia
-		# clr_character_flag = disapproves_of_shia
-		# clr_character_flag = willing_to_join
-		# clr_character_flag = unwilling_to_join
-		# clr_character_flag = assassins_attempted_recruitment
-		# clr_character_flag = escape_successful
-		# clr_character_flag = escape_injured
-		# clr_character_flag = escape_death
-		# clr_character_flag = escape_bribe
-
-		#Powers, Missions and Interactions: Devil Worshipers
-		clr_character_flag = attempted_corrupt_priest
-		clr_character_flag = possessing_courtier
-		clr_character_flag = desecration_in_progress
-		clr_character_flag = desecration_violent
-		clr_character_flag = desecration_at_home
-		clr_character_flag = desecration_plotting
-		clr_character_flag = approves_of_satanism
-		clr_character_flag = disapproves_of_satanism
-		clr_character_flag = has_ill_lover_loc
-		clr_character_flag = has_ill_spouse_loc
-		clr_character_flag = has_ill_child_loc
-		clr_character_flag = has_money_troubles_loc
-		clr_character_flag = has_some_illness_loc
-		clr_character_flag = has_need_of_winning_battles_loc
-		clr_character_flag = has_a_rival_loc
-		clr_character_flag = is_weak_loc
-		clr_character_flag = is_dumb_loc
-		clr_character_flag = being_recruited_by_the_satanists
-
-		#Powers, Missions and Interactions: Secret Religious
-		clr_character_flag = sr_too_honest
-		clr_character_flag = sr_too_wroth
-		clr_character_flag = sr_too_slothful
-		clr_character_flag = sr_too_trusting
-		clr_character_flag = sr_too_indiscreet
-		clr_character_flag = free_help
-		clr_character_flag = help_for_cost
-		clr_character_flag = conduct_secret_ceremony_timer
-		remove_character_modifier = attempting_to_blend_in
-		clr_character_flag = blending_in_timer
-		clr_character_flag = attempting_to_convince_stubborn_courtier
-		clr_character_flag = attempting_to_convince_concerned_friend
-		clr_character_flag = blend_in_struggled_with_trait
-		clr_character_flag = blend_in_attended_house_of_worship
-		clr_character_flag = blend_in_general_progress
-		#quest_secret_religious_societies_induct_ruler
-		#quest_secret_religious_societies_sympathy_ruler
-
-		#Powers, Missions and Interactions: Monastic orders
-		clr_character_flag = monastic_orders_holy_seclusion
-		clr_character_flag = monastic_orders_mission_charity
-		clr_character_flag = monastic_orders_mission_theology
- 		clr_character_flag = monastic_orders_mission_christian_pilgrimage
-		clr_character_flag = monastic_orders_mission_dharmic_pilgrimage
-		clr_character_flag = monastic_orders_mission_temple
-		clr_character_flag = ascetic_arriving
-		clr_character_flag = monastic_artifact_lover
-		if = {
-			limit = { NOT = { has_character_flag = flag_monastic_mid_theft } }
-			clr_character_flag = monastic_artifact_seamless_robe_of_jesus
-			clr_character_flag = monastic_artifact_crown_of_thorns
-			clr_character_flag = monastic_artifact_fragment_of_true_cross
-			clr_character_flag = monastic_artifact_holy_foreskin
-			clr_character_flag = monastic_artifact_image_of_edessa
-			clr_character_flag = monastic_artifact_elaborate_danda
-			clr_character_flag = monastic_artifact_sariraka_actual_body_part
-			clr_character_flag = monastic_artifact_sarira
-		}
-		clr_character_flag = suggestion_A_flag
-		clr_character_flag = suggestion_B_flag
-		clr_character_flag = 3264_deceitful_flag
-		clr_character_flag = 3264_publish_flag
-		clr_character_flag = 3264_depressed_flag
-		clr_character_flag = 3264_deceitful_flag
-		clr_character_flag = 4202_visit_monastery_flag
-		clr_character_flag = 4202_hire_someone_flag
-		clr_character_flag = 4202_send_my_own_samples_flag
-		clr_character_flag = 4212_woke_them_up_flag
-		clr_character_flag = 4212_let_them_sleep_flag
-		clr_character_flag = 4212_pranked_them_flag
-		remove_character_modifier = in_meditation
-		remove_character_modifier = doing_penance
-		clr_character_flag = holy_seclusion_timer
-		clr_character_flag = holy_seclusion_struggled_with_vice
-		clr_character_flag = holy_seclusion_lustful
-		clr_character_flag = holy_seclusion_gluttonous
-		clr_character_flag = holy_seclusion_greedy
-		clr_character_flag = holy_seclusion_slothful
-		clr_character_flag = holy_seclusion_struggled_with_loneliness
-		clr_character_flag = holy_seclusion_scripture_reading
-		clr_character_flag = holy_seclusion_scripture_reading
-		clr_character_flag = holy_seclusion_interrupting_child
-		clr_character_flag = success_seculison_desc_A
-		clr_character_flag = success_seculison_desc_B
-		clr_character_flag = success_seculison_desc_C
-
-		#Powers, Missions and Interactions: Hermetics
-		clr_character_flag = power_hungry_scrying_flag
-		clr_character_flag = relationship_focused_scrying_flag
-		clr_character_flag = battle_focused_scrying_flag
-		remove_character_modifier = writing_magnum_opus
-		remove_character_modifier = acquire_ingredients_decision_cooldown_timer
-		clr_character_flag = building_laboratory
-		clr_character_flag = decided_on_glass
-		clr_character_flag = decided_on_crucibles
-		clr_character_flag = decided_on_tools
-		clr_character_flag = decided_on_books
-		clr_character_flag = bribed_guards
-		clr_character_flag = guards_wake_up
-		clr_character_flag = distraction_failed
-		clr_character_flag = caught_stealing
-		clr_character_flag = caught_destroying
-		remove_scrying_omen_modifiers_effect = yes
-		clr_character_flag = lab_destruction
-		clr_character_flag = lab_damage
-		clr_character_flag = lab_explosion_death
-
-		#Warrior Lodges: everything
-		if = {
-			limit = {
-				has_character_flag = call_to_legend_active
-				has_character_modifier = out_traveling
-			}
-			remove_character_modifier = out_traveling #Should hopefully only remove this when relevant
-		}
-		clr_character_flag = call_to_legend_active
-		clr_character_flag = call_to_legend_active
-		clr_character_flag = do_not_disturb
-		clr_character_flag = start_bracket
-		clr_character_flag = mid_bracket
-		clr_character_flag = top_bracket
-		clr_character_flag = call_it_a_day
-		clr_character_flag = i_will_survive
-		clr_character_flag = bloodline_quality_1
-		clr_character_flag = bloodline_quality_2
-		clr_character_flag = bloodline_quality_3
-		clr_character_flag = player_was_involved
-
-		#tombola events...
-		clr_character_flag = HF_legend_artifact
-		clr_character_flag = HF_legend_feast
-		clr_character_flag = HF_legend_skull
-		clr_character_flag = HF_legend_eagle
-		clr_character_flag = HF_legend_upgrade_weapon
-		clr_character_flag = HF_legend_artifact
-		clr_character_flag = HF_legend_artifact
-
-		#Duel outcomes...
-		clr_character_flag = WL_desc_A
-		clr_character_flag = WL_desc_B
-		clr_character_flag = WL_desc_C
-		clr_character_flag = WL_desc_D
-		clr_character_flag = WL_desc_E
-		clr_character_flag = WL_desc_F
-		clr_character_flag = had_WL_desc_A
-		clr_character_flag = had_WL_desc_B
-		clr_character_flag = had_WL_desc_C
-		clr_character_flag = had_WL_desc_D
-		clr_character_flag = had_WL_desc_E
-		clr_character_flag = had_WL_desc_F
-		clr_character_flag = WL_desc_X
-		clr_character_flag = WL_desc_Y
-		clr_character_flag = WL_desc_Z
-
-		#Some Faerun persistent modifiers
-		remove_character_modifier = alliance_member
-		remove_character_modifier = open_arcane_brother
-		remove_character_modifier = open_flame_brother
-		remove_character_modifier = open_zhent
-		remove_character_modifier = open_warlock_knight
-		remove_character_modifier = zhent_pretender
-		remove_character_modifier = shadow_telflamm_walker_modifier
-		remove_character_modifier = cat_familiar
-		remove_character_modifier = wolf_familiar
-		remove_character_modifier = raven_familiar
-		remove_character_modifier = owl_familiar
-		remove_character_modifier = promise_of_celibacy
-		remove_character_modifier = arcane_archer_modifier
-		remove_character_modifier = cat_bladesinger_modifier
-		remove_character_modifier = bird_bladesinger_modifier
-		remove_character_modifier = snake_bladesinger_modifier
-		if = {
-			limit = {
-				has_character_flag = fr_monastic_celibate
-			}
-			remove_trait = celibate
-			clr_character_flag = fr_monastic_celibate
-		}
-	}
-}
-
-spawn_good_commander_effect = {
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = yes
-			attributes = {
-				diplomacy = 2
-				learning = 2
-				stewardship = 2
-				intrigue = 2
-				martial = 8
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = no
-			attributes = {
-				diplomacy = 2
-				learning = 2
-				stewardship = 2
-				intrigue = 2
-				martial = 8
-			}
-		}
-	}
-	if = {
-		limit = {
-			AND = {
-				NOT = { has_religion_feature = religion_matriarchal }
-				NOT = { has_religion_feature = religion_patriarchal }
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = 50
-			attributes = {
-				diplomacy = 2
-				learning = 2
-				stewardship = 2
-				intrigue = 2
-				martial = 8
-			}
-		}
-	}
-	new_character = {
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		random_list = { # Flavor Randomization
-			35 = {
-				# Nothing
-			}
-			15 = {
-				change_martial = 2
-			}
-			10 = {
-				add_trait = robust
-			}
-			10 = {
-				add_trait = duelist
-			}
-			10 = {
-				add_trait = hunter
-			}
-			5 = {
-				add_trait = strategist
-			}
-			5 = {
-				change_martial = 4
-			}
-			5 = {
-				if = {
-					limit = {
-						has_dlc = "Reapers"
-					}
-					add_trait = one_eyed
-				}
-			}
-			5 = {
-				add_trait = shrewd
-			}
-			3 = {
-				add_trait = giant
-			}
-		}
-		random_list = { # Class assignment
-			20 = {
-				# No class
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = fighter
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = trained_fighter
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = barbarian
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = trained_barbarian
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = invited_soldier
-		save_event_target_as = invited_character
-	}
-}
-
-spawn_great_commander_effect = {
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = yes
-			attributes = {
-				diplomacy = 3
-				learning = 3
-				stewardship = 3
-				intrigue = 3
-				martial = 9
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = no
-			attributes = {
-				diplomacy = 3
-				learning = 3
-				stewardship = 3
-				intrigue = 3
-				martial = 9
-			}
-		}
-	}
-	if = {
-		limit = {
-			AND = {
-				NOT = { has_religion_feature = religion_matriarchal }
-				NOT = { has_religion_feature = religion_patriarchal }
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = random
-			female = 50
-			attributes = {
-				diplomacy = 3
-				learning = 3
-				stewardship = 3
-				intrigue = 3
-				martial = 9
-			}
-		}
-	}
-	new_character = {
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-		remove_trait = dwarf
-		remove_trait = giant
-		remove_trait = hunchback
-		remove_trait = clubfooted
-		remove_trait = craven
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		remove_trait = misguided_warrior
-		remove_trait = tough_soldier
-		remove_trait = skilled_tactician
-		remove_trait = brilliant_strategist
-
-		random_list = {
-			5 = { add_trait = misguided_warrior }
-			10 = { add_trait = tough_soldier }
-			20 = { add_trait = skilled_tactician }
-			30 = { add_trait = brilliant_strategist }
-		}
-
-		random_list = { # Flavor Randomization
-			35 = {
-				# Nothing
-			}
-			15 = {
-				change_martial = 2
-			}
-			10 = {
-				add_trait = robust
-			}
-			10 = {
-				add_trait = duelist
-			}
-			10 = {
-				add_trait = hunter
-			}
-			5 = {
-				add_trait = strategist
-			}
-			5 = {
-				change_martial = 4
-			}
-			5 = {
-				if = {
-					limit = {
-						has_dlc = "Reapers"
-					}
-					add_trait = one_eyed
-				}
-			}
-			5 = {
-				add_trait = shrewd
-			}
-			1 = {
-				add_trait = giant
-			}
-		}
-		random_list = {
-			50 = {
-				#Nothing
-			}
-			10 = {
-				add_trait = narrow_flank_leader
-			}
-			10 = {
-				add_trait = defensive_leader
-			}
-			10 = {
-				add_trait = experimenter
-			}
-			10 = {
-				add_trait = flanker
-			}
-			10 = {
-				add_trait = heavy_infantry_leader
-			}
-			10 = {
-				add_trait = inspiring_leader
-			}
-			10 = {
-				add_trait = organizer
-			}
-			10 = {
-				add_trait = siege_leader
-			}
-			10 = {
-				add_trait = trickster
-			}
-			10 = {
-				add_trait = aggressive_leader
-			}
-		}
-		random_list = { # Class assignment
-			20 = {
-				# No class
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = trained_fighter
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = journeyman_fighter
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = trained_barbarian
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = journeyman_barbarian
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = invited_soldier
-		save_event_target_as = invited_character
-	}
-}
-
-spawn_fantastic_commander_effect = {
-
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = yes
-			attributes = {
-				diplomacy = 4
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 12
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = no
-			attributes = {
-				diplomacy = 4
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 12
-			}
-		}
-	}
-	if = {
-		limit = {
-			AND = {
-				NOT = { has_religion_feature = religion_matriarchal }
-				NOT = { has_religion_feature = religion_patriarchal }
-			}
-		}
-		create_random_soldier = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = 50
-			attributes = {
-				diplomacy = 4
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 12
-			}
-		}
-	}
-	new_character = {
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-		remove_trait = dwarf
-		remove_trait = giant
-		remove_trait = hunchback
-		remove_trait = clubfooted
-		remove_trait = craven
-		remove_trait = paranoid
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		remove_trait = misguided_warrior
-		remove_trait = tough_soldier
-		remove_trait = skilled_tactician
-
-		add_trait = brilliant_strategist
-
-		random_list = {
-			20 = {
-				add_trait = robust
-			}
-			10 = {
-				add_trait = strong
-			}
-			5 = {
-				health = 1
-			}
-		}
-
-		random_list = {
-			10 = {
-				add_trait = narrow_flank_leader
-			}
-			10 = {
-				add_trait = defensive_leader
-			}
-			10 = {
-				add_trait = experimenter
-			}
-			10 = {
-				add_trait = flanker
-			}
-			10 = {
-				add_trait = heavy_infantry_leader
-			}
-			10 = {
-				add_trait = inspiring_leader
-			}
-			10 = {
-				add_trait = organizer
-			}
-			10 = {
-				add_trait = siege_leader
-			}
-			10 = {
-				add_trait = trickster
-			}
-			10 = {
-				add_trait = aggressive_leader
-			}
-		}
-
-		random_list = { # Flavor Randomization
-			20 = {
-				add_trait = giant
-				add_trait = robust
-				add_trait = hunter
-				change_martial = 2
-				give_nickname = nick_the_giant
-			}
-			20 = {
-				modifier = {
-					factor = 0
-					NOT = {
-						has_dlc = "Reapers"
-					}
-				}
-				add_trait = giant
-				add_trait = robust
-				add_trait = strategist
-				add_trait = one_eyed
-				change_martial = 1
-				give_nickname = nick_the_cyclops
-			}
-			20 = {
-				add_trait = holy_warrior
-				add_trait = scarred
-				change_martial = 3
-				give_nickname = nick_the_hammer
-			}
-			20 = {
-				add_trait = brave
-				add_trait = poet
-				change_martial = 2
-				give_nickname = nick_the_fearless
-			}
-			20 = {
-				add_trait = robust
-				remove_trait = temperate
-				add_trait = wroth
-				add_trait = falconer
-				change_martial = 1
-				give_nickname = nick_the_ill_tempered
-			}
-			20 = {
-				add_trait = unyielding_leader
-				remove_trait = wroth
-				add_trait = patient
-				change_martial = 2
-				give_nickname = nick_the_defender
-			}
-			20 = {
-				add_trait = aggressive_leader
-				remove_trait = patient
-				add_trait = wroth
-				change_martial = 3
-				give_nickname = nick_the_destroyer
-			}
-			20 = {
-				add_trait = shrewd
-				add_trait = brave
-				change_martial = 2
-				give_nickname = nick_the_brave
-			}
-			20 = {
-				add_trait = robust
-				add_trait = strategist
-				change_martial = 1
-				give_nickname = nick_the_strong
-			}
-			20 = {
-				add_trait = genius
-				add_trait = socializer
-				add_trait = poet
-				change_martial = 4
-				give_nickname = nick_the_noble
-			}
-			20 = {
-				add_trait = blinded
-				add_trait = strategist
-				add_trait = genius
-				change_martial = 4
-				give_nickname = nick_the_blind
-			}
-			20 = {
-				remove_trait = humble
-				add_trait = proud
-				add_trait = duelist
-				change_martial = 2
-				give_nickname = nick_the_proud
-			}
-			20 = {
-				add_trait = hunter
-				add_trait = shrewd
-				change_martial = 3
-				give_nickname = nick_the_hunter
-			}
-			20 = {
-				modifier = {
-					factor = 0
-					NOT = {
-						has_dlc = "Reapers"
-					}
-				}
-				add_trait = disfigured
-				add_trait = scarred
-				add_trait = genius
-				change_martial = 2
-				change_intrigue = 12
-				give_nickname = nick_of_a_thousand_faces
-			}
-			20 = {
-				add_trait = genius
-				add_trait = clubfooted
-				change_martial = 1
-				give_nickname = nick_the_bear
-			}
-			20 = {
-				add_trait = trusting
-				add_trait = quick
-				change_martial = 4
-				give_nickname = nick_the_loyal
-			}
-			20 = {
-				add_trait = ugly
-				add_trait = strong
-				add_trait = duelist
-				change_martial = 1
-				give_nickname = nick_the_boar
-			}
-			20 = {
-				add_trait = fair
-				add_trait = strategist
-				change_martial = 4
-				give_nickname = nick_the_lion
-			}
-			20 = {
-				add_trait = brave
-				add_trait = duelist
-				change_martial = 3
-				give_nickname = nick_the_bold
-			}
-			20 = {
-				add_trait = shrewd
-				add_trait = hedonist
-				change_martial = 4
-				give_nickname = nick_the_quarreller
-			}
-			20 = {
-				add_trait = shrewd
-				add_trait = cavalry_leader
-				change_martial = 2
-				give_nickname = nick_the_wolf
-			}
-		}
-		random_list = { # Class assignment
-			20 = {
-				# No class
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = journeyman_fighter
-			}
-			35 = {
-				modifier = {
-					factor = 0.14
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = expert_fighter
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = journeyman_barbarian
-			}
-			5 = {
-				modifier = {
-					factor = 7
-					liege = {
-						OR = {
-							is_nomadic = yes
-							is_tribal = yes
-						}
-					}
-				}
-				add_trait = expert_barbarian
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = invited_soldier
-		save_event_target_as = invited_character
-	}
-}
-
-spawn_fantastic_diplomat_effect = {
-
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_diplomat = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = yes
-			attributes = {
-				diplomacy = 12
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_diplomat = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = no
-			attributes = {
-				diplomacy = 12
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	if = {
-		limit = {
-			AND = {
-				NOT = { has_religion_feature = religion_matriarchal }
-				NOT = { has_religion_feature = religion_patriarchal }
-			}
-		}
-		create_random_diplomat = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = 50
-			attributes = {
-				diplomacy = 12
-				learning = 4
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	new_character = {
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-		remove_trait = dwarf
-		remove_trait = giant
-		remove_trait = hunchback
-		remove_trait = clubfooted
-		remove_trait = craven
-		remove_trait = paranoid
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		remove_trait = naive_appeaser
-		remove_trait = underhanded_rogue
-		remove_trait = charismatic_negotiator
-
-		add_trait = grey_eminence
-
-		random_list = {
-			27 = {
-				add_trait = shrewd
-			}
-			3 = {
-				add_trait = quick
-			}
-			70 = {
-				health = 1
-			}
-		}
-		if = {
-			limit = {
-				has_global_flag = christian_crusades_unlocked
-			}
-			random = {
-				chance = 20
-				add_trait = crusader
-			}
-		}
-		random_list = { # Class assignment
-			60 = {
-				# No class
-			}
-			10 = {
-				add_trait = trained_shadow
-			}
-			10 = {
-				add_trait = journeyman_shadow
-			}
-			10 = {
-				add_trait = trained_bard
-			}
-			10 = {
-				add_trait = journeyman_bard
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = invited_soldier
-		save_event_target_as = invited_character
-	}
-}
-
-spawn_fantastic_scholar_effect = {
-
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_priest = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = yes
-			attributes = {
-				diplomacy = 4
-				learning = 12
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_priest = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = no
-			attributes = {
-				diplomacy = 4
-				learning = 12
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	if = {
-		limit = {
-			AND = {
-				NOT = { has_religion_feature = religion_matriarchal }
-				NOT = { has_religion_feature = religion_patriarchal }
-			}
-		}
-		create_random_priest = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = 50
-			attributes = {
-				diplomacy = 4
-				learning = 12
-				stewardship = 4
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	new_character = {
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-		remove_trait = dwarf
-		remove_trait = giant
-		remove_trait = hunchback
-		remove_trait = clubfooted
-		remove_trait = craven
-		remove_trait = paranoid
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		remove_trait = detached_priest
-		remove_trait = martial_cleric
-		remove_trait = scholarly_theologian
-
-		add_trait = mastermind_theologian
-
-		random_list = {
-			27 = {
-				add_trait = shrewd
-			}
-			3 = {
-				add_trait = quick
-			}
-			70 = {
-				change_diplomacy = 1
-			}
-		}
-		random_list = { # Class assignment
-			60 = {
-				# No class
-			}
-			5 = {
-				add_trait = trained_wizard
-			}
-			5 = {
-				add_trait = journeyman_wizard
-			}
-			5 = {
-				add_trait = trained_warlock
-			}
-			5 = {
-				add_trait = journeyman_warlock
-			}
-			5 = {
-				add_trait = trained_cleric
-			}
-			5 = {
-				add_trait = journeyman_cleric
-			}
-			5 = {
-				add_trait = trained_bard
-			}
-			5 = {
-				add_trait = journeyman_bard
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = invited_soldier
-		save_event_target_as = invited_character
-	}
-}
-
-spawn_elder_effect = {
-
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_random_priest = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = yes
-			age = 50
-			attributes = {
-				diplomacy = 4
-				learning = 10
-				stewardship = 6
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	if = {
-		limit = { NOR = { has_religion_feature = religion_matriarchal has_religion_feature = religion_patriarchal } }
-		random_list = {
-			50 = {
-				create_random_priest = {
-					random_traits = yes
-					dynasty = actually_culture
-					female = no
-					age = 50
-					attributes = {
-						diplomacy = 4
-						learning = 10
-						stewardship = 6
-						intrigue = 4
-						martial = 4
-					}
-				}
-			}
-			50 = {
-				create_random_priest = {
-					random_traits = yes
-					dynasty = actually_culture
-					female = yes
-					age = 50
-					attributes = {
-						diplomacy = 4
-						learning = 10
-						stewardship = 6
-						intrigue = 4
-						martial = 4
-					}
-				}
-			}
-		}
-	}
-	if = {
-		limit = { has_religion_feature = religion_patriarchal }
-		create_random_priest = {
-			random_traits = yes
-			dynasty = actually_culture
-			female = no
-			age = 50
-			attributes = {
-				diplomacy = 4
-				learning = 10
-				stewardship = 6
-				intrigue = 4
-				martial = 4
-			}
-		}
-	}
-	new_character = {
-
-		remove_trait = weak
-		remove_trait = slow
-		remove_trait = imbecile
-		remove_trait = dull
-		remove_trait = dwarf
-		remove_trait = giant
-		remove_trait = hunchback
-		remove_trait = clubfooted
-		remove_trait = craven
-		remove_trait = paranoid
-
-		remove_trait = mystic
-		remove_trait = socializer
-		remove_trait = gamer
-		remove_trait = hedonist
-		remove_trait = duelist
-		remove_trait = hunter
-		remove_trait = strategist
-		remove_trait = administrator
-		remove_trait = architect
-		remove_trait = gardener
-		remove_trait = schemer
-		remove_trait = impaler
-		remove_trait = seducer
-		remove_trait = seductress
-		remove_trait = theologian
-		remove_trait = scholar
-
-		remove_trait = detached_priest
-		remove_trait = martial_cleric
-		remove_trait = scholarly_theologian
-		remove_trait = mastermind_theologian
-
-		add_character_modifier = { name = elder_long_life_modifier years = 100 }
-		give_nickname = nick_the_elder
-
-		random_list = {
-			50 = {
-				add_trait = martial_cleric
-			}
-			25 = {
-				add_trait = scholarly_theologian
-			}
-			10 = {
-				add_trait = mastermind_theologian
-			}
-		}
-		random_list = {
-			5 = {
-				add_trait = stubborn
-			}
-			1 = {
-				add_trait = mystic
-			}
-			1 = {
-				add_trait = hunchback
-			}
-			1 = {
-				add_trait = ugly
-			}
-			10 = {
-				add_scarred_tiered_effect = yes
-			}
-			70 = {
-				change_stewardship = 1
-			}
-		}
-		random_list = { # Class assignment
-			60 = {
-				# No class
-			}
-			5 = {
-				add_trait = trained_sorcerer
-			}
-			5 = {
-				add_trait = sorcerer
-			}
-			5 = {
-				add_trait = trained_druid
-			}
-			5 = {
-				add_trait = druid
-			}
-			5 = {
-				add_trait = trained_shadow
-			}
-			5 = {
-				add_trait = shadow
-			}
-			5 = {
-				add_trait = trained_monk
-			}
-			5 = {
-				add_trait = class_monk
-			}
-		}
-		hidden_tooltip = {
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-
-			if = { # Assign African face paint
-				limit = {
-					OR = {
-						# religion = west_african_pagan
-						# religion = west_african_pagan_reformed
-						has_religion_feature = religion_animistic
-						has_religion_feature = religion_feature_orc_good
-					}
-				}
-				# random_list = {
-				# 	25 = { #Nothing
-				# 	}
-				# 	15 = {
-				# 		add_trait = african_tattoo_1
-				# 	}
-				# 	15 = {
-				# 		add_trait = african_tattoo_2
-				# 	}
-				# 	15 = {
-				# 		add_trait = african_tattoo_3
-				# 	}
-				# 	15 = {
-				# 		add_trait = african_tattoo_4
-				# 	}
-				# 	5 = {
-				# 		add_trait = african_tattoo_5
-				# 	}
-				# 	4 = {
-				# 		add_trait = african_tattoo_6
-				# 	}
-				# 	3 = {
-				# 		add_trait = african_tattoo_7
-				# 	}
-				# 	2 = {
-				# 		add_trait = african_tattoo_8
-				# 	}
-				# 	10 = {
-				# 		add_trait = african_tattoo_9
-				# 	}
-				# 	10 = {
-				# 		add_trait = african_tattoo_10
-				# 	}
-				# 	10 = {
-				# 		add_trait = african_tattoo_11
-				# 	}
-				# 	10 = {
-				# 		add_trait = african_tattoo_12
-				# 	}
-				# }
-				if = {
-					limit = { NOT = { age = 23 } }
-					random_list = { #Modifier, if young enough.
-						10 = { #Nothing
-						}
-						25 = {
-							# trigger = {
-							# 	OR = {
-							# 		trait = african_tattoo_12
-							# 		trait = african_tattoo_8
-							# 		trait = african_tattoo_2
-							# 	}
-							# }
-							add_character_modifier = {
-								name = african_adulthood_rites_1
-								years = 6
-							}
-						}
-						25 = {
-							# trigger = {
-							# 	OR = {
-							# 		trait = african_tattoo_10
-							# 		trait = african_tattoo_7
-							# 		trait = african_tattoo_1
-							# 	}
-							# }
-							add_character_modifier = {
-								name = african_adulthood_rites_2
-								years = 6
-							}
-						}
-						25 = {
-							# trigger = {
-							# 	OR = {
-							# 		trait = african_tattoo_9
-							# 		trait = african_tattoo_6
-							# 		trait = african_tattoo_3
-							# 	}
-							# }
-							add_character_modifier = {
-								name = african_adulthood_rites_3
-								years = 6
-							}
-						}
-						25 = {
-							# trigger = {
-							# 	OR = {
-							# 		trait = african_tattoo_11
-							# 		trait = african_tattoo_5
-							# 		trait = african_tattoo_4
-							# 	}
-							# }
-							add_character_modifier = {
-								name = african_adulthood_rites_4
-								years = 6
-							}
-						}
-					}
-				}
-			}
-		}
-		set_character_flag = invited_elder
-		save_event_target_as = invited_character
-		character_event = { id = character_trait.1 } #assigns creature trait
 	}
 }
 
@@ -2645,534 +489,6 @@ root_secret_religion_provinces_convert_effect = {
 }
 
 # random_coronation_events_effect - removed
-
-random_antagonizer_slander_roll_effect = {
-	random_list = {
-		75 = { #Nothing
-			modifier = {
-				factor = 0.75
-				FROM = {
-					attribute_diff = { character = ROOT attribute = intrigue  value = 4 }
-				}
-			}
-			modifier = {
-				factor = 0.75
-				FROM = {
-					attribute_diff = { character = ROOT attribute = intrigue  value = 6 }
-				}
-			}
-			modifier = {
-				factor = 0.5
-				FROM = {
-					attribute_diff = { character = ROOT attribute = intrigue  value = 8 }
-				}
-			}
-			modifier = {
-				factor = 0.5
-				FROM = {
-					attribute_diff = { character = ROOT attribute = intrigue  value = 10 }
-				}
-			}
-		}
-		25 = { #Bonus event
-			modifier = {
-				factor = 0.5
-				NOR = {
-					trait = stressed
-					trait = depressed
-				}
-				opinion = { who = FROM value = 20 }
-			}
-			modifier = {
-				factor = 0.1
-				FROM = {
-					has_character_flag = flag_antagonize_slander_generic
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					intrigue = 15
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					intrigue = 18
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					intrigue = 21
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					intrigue = 25
-				}
-			}
-			modifier = {
-				factor = 1.75
-				FROM = {
-					intrigue = 30
-				}
-			}
-			random_antagonizer_slander_effect = yes
-		}
-	}
-}
-random_antagonizer_slander_effect = { #Chance of this effect firing is tied to the Antagonizer's intrigue.
-	#Gain rival.
-	#Rival of target becomes friend.
-	#Prestige from antagonizing a higher tier ruler.
-	#Appeased's Claimant moves to court.
-	#Prestige loss.
-	#Piety loss.
-	#Sanity loss.
-	#Evil Antagonized losing depressed.
-	#Evil Antagonized losing Stressed.
-	#Evil Antagonized gaining Diplomacy modifier (happy disposition).
-	#Evil Antagonized gaining Intrigue.
-	#Evil Antagonized gaining Deceitful.
-	#Evil Antagonized gaining Patient.
-
-
-
-
-
-	random_list = {
-		35 = {
-			trigger = {
-				NOT = {
-					persistent_event_target:antagonize_target = {
-						opinion = {
-							who = FROM
-							value = 10
-						}
-					}
-				}
-			}
-			modifier = {
-				factor = 0
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						is_rival = FROM
-					}
-				}
-			}
-			modifier = {
-				factor = 1.25
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						NOT = {
-							opinion = {
-								who = FROM
-								value = -10
-							}
-						}
-					}
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						NOT = {
-							opinion = {
-								who = FROM
-								value = -30
-							}
-						}
-					}
-				}
-			}
-			modifier = {
-				factor = 1.5
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						NOT = {
-							opinion = {
-								who = FROM
-								value = -50
-							}
-						}
-					}
-				}
-			}
-			modifier = {
-				factor = 1.75
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						NOT = {
-							opinion = {
-								who = FROM
-								value = -70
-							}
-						}
-					}
-				}
-			}
-			FROM = { persistent_event_target:antagonize_target = { character_event = { id = HF.22030 days = 15 } } } #Antagonized gets the event.
-		}
-		25 = {
-			modifier = {
-				factor = 0
-				NOT = {
-					FROM = {
-						persistent_event_target:antagonize_target = {
-							any_realm_character = {
-								age = 14
-								NOR = {
-									trait = incapable
-									is_rival = PREVPREV
-								}
-								NOT = {
-									opinion = {
-										who = PREV
-										value = -20
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			FROM = {
-				persistent_event_target:antagonize_target = {
-					random_realm_character = {
-						limit = {
-							age = 14
-							NOR = {
-								trait = incapable
-								is_rival = PREVPREV
-							}
-							NOT = {
-								opinion = {
-									who = PREV
-									value = -20
-								}
-							}
-						}
-						character_event = { id = HF.22032 days = 15 } #Third party notified.
-					}
-				}
-			}
-		}
-		25 = {
-			modifier = {
-				factor = 0
-				FROM = {
-					persistent_event_target:antagonize_target = {
-						lower_tier_than = FROM
-					}
-				}
-			}
-			modifier = {
-				factor = 1.75
-				FROM = {
-					lower_tier_than = KING
-					persistent_event_target:antagonize_target = {
-						higher_tier_than = DUKE
-					}
-				}
-			}
-			FROM = { character_event = { id = HF.22035 days = 15 } } #Antagonizer gets the event.
-		}
-		5 = {
-			FROM = { character_event = { id = HF.22042 days = 15 } } #Antagonizer gets the event. - Prestige loss for Antagonized.
-		}
-		5 = {
-			FROM = { character_event = { id = HF.22044 days = 15 } } #Antagonizer gets the event. - Piety loss for Antagonized.
-		}
-		5 = {
-			FROM = { character_event = { id = HF.22046 days = 15 } } #Antagonizer gets the event. - Opinion loss for Antagonized.
-		}
-		1 = {
-			modifier = {
-				factor = 0
-				persistent_event_target:antagonize_target = {
-					NOT = { trait = depressed }
-				}
-			}
-			FROM = { character_event = { id =  HF.22048 days = 15 } } #Antagonizer gets the event. - Sanity loss for Depressed Antagonized.
-		}
-		25 = {
-			modifier = {
-				factor = 0
-				NOT = {
-					age = 14
-					is_ruler = no
-					any_claim = { holder_scope = { character = ROOT } }
-					NOR = {
-						any_spouse = { is_ruler = yes }
-						host = { character = FROM }
-						is_rival = FROM
-						trait = incapable
-						persistent_event_target:antagonize_target = { current_heir = { character = PREVPREV } }
-					}
-					NOT = {
-						opinion = {
-							who = ROOT
-							value = -20
-						}
-					}
-					opinion = {
-						who = FROM
-						value = 10
-					}
-				}
-			}
-			random_character = {
-				limit = {
-					age = 14
-					is_ruler = no
-					any_claim = { holder_scope = { character = ROOT } }
-					NOR = {
-						any_spouse = { is_ruler = yes }
-						host = { character = FROM }
-						is_rival = FROM
-						trait = incapable
-						persistent_event_target:antagonize_target = { current_heir = { character = PREVPREV } }
-					}
-					NOT = {
-						opinion = {
-							who = ROOT
-							value = -20
-						}
-					}
-					opinion = {
-						who = FROM
-						value = 10
-					}
-				}
-				character_event = { id = HF.22036 days = 15 } #Claimant notified.
-			}
-		}
-		5 = {
-			trigger = {
-
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = deceitful
-						trait = envious
-					}
-				}
-				FROM = { trait = depressed }
-			}
-			FROM = { character_event = { id = HF.22113 days = 15 } } #Evil Antagonized loses depressed.
-		}
-		5 = {
-			trigger = {
-
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = deceitful
-						trait = envious
-					}
-				}
-				FROM = { trait = stressed }
-			}
-			FROM = { character_event = { id = HF.22114 days = 15 } } #Evil Antagonized loses stressed.
-		}
-		5 = {
-			trigger = {
-
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = deceitful
-						trait = envious
-					}
-					NOR = {
-						trait = stressed
-						trait = depressed
-					}
-				}
-				FROM = { NOT = { has_character_modifier = antagonizer_good_mood } }
-			}
-			FROM = { character_event = { id = HF.22115 days = 15 } } #Evil Antagonized gains Diplomacy modifier.
-		}
-		1 = {
-			trigger = {
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = deceitful
-						trait = envious
-					}
-				}
-			}
-			FROM = { character_event = { id = HF.22116 days = 15 } } #Evil Antagonized gains Intrigue.
-		}
-		3 = {
-			trigger = {
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = envious
-					}
-					NOT = {
-						trait = deceitful
-					}
-				}
-			}
-			FROM = { character_event = { id = HF.22117 days = 15 } } #Evil Antagonized gains Deceitful/loses Honest.
-		}
-		5 = {
-			trigger = {
-				FROM = {
-					OR = {
-						trait = impaler
-						trait = cruel
-						trait = arbitrary
-						trait = deceitful
-						trait = envious
-					}
-					NOT = {
-						trait = patient
-					}
-				}
-				NOR = {
-					trait = patient
-					diplomacy = 12
-				}
-			}
-			FROM = { character_event = { id = HF.22118 days = 15 } } #Evil Antagonized gains Patient/loses Wroth.
-		}
-	#	5 = {
-	#		modifier = {
-	#			factor = 0
-	#			FROM = {
-	#				any_claim = {
-	#					holder_scope = {
-	#						character = ROOT
-	#					}
-	#				}
-	#			}
-	#		}
-	#		modifier = { #Only against dangerous Antagonize targets.
-	#			factor = 0
-	#			persistent_event_target:antagonize_target = {
-	#				lower_tier_than = FROM
-	#			}
-	#		}
-	#		modifier = { #Only against dangerous Antagonize targets.
-	#			factor = 0.25
-	#			persistent_event_target:antagonize_target = {
-	#				prestige = 500
-	#			}
-	#		}
-	#		modifier = { #Needs to be hated already. The Antagonizer should receive the claim only if the Antagonized is already mad at him and is a more powerful ruler.
-	#			factor = 0
-	#			persistent_event_target:antagonize_target = {
-	#				opinion = {
-	#					who = FROM
-	#					value = 10
-	#				}
-	#			}
-	#		}
-	#		FROM = { character_event = { id = HF.22038 days = 15 } } #Antagonizer gets the claim.
-	#	}
-	}
-}
-
-select_and_save_fellow_society_member_effect = { #[Runs for ROOT]
-	### Scripted triggers involved:
-	# block_general_event_trigger	- NOTE, if you want to reuse this and allow children be selected, this blocks it
-
-	# root_has_terrible_opinion_modifier_of_this_trigger	- To not select folks that have HATRED between them...
-	# this_has_terrible_opinion_modifier_of_root_trigger
-
-	# root_potentially_platonically_interested_in_this_trigger	- In the best case, selects characters that have shared POSITIVE experiences...
-	# potentially_platonically_interested_in_root_trigger
-	# current_scope_and_root_make_sense_as_friendlies_trigger
-
-	random_society_member = { #Worst case scenario...
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			prisoner = no
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = { #Second worst, etc...
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			prisoner = no
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = {
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			root_has_terrible_opinion_modifier_of_this_trigger = no
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = {
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			this_has_terrible_opinion_modifier_of_root_trigger = no
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = {
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			root_has_terrible_opinion_modifier_of_this_trigger = no
-			this_has_terrible_opinion_modifier_of_root_trigger = no
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = {
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			root_potentially_platonically_interested_in_this_trigger = yes
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = {
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			potentially_platonically_interested_in_root_trigger = yes
-		}
-		save_event_target_as = fellow_member
-	}
-	random_society_member = { #Best case scenario...
-		limit = {
-			same_society_as = ROOT
-			NOT = { character = ROOT }
-			block_general_event_trigger = no
-			current_scope_and_root_make_sense_as_friendlies_trigger = yes
-		}
-		save_event_target_as = fellow_member
-	}
-}
 
 remove_opinions_with_prison_reason_effect = {
 	#Removes the specified opinion about "who" (PREV), from current scope
@@ -3317,110 +633,6 @@ child_of_destiny_journey_resume_effect = {
 	}
 	else = {
 		character_event = { id = HF.210 days = 365 random = 500 } # Back to the journey tombola!
-	}
-}
-
-reset_flag_lifestyle_sway_event_effect = {
-	clr_character_flag = lifestyle_event_successful
-	clr_character_flag = lifestyle_event_unsuccessful
-	clr_character_flag = sway_hunting
-	clr_character_flag = sway_dueling
-	clr_character_flag = sway_game
-	clr_character_flag = sway_social
-	clr_character_flag = sway_scholar
-	clr_character_flag = sway_steward
-	clr_character_flag = sway_torture
-}
-
-spawn_debutante_effect = {
-	if = {
-		limit = { has_religion_feature = religion_matriarchal }
-		create_character = {
-			random_traits = yes
-			dynasty = actually_culture
-			culture = ROOT
-			female = no
-			age = 17
-		}
-	}
-	if = {
-		limit = { NOT = { has_religion_feature = religion_matriarchal } }
-		create_character = {
-			random_traits = yes
-			dynasty = actually_culture
-			culture = ROOT
-			female = yes
-			age = 17
-		}
-	}
-	new_character = {
-		hidden_tooltip = {
-			random_list = { # Class assignment
-				70 = {
-					# No class
-				}
-				2 = {
-					add_trait = rogue
-				}
-				2 = {
-					add_trait = shadow
-				}
-				6 = {
-					add_trait = fighter
-				}
-				2 = {
-					add_trait = ranger
-				}
-				2 = {
-					add_trait = class_monk
-				}
-				2 = {
-					add_trait = barbarian
-				}
-				2 = {
-					add_trait = cleric
-				}
-				2 = {
-					add_trait = paladin
-				}
-				2 = {
-					add_trait = druid
-				}
-				2 = {
-					add_trait = wizard
-				}
-				2 = {
-					add_trait = bard
-				}
-				2 = {
-					add_trait = sorcerer
-				}
-				2 = {
-					add_trait = warlock
-				}
-			}
-			if = {
-				limit = {
-					has_religion_feature = religion_no_leader
-				}
-				random_list = {
-					5 = {
-						add_trait = pagan_branch_1
-					}
-					25 = {
-						add_trait = pagan_branch_2
-					}
-					25 = {
-						add_trait = pagan_branch_3
-					}
-					25 = {
-						add_trait = pagan_branch_4
-					}
-				}
-			}
-		}
-		set_character_flag = debutante
-		save_event_target_as = invited_character
 	}
 }
 
@@ -3614,28 +826,6 @@ warrior_lodge_double_dice_bet_effect = {
 		custom_tooltip = { text = tooltip_betting_20_gold }
 	}
 }
-warrior_lodge_dice_game_cleanup_effect = {
-	clr_character_flag = cheat_fake_die
-	clr_character_flag = cheat_bump_table
-	clr_character_flag = won_die_roll
-	# clr_character_flag = flag_betting_money_1000
-	# clr_character_flag = flag_betting_money_500
-	# clr_character_flag = flag_betting_money_250
-	# clr_character_flag = flag_betting_money_200
-	# clr_character_flag = flag_betting_money_100
-	# clr_character_flag = flag_betting_money_50
-	# clr_character_flag = flag_betting_money_25
-	# clr_character_flag = flag_betting_money_20
-	# clr_character_flag = flag_betting_money_10
-	clr_character_flag = flag_betting_on_krita
-	clr_character_flag = flag_betting_on_treta
-	clr_character_flag = flag_betting_on_dwapara
-	clr_character_flag = flag_betting_on_kali
-	clr_character_flag = flag_warrior_lodge_die_is_krita
-	clr_character_flag = flag_warrior_lodge_die_is_treta
-	clr_character_flag = flag_warrior_lodge_die_is_dwapara
-	clr_character_flag = flag_warrior_lodge_die_is_kali
-}
 
 this_is_becoming_grand_mistress_effect = {
 	custom_tooltip = {
@@ -3711,24 +901,6 @@ this_is_becoming_breeder_effect = {
 		text = tooltip_becoming_breeder
 		hidden_tooltip = { change_variable = { which = becoming_breeder value = 2 } }
 	}
-}
-
-WL_ritual_hunt_cleanup_effect = {
-	clr_character_flag = do_not_disturb
-	hidden_tooltip = { set_variable = { which = wl_ritual_hunting value = 0 } }
-
-	clr_character_flag = flag_hunting_wolf_norse
-	clr_character_flag = flag_hunting_wolf_baltic
-	clr_character_flag = flag_hunting_wolf_hellenic
-
-	clr_character_flag = flag_hunting_eagle_slavic
-	clr_character_flag = flag_hunting_eagle_tengri
-	clr_character_flag = flag_hunting_eagle_bon
-
-	clr_character_flag = flag_hunting_bear_finnish
-
-	clr_character_flag = flag_hunting_lion_west_african
-	clr_character_flag = flag_hunting_lion_zun
 }
 
 WL_ritual_hunt_flavor_events_effect = {
@@ -4721,341 +1893,412 @@ give_random_character_modifier_effect = {
 			trigger = {
 				NOT = { has_character_modifier = aspiring_poet }
 			}
-			modifier = {
-				factor = 2
-				learning = 12
-			}
+
 			add_character_modifier = {
 				name = aspiring_poet
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				learning >= 12
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = aspiring_duelist }
 			}
-			modifier = {
-				factor = 2
-				martial = 12
+
+			add_character_modifier = {
+				name = aspiring_duelist
+				years = 5
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
+				martial >= 12
+			}
+
+			mult_modifier = {
+				factor = 2
+
 				OR = {
 					duelist_skill_is_medium_group_trigger = yes
 					duelist_skill_is_high_group_trigger = yes
 				}
 			}
-			add_character_modifier = {
-				name = aspiring_duelist
-				years = 5
-			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = aspiring_hunter }
 			}
+
 			add_character_modifier = {
 				name = aspiring_hunter
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = aspiring_falconer }
 			}
+
 			add_character_modifier = {
 				name = aspiring_falconer
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = learning_advice }
 			}
+
 			add_character_modifier = {
 				name = learning_advice
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = slept_in_church }
 			}
-			modifier = {
-				factor = 2
-				trait = drunkard
-			}
+
 			add_character_modifier = {
 				name = slept_in_church
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				trait = drunkard
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = gambler }
 			}
+
 			add_character_modifier = {
 				name = gambler
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = whoremaster }
 			}
-			modifier = {
-				factor = 2
-				trait = lustful
-			}
+
 			add_character_modifier = {
 				name = whoremaster
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				trait = lustful
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = good_deeds }
 			}
-			modifier = {
-				factor = 1.5
-				is_benevolent_trigger = yes
-			}
-			modifier = {
-				factor = 1.5
-				has_pleasant_personality_trigger = yes
-			}
+
 			add_character_modifier = {
 				name = good_deeds
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_benevolent_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				has_pleasant_personality_trigger = yes
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = proving_bravery }
 			}
-			modifier = {
-				factor = 2
-				trait = brave
-			}
+
 			add_character_modifier = {
 				name = proving_bravery
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				trait = brave
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = suspected_coward }
 			}
-			modifier = {
-				factor = 0.5
-				trait = brave
-			}
+
 			add_character_modifier = {
 				name = suspected_coward
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = brave
+			}
 		}
+
 		5 = {
 			trigger = {
 				NOT = { has_character_modifier = speaking_in_tounges }
 			}
-			modifier = {
-				factor = 4
-				trait = lunatic
-			}
+
 			add_character_modifier = {
 				name = speaking_in_tounges
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 4
+				trait = lunatic
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = good_times }
 			}
+
 			add_character_modifier = {
 				name = good_times
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = good_hunt }
 			}
-			modifier = {
-				factor = 2
-				trait = hunter
-			}
+
 			add_character_modifier = {
 				name = good_hunt
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				trait = hunter
+			}
 		}
+
 		5 = {
 			trigger = {
 				NOT = { has_character_modifier = epic_hangover }
 			}
-			modifier ={
-				factor = 4
-				trait = drunkard
-			}
+
 			add_character_modifier = {
 				name = epic_hangover
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 4
+				trait = drunkard
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = weird_scholar }
 			}
-			modifier = {
-				factor = 2
-				learning = 12
-			}
+
 			add_character_modifier = {
 				name = weird_scholar
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				learning >= 12
+			}
 		}
+
 		100 = {
 			trigger = {
+				has_lover = yes
 				NOT = { has_character_modifier = comfort_of_lover }
 			}
-			trigger = {
-				has_lover = yes
-			}
+
 			add_character_modifier = {
 				name = comfort_of_lover
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = sleep_deprivation }
 			}
+
 			add_character_modifier = {
 				name = sleep_deprivation
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = pet_cat }
 			}
+
 			add_character_modifier = {
 				name = pet_cat
 				years = 5
 			}
+
 			random_list = {
 				25 = {
-					trigger = {
-						is_female = yes
-					}
+					trigger = { is_female = yes }
+
 					add_character_modifier = {
 						name = crazy_cat_lady
 						years = 5
 					}
 				}
+
 				25 = {
-					trigger = {
-						is_female = no
-					}
+					trigger = { is_female = no }
+
 					add_character_modifier = {
 						name = crazy_cat_lord
 						years = 5
 					}
 				}
-				50 = {}
+
+				50 = { } # Nothing
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = invigorated }
 			}
+
 			add_character_modifier = {
 				name = invigorated
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = good_listener }
 			}
+
 			add_character_modifier = {
 				name = good_listener
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = confident }
 			}
+
 			add_character_modifier = {
 				name = confident
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = bad_person }
 				is_benevolent_trigger = no
 				has_pleasant_personality_trigger = no
 			}
-			modifier = {
+
+			add_character_modifier = {
+				name = bad_person
+				years = 5
+			}
+
+			mult_modifier = {
 				factor = 2
+
 				OR = {
 					is_evil_trigger = yes
 					has_unpleasant_personality_trigger = yes
 				}
 			}
-			add_character_modifier = {
-				name = bad_person
-				years = 5
-			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = pet_parrot }
 			}
+
 			add_character_modifier = {
 				name = pet_parrot
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = pet_owl }
 			}
+
 			add_character_modifier = {
 				name = pet_owl
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = taking_it_easy }
 			}
-			modifier = {
-				factor = 2
-				trait = slothful
-			}
+
 			add_character_modifier = {
 				name = taking_it_easy
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				trait = slothful
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = fell_into_the_river }
 			}
+
 			add_character_modifier = {
 				name = fell_into_the_river
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = green_fingers }
 			}
+
 			add_character_modifier = {
 				name = green_fingers
 				years = 5
@@ -5092,415 +2335,394 @@ give_random_character_modifier_effect = {
 			trigger = {
 				NOT = { has_character_modifier = bad_nights_sleep }
 			}
+
 			add_character_modifier = {
 				name = bad_nights_sleep
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = good_nights_sleep }
 			}
+
 			add_character_modifier = {
 				name = good_nights_sleep
 				years = 5
 			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = well_spoken }
 			}
-			modifier = {
-				factor = 2
-				diplomacy = 12
-			}
+
 			add_character_modifier = {
 				name = well_spoken
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				diplomacy >= 12
+			}
 		}
+
 		100 = {
 			trigger = {
 				NOT = { has_character_modifier = jumbling_words }
 			}
-			modifier = {
-				factor = 2
-				diplomacy < 8
-			}
+
 			add_character_modifier = {
 				name = jumbling_words
 				years = 5
 			}
+
+			mult_modifier = {
+				factor = 2
+				diplomacy < 8
+			}
 		}
+
 		100 = {
 			trigger = {
 				has_injury_trigger = no
 			}
+
 			apply_random_minor_injury_effect = yes
-		}
-		0.001 = {
-			#fallback
 		}
 	}
 }
 
 assign_random_nickname_effect = {
 	random_list = {
+		10 = { give_nickname = nick_the_unlucky }
+		10 = { give_nickname = nick_the_lucky }
+		10 = { give_nickname = nick_the_careless }
+		10 = { give_nickname = nick_the_jittery }
+		10 = { give_nickname = nick_the_dry_throat }
+		10 = { give_nickname = nick_the_messy }
+		10 = { give_nickname = nick_the_feeble }
+		10 = { give_nickname = nick_the_red_cheeks }
+		10 = { give_nickname = nick_the_blushing }
+		10 = { give_nickname = nick_the_twitchy }
+
 		10 = {
-			trigger = {
-				trait = brave
-			}
+			trigger = { trait = brave }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_brave
-				}
-				10 = {
-					give_nickname = nick_the_fearless
-				}
+				10 = { give_nickname = nick_the_brave }
+				10 = { give_nickname = nick_the_fearless }
 			}
 		}
-		10 = {
-			give_nickname = nick_the_unlucky
-		}
-		10 = {
-			give_nickname = nick_the_lucky
-		}
+
 		5 = {
-			modifier = {
+			give_nickname = nick_the_clueless
+
+			mult_modifier = {
 				factor = 4
 				learning < 6
 			}
-			give_nickname = nick_the_clueless
 		}
+
 		10 = {
-			modifier = {
+			give_nickname = nick_the_ill_tempered
+
+			mult_modifier = {
 				factor = 4
+
 				OR = {
 					is_evil_trigger = yes
 					has_unpleasant_personality_trigger = yes
 				}
 			}
-			give_nickname = nick_the_ill_tempered
 		}
+
 		10 = {
-			modifier = {
+			give_nickname = nick_the_affable
+
+			mult_modifier = {
 				factor = 4
+
 				OR = {
 					has_pleasant_personality_trigger = yes
 					is_pious_trigger = yes
 				}
 			}
-			give_nickname = nick_the_affable
 		}
+
 		10 = {
-			trigger = {
-				age < 30
-			}
+			trigger = { practical_age < 30 }
+
 			give_nickname = nick_the_youthful
 		}
+
 		5 = {
-			modifier = {
+			give_nickname = nick_the_beguiling
+
+			mult_modifier = {
 				factor = 4
 				is_attractive_trigger = yes
 			}
-			give_nickname = nick_the_beguiling
 		}
+
 		10 = {
-			trigger = {
-				trait = lustful
-			}
+			trigger = { trait = lustful }
+
 			give_nickname = nick_the_lewd
 		}
+
 		5 = {
-			modifier = {
+			give_nickname = nick_the_unchaste
+
+			mult_modifier = {
 				factor = 4
 				trait = lustful
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				has_lover = yes
 			}
-			give_nickname = nick_the_unchaste
 		}
+
 		5 = {
 			trigger = {
 				uses_decadence = yes
-				decadence = 50
+				decadence >= 50
 			}
-			modifier = {
-				factor = 4
-				decadence = 70
-			}
+
 			give_nickname = nick_the_decadent
-		}
-		10 = {
-			trigger = {
-				has_unpleasant_personality_trigger = yes
+
+			mult_modifier = {
+				factor = 4
+				decadence >= 70
 			}
+		}
+
+		10 = {
+			trigger = { has_unpleasant_personality_trigger = yes }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_shrewd
-				}
-				10 = {
-					give_nickname = nick_the_wily
-				}
+				10 = { give_nickname = nick_the_shrewd }
+				10 = { give_nickname = nick_the_wily }
 			}
 		}
+
 		10 = {
-			trigger = {
-				has_pleasant_personality_trigger = yes
-			}
+			trigger = { has_pleasant_personality_trigger = yes }
+
 			give_nickname = nick_the_jolly
 		}
+
 		10 = {
-			trigger ={
-				has_pleasant_personality_trigger = yes
-			}
+			trigger = { has_pleasant_personality_trigger = yes }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_gracious
-				}
-				10 = {
-					give_nickname = nick_the_kind
-				}
-				10 = {
-					give_nickname = nick_the_good
-				}
+				10 = { give_nickname = nick_the_gracious }
+				10 = { give_nickname = nick_the_kind }
+				10 = { give_nickname = nick_the_good }
 			}
 		}
+
 		10 = {
-			trigger = {
-				trait = patient
-			}
+			trigger = { trait = patient }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_tenacious
-				}
-				10 = {
-					give_nickname = nick_the_mule
-				}
+				10 = { give_nickname = nick_the_tenacious }
+				10 = { give_nickname = nick_the_mule }
 			}
 		}
+
 		5 = {
-			modifier = {
+			give_nickname = nick_the_strange
+
+			mult_modifier = {
 				factor = 4
 				has_mental_disorder_trigger = yes
 			}
-			give_nickname = nick_the_strange
 		}
+
 		10 = {
-			trigger = {
-				is_weak_trigger = yes
-			}
+			trigger = { is_weak_trigger = yes }
+
 			give_nickname = nick_the_clumsy
 		}
+
 		10 = {
-			trigger = {
-				is_impious_trigger = yes
-			}
+			trigger = { is_impious_trigger = yes }
+
 			give_nickname = nick_the_evil
 		}
+
 		10 = {
-			trigger = {
-				is_strong_trigger = yes
-			}
+			trigger = { is_strong_trigger = yes }
+
 			give_nickname = nick_the_strong
 		}
+
 		10 = {
-			modifier = {
-				factor = 2
-				has_pleasant_personality_trigger = yes
-			}
 			give_nickname = nick_the_merry
-		}
-		10 = {
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				has_pleasant_personality_trigger = yes
 			}
-			give_nickname = nick_the_gentle
 		}
+
 		10 = {
-			trigger = {
-				trait = proud
+			give_nickname = nick_the_gentle
+
+			mult_modifier = {
+				factor = 2
+				has_pleasant_personality_trigger = yes
 			}
+		}
+
+		10 = {
+			trigger = { trait = proud }
+
 			give_nickname = nick_the_proud
 		}
+
 		10 = {
-			trigger = {
-				trait = shy
-			}
+			trigger = { trait = shy }
+
 			give_nickname = nick_the_silent
 		}
+
 		10 = {
-			trigger = {
-				trait = chaste
-			}
+			trigger = { trait = chaste }
+
 			give_nickname = nick_the_chaste
 		}
+
 		10 = {
 			trigger = {
-				is_attractive_trigger = yes
 				is_female = no
-			}
-			random_list = {
-				10 = {
-					give_nickname = nick_the_handsome
-				}
-				10 = {
-					give_nickname = nick_the_vain
-				}
-			}
-		}
-		10 = {
-			trigger = {
 				is_attractive_trigger = yes
+			}
+
+			random_list = {
+				10 = { give_nickname = nick_the_handsome }
+				10 = { give_nickname = nick_the_vain }
+			}
+		}
+
+		10 = {
+			trigger = {
 				is_female = yes
+				is_attractive_trigger = yes
 			}
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_fair
-				}
-				10 = {
-					give_nickname = nick_the_vain
-				}
-				10 = {
-					give_nickname = nick_the_flower
-				}
+				10 = { give_nickname = nick_the_fair }
+				10 = { give_nickname = nick_the_vain }
+				10 = { give_nickname = nick_the_flower }
 			}
 		}
+
 		10 = {
-			trigger = {
-				is_unattractive_trigger = yes
-			}
+			trigger = { is_unattractive_trigger = yes }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_hideous
-				}
-				10 = {
-					give_nickname = nick_the_frog
-				}
-				10 = {
-					give_nickname = nick_the_repulsive
-				}
+				10 = { give_nickname = nick_the_hideous }
+				10 = { give_nickname = nick_the_frog }
+				10 = { give_nickname = nick_the_repulsive }
 			}
 		}
+
 		10 = {
-			trigger = {
-				trait = lunatic
-			}
+			trigger = { trait = lunatic }
+
 			give_nickname = nick_the_mad
 		}
+
 		10 = {
-			trigger = {
-				trait = drunkard
-			}
+			trigger = { trait = drunkard }
+
 			give_nickname = nick_the_drunkard
 		}
+
 		10 = {
-			trigger = {
-				learning = 10
-			}
-			modifier = {
-				factor = 2
-				learning = 14
-			}
+			trigger = { learning >= 10 }
+
 			give_nickname = nick_the_wise
-		}
-		10 = {
-			trigger = {
-				is_pious_trigger = yes
+
+			mult_modifier = {
+				factor = 2
+				learning >= 14
 			}
+		}
+
+		10 = {
+			trigger = { is_pious_trigger = yes }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_pious
-				}
-				10 = {
-					give_nickname = nick_the_blessed
-				}
+				10 = { give_nickname = nick_the_pious }
+				10 = { give_nickname = nick_the_blessed }
 			}
 		}
+
 		10 = {
-			give_nickname = nick_the_careless
-		}
-		10 = {
-			trigger = {
-				age < 25
-			}
+			trigger = { practical_age < 25 }
+
 			give_nickname = nick_the_young
 		}
+
 		10 = {
-			trigger = {
-				age = 50
-			}
+			trigger = { practical_age >= 50 }
+
 			give_nickname = nick_the_old
 		}
+
 		10 = {
-			trigger = {
-				learning = 10
-			}
+			trigger = { learning >= 10 }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_scholar
-				}
-				10 = {
-					give_nickname = nick_the_understanding
-				}
-				10 = {
-					give_nickname = nick_the_healer
-				}
+				10 = { give_nickname = nick_the_scholar }
+				10 = { give_nickname = nick_the_understanding }
+				10 = { give_nickname = nick_the_healer }
 			}
 		}
+
 		10 = {
-			trigger = {
-				combat_rating = 10
-			}
+			trigger = { combat_rating >= 10 }
+
 			give_nickname = nick_the_oakskin
 		}
+
 		10 = {
-			give_nickname = nick_the_jittery
-		}
-		10 = {
-			trigger = {
-				trait = slothful
-			}
+			trigger = { trait = slothful }
+
 			give_nickname = nick_the_sleepy
 		}
+
 		10 = {
-			trigger = {
-				base_health < 3
-			}
+			trigger = { base_health < 3 }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_butter_teeth
-				}
-				10 = {
-					give_nickname = nick_the_toothless
-				}
+				10 = { give_nickname = nick_butter_teeth }
+				10 = { give_nickname = nick_the_toothless }
 			}
 		}
+
 		10 = {
-			trigger = {
-				trait = craven
-			}
+			trigger = { trait = craven }
+
 			random_list = {
-				10 = {
-					give_nickname = nick_the_cowardly
-				}
-				10 = {
-					give_nickname = nick_the_squirmy
-				}
+				10 = { give_nickname = nick_the_cowardly }
+				10 = { give_nickname = nick_the_squirmy }
 			}
 		}
+
 		10 = {
-			trigger = {
-				trait = paranoid
-			}
+			trigger = { trait = paranoid }
+
 			give_nickname = nick_the_frantic
 		}
-		10 = {
-			give_nickname = nick_the_dry_throat
-		}
+
 		10 = {
 			trigger = {
 				NOR = {
@@ -5508,66 +2730,74 @@ assign_random_nickname_effect = {
 					trait = quick
 				}
 			}
-			modifier = {
+
+			random_list = {
+				10 = { give_nickname = nick_the_thin_minded }
+				10 = { give_nickname = nick_the_forgetful }
+			}
+
+			mult_modifier = {
 				factor = 4
+
 				OR = {
 					trait = imbecile
 					trait = slow
 				}
 			}
-			random_list = {
-				10 = {
-					give_nickname = nick_the_thin_minded
-				}
-				10 = {
-					give_nickname = nick_the_forgetful
-				}
-			}
 		}
-		10 = {
-			give_nickname = nick_the_messy
-		}
-		10 = {
-			give_nickname = nick_the_feeble
-		}
+
 		10 = {
 			trigger = {
 				NOT = { trait = gregarious }
 			}
-			modifier = {
+
+			give_nickname = nick_the_recluse
+
+			mult_modifier = {
 				factor = 2
 				trait = shy
 			}
-			give_nickname = nick_the_recluse
 		}
+
 		10 = {
-			trigger = {
-				trait = wroth
-			}
+			trigger = { trait = wroth }
+
 			give_nickname = nick_the_short_tempered
 		}
-		10 = {
-			give_nickname = nick_the_red_cheeks
-		}
-		10 = {
-			give_nickname = nick_the_blushing
-		}
+
 		10 = {
 			trigger = {
-				NOT = {
-					trait = content
-				}
+				NOT = { trait = content }
 			}
+
 			give_nickname = nick_the_whiner
 		}
+
 		10 = {
 			trigger = {
 				trait = deceitful
 			}
+
 			give_nickname = nick_the_liar
 		}
-		10 = {
-			give_nickname = nick_the_twitchy
+	}
+}
+
+setup_province_pulse = {
+	if = {
+		limit = {
+			independent = yes
+			NOT = { has_global_flag = pulse_province_set }
 		}
+
+		random_province = {
+			limit = { has_owner = yes }
+
+			set_province_flag = pulse_province
+			save_global_event_target_as = pulse_province
+			log = "[This.GetName] (ID [This.GetID]) is the pulse province"
+		}
+
+		set_global_flag = pulse_province_set
 	}
 }

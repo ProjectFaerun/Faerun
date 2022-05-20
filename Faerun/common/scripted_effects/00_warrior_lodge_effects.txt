@@ -1,0 +1,131 @@
+# join_prev_warrior_lodge_society_effect
+# give_this_warrior_lodge_religion_effect
+# warrior_lodge_dice_game_duel_winner_effect
+# warrior_lodge_dice_game_cleanup_effect
+# warrior_lodge_war_aid_cleanup_effect
+# WL_ritual_hunt_cleanup_effect
+
+join_prev_warrior_lodge_society_effect = {
+	if = {
+		limit = { PREV = { society_member_of = warrior_lodge_uthgardt } }
+		join_society = warrior_lodge_uthgardt
+	}
+	else_if = {
+		limit = { PREV = { society_member_of = warrior_lodge_orcs } }
+		join_society = warrior_lodge_orcs
+	}
+	else_if = {
+		limit = { PREV = { society_member_of = warrior_lodge_goblins } }
+		join_society = warrior_lodge_goblins
+	}
+	else_if = {
+		limit = { PREV = { society_member_of = warrior_lodge_rashemen } }
+		join_society = warrior_lodge_rashemen
+	}
+	else_if = {
+		limit = { PREV = { society_member_of = warrior_lodge_elven } }
+		join_society = warrior_lodge_elven
+	}
+	else_if = {
+		limit = { PREV = { society_member_of = warrior_lodge_dwarven } }
+		join_society = warrior_lodge_dwarven
+	}
+}
+
+give_this_warrior_lodge_religion_effect = { # Mostly for spawned characters
+	religion = society
+
+	if = {
+		limit = { is_heretic = yes }
+		abandon_heresy = yes
+	}
+}
+
+warrior_lodge_dice_game_duel_winner_effect = {
+	custom_tooltip = { text = tooltip_EVTOPTYHF25230 }
+
+	tiered_prestige_negative_effect = yes
+	warrior_lodge_dice_game_cleanup_effect = yes
+
+	# REQUIRED event targets for setting up duel evaluation!
+	hidden_effect = {
+		save_event_target_as = combatant_1 # the person issuing the duel...
+		event_target:random_society_winner = { save_event_target_as = combatant_2 } # the target of the duel...
+		
+		add_character_modifier = {
+			name = recent_duel_timer
+			years = 1
+			hidden = yes
+		}
+	}
+
+	event_target:random_society_winner = {
+		show_scope_change = no
+		apply_degree_of_dishonorable_duel_effect = yes # checks a bunch of age and health statuses...
+	}
+
+	pacifists_lose_piety_effect = yes
+
+	event_target:random_society_winner = { character_event = { id = HFP.10095 days = 1 } } # Duel evaluation (hidden) + result event as follow-up.
+}
+
+warrior_lodge_dice_game_cleanup_effect = {
+	clr_character_flag = cheat_fake_die
+	clr_character_flag = cheat_bump_table
+	clr_character_flag = won_die_roll
+	# clr_character_flag = flag_betting_money_1000
+	# clr_character_flag = flag_betting_money_500
+	# clr_character_flag = flag_betting_money_250
+	# clr_character_flag = flag_betting_money_200
+	# clr_character_flag = flag_betting_money_100
+	# clr_character_flag = flag_betting_money_50
+	# clr_character_flag = flag_betting_money_25
+	# clr_character_flag = flag_betting_money_20
+	# clr_character_flag = flag_betting_money_10
+	clr_character_flag = flag_betting_on_krita
+	clr_character_flag = flag_betting_on_treta
+	clr_character_flag = flag_betting_on_dwapara
+	clr_character_flag = flag_betting_on_kali
+	clr_character_flag = flag_warrior_lodge_die_is_krita
+	clr_character_flag = flag_warrior_lodge_die_is_treta
+	clr_character_flag = flag_warrior_lodge_die_is_dwapara
+	clr_character_flag = flag_warrior_lodge_die_is_kali
+}
+
+warrior_lodge_war_aid_cleanup_effect = {
+	clr_character_flag = invited_player_to_war
+	clr_character_flag = defender_invited_player_to_war
+	clr_character_flag = accepted_war_invite_from_defender
+	clr_character_flag = accepted_war_invite_from_attacker
+	clr_character_flag = got_war_invite_from_defender
+	clr_character_flag = got_war_invite_from_attacker
+	clr_character_flag = attacker_won
+	clr_character_flag = defender_won
+	clr_character_flag = white_peace
+	clr_character_flag = negative_war_letter
+	clr_character_flag = positive_war_letter
+}
+
+WL_ritual_hunt_cleanup_effect = {
+	clr_character_flag = do_not_disturb
+
+	hidden_effect = {
+		set_variable = {
+			which = wl_ritual_hunting
+			value = 0
+		}
+	}
+
+	clr_character_flag = flag_hunting_wolf_norse
+	clr_character_flag = flag_hunting_wolf_baltic
+	clr_character_flag = flag_hunting_wolf_hellenic
+
+	clr_character_flag = flag_hunting_eagle_slavic
+	clr_character_flag = flag_hunting_eagle_tengri
+	clr_character_flag = flag_hunting_eagle_bon
+
+	clr_character_flag = flag_hunting_bear_finnish
+
+	clr_character_flag = flag_hunting_lion_west_african
+	clr_character_flag = flag_hunting_lion_zun
+}
