@@ -2923,3 +2923,1779 @@ send_duel_result_event_effect = { # Runs via the attacker/combatant_1
 		#}
 	}
 }
+
+# For localisation purposes, mainly (can run from the immediate of duel result events!)...
+set_winner_flags_and_save_opponent_effect = {
+	save_event_target_as = root_character # for custom loc purposes!
+
+	if = { # This means you were the attacker...
+		limit = { character = event_target:combatant_1 }
+
+		event_target:combatant_2 = {
+			save_event_target_as = other_combatant
+		}
+
+		set_character_flag = is_victorious_attacker
+	}
+	else = { # This means you were the defender...
+		event_target:combatant_1 = {
+			save_event_target_as = other_combatant
+		}
+
+		set_character_flag = is_victorious_defender
+	}
+
+	if = {
+		limit = {
+			event_target:combatant_1 = {
+				has_character_flag = mock_duel
+			}
+		}
+
+		sound_effect = legendary_gathering_win
+	}
+	else_if = {
+		limit = {
+			event_target:combatant_1 = {
+				has_character_flag = is_battlefield_duel
+			}
+		}
+
+		sound_effect = win_battle
+	}
+	else = {
+		sound_effect = duel_win
+	}
+
+	event_target:other_combatant = {
+		save_event_target_as = kinslayer_target # To check for kinslayer, later on
+	}
+}
+
+set_loser_flags_and_save_opponent_effect = {
+	save_event_target_as = root_character
+
+	if = { # This means you were the attacker...
+		limit = { character = event_target:combatant_1 }
+
+		event_target:combatant_2 = {
+			save_event_target_as = other_combatant
+		}
+
+		set_character_flag = is_defeated_attacker
+	}
+	else = { # This means you were the defender...
+		event_target:combatant_1 = {
+			save_event_target_as = other_combatant
+		}
+
+		set_character_flag = is_defeated_defender
+	}
+
+	if = {
+		limit = {
+			event_target:combatant_1 = {
+				has_character_flag = mock_duel
+			}
+		}
+
+		sound_effect = legendary_gathering_lose
+	}
+	else_if = {
+		limit = {
+			event_target:combatant_1 = {
+				has_character_flag = is_battlefield_duel
+			}
+		}
+
+		sound_effect = lose_battle
+	}
+	else = {
+		sound_effect = duel_lose
+	}
+
+	event_target:other_combatant = {
+		save_event_target_as = kinslayer_target # To check for kinslayer, later on
+	}
+}
+
+apply_selected_duel_injury_effect = { # To be used in combination with set_potential_injury_flag_effect...
+	duel_check_for_lycan_infection = yes
+	if = { # If mild injury
+		limit = { has_character_flag = mildly_injured }
+		apply_duel_wounded_effect = yes
+	}
+	else_if = {
+		limit = { has_character_flag = severely_injured }
+		add_severely_injured_effect = yes
+	}
+	else = { # If more than mildly/severely injured
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			injury_both_eyes = {
+				remove_trait = one_eyed
+				add_trait = blinded
+			}
+
+			injury_eye = { add_trait = one_eyed }
+			injury_hand = { add_trait = one_handed }
+			injury_leg = { add_trait = one_legged }
+			injury_face = { add_trait = disfigured }
+			injury_mangled_body = { add_trait = mangled }
+			injury_maimed = { add_trait = maimed }
+		}
+
+		# After all severe injuries...
+		add_trait = severely_injured
+		resolve_severely_injured_effect = yes
+
+		if = { # In case character has *all* the maimed traits already...
+			limit = {
+				has_character_flag = injury_could_be_lethal	# If scope is so injured they are likely to die from it
+				character = ROOT							# Will only show if the current scope is ROOT
+			}
+
+			custom_tooltip = {
+				text = you_crawl_off_and_die_tt
+			}
+		}
+	}
+}
+
+apply_duel_wounded_effect = { # To be used in particular in mock-duels (flag check before this effect!)...
+	duel_check_for_lycan_infection = yes
+	if = {
+		limit = { NOT = { has_character_flag = skip_wounded_trait } }
+
+		add_trait = wounded
+
+		hidden_effect = {
+			change_variable = { # While the variable stacks, actual scars are added only after the wound heals
+				which = scarred_variable
+				value = 2
+			}
+		}
+	}
+
+	trigger_switch = {
+		on_trigger = has_character_flag
+
+		injury_both_eyes = {
+			add_character_modifier = {
+				name = black_eye
+				months = 10
+			}
+		}
+
+		injury_eye = {
+			add_character_modifier = {
+				name = black_eye
+				months = 10
+			}
+		}
+
+		injury_hand = {
+			add_character_modifier = {
+				name = swollen_wrist
+				months = 10
+			}
+		}
+
+		injury_leg = {
+			add_character_modifier = {
+				name = swollen_ankle
+				months = 10
+			}
+		}
+
+		injury_face = {
+			add_character_modifier = {
+				name = concussion
+				months = 10
+			}
+		}
+
+		injury_mangled_body = {
+			add_character_modifier = {
+				name = cracked_ribs
+				months = 10
+			}
+		}
+
+		injury_maimed = {
+			add_character_modifier = {
+				name = badly_bruised
+				months = 10
+			}
+		}
+
+		injury_could_be_lethal = {
+			apply_random_minor_injury_effect = yes
+		}
+	}
+}
+
+apply_random_minor_injury_effect = {
+	random_list = {
+		10 = {
+			add_character_modifier = {
+				name = black_eye
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = badly_bruised
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = swollen_wrist
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = swollen_ankle
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = sore_muscles
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = cracked_ribs
+				months = 10
+			}
+		}
+
+		10 = {
+			add_character_modifier = {
+				name = concussion
+				months = 10
+			}
+		}
+	}
+}
+
+# Checks some goodies, adds prestige, progresses achievement, kinslayer, shows relevant tooltips, etc...
+apply_generic_duel_victory_effect = {
+	if = {
+		limit = { has_character_flag = mock_duel }
+
+		prestige = 15
+		# Run appropriate effects for joining or not joining the society
+	}
+	else = {
+		if = {
+			limit = { has_character_flag = is_rival_fight }
+
+			prestige = 100
+		}
+		else = {
+			prestige = 50
+		}
+	}
+
+	if = {
+		limit = { has_character_flag = someone_died }
+		add_kinslayer_trait_effect = yes # Requires event_target:kinslayer_target (set in set_winner/loser_flags_and_save_opponent_effect)
+	}
+
+	if = {
+		limit = {
+			NOT = { has_character_flag = mock_duel } # Should not happen if mock_duel
+
+			event_target:other_combatant = { # If they were so injured they were likely to die if injured
+				has_character_flag = injury_could_be_lethal
+			}
+		}
+
+		custom_tooltip = { text = they_crawl_off_and_die_tt }
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_character_flag = is_victorious_attacker
+				has_character_flag = is_victorious_defender
+			}
+		}
+
+		add_character_modifier = {
+			name = recent_duel_victory
+			years = 1 # Also clears upon new duel!
+		}
+	}
+}
+
+# Is this even needed? Might be handled by apply_selected_duel_injury_effect
+apply_generic_duel_defeat_effect = {
+	if = {
+		limit = { has_character_flag = mock_duel }
+
+		# Run appropriate effects for joining or not joining the society
+	}
+	if = {
+		limit = { has_character_flag = someone_died }
+
+		# Any effects that might need to be added?
+	}
+	if = {
+		limit = {
+			OR = {
+				has_character_flag = is_defeated_attacker
+				has_character_flag = is_defeated_defender
+			}
+		}
+
+		# Something
+	}
+}
+
+handle_claim_duel_result_effect = {
+	if = { # Only for CLAIM duels...
+		limit = {
+			event_target:combatant_1 = {
+				has_character_flag = claim_duel@event_target:combatant_2
+			}
+		}
+
+		if = {  # If you are the *attacker* ...
+			limit = { character = event_target:combatant_1 }
+
+			if = {
+				limit = {
+					OR = { # and you *won*...
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+
+				if = { # and there are multiple titles you want...
+					limit = { has_character_flag = wants_multiple_titles_from@event_target:combatant_2 }
+
+					log = "[This.GetBestName] - I am the victorious winner and I seize titles!"
+
+					custom_tooltip = {
+						text = you_take_their_titles_and_all_under_it_tt
+
+						event_target:combatant_2 = { # Seize titles from target...!
+							any_demesne_title = {
+								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
+
+								event_target:combatant_1 = {
+									usurp_title = {
+										target = PREV
+										type = duel
+									}
+
+									vassalize_or_take_under_title = {
+										title = PREV
+										enemy = event_target:combatant_2
+										type = duel
+									}
+								}
+
+								log = "[This.GetFullName] is seized by [combatant_1.GetBestName]"
+							}
+						}
+					}
+				}
+
+				else_if = { # If it's only a matter of ONE title, usurp that one...
+					limit = { has_character_flag = wants_single_title_from@event_target:combatant_2 }
+
+					custom_tooltip = {
+						text = you_take_their_title_and_all_under_it_attacker_tt
+
+						event_target:target_title = {
+							event_target:combatant_1 = {
+								usurp_title = {
+									target = event_target:target_title # Grab this one title...!
+									type = duel
+								}
+
+								vassalize_or_take_under_title = {
+									title = PREV
+									enemy = event_target:combatant_2
+									type = duel
+								}
+							}
+
+							log = "[This.GetFullName] is seized by [combatant_1.GetBestName]"
+						}
+					}
+				}
+
+				if = {
+					limit = {
+						ai = no
+						is_ironman = yes
+					}
+
+					set_character_flag = achievement_over_your_dead_body
+				}
+			}
+			else = { # Means you lost...
+				if = {
+					limit = { has_character_flag = wants_single_title_from@event_target:combatant_2 }
+
+					custom_tooltip = {
+						text = your_claim_is_lost_attacker_tt
+
+						remove_claim = event_target:target_title
+						add_weak_pressed_claim = event_target:target_title
+					}
+				}
+				else = {
+					custom_tooltip = {
+						text = your_claims_are_lost_tt
+
+						event_target:combatant_2 = {
+							any_demesne_title = {
+								limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
+
+								remove_claim = event_target:combatant_1
+								add_weak_pressed_claim = event_target:combatant_1
+							}
+						}
+					}
+				}
+
+				if = { # If defender happens to have claims of their own, *they* take titles....
+					limit = {
+						event_target:combatant_1 = {
+							any_demesne_title = {
+								event_target:combatant_2 = { has_strong_claim = PREV }
+							}
+						}
+					}
+
+					custom_tooltip = { text = they_take_your_titles_tt } # Happens below, on defender side
+				}
+			}
+		}
+
+		###################################################
+
+		else_if = { # If you are the *defender*...
+			limit = { character = event_target:combatant_2 }
+
+			if = {
+				limit = {
+					OR = { # and you *won*...
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+
+				if = { # If defender happens to have claims of their own, *they* take titles....
+					limit = {
+						event_target:combatant_1 = {
+							any_demesne_title = {
+								event_target:combatant_2 = { has_strong_claim = PREV }
+							}
+						}
+					}
+
+					if = {
+						limit = {
+							ai = no
+							is_ironman = yes
+						}
+
+						set_character_flag = achievement_over_your_dead_body
+					}
+
+					if = { # If claims on *multiple* titles...
+						limit = {
+							event_target:combatant_1 = {
+								any_demesne_title = {
+									count > 1
+									event_target:combatant_2 = { has_strong_claim = PREV }
+								}
+							}
+						}
+
+						custom_tooltip = {
+							text = you_take_their_titles_and_all_under_it_tt
+
+							event_target:combatant_1 = { # Grab titles from target...!
+								any_demesne_title = {
+									limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
+
+									event_target:combatant_2 = {
+										usurp_title = {
+											target = PREV
+											type = duel
+										}
+
+										vassalize_or_take_under_title = {
+											title = PREV
+											enemy = event_target:combatant_1
+											type = duel
+										}
+									}
+
+									log = "[This.GetFullName] is grabbed by [combatant_2.GetBestName]"
+								}
+							}
+						}
+					}
+					else = { # Only one claim...
+						custom_tooltip = {
+							text = you_take_their_title_and_all_under_it_defender_tt
+
+							event_target:combatant_1 = {
+								random_demesne_title = {
+									limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
+
+									event_target:combatant_2 = {
+										usurp_title = {
+											target = PREV
+											type = duel
+										}
+
+										vassalize_or_take_under_title = {
+											title = PREV
+											enemy = event_target:combatant_1
+											type = duel
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else = { # You *lost*...
+				log = "CLAIM DUEL: I am [This.GetBestName] and all my titles (like [This.PrimaryTitle.GetName]) are belong to [combatant_1.GetBestName]"
+
+				if = { # Attacker has claims, and they take the titles they came for....
+					limit = {
+						event_target:combatant_2 = {
+							any_demesne_title = {
+								event_target:combatant_1 = { has_strong_claim = PREV }
+							}
+						}
+					}
+
+					custom_tooltip = { text = they_take_your_titles_tt }
+				}
+
+				if = {
+					limit = { # If losing defender has claims on any titles of the attacker...
+						event_target:combatant_1 = {
+							any_demesne_title = {
+								event_target:combatant_2 = { has_strong_claim = PREV }
+							}
+						}
+					}
+
+					custom_tooltip = {
+						text = your_claims_are_lost_tt
+
+						event_target:combatant_1 = {
+							any_demesne_title = {
+								limit = {
+									event_target:combatant_2 = { has_strong_claim = PREV }
+								}
+
+								remove_claim = event_target:combatant_2
+								add_weak_pressed_claim = event_target:combatant_2
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+remove_all_claims_for_combatant_1_effect = {
+	if = {
+		limit = { has_character_flag = wants_single_title_from@event_target:combatant_2 }
+
+		custom_tooltip = {
+			text = your_claim_is_lost_attacker_tt
+			remove_claim = event_target:target_title
+		}
+	}
+	else = {
+		custom_tooltip = {
+			text = your_claims_are_lost_tt
+
+			event_target:combatant_2 = {
+				any_demesne_title = {
+					limit = { event_target:combatant_1 = { has_strong_claim = PREV } }
+					remove_claim = event_target:combatant_1
+				}
+			}
+		}
+
+	}
+}
+
+remove_all_claims_for_combatant_2_effect = {
+	custom_tooltip = {
+		text = your_claims_are_lost_tt
+
+		event_target:combatant_1 = {
+			any_demesne_title = {
+				limit = { event_target:combatant_2 = { has_strong_claim = PREV } }
+				remove_claim = event_target:combatant_2
+			}
+		}
+	}
+}
+
+apply_merciful_modifier_effect = { # For Claim Duels
+	if = { # For attacker...
+		limit = { character = event_target:combatant_1 }
+
+		add_character_modifier = {
+			name = merciful_attacker
+			years = 5
+		}
+	}
+	else = { # for defender...
+		if = {
+			limit = {
+				sibling = event_target:combatant_1
+				is_female = yes
+			}
+
+			add_character_modifier = {
+				name = merciful_sister
+				years = 5
+			}
+		}
+		else_if = {
+			limit = {
+				sibling = event_target:combatant_1
+				is_female = no
+			}
+
+			add_character_modifier = {
+				name = merciful_brother
+				years = 5
+			}
+		}
+		else = {
+			add_character_modifier = {
+				name = merciful_defender
+				years = 5
+			}
+		}
+	}
+}
+
+handle_warrior_lodge_induction_effect = { # Will only affect those trying to join warrior lodges...
+	hidden_effect = {
+		if = {
+			limit = { has_character_flag = awaiting_initiation_trial }
+
+			if = {
+				limit = { has_character_flag = mildly_injured }
+				set_character_flag = was_mildly_injured
+			}
+			else_if = {
+				limit = { has_character_flag = actually_injured }
+				set_character_flag = was_actually_injured
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+
+					NOR = {
+						has_character_flag = stalemate_won
+						has_character_flag = stalemate_lost
+					}
+				}
+
+				# Medium power boon upon joining
+				set_character_flag = medium_reward
+
+				# Small chance of befriending your duel target
+				# Small chance of becoming rivals with your target
+				# Small chance of getting wounded
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = is_defeated_attacker
+						has_character_flag = is_defeated_defender
+					}
+
+					NOR = {
+						has_character_flag = stalemate_won
+						has_character_flag = stalemate_lost
+					}
+				}
+				# Small chance of befriending your duel target
+				# Small chance of becoming rivals with your target
+				# High chance of getting wounded
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = stalemate_won
+						has_character_flag = stalemate_lost
+					}
+				}
+
+				# Low power boon upon joining
+				set_character_flag = minor_reward
+
+				# Big chance of befriending your duel target
+				# Big chance of becoming rivals with your target
+				# Medium chance of getting wounded
+			}
+
+			if = {
+				limit = { has_character_modifier = warrior_lodge_failed_joining_cd }
+				set_character_flag = duel_fled
+			}
+
+			character_event = {
+				id = HF.10011 # Delayed gating event for final outcome...
+				days = 10
+			}
+		}
+	}
+}
+
+handle_poison_effect = { # Shows tooltips, etc
+	if = { # Opponent used poison
+		limit = {
+			has_character_flag = add_duel_xp
+
+			OR = {
+				event_target:combatant_1 = { # If you are the person seeing the event
+					character = ROOT
+					character = PREV
+
+					event_target:combatant_2 = {
+						has_character_flag = defender_using_poison@event_target:combatant_1 # and they tried to poison you
+					}
+				}
+
+				event_target:combatant_2 = { # If you are the person seeing the event
+					character = ROOT
+					character = PREV
+
+					event_target:combatant_1 = {
+						has_character_flag = attacker_using_poison@event_target:combatant_2 # and they tried to poison you
+					}
+				}
+			}
+
+			OR = { # and you lost
+				has_character_flag = is_defeated_attacker
+				has_character_flag = is_defeated_defender
+			}
+		}
+
+		if = { # and you died
+			limit = { has_character_flag = someone_died }
+
+			custom_tooltip = { text = definitely_foul_play_tt }
+		}
+		else = { # but no one died
+			custom_tooltip = { text = suspect_foul_play_tt }
+		}
+	}
+	else_if = { # I used poison
+		limit = {
+			has_character_flag = add_duel_xp
+
+			OR = {
+				event_target:combatant_1 = { # If you are the person seeing the event
+					character = ROOT
+					character = PREV
+					has_character_flag = attacker_using_poison@event_target:combatant_2 # and you tried to poison opponent
+				}
+
+				event_target:combatant_2 = { # If you are the person seeing the event
+					character = ROOT
+					character = PREV
+					has_character_flag = defender_using_poison@event_target:combatant_1 # and you tried to poison opponent
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				OR = { # but you lost
+					has_character_flag = is_defeated_attacker
+					has_character_flag = is_defeated_defender
+				}
+			}
+
+			if = { # and you died
+				limit = { has_character_flag = someone_died }
+				custom_tooltip = { text = so_much_for_poison_tt }
+			}
+			else = { # but no one died
+				custom_tooltip = { text = so_much_for_poison_tt } # vanilla uses same message for both here
+			}
+		}
+		else_if = {
+			limit = {
+				OR = { # and you won
+					has_character_flag = is_victorious_attacker
+					has_character_flag = is_victorious_defender
+				}
+			}
+
+			if = { # and someone died died
+				limit = { has_character_flag = someone_died }
+				custom_tooltip = { text = poison_was_very_effective_tt }
+			}
+			else = { # but no one died
+				custom_tooltip = { text = poison_was_only_mildly_effective_tt }
+			}
+		}
+	}
+}
+
+# Runs for both combatant_1 and 2
+clean_up_after_duel_effect = {
+	handle_poison_effect = yes
+
+	if = {
+		limit = {
+			has_character_flag = add_duel_xp
+
+			NAND = { # Can't be you who died if you lost
+				has_character_flag = someone_died
+
+				OR = {
+					has_character_flag = is_defeated_attacker
+					has_character_flag = is_defeated_defender
+				}
+			}
+		}
+
+		increase_duel_exp_modifier_effect = yes
+	}
+
+	hidden_effect = {
+		if = { # Give troops to winner of event-duel
+			limit = {
+				has_character_flag = flag_pirate_fighting_mercenary_leader
+
+				OR = {
+					has_character_flag = is_victorious_attacker
+					has_character_flag = is_victorious_defender
+				}
+			}
+
+			character_event = { id = HF.23218 }
+		}
+
+		if = { # Courtier wrestles regency
+			limit = {
+				has_character_flag = flag_courtier_challenging_regent
+
+				OR = {
+					has_character_flag = is_victorious_attacker
+					has_character_flag = is_victorious_defender
+				}
+			}
+
+			character_event = { id = 61229 } # Courtier informed he wins, regent maimed (regency_events.txt)
+		}
+	}
+
+	if = {
+		limit = { NOT = { has_character_flag = skip_blood_effect } }
+
+		add_blood_splatter_effect = yes
+		clr_character_flag = skip_blood_effect
+	}
+
+	# If this was on the battlefield...
+	apply_battlefield_duel_opinions_effect = yes
+	send_notifications_after_champion_stand_in_effect = yes
+
+	if = {
+		limit = { is_alive = yes }
+
+		hidden_effect = {
+			set_variable = { # Reset duel score
+				which = duel_result_score # 50 (TODO: figure out why 50)
+				value = 0 # Set to zero so can be cleared on save
+			}
+
+			handle_warrior_lodge_induction_effect = yes
+		}
+	}
+
+	# If this was part of legendary journey (Warrior Lodge only)
+	if = {
+		limit = { has_character_flag = is_legendary_duel }
+
+		if = { # You died!
+			limit = { is_dying = yes }
+
+			if = {
+				limit = {
+					check_variable = {
+						which = legendary_event_progress
+						value >= 15
+					}
+				}
+
+				set_character_flag = call_it_a_day
+			}
+
+			character_event = { id = HF.12003 } # Send tombola instantly, in case of death...
+		}
+
+		else = { # You are still standing...!
+			evaluate_legendary_progress_effect = yes # Evalutate status of progress flags, as usual...
+			send_legendary_tombola_effect = yes
+		}
+	}
+
+	rank_up_to_hero_level_effect = yes
+	clr_duel_missions_effect = yes
+	clr_duel_flags_effect = yes
+}
+
+clr_duel_missions_effect = {
+	### For warrior lodge mission duels...
+	if = {
+		limit = { has_character_flag = failed_mission }
+
+		detract_society_currency_medium_effect = yes
+
+		clr_quest = {
+			id = quest_warrior_lodge_duel_deadly
+			failure = yes
+		}
+
+		clr_character_flag = failed_mission
+	}
+	else = { # Means you succeeded your mission!
+		if = {
+			limit = { character = event_target:combatant_1 } # If you are the attacker...
+
+			if = {
+				limit = {
+					has_quest = quest_warrior_lodge_duel_honor
+					quest_target = { character = event_target:combatant_2 }
+				}
+
+				if = {
+					limit = {
+						OR = {
+							has_character_flag = is_victorious_attacker
+							has_character_flag = is_victorious_defender
+						}
+					}
+
+					add_society_currency_medium_effect = yes
+				}
+				else = {
+					add_society_currency_minor_effect = yes
+				}
+
+				clr_quest = quest_warrior_lodge_duel_honor
+			}
+			else_if = {
+				limit = {
+					has_quest = quest_warrior_lodge_duel_deadly
+					quest_target = { character = event_target:combatant_2 }
+				}
+
+				if = {
+					limit = {
+						OR = {
+							has_character_flag = is_victorious_attacker
+							has_character_flag = is_victorious_defender
+						}
+					}
+
+					if = { # This missions gives more reward for deadly outcomes...
+						limit = { has_character_flag = someone_died }
+						add_society_currency_major_effect = yes
+					}
+					else = {
+						add_society_currency_medium_effect = yes
+					}
+				}
+				else = {
+					detract_society_currency_minor_effect = yes
+				}
+
+				clr_quest = quest_warrior_lodge_duel_deadly
+			}
+		}
+		else = { # Means you are player 2/defender...
+			if = {
+				limit = {
+					has_quest = quest_warrior_lodge_duel_honor
+					quest_target = { character = event_target:combatant_1 }
+				}
+
+				if = {
+					limit = {
+						OR = {
+							has_character_flag = is_victorious_attacker
+							has_character_flag = is_victorious_defender
+						}
+					}
+
+					add_society_currency_medium_effect = yes
+				}
+				else = {
+					add_society_currency_minor_effect = yes
+				}
+
+				clr_quest = quest_warrior_lodge_duel_honor
+			}
+			else_if = {
+				limit = {
+					has_quest = quest_warrior_lodge_duel_deadly
+					quest_target = { character = event_target:combatant_1 }
+				}
+
+				if = {
+					limit = {
+						OR = {
+							has_character_flag = is_victorious_attacker
+							has_character_flag = is_victorious_defender
+						}
+					}
+
+					if = { # this missions gives more reward for deadly outcomes...
+						limit = { has_character_flag = someone_died }
+						add_society_currency_major_effect = yes
+					}
+					else = {
+						add_society_currency_medium_effect = yes
+					}
+				}
+				else = {
+					detract_society_currency_minor_effect = yes
+				}
+				clr_quest = quest_warrior_lodge_duel_deadly
+			}
+		}
+	}
+}
+
+rank_up_to_hero_level_effect = {
+	### For warrior lodge rank-up duels...
+	if = {
+		limit = { has_character_flag = fighting_to_rank_up } # Ensures it only runs for the player...
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = is_victorious_attacker
+					has_character_flag = is_victorious_defender
+				}
+			}
+
+			if = { # If the target is still alive...
+				limit = { event_target:combatant_2 = { is_alive = yes } }
+
+				event_target:combatant_2 = {
+					set_character_flag = may_join_society
+					character_event = { id = HF.10061 } # Send outcome ping to the duel target...
+				}
+			}
+			else = {
+				event_target:my_society = { # Choose a hero target to deliver the news instead...
+					any_society_member = {
+						limit = { society_rank == 4 }
+
+						score_value = { # Prioritizes selecting some kind of warrior...
+							value = 10
+							good_soldier_outcome_score = yes
+						}
+
+						save_event_target_as = hero_character
+						set_character_flag = may_join_society
+						character_event = { id = HF.10061 } # Send outcome...
+					}
+				}
+			}
+		}
+		else = {
+			if = { # If the target is still alive...
+				limit = { event_target:combatant_2 = { is_alive = yes } }
+
+				event_target:combatant_2 = {
+					character_event = { id = HF.10061 } # Send outcome ping to the duel target...
+				}
+			}
+			else = {
+				event_target:my_society = { # Choose a hero target to deliver the news instead...
+					any_society_member = {
+						limit = { society_rank == 4 }
+
+						score_value = { # Prioritizes selecting some kind of warrior...
+							value = 10
+							good_soldier_outcome_score = yes
+						}
+
+						save_event_target_as = hero_character
+						character_event = { id = HF.10061 } # Send outcome...
+					}
+				}
+			}
+		}
+	}
+}
+
+send_notifications_after_champion_stand_in_effect = {
+	if = {
+		limit = {
+			has_character_flag = is_battlefield_duel
+			character = event_target:commander_to_the_rescue # If you are the rescuer...
+		}
+
+		if = {
+			limit = {
+				NOR = {
+					has_character_flag = is_defeated_attacker
+					has_character_flag = is_defeated_defender
+				}
+			}
+
+			set_character_flag = won_battlefield_duel
+		}
+		else = {
+			set_character_flag = lost_battlefield_duel
+		}
+
+		hidden_effect = {
+			event_target:home_commander = {
+				character_event = { id = HFP.11040 } # Let the original *commander* know what happened...
+			}
+
+			if = {
+				limit = { home_commander_and_liege_are_different_characters = yes }
+
+				event_target:home_liege = {
+					character_event = { id = HFP.11041 } # Let the original *liege* know what happened...
+				}
+			}
+		}
+	}
+}
+
+clr_duel_flags_effect = {
+	hidden_effect = {
+		# Clears all flags...
+		clr_character_flag = flag_antagonizer_duel
+		clr_character_flag = mock_duel
+		clr_character_flag = deadly_duel # Not yet used?
+		clr_character_flag = about_to_challenge_enemy_commander
+		clr_character_flag = is_legendary_duel
+		clr_character_flag = is_battlefield_duel
+		clr_character_flag = battle_event_in_progess
+		clr_character_flag = someone_died
+		clr_character_flag = is_defeated_attacker
+		clr_character_flag = is_defeated_defender
+		clr_character_flag = is_victorious_attacker
+		clr_character_flag = is_victorious_defender
+		clr_character_flag = intrigue_options_available
+		clr_character_flag = is_friendly_fight
+		clr_character_flag = is_family_fight
+		clr_character_flag = is_rival_fight
+		clr_character_flag = fight_could_spark_romance
+		clr_character_flag = fight_could_spark_rivalry
+		clr_character_flag = fight_could_spark_friendship
+		clr_character_flag = injury_both_eyes
+		clr_character_flag = injury_eye
+		clr_character_flag = injury_hand
+		clr_character_flag = injury_leg
+		clr_character_flag = injury_face
+		clr_character_flag = injury_mangled_body
+		clr_character_flag = injury_maimed
+		clr_character_flag = injury_could_be_lethal
+		clr_character_flag = clumsy_double_KO
+		clr_character_flag = elegant_double_KO
+		clr_character_flag = mildly_injured
+		clr_character_flag = severely_injured
+		clr_character_flag = actually_injured
+		clr_character_flag = ignore_damage
+		clr_character_flag = injury_kills
+		clr_character_flag = desc_A
+		clr_character_flag = desc_B
+		clr_character_flag = desc_C
+		clr_character_flag = desc_D
+		clr_character_flag = desc_E
+		clr_character_flag = stalemate_won
+		clr_character_flag = stalemate_lost
+		clr_character_flag = add_duel_xp
+		clr_character_flag = target_was_threatened
+		clr_character_flag = flag_duel_no_draws
+		clr_character_flag = flag_pirate_fighting_mercenary_leader
+		clr_character_flag = flag_courtier_challenging_regent
+		clr_character_flag = claim_duel@event_target:combatant_2
+		clr_character_flag = adventure_duel@event_target:combatant_2
+		clr_character_flag = wants_multiple_titles_from@event_target:combatant_2
+		clr_character_flag = wants_single_title_from@event_target:combatant_2
+		clr_character_flag = is_spared_poisoner
+		clr_character_flag = attacker_using_poison@event_target:combatant_2
+		clr_character_flag = poison_can_fail_against@event_target:combatant_2
+		clr_character_flag = defender_using_poison@event_target:combatant_1
+		clr_character_flag = poison_can_fail_against@event_target:combatant_1
+		clr_character_flag = use_tribal_victory_pic
+		### DnD Classes
+		clr_character_flag = wizardduel
+		clr_character_flag = sorcererduel
+		clr_character_flag = bardduel
+		clr_character_flag = warlockduel
+		clr_character_flag = clericduel
+		clr_character_flag = druidduel
+		clr_character_flag = paladinduel
+		clr_character_flag = fighterduel
+		clr_character_flag = barbarianduel
+		clr_character_flag = rangerduel
+		clr_character_flag = rogueduel
+		clr_character_flag = assassinduel
+		clr_character_flag = shadowduel
+		clr_character_flag = monkduel
+	}
+}
+
+# increase_duel_exp_modifier_effect = { # Modifiers gotten at end-states a duel
+#	if = {
+#		limit = { has_duel_exp_modifier_trigger = yes }
+#
+#		custom_tooltip = {
+#			text = increase_duel_exp_tt
+#
+#			trigger_switch = {
+#				on_trigger = has_character_modifier
+#
+#				duel_exp_1 = {
+#					remove_character_modifier = duel_exp_1
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_2
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_2 = {
+#					remove_character_modifier = duel_exp_2
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_3
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_3 = {
+#					remove_character_modifier = duel_exp_3
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_4
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_4 = {
+#					remove_character_modifier = duel_exp_4
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_5
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_5 = {
+#					remove_character_modifier = duel_exp_5
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_6
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_6 = {
+#					remove_character_modifier = duel_exp_6
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_7
+#			    		years = 7
+#			    	}
+#				}
+#
+#				duel_exp_7 = {
+#					remove_character_modifier = duel_exp_7
+#
+#					add_character_modifier = {
+#			    		name = duel_exp_8
+#			    		years = 7
+#			    	}
+#				}
+#				duel_exp_8 = {
+#					add_character_modifier = {
+#			    		name = duel_exp_8
+#			    		years = 7
+#			    	}
+#				}
+#			}
+#		}
+#	}
+#	else = {
+#		add_character_modifier = {
+#    		name = duel_exp_1
+#    		years = 7
+#    	}
+#	}
+# }
+
+# Send an event to random subject, where they share in the guilt and shame and might be come Cowards themselves.
+# Or angry, encouraging liege to stop being such a Coward
+spread_cowardice_trait_effect = {
+	any_courtier_or_vassal = {
+		limit = {
+			age >= 14
+
+			NOR = {
+				trait = craven
+				has_character_flag = reacting_to_craven_duelist
+
+				has_opinion_modifier = {
+					name = opinion_declined_my_duel
+					who = PREV
+				}
+			}
+
+			is_inaccessible_or_incapable_trigger = no
+		}
+
+		score_value = { # Prioritizes selecting an interesting courtier...
+			value = 10
+			interesting_courtier_selection_score = yes
+		}
+
+		set_character_flag = reacting_to_craven_duelist
+
+		character_event = {
+			id = HF.16000 # Become Craven, like your liege!
+			days = 10
+			random = 5
+		}
+	}
+}
+
+# Run in combatant_2/defender scope, with FROM as combatant_1/attacker
+increase_cowardly_status_effect = {
+	add_character_modifier = {
+		name = duels_declined # To track TOTAL amounts of challenges rejected
+		duration = -1
+		stacking = yes
+		hidden = yes
+	}
+
+	if = {
+		limit = {
+			has_instances_of_character_modifier = {
+				name = duels_declined
+				amount >= 3
+			}
+		}
+
+		hidden_effect = {
+			if = {
+				limit = { trait = craven }
+				spread_cowardice_trait_effect = yes # Send event to random subject
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			has_instances_of_character_modifier = {
+				name = duels_declined
+				amount >= 5
+			}
+		}
+
+		hidden_effect = {
+			spread_cowardice_trait_effect = yes # Send event to random subject
+		}
+	}
+
+	if = {
+		limit = {
+			has_instances_of_character_modifier = {
+				name = duels_declined
+				amount >= 5 # TODO: Change this number, or one of the above numbers?
+			}
+		}
+
+		hidden_effect = {
+			spread_cowardice_trait_effect = yes # Send event to random subject
+		}
+	}
+
+	else_if = {
+		limit = {
+			has_instances_of_character_modifier = {
+				name = duels_declined
+				amount >= 10
+			}
+		}
+
+		give_nickname = nick_the_cowardly
+
+		hidden_effect = {
+			spread_cowardice_trait_effect = yes # Send event to random subject
+		}
+	}
+}
+
+increase_troublemaker_status_effect = {
+	add_character_modifier = {
+		name = trigger_happy # To track TOTAL amounts of challenges issued
+		duration = -1
+		stacking = yes
+		hidden = yes
+	}
+
+	if = {
+		limit = {
+			has_instances_of_character_modifier = {
+				name = trigger_happy
+				amount >= 10
+			}
+		}
+
+		give_nickname = nick_the_belligerent
+	}
+}
+
+increase_duel_exp_modifier_effect = {
+	# Add the Duel Experience Modifier - It is very mild, so it can be given out multiple times
+	custom_tooltip = {
+		text = increase_duel_exp_tt
+
+		# You always get one level
+		add_one_duel_experience_modifier = yes
+
+		# If you're victorious, you gain one extra level, and two small chances for more
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = is_victorious_attacker
+					has_character_flag = is_victorious_defender
+				}
+			}
+
+			add_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+		}
+		# If you're defeated you gain five small chances for more, as you may or may not pick something up
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = is_defeated_attacker
+					has_character_flag = is_defeated_defender
+				}
+			}
+
+			small_chance_for_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+			small_chance_for_one_duel_experience_modifier = yes
+		}
+
+		# Apply hidden 'practical' duel experience, which can give you special modifiers
+		if = {
+			limit = { # Mock duels gives you Personal Combat Skill, but do not bring any other benefits
+				NOT = { has_character_flag = mock_duel }
+			}
+
+			change_variable = {
+				which = duel_experience_level
+				value = 1
+			}
+
+
+			if = { # Victories give more experience levels
+				limit = {
+					OR = {
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+
+				change_variable = {
+					which = duel_experience_level
+					value = 1
+				}
+			}
+
+			if = { # Fighting Rivals give more experience levels
+				limit = { has_character_flag = is_rival_fight }
+
+				change_variable = {
+					which = duel_experience_level
+					value = 1
+				}
+			}
+
+			if = { # Duels in Battles give more experience
+				limit = { has_character_flag = is_battlefield_duel }
+
+				change_variable = {
+					which = duel_experience_level
+					value = 1
+				}
+			}
+
+			if = { # Sneaky experience is awarded when you use Intrigue
+				limit = { has_character_flag = target_was_threatened } # Applied when a cornering is successful
+
+				change_variable = {
+					which = sneaky_duel_experience_level
+					value = 1
+				}
+			}
+
+			if = { # Ruthless experience is awarded when you kill someone in a duel
+				limit = {
+					has_character_flag = someone_died
+
+					OR = {
+						has_character_flag = is_victorious_attacker
+						has_character_flag = is_victorious_defender
+					}
+				}
+
+				change_variable = {
+					which = ruthless_duel_experience_level
+					value = 1
+				}
+			}
+		}
+
+		# Renown increases the more you fight in real duels, makes you more respected (and sexy)
+		set_variable = {
+			which = duel_experience_level_check
+			which = duel_experience_level
+		}
+
+		divide_variable = {
+			which = duel_experience_level_check
+			value = 5
+		}
+
+		remove_character_modifiers = {
+			name = duelist_renown
+			amount = 999
+		}
+
+		while = {
+			limit = {
+				check_variable = {
+					which = duel_experience_level_check
+					value >= 1
+				}
+			}
+
+			add_character_modifier = {
+				name = duelist_renown
+				duration = -1
+				stacking = yes
+			}
+
+			change_variable = {
+				which = duel_experience_level_check
+				value = -1
+			}
+		}
+
+		# Ruthlessness (If particularly violent and non-discriminating)
+		set_variable = {
+			which = ruthlessness_level_check
+			which = ruthless_duel_experience_level
+		}
+
+		divide_variable = {
+			which = ruthlessness_level_check
+			value = 5
+		}
+
+		remove_character_modifiers = {
+			name = ruthless_duelist
+			amount = 999
+		}
+
+		while = {
+			limit = {
+				check_variable = {
+					which = ruthlessness_level_check
+					value >= 1
+				}
+			}
+
+			add_character_modifier = {
+				name = ruthless_duelist
+				duration = -1
+				stacking = yes
+			}
+
+			change_variable = {
+				which = ruthlessness_level_check
+				value = -1
+			}
+		}
+
+
+		# Sneaky Duelist (If Intrigue is used)
+		set_variable = {
+			which = sneaky_level_check
+			which = sneaky_duel_experience_level
+		}
+
+		divide_variable = {
+			which = sneaky_level_check
+			value = 5
+		}
+
+		remove_character_modifiers = {
+			name = devious_duelist
+			amount = 999
+		}
+
+		while = {
+			limit = {
+				check_variable = {
+					which = sneaky_level_check
+					value >= 1
+				}
+			}
+
+			add_character_modifier = {
+				name = devious_duelist
+				duration = -1
+				stacking = yes
+			}
+
+			change_variable = {
+				which = sneaky_level_check
+				value = -1
+			}
+		}
+
+
+		# Particularly tenacious Duelists can gain the Duelist trait, but it's a low chance as it's so uber-powerful
+		if = {
+			limit = {
+				check_variable = {
+					which = duel_experience_level
+					value >= 15
+				}
+
+				NOR = {
+					has_character_flag = denied_duelist_trait
+					lifestyle_traits >= 1
+				}
+
+				any_kill_list_character = {
+					death_reason = death_duel
+				}
+			}
+
+			random = {
+				chance = 5
+
+				character_event = {
+					id = HFP.400 # Chance for Duelist
+					days = 14
+				}
+			}
+		}
+
+		# Particularly Crafty, Ruthless and Experienced Duelists can gain a Legendary bloodline
+		# if = {
+			# limit = {
+				# has_dlc = "Holy Fury"
+				# trait = duelist
+				# check_variable = { which = duel_experience_level value >= 50 }
+				# check_variable = { which = ruthless_duel_experience_level value >= 20 }
+
+				# OR = {
+					# check_variable = { which = sneaky_duel_experience_level value >= 10 }
+					# check_variable = { which = duel_experience_level value >= 80 }
+				# }
+
+				# NOR = {
+					# any_owned_bloodline = {
+						# has_bloodline_flag = duelist_bloodline
+						# bloodline_is_active_for = PREV
+					# }
+
+					# has_character_flag = got_duelist_bloodline
+				# }
+			# }
+
+			# random = {
+				# chance = 20
+
+				# mult_modifier = { # Increased chance if no bloodline present
+					# factor = 2.5
+
+					# NOT = {
+						# any_owned_bloodline = {
+							# always = yes
+						# }
+					# }
+				# }
+
+				# set_character_flag = got_duelist_bloodline
+
+				# character_event = {
+					# id = HFP.402 # Duelist Bloodline Earned
+					# days = 14
+				# }
+			# }
+		# }
+	}
+
+	# Battle Experience is applied if you win a battlefield duel, as an added boon for your risk
+	if = {
+		limit = {
+			has_character_flag = is_battlefield_duel
+
+			OR = {
+				has_character_flag = is_victorious_attacker
+				has_character_flag = is_victorious_defender
+			}
+		}
+
+		increase_battle_experience_effect = yes
+	}
+}
