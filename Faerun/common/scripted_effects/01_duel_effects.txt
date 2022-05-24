@@ -4394,308 +4394,499 @@ increase_troublemaker_status_effect = {
 	}
 }
 
-increase_duel_exp_modifier_effect = {
-	# Add the Duel Experience Modifier - It is very mild, so it can be given out multiple times
-	custom_tooltip = {
-		text = increase_duel_exp_tt
+reset_warrior_lodge_joining_chain_effect = {
+	hidden_effect = {
+		clr_character_flag = society_join_block
+		clr_character_flag = awaiting_initiation_trial
+		clr_character_flag = mock_duel
+		clr_character_flag = add_duel_xp
+	}
+}
 
-		# You always get one level
-		add_one_duel_experience_modifier = yes
-
-		# If you're victorious, you gain one extra level, and two small chances for more
-		if = {
-			limit = {
-				OR = {
-					has_character_flag = is_victorious_attacker
-					has_character_flag = is_victorious_defender
-				}
-			}
-
-			add_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-		}
-		# If you're defeated you gain five small chances for more, as you may or may not pick something up
-		if = {
-			limit = {
-				OR = {
-					has_character_flag = is_defeated_attacker
-					has_character_flag = is_defeated_defender
-				}
-			}
-
-			small_chance_for_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-			small_chance_for_one_duel_experience_modifier = yes
-		}
-
-		# Apply hidden 'practical' duel experience, which can give you special modifiers
-		if = {
-			limit = { # Mock duels gives you Personal Combat Skill, but do not bring any other benefits
-				NOT = { has_character_flag = mock_duel }
-			}
-
-			change_variable = {
-				which = duel_experience_level
-				value = 1
-			}
-
-
-			if = { # Victories give more experience levels
-				limit = {
-					OR = {
-						has_character_flag = is_victorious_attacker
-						has_character_flag = is_victorious_defender
-					}
-				}
-
-				change_variable = {
-					which = duel_experience_level
-					value = 1
-				}
-			}
-
-			if = { # Fighting Rivals give more experience levels
-				limit = { has_character_flag = is_rival_fight }
-
-				change_variable = {
-					which = duel_experience_level
-					value = 1
-				}
-			}
-
-			if = { # Duels in Battles give more experience
-				limit = { has_character_flag = is_battlefield_duel }
-
-				change_variable = {
-					which = duel_experience_level
-					value = 1
-				}
-			}
-
-			if = { # Sneaky experience is awarded when you use Intrigue
-				limit = { has_character_flag = target_was_threatened } # Applied when a cornering is successful
-
-				change_variable = {
-					which = sneaky_duel_experience_level
-					value = 1
-				}
-			}
-
-			if = { # Ruthless experience is awarded when you kill someone in a duel
-				limit = {
-					has_character_flag = someone_died
-
-					OR = {
-						has_character_flag = is_victorious_attacker
-						has_character_flag = is_victorious_defender
-					}
-				}
-
-				change_variable = {
-					which = ruthless_duel_experience_level
-					value = 1
-				}
-			}
-		}
-
-		# Renown increases the more you fight in real duels, makes you more respected (and sexy)
-		set_variable = {
-			which = duel_experience_level_check
-			which = duel_experience_level
-		}
-
-		divide_variable = {
-			which = duel_experience_level_check
-			value = 5
-		}
-
-		remove_character_modifiers = {
-			name = duelist_renown
-			amount = 999
-		}
-
-		while = {
-			limit = {
-				check_variable = {
-					which = duel_experience_level_check
-					value >= 1
-				}
-			}
-
-			add_character_modifier = {
-				name = duelist_renown
-				duration = -1
-				stacking = yes
-			}
-
-			change_variable = {
-				which = duel_experience_level_check
-				value = -1
-			}
-		}
-
-		# Ruthlessness (If particularly violent and non-discriminating)
-		set_variable = {
-			which = ruthlessness_level_check
-			which = ruthless_duel_experience_level
-		}
-
-		divide_variable = {
-			which = ruthlessness_level_check
-			value = 5
-		}
-
-		remove_character_modifiers = {
-			name = ruthless_duelist
-			amount = 999
-		}
-
-		while = {
-			limit = {
-				check_variable = {
-					which = ruthlessness_level_check
-					value >= 1
-				}
-			}
-
-			add_character_modifier = {
-				name = ruthless_duelist
-				duration = -1
-				stacking = yes
-			}
-
-			change_variable = {
-				which = ruthlessness_level_check
-				value = -1
-			}
-		}
-
-
-		# Sneaky Duelist (If Intrigue is used)
-		set_variable = {
-			which = sneaky_level_check
-			which = sneaky_duel_experience_level
-		}
-
-		divide_variable = {
-			which = sneaky_level_check
-			value = 5
-		}
-
-		remove_character_modifiers = {
-			name = devious_duelist
-			amount = 999
-		}
-
-		while = {
-			limit = {
-				check_variable = {
-					which = sneaky_level_check
-					value >= 1
-				}
-			}
-
-			add_character_modifier = {
-				name = devious_duelist
-				duration = -1
-				stacking = yes
-			}
-
-			change_variable = {
-				which = sneaky_level_check
-				value = -1
-			}
-		}
-
-
-		# Particularly tenacious Duelists can gain the Duelist trait, but it's a low chance as it's so uber-powerful
-		if = {
-			limit = {
-				check_variable = {
-					which = duel_experience_level
-					value >= 15
-				}
+# Run in immediate of events before duel_enemy_commander_effect to enable options! (use random chance?)
+find_cannon_fodder_commander_effect = {
+	if = { # Check for friendly commander to jump in and take the duel for you...
+		limit = {
+			any_unit_leader = { # Check if there is a unit leader with you, who doesn't hate you...}
+				is_in_same_unit_as = ROOT
+				ai = yes
 
 				NOR = {
-					has_character_flag = denied_duelist_trait
-					lifestyle_traits >= 1
-				}
-
-				any_kill_list_character = {
-					death_reason = death_duel
-				}
-			}
-
-			random = {
-				chance = 5
-
-				character_event = {
-					id = HFP.400 # Chance for Duelist
-					days = 14
+					character = ROOT
+					has_character_flag = battle_event_in_progess
 				}
 			}
 		}
 
-		# Particularly Crafty, Ruthless and Experienced Duelists can gain a Legendary bloodline
-		# if = {
-			# limit = {
-				# has_dlc = "Holy Fury"
-				# trait = duelist
-				# check_variable = { which = duel_experience_level value >= 50 }
-				# check_variable = { which = ruthless_duel_experience_level value >= 20 }
+		any_unit_leader = { # This person takes the fight for you...
+			limit = {
+				is_in_same_unit_as = ROOT
+				ai = yes
 
-				# OR = {
-					# check_variable = { which = sneaky_duel_experience_level value >= 10 }
-					# check_variable = { which = duel_experience_level value >= 80 }
-				# }
+				NOR = {
+					character = ROOT
+					has_character_flag = battle_event_in_progess
+				}
+			}
 
-				# NOR = {
-					# any_owned_bloodline = {
-						# has_bloodline_flag = duelist_bloodline
-						# bloodline_is_active_for = PREV
-					# }
+			score_value = {
+				value = 1
+				beloved_target_selection_score = yes
+			}
 
-					# has_character_flag = got_duelist_bloodline
-				# }
-			# }
-
-			# random = {
-				# chance = 20
-
-				# mult_modifier = { # Increased chance if no bloodline present
-					# factor = 2.5
-
-					# NOT = {
-						# any_owned_bloodline = {
-							# always = yes
-						# }
-					# }
-				# }
-
-				# set_character_flag = got_duelist_bloodline
-
-				# character_event = {
-					# id = HFP.402 # Duelist Bloodline Earned
-					# days = 14
-				# }
-			# }
-		# }
+			disallow_new_battle_events_effect = yes # To keep the tombola from spamming this character...
+			save_event_target_as = commander_cannon_fodder
+		}
 	}
+}
 
-	# Battle Experience is applied if you win a battlefield duel, as an added boon for your risk
+# Runs before duel_enemy_commander_effect. Won't always succeed.
+find_commander_to_the_rescue_effect = {
+	if = { # Check for friendly commander to jump in and take the duel for you...
+		limit = {
+			any_unit_leader = { # Check if there is a unit leader with you, who doesn't hate you...
+				is_in_same_unit_as = ROOT
+				ai = yes
+
+				NOR = {
+					character = ROOT
+					has_character_flag = battle_event_in_progess
+				}
+
+				# this_has_terrible_opinion_modifier_of_root_extended_trigger = no
+			}
+		}
+
+		random = {
+			chance = 25
+
+			any_unit_leader = { # This person takes the fight for you...
+				limit = {
+					is_in_same_unit_as = ROOT
+					ai = yes
+
+					NOR = {
+						character = ROOT
+						has_character_flag = battle_event_in_progess
+					}
+
+					# this_has_terrible_opinion_modifier_of_root_extended_trigger = no
+				}
+
+				score_value = {
+					value = 1
+					beloved_target_selection_score = yes
+				}
+
+				save_event_target_as = commander_to_the_rescue
+			}
+		}
+	}
+}
+
+# Used in battles (on_combat_pulse)
+duel_enemy_commander_effect = {
+	custom_tooltip = {
+		text = chase_down_enemy_commander_tt
+
+		event_target:enemy_commander = {
+			set_character_flag = add_duel_xp
+			set_character_flag = is_battlefield_duel
+			disallow_new_battle_events_effect = yes
+		}
+
+		find_commander_to_the_rescue_effect = yes
+
+		if = {
+			limit = {
+				event_target:commander_to_the_rescue = { is_alive = yes } # Check for whether find_commander_to_the_rescue_effect found someone...
+			}
+
+			event_target:commander_to_the_rescue = {
+				save_event_target_as = combatant_1 # Overwrites ROOT, who's no longer participating in duel
+				set_character_flag = add_duel_xp
+				set_character_flag = is_battlefield_duel
+				set_character_flag = already_taking_a_duel # To make sure an AI isn't going through a ton of duels at once...
+
+				set_dueling_weapon_effect = yes
+				reset_duel_timers_effect = yes
+				character_event = { id = HFP.10100 } # Actual Duel evaluation and result...
+
+				if = {
+					limit = { ROOT = { ai = no } }
+					log = "BATTLE EVENT: [commander_to_the_rescue.GetBestName] took a duel for [Root.GetTitledFirstName]."
+				}
+			}
+		}
+		else = { # You have no champion, so going through with duel...
+			set_character_flag = add_duel_xp
+			set_character_flag = is_battlefield_duel
+			reset_duel_timers_effect = yes
+
+			if = {
+				limit = { ROOT = { ai = no } }
+				log = "BATTLE EVENT: [Root.GetBestName] started a duel against [enemy_commander.GetBestName]."
+			}
+
+			# Chooses a weapon for mainly loc purposes (but has a tiny effect on outcomes, too)...
+			set_dueling_weapon_effect = yes # You get a weapon!
+			event_target:combatant_2 = { set_dueling_weapon_effect = yes } # and YOU get a weapon!
+
+			# Chooses a body part for injury (if it occurs), also for loc purposes (effect handles both characters)
+			set_potential_injury_flag_effect = yes
+
+			# Scripted effect requiring event-targets combatant_1 & combatant_2! RAW NUMBERS...
+			evaluate_duel_result_score_effect = yes
+
+			# Room for extra special calculations... (based on traits, and other special circumstances?)
+			evaluate_extra_duel_result_score_effect = yes
+
+			# Send the correct result event (from random_list)...
+			send_duel_result_event_effect = yes
+		}
+	}
+}
+
+# Used at the end of battle duels...
+apply_battlefield_duel_opinions_effect = {
 	if = {
 		limit = {
 			has_character_flag = is_battlefield_duel
 
-			OR = {
+			NOR = {
+				has_character_flag = fight_could_spark_friendship
+				has_character_flag = fight_could_spark_romance
 				has_character_flag = is_victorious_attacker
 				has_character_flag = is_victorious_defender
 			}
+
+			event_target:other_combatant = {
+				is_alive = yes
+			}
 		}
 
-		increase_battle_experience_effect = yes
+		opinion = {
+			name = opinion_injured_me_in_battle
+			who = event_target:other_combatant
+			years = 15
+		}
+	}
+	else_if = {
+		limit = {
+			has_character_flag = is_battlefield_duel
+
+			OR = {
+				has_character_flag = fight_could_spark_friendship
+				has_character_flag = fight_could_spark_romance
+			}
+
+			NOR = {
+				has_character_flag = is_victorious_attacker
+				has_character_flag = is_victorious_defender
+			}
+
+			event_target:other_combatant = {
+				is_alive = yes
+			}
+		}
+
+		opinion = {
+			name = opinion_impressed_me_in_battle
+			who = event_target:other_combatant
+			years = 15
+		}
+	}
+	else_if = { # If this was an "uneventful" battlefield-duel...
+		limit = {
+			has_character_flag = is_battlefield_duel
+
+			NOR = {
+				has_character_flag = fight_could_spark_friendship
+				has_character_flag = fight_could_spark_romance
+			}
+		}
+
+		random = {
+			chance = 50
+			add_battle_PTSD_effect = yes # Chance to send delayed follow-up event
+		}
+	}
+}
+
+add_battle_PTSD_effect = {
+	if = {
+		limit = { NOT = { has_character_flag = has_PTSD } }
+
+		hidden_effect = {
+			set_character_flag = has_PTSD
+
+			character_event = {
+				id = HFP.11019 # PTSD follow up (normal version)
+				years = 1
+				random = 50
+			}
+		}
+	}
+}
+
+disallow_new_battle_events_effect = {
+	set_character_flag = battle_event_in_progess
+}
+
+allow_new_battle_events_effect = {
+	clr_character_flag = battle_event_in_progess
+}
+
+clr_battle_nickname_flags_effect = {
+	clr_character_flag = the_astrologer
+	clr_character_flag = the_great_beast
+	clr_character_flag = the_artist_ruler
+	clr_character_flag = the_ambitious
+	clr_character_flag = the_bloody
+	clr_character_flag = the_diplomat
+	clr_character_flag = the_kind_hearted
+	clr_character_flag = the_generous
+	clr_character_flag = the_executioner
+	clr_character_flag = iron_fist
+	clr_character_flag = stone_fist
+	clr_character_flag = the_bulwark
+	clr_character_flag = the_tower
+	clr_character_flag = the_wall_of_title
+	clr_character_flag = the_underdog
+	clr_character_flag = the_ground_warrior
+	clr_character_flag = lord_lady_of_the_terrain
+	clr_character_flag = lord_lady_ground
+	clr_character_flag = the_terrain_commander
+}
+
+apply_opinion_reward_effect = {
+	if = { # As long as you are not BOTH characters...
+		limit = { enemy_commander_and_liege_are_different_characters = yes }
+
+		if = {
+			limit = { event_target:enemy_commander = { character = ROOT } } # If ROOT is the enemy-commander
+
+			show_portrait = event_target:enemy_liege
+			show_portrait = event_target:home_commander
+
+			trigger_switch = {
+				on_trigger = has_character_flag
+
+				fought_worse_warrior@event_target:home_commander = { # If it was a worse commander you killed...
+					tooltip = {
+						opinion = {
+							name = opinion_impressed
+							who = event_target:enemy_liege
+							years = 10
+						}
+					}
+
+					reverse_opinion = {
+						name = opinion_was_praised
+						who = event_target:enemy_liege
+						years = 10
+					}
+				}
+
+				fought_even_warrior@event_target:home_commander = {  # If it was an evenly matched commander you killed...
+					tooltip = {
+						opinion = {
+							name = opinion_thoroughly_impressed
+							who = event_target:enemy_liege
+							years = 10
+						}
+					}
+
+					reverse_opinion = {
+						name = opinion_was_thoroughly_praised
+						who = event_target:enemy_liege
+						years = 10
+					}
+				}
+
+				fought_great_warrior@event_target:home_commander = { # If it was a better commander you killed...
+					tooltip = {
+						opinion = {
+							name = opinion_wildly_impressed
+							who = event_target:enemy_liege
+							years = 10
+						}
+					}
+
+					reverse_opinion = {
+						name = opinion_was_wildly_praised
+						who = event_target:enemy_liege
+						years = 10
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { event_target:enemy_liege = { character = ROOT } } # If ROOT is the enemy-liege
+
+			show_portrait = event_target:enemy_commander
+			show_portrait = event_target:home_commander
+
+			if = {
+				limit = { event_target:enemy_commander = { is_alive = yes } }
+
+				event_target:enemy_commander = { # Scope setting to use the trigger-switch properly...
+					show_scope_change = no
+
+					trigger_switch = {
+						on_trigger = has_character_flag
+
+						fought_worse_warrior@event_target:home_commander = { # If it was a worse commander you killed...
+							ROOT = {
+								show_scope_change = no
+
+								tooltip = {
+									reverse_opinion = {
+										name = opinion_was_praised
+										who = event_target:enemy_commander
+										years = 10
+									}
+								}
+
+								opinion = {
+									name = opinion_impressed
+									who = event_target:enemy_commander
+									years = 10
+								}
+							}
+						}
+
+						fought_even_warrior@event_target:home_commander = { # If it was an evenly matched commander you killed...
+							ROOT = {
+								show_scope_change = no
+
+								tooltip = {
+									reverse_opinion = {
+										name = opinion_was_thoroughly_praised
+										who = event_target:enemy_commander
+										years = 10
+									}
+								}
+
+								opinion = {
+									name = opinion_thoroughly_impressed
+									who = event_target:enemy_commander
+									years = 10
+								}
+							}
+						}
+
+						fought_great_warrior@event_target:home_commander = { # If it was a better commander you killed...
+							ROOT = {
+								show_scope_change = no
+
+								tooltip = {
+									reverse_opinion = {
+										name = opinion_was_wildly_praised
+										who = event_target:enemy_commander
+										years = 10
+									}
+								}
+
+								opinion = {
+									name = opinion_wildly_impressed
+									who = event_target:enemy_commander
+									years = 10
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	character_event = {
+		id = HFP.11044 # Clean-up reward-flags (mostly for MP safety)
+		days = 20
+	}
+}
+
+# For logging purposes...
+debug_battle_death_counter_effect = {
+	hidden_effect = {
+		if = {
+			limit = { has_character_flag = is_battlefield_duel }
+
+			change_variable = {
+				which = global_deaths_in_battle
+				value = 1
+			}
+
+			liege = {
+				set_character_flag = commanders_have_died_for_me
+
+				change_variable = {
+					which = my_commander_deaths_in_battle
+					value = 1
+				}
+			}
+		}
+	}
+}
+
+set_battle_duels_option_flag_effect = {
+	# Clean-up from before, for safety...
+	clr_character_flag = high_PCS_opt
+	clr_character_flag = duel_enemy_opt
+	clr_character_flag = duel_enemy_opt_gain_brave
+	clr_character_flag = duel_enemy_opt_is_brave
+
+	random_list = {
+		100 = { # Special option: High Combat-rating only (no enemy commander present)
+			trigger = {
+				duelist_skill_is_high_group_trigger = yes
+				NOT = { event_target:enemy_commander = { always = yes } }
+			}
+
+			set_character_flag = high_PCS_opt
+		}
+
+		100 = { # Special option: Duel enemy commander instead (if you have great combat rating)
+			trigger = {
+				NOT = { trait = brave }
+
+				event_target:enemy_commander = {
+					is_alive = yes
+
+					OR = {
+						duelist_skill_compared_to_prev_low_group_trigger = yes # Means the enemy commander is the worst dueler out of the two
+						duelist_skill_is_high_group_trigger = yes
+					}
+				}
+			}
+
+			set_character_flag = duel_enemy_opt
+		}
+
+		1 = {
+			trigger = { # Special option: Duel enemy commander instead (but you have terrible Combat Rating - blocks option above + gives Brave)
+				NOT = { trait = brave }
+
+				event_target:enemy_commander = {
+					is_alive = yes
+					OR = {
+						duelist_skill_compared_to_prev_high_group_trigger = yes # Means the enemy commander is the better dueler out of the two
+						duelist_skill_is_low_group_trigger = yes # Means you suck
+					}
+				}
+			}
+
+			set_character_flag = duel_enemy_opt_gain_brave
+		}
+
+		1 = {
+			trigger = { # Special option: Duel enemy commander instead (you are Brave already - unlocks dueling regardless, but should block the two above)
+				trait = brave
+				event_target:enemy_commander = { is_alive = yes }
+			}
+
+			set_character_flag = duel_enemy_opt_is_brave
+		}
 	}
 }
