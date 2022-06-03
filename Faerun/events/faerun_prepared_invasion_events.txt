@@ -74,7 +74,7 @@ character_event = {
 			religion = martial_faith
 			religion = giant_pantheon
 			religion = vaprak
-			religion = karontor          
+			religion = karontor
 			religion = goblin_pantheon
 			religion = orc_pantheon
 			AND = {
@@ -349,7 +349,16 @@ character_event = {
     trigger = {
     	persistent_event_target:prep_invader_target = { NOT = { war_with = ROOT } }
     	persistent_event_target:prep_invader_target = { independent = yes }
-    	persistent_event_target:prep_invader_target = { any_realm_title = { real_tier = KING is_valid_viking_invasion_target = PREV } }
+			OR = {
+				persistent_event_target:prep_invader_target = { any_realm_title = { real_tier = KING is_valid_viking_invasion_target = PREV } }
+				persistent_event_target:prep_invader_target = {
+					any_realm_title = {
+						any_de_jure_liege_title = {
+							real_tier = KING is_valid_viking_invasion_target = PREVPREV
+						}
+					}
+				}
+			}
     	persistent_event_target:prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
     	OR = {
       	government = nomadic_tribal_government
@@ -369,7 +378,7 @@ character_event = {
                 religion = goblin_reformed
             }
             NOT = { has_dlc = "Holy Fury" }
-        }  
+        }
     	}
     }
 
@@ -427,9 +436,17 @@ character_event = {
 			}
 			persistent_event_target:prep_invader_target = {
 				random_realm_title = {
-                    limit = { real_tier = KING is_valid_viking_invasion_target = PREV }
-                    save_event_target_as = ai_prep_invasion_target
-                }
+					limit = { real_tier = KING is_valid_viking_invasion_target = PREV }
+					save_event_target_as = ai_prep_invasion_target
+					break = yes
+				}
+				random_landed_title = {
+					limit = {
+						real_tier = KING
+						is_valid_viking_invasion_target = PREV
+					}
+					save_event_target_as = ai_prep_invasion_target
+				}
 			}
 			ROOT = {
 				war = { target = persistent_event_target:prep_invader_target casus_belli = viking_invasion thirdparty_title = event_target:ai_prep_invasion_target tier = KING }
