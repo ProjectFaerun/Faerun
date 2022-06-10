@@ -1,0 +1,983 @@
+decisions = {
+	
+	breath_weapon = {
+		ai = no
+
+		potential = {
+			trait = creature_dragon
+			not_casting = yes
+			age = 16
+		}
+		allow = {
+			war = yes
+			in_battle = yes
+			custom_tooltip = {
+				text = SPELL_ON_COOLDOWN
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = breath_weapon_cooldown }
+						had_character_flag = { flag = breath_weapon_cooldown months = 1 }
+					}
+				}
+			}
+		}
+		effect = {
+			set_character_flag = breath_weapon_cooldown
+			hidden_tooltip = {
+				combat = {
+					enemy = {
+						any_unit_leader = {
+							repeat_event = { id = spellaux.24 }
+						}
+					}
+				}
+			}
+			any_current_enemy = {
+				random_realm_character = {
+					limit = {
+						at_location = ROOT
+						in_command = yes
+						prisoner = no
+					}
+					if = {
+						limit = {
+							ROOT = {
+								age = 16
+								NOT = { age = 26 }
+							}
+						}
+						troops = -0.02
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 26
+								NOT = { age = 51 }
+							}
+						}
+						troops = -0.04
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 51
+								NOT = { age = 101 }
+							}
+						}
+						troops = -0.06
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 101
+								NOT = { age = 201 }
+							}
+						}
+						troops = -0.08
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 201
+								NOT = { age = 401 }
+							}
+						}
+						troops = -0.1
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 401
+								NOT = { age = 601 }
+							}
+						}
+						troops = -0.12
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 601
+								NOT = { age = 801 }
+							}
+						}
+						troops = -0.14
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 801
+								NOT = { age = 1001 }
+							}
+						}
+						troops = -0.16
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 1001
+								NOT = { age = 1201 }
+							}
+						}
+						troops = -0.18
+					}
+
+					else_if = {
+						limit = {
+							ROOT = {
+								age = 1201
+							}
+						}
+						troops = -0.2
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	aboleth_lay_egg = {
+		only_rulers = yes
+		ai_check_interval = 500
+
+		potential = {
+			OR = {
+				AND = {
+					ai = yes
+					any_child = {
+						is_alive = yes
+						count < 3
+					}
+				}
+				ai = no
+			}
+			trait = creature_aboleth
+		}
+		allow = {
+			custom_tooltip = {
+				text = ABOLETHCD
+				hidden_tooltip = {
+					NOT = { has_character_flag = aboleth_egg }
+				}
+			}
+			OR = {
+				AND = {
+					NOT = {
+						any_child = {
+							is_alive = yes
+							count = 1
+						}
+					}
+					prestige = 50
+				}
+				AND = {
+					any_child = {
+						is_alive = yes
+						count == 1
+					}
+					prestige = 75
+				}
+				AND = {
+					any_child = {
+						is_alive = yes
+						count == 2
+					}
+					prestige = 150
+				}
+				AND = {
+					any_child = {
+						is_alive = yes
+						count = 3
+					}
+					prestige = 250
+				}
+			}
+		}
+		effect = {
+			set_character_flag = aboleth_egg
+			if = {
+				limit = {
+					NOT = {
+						any_child = {
+							is_alive = yes
+							count == 0
+						}
+					}
+				}
+				prestige = -50
+			}
+			else_if = {
+				limit = {
+					any_child = {
+						is_alive = yes
+						count == 1
+					}
+				}
+				prestige = -75
+			}
+			else_if = {
+				limit = {
+					any_child = {
+						is_alive = yes
+						count == 2
+					}
+				}
+				prestige = -150
+			}
+			else_if = {
+				limit = {
+					any_child = {
+						is_alive = yes
+						count = 3
+					}
+				}
+				prestige = -250
+			}
+			custom_tooltip = {
+				text = ABOLETHBREED
+				hidden_tooltip = {
+					character_event = { id = aberrationevt.7 years = 5 }
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				any_child = {
+					is_alive = yes
+					count == 0
+				}
+			}
+		}
+	}
+
+	beholder_eye_sacrifice = {
+		ai = no
+		only_playable = yes
+
+		potential = {
+			trait = creature_beholder
+			z_multiclass = no
+			NOR = {
+				trait = one_eyed
+				trait = blinded
+			}
+		}
+		allow = {
+			NOR = {
+				z_sorcerer = yes
+				trait = incapable
+				trait = dim
+				trait = dumb
+				trait = slow
+				trait = idiot
+				trait = imbecile
+				trait = dull
+				trait = inbred
+			}
+		}
+		effect = {
+			add_trait = one_eyed
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+	raise_monster_units = {
+		only_rulers = yes
+		potential = {
+			culture = monster
+			is_ruler = yes
+			OR = {
+				any_war = {
+					OR = {
+						any_defender = {
+							character = ROOT
+							is_primary_war_defender = yes
+						}
+						any_attacker = {
+							character = ROOT
+							is_primary_war_attacker = yes
+						}
+					}
+				}
+			}
+		}
+		
+		allow = {
+			war = yes
+			NOT = { has_character_flag = raised_monster_defences }
+		}
+		
+		effect = {
+			set_character_flag = raised_monster_defences
+			character_event = { id = monster.5 days = 6000 }
+			any_current_enemy = { character_event = { id = monster.6 } }
+			location = {
+				ROOT = {
+					spawn_unit = {
+						province = PREV
+						attrition = 0.0
+						disband_on_peace = yes
+						maintenance_multiplier = 0.1
+						is_looter = yes
+						can_toggle_looting = no
+						troops = {
+							heavy_infantry = { 500 500 }
+							archers = { 500 500 }
+							light_infantry = { 1000 1000 }
+						}
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 1500
+		}
+	}
+	
+	shun_the_living = {
+		is_high_prio = yes
+		only_rulers = yes
+		ai_check_interval = 100
+
+		potential = {
+			is_landed = yes
+			not_casting = yes
+			is_undead = yes
+			NAND = {
+				trait = lich_baelnorn
+				religion = elven_pantheon
+			}
+			NOR = {
+				mercenary = yes
+				holy_order = yes
+				has_character_modifier = undead_realm_lord
+			}
+		}
+
+		allow = {
+			war = no
+			NOR = {
+				olrox_is_good_religion_trigger = yes
+				trait = kind
+				pacifist = yes
+			}
+		}
+
+		effect = {
+			set_character_flag = undead_court
+			add_character_modifier = {
+				name = undead_realm_lord
+				duration = -1
+			}
+			any_vassal = {
+				limit = {
+					NOT = { tier = BARON }
+					NOT = { is_undead = yes }
+				}
+				set_defacto_liege = THIS
+				if = {
+					limit = {
+						higher_tier_than = COUNT
+					}
+					any_vassal = {
+						if = {
+							limit = {
+								NOT = { tier = BARON }
+								is_undead = yes
+							}
+							set_defacto_liege = ROOT
+						}
+						any_vassal = {
+							if = {
+								limit = {
+									NOT = { tier = BARON }
+									is_undead = yes
+								}
+								set_defacto_liege = ROOT
+							}
+						}
+					}
+				}
+			}
+			any_courtier_or_vassal = {
+				limit = {
+					OR = {
+						tier = BARON
+						is_ruler = no
+					}
+				}
+				if = {
+					limit = {
+						NOT = { is_undead = yes }
+					}
+					banish = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 5
+				trait = lich
+			}
+			modifier = {
+				factor = 0.1
+				trait = lich_baelnorn
+			}
+			modifier = {
+				factor = 0.2
+				trait = archlich
+			}
+			modifier = {
+				factor = 10
+				trait = undead
+			}
+			modifier = {
+				factor = 0.7
+				trait = gregarious
+			}
+			modifier = {
+				factor = 3
+				trait = cruel
+			}
+		}
+	}
+	
+	reveal_as_lycan = {
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			OR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+			NOT = { has_character_modifier = known_lycan_modifier }
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			add_character_modifier = {
+				name = known_lycan_modifier
+				duration = -1
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				liege = {
+					has_character_modifier = known_lycan_modifier
+				}
+			}
+			modifier = {
+				factor = 5
+				liege = {
+					has_character_flag = lycan_court
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 1.5
+				trait = proud
+			}
+		}
+	}
+
+	establish_lycan_court = {
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			OR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+			has_character_modifier = known_lycan_modifier
+			NOT = { has_character_flag = lycan_court }
+		}
+		allow = {
+			always = yes
+			prestige = 30
+		}
+		effect = {
+			set_character_flag = lycan_court
+			prestige = -30
+			custom_tooltip = {
+				text = lycan_court_tt
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				liege = {
+					has_character_modifier = known_lycan_modifier
+				}
+			}
+			modifier = {
+				factor = 5
+				liege = {
+					has_character_flag = lycan_court
+				}
+			}
+			modifier = {
+				factor = 5
+				trait = patron_malar
+			}
+			modifier = {
+				factor = 5
+				trait = patron_sebek
+				trait = werecrocodile
+			}
+			modifier = {
+				factor = 2
+				trait = patron_selune
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 1.5
+				trait = proud
+			}
+		}
+	}
+}
+
+targetted_decisions = {
+
+	ceremorphosis = {
+		filter = court
+		ai_target_filter = court
+		only_rulers = yes
+		ai_check_interval = 24
+
+		from_potential = {
+			OR = {
+				AND = {
+					ai = yes
+					any_child = {
+						is_alive = yes
+						count < 3
+					}
+				}
+				ai = no
+			}
+			OR = {
+				trait = creature_illithid
+				trait = creature_elder_brain
+			}
+		}
+		potential = {
+			prisoner = yes
+			is_incapable = no
+			is_adult = yes
+			OR = {
+				trait = creature_human
+				trait = creature_half_elf
+				trait = creature_half_orc
+				trait = creature_gith
+				trait = creature_spirit_folk
+				trait = creature_deep_imaskari
+				trait = creature_half_ogre
+				trait = creature_half_dwarf
+				trait = creature_half_gnoll
+				trait = creature_half_giant
+				trait = creature_genasi
+				trait = creature_tiefling
+				trait = creature_aasimar
+				trait = creature_elf
+				trait = creature_drow
+				trait = creature_draegloth
+				trait = creature_feyri
+				trait = creature_gnoll
+				trait = creature_orc
+				trait = creature_tanarukk
+				trait = creature_goblin
+				trait = creature_hobgoblin
+				trait = creature_bugbear
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						has_living_children = no
+						piety = 50
+					}
+					AND = {
+						has_living_children = yes
+						piety = 100
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				if = {
+					limit = {
+						has_living_children = no
+					}
+					piety = -50
+				}
+				else_if = {
+					limit = {
+						has_living_children = yes
+					}
+					piety = -100
+				}
+			}
+			if = {
+				limit = {
+					ai = no
+				}
+				character_event = { id = aberrationevt.1 }
+			}
+			random_list = {
+				9 = {
+					FROM = {
+						create_character = {
+							random_traits = yes
+							age = 16
+							trait = creature_illithid
+							employer = FROM
+							religion = FROM
+							culture = FROM
+							dynasty = FROM
+						}
+						gfx_culture_scope = {
+							new_character = {
+								set_graphical_culture = illithid
+
+								evilcat_give_random_stats_effect = yes
+								random_list = {
+									9 = { # Nothing
+									}
+									1 = {
+										add_trait = creature_ulitharid
+										add_trait = longevity
+									}
+								}
+								if = {
+									limit = { FROM = { is_female = no } }
+									set_father = FROM
+								}
+								else = {
+									set_mother = FROM
+								}
+								recalc_succession = yes
+							}
+						}
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 2
+						age > 40
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 50
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 60
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 70
+						olrox_all_immortals_trigger = no
+					}
+					modifier = {
+						factor = 2
+						age > 80
+						olrox_all_immortals_trigger = no
+					}
+					FROM = {
+						character_event = { id = aberrationevt.2 }
+					}
+				}
+			}
+			death = { death_reason = death_ceremorphosis killer = FROM }
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				FROM = {
+					any_child = {
+						is_alive = yes
+						count == 0
+					}
+				}
+			}
+		}
+	}
+	
+	infect_with_lycanthropy = {
+		only_playable = yes
+		ai_check_interval = 36
+		filter = home_court
+		ai_target_filter = home_court
+		
+		from_potential = {
+			is_playable = yes
+			OR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+		
+		potential = {
+			NOR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+				trait = vampire
+				trait = vampire_spawn
+				trait = undead
+				trait = lich
+				trait = archlich
+				trait = lich_baelnorn
+				trait = avatar
+			}
+			OR = {
+				trait = creature_drow
+				trait = creature_elf
+				trait = creature_half_elf
+				trait = creature_feyri
+				trait = creature_draegloth
+				trait = creature_spirit_folk
+				trait = creature_dwarf
+				trait = creature_half_dwarf
+				trait = creature_giant
+				trait = creature_half_giant
+				trait = creature_ogre
+				trait = creature_half_ogre
+				trait = creature_ogrillon
+				trait = creature_troll
+				trait = creature_goliath
+				trait = creature_gnome
+				trait = creature_gith
+				trait = creature_goblin
+				trait = creature_hobgoblin
+				trait = creature_bugbear
+				trait = creature_hagspawn
+				trait = creature_halfling
+				trait = creature_human
+				trait = creature_deep_imaskari
+				trait = creature_orc
+				trait = creature_half_orc
+				trait = creature_tanarukk
+				trait = creature_genasi
+				trait = creature_tiefling
+				trait = creature_aasimar
+			}
+		}
+		
+		allow = {
+			prestige = 30
+			OR = {
+				AND = {
+					olrox_is_good_religion_trigger = yes
+					piety = 25
+				}
+				olrox_is_good_religion_trigger = no
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = attempted_to_infect_me
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				prestige = -30
+				if = {
+					limit = {
+						olrox_is_good_religion_trigger = yes
+					}
+					piety = -25
+				}
+			}
+			if = {
+				limit = {
+					prisoner = no
+				}
+				character_event = { id = frwerebeast.8 }
+			}
+			else = {
+				character_event = { id = frwerebeast.12 }
+				FROM = {
+					random = {
+						chance = 50
+						add_trait = cruel
+					}
+					character_event = { id = frwerebeast.13 }
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 20
+				FROM = {
+					opinion = {
+						who = ROOT
+						value = 80
+					}
+				}
+			}
+			modifier = {
+				factor = 30
+				FROM = {
+					has_character_modifier = known_lycan_modifier
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					has_character_flag = lycan_court
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					NOT = {
+						opinion = {
+							who = ROOT
+							value = 0
+						}
+					}
+				}
+			}
+		}
+	}
+
+}
+
+settlement_decisions = {
+	undead_animate_dead_prov = {
+		is_high_prio = yes
+		only_playable = yes
+		ai_check_interval = 10
+		filter = realm_owned
+		ai_target_filter = realm_owned
+
+		from_potential = {
+			is_undead = yes
+			has_character_modifier = undead_realm_lord
+			NOT = {
+				has_dlc = "Legacy of Rome"
+				has_dlc = "Holy Fury"
+			}
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			location = {
+				NOT = { has_province_modifier = empty_graves_mod }
+			}
+			FROM = {
+				piety = 50
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_animate_dead_cooldown }
+							had_character_flag = { flag = spell_animate_dead_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_animate_dead_cooldown }
+			FROM = { piety = -50 }
+			location = {
+				FROM = {
+					spawn_unit = {
+						province = PREV
+						home = PREV
+						owner = FROM
+						troops = {
+							undead_troops = { 100 100 }
+						}
+						scaled_by_biggest_garrison = 0.5
+						cannot_inherit = yes
+						attrition = 0.1
+						can_toggle_looting = no
+						reinforces = no
+					}
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = empty_graves_mod
+					years = 3
+				}
+				if = {
+					limit = {
+						NOT = {
+							has_province_modifier = undead_province
+						}
+					}
+					add_province_modifier = {
+						name = raised_dead_in_prov
+						years = 3
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+}

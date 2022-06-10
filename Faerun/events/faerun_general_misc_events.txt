@@ -488,6 +488,18 @@ character_event ={
 			trait = creature_illithid
 			trait = creature_ulitharid
 			trait = creature_elder_brain
+			AND = {
+				trait = creature_dragon
+				gfx_culture_scope = {
+					OR = {
+						culture = amethyst_dragon
+						culture = sapphire_dragon
+						culture = topaz_dragon
+						culture = emerald_dragon
+						culture = crystal_dragon
+					}
+				}
+			}
 			olrox_has_specific_sorc_origin = yes
 		}
 	}
@@ -531,6 +543,7 @@ character_event ={
 					culture = tashalan
 					culture = thinguth
 					culture = vilhonian
+					culture = halruaan
 				}
 			}
 		}
@@ -591,8 +604,9 @@ character_event ={
 		hidden_tooltip = {
 			guardian = {
 				limit = {
-					any_child = {
-						NOT = { character = ROOT }
+					NOR = {
+						is_father = ROOT
+						is_mother = ROOT
 					}
 				}
 				character_event = { id = generalmisc.13 }
@@ -633,5 +647,55 @@ character_event = {
 	option = {
 		name = GENMISC.13c
 		FROM = { add_trait = psi_potential }
+	}
+}
+
+character_event = {
+	id = generalmisc.14
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				has_character_modifier = small_psi_stress
+			}
+			remove_character_modifier = small_psi_stress
+		}
+		else_if = {
+			limit = {
+				has_character_modifier = med_psi_stress
+			}
+			remove_character_modifier = med_psi_stress
+			add_character_modifier = {
+				name = small_psi_stress
+				duration = -1
+			}
+		}
+		else_if = {
+			limit = {
+				has_character_modifier = big_psi_stress
+			}
+			remove_character_modifier = big_psi_stress
+			add_character_modifier = {
+				name = med_psi_stress
+				duration = -1
+			}
+		}
+		if = {
+			limit = {
+				z_psion = yes # sanity check
+			}
+			repeat_event = { id = generalmisc.14 months = 4 }
+		}
+		else_if = {
+			limit = {
+				z_psion = no
+			}
+			remove_character_modifier = small_psi_stress
+			remove_character_modifier = med_psi_stress
+			remove_character_modifier = big_psi_stress
+		}
 	}
 }

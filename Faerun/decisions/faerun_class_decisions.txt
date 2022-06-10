@@ -1,0 +1,8364 @@
+decisions = {
+	
+	empty_mind_dec = {
+		ai_check_interval = 100
+		potential = {
+			z_psion = yes
+			trait = stressed
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			remove_trait = stressed
+			add_character_modifier = {
+				name = empty_mind
+				years = 5
+				stacking = yes
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0.1
+				has_character_modifier = empty_mind
+			}
+		}
+	}
+	
+	heal_mind_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			z_psion = yes
+			has_character_flag = psi_spellbook_open
+		}
+		allow = {
+			always = no
+		}
+		effect = {
+			break = yes # doesn't matter
+		}
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	glamour_dec = {
+		ai_check_interval = 50
+		potential = {
+			z_psion = yes
+			OR = {
+				ai = yes
+				has_character_flag = psi_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { trait = stressed }
+			NOT = { has_character_modifier = glamour }
+		}
+		effect = {
+			custom_tooltip = {
+				text = lightpsi_tt
+				small_psi_stress = yes
+			}
+			add_character_modifier = {
+				name = glamour
+				years = 3
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0.1
+				diplomacy = 10
+			}
+			modifier = {
+				factor = 1.5
+				NOT = { diplomacy = 5 }
+			}
+		}
+	}
+
+	manifest_mindblade = {
+		ai_check_interval = 50
+		potential = {
+			z_psion = yes
+			OR = {
+				ai = yes
+				has_character_flag = psi_spellbook_open
+			}
+		}
+		allow = {
+			NOT = { trait = stressed }
+			NOT = { has_character_modifier = mindblade}
+		}
+		effect = {
+			custom_tooltip = {
+				text = mediumpsi_tt
+				med_psi_stress = yes
+			}
+			add_character_modifier = {
+				name = mindblade
+				years = 5
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 2
+				z_rogue = yes
+			}
+			modifier = {
+				factor = 2
+				trait = deceitful
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	# Aberrant Mind
+
+		#see general note on job spells
+		detect_thoughts_sorc = {
+			only_rulers = yes
+			ai_check_interval = 12
+			potential = {
+				OR = {
+					AND = {
+						OR = {
+							trait = origin_aberrant_mind
+							AND = {
+								race_has_aberrant_magic = yes
+								olrox_has_specific_sorc_origin = no
+							}
+						}
+						z_sorcerer = yes
+					}
+					z_psion = yes
+				}
+				is_ruler = yes
+				
+				OR = {
+					#AND = {
+						ai = yes
+						#OR = {
+						#	has_job_title = job_spymaster
+						#	is_ruler = yes
+						#}
+					#}
+					OR = {
+						has_character_flag = sorc_spellbook_open
+						has_character_flag = psi_spellbook_open
+					}
+				}
+			}
+			allow = {
+				OR = {
+					AND = {
+						z_sorcerer = yes
+						custom_tooltip = {
+							text = HAS7SPELLPOINTS
+							hidden_tooltip = {
+								check_variable = { which = sorcspellpoints value = 7 }
+							}
+						}
+					}
+					AND = {
+						z_psion = yes
+						NOT = { trait = stressed }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_detect_thoughts_cooldown }
+							had_character_flag = { flag = spell_detect_thoughts_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+				NOT = { has_character_modifier = detect_thoughts_mod }
+			}
+			effect = {
+				set_character_flag = spell_detect_thoughts_cooldown
+				if = {
+					limit = {
+						z_sorcerer = yes
+					}
+					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -7 } }
+					hidden_tooltip = {
+						if = {
+							limit = {
+								trait = origin_wild_magic
+							}
+							random = {
+								chance = 5
+								character_event = { id = spellaux.4 }
+								break = yes
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						z_psion = yes
+					}
+					custom_tooltip = {
+						text = lightpsi_tt
+						small_psi_stress = yes
+					}
+				}
+				add_character_modifier = {
+					name = detect_thoughts_mod
+					months = 12
+				}
+			}
+			ai_will_do = {
+				factor = 0.5
+				modifier = {
+					factor = 0.5
+					intrigue = 10 # Don't really need it
+				}
+				modifier = {
+					factor = 5
+					NOT = { intrigue = 5 }
+				}
+			}
+		}
+
+		# find_familiar
+
+		spell_charm_person_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				OR =	{
+					AND = {
+						has_character_flag = sorc_spellbook_open
+						OR = {
+							trait = origin_aberrant_mind
+							trait = origin_shadow
+							AND = {
+								OR = {
+									race_has_aberrant_magic = yes
+									race_has_shadow_magic = yes
+								}
+								olrox_has_specific_sorc_origin = no
+							}
+						}
+						z_sorcerer = yes
+					}
+					AND = {
+						z_psion = yes
+						has_character_flag = psi_spellbook_open
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		spell_forget_past_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				OR = {
+					AND = {
+						has_character_flag = sorc_spellbook_open
+						OR = {
+							trait = origin_aberrant_mind
+							AND = {
+								race_has_aberrant_magic = yes
+								olrox_has_specific_sorc_origin = no
+							}
+						}
+						z_sorcerer = yes
+					}
+					AND = {
+						z_psion = yes
+						has_character_flag = psi_spellbook_open
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		phantasmal_force_sorc = {
+			only_playable = yes
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_aberrant_mind
+					AND = {
+						race_has_aberrant_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				is_playable = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				war = yes
+				custom_tooltip = {
+					text = NOSUMMONEDDEMONS
+					hidden_tooltip = {
+						NOT = { has_earmarked_regiments = sorc_illusions }
+					}
+				}
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_phantasmal_force_cooldown }
+							had_character_flag = { flag = spell_phantasmal_force_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_phantasmal_force_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
+				if = {
+					limit = {
+						OR = {
+							trait = sorcerer
+							trait = trained_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_illusions
+								troops = {
+									illusory_troops = { 400 400 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_illusions
+								troops = {
+									illusory_troops = { 750 750 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_illusions
+								troops = {
+									illusory_troops = { 1200 1200 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						trait = legendary_sorcerer
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_illusions
+								troops = {
+									illusory_troops = { 1600 1600 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0
+					war = no
+				}
+			}
+		}
+
+		dominate_person_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				has_character_flag = sorc_spellbook_open
+				z_sorcerer = yes
+				OR = {
+					trait = origin_aberrant_mind
+					AND = {
+						race_has_aberrant_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+	# Draconic
+
+		spell_longstrider_sorc = {
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_draconic
+					trait = origin_storm
+					AND = {
+						OR = {
+							race_has_draconic_magic = yes
+							race_has_storm_magic = yes
+						}
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				in_command = yes
+				custom_tooltip = {
+					text = HAS5SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 5 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_longstrider_cooldown }
+							had_character_flag = { flag = spell_longstrider_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = spell_longstrider_mod }
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_longstrider_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -5 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = spell_longstrider_mod
+					duration = 365
+				}
+			}
+			ai_will_do = {
+				factor = 0.5
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+			}
+		}
+
+		# find_familiar
+
+		spell_wall_of_stone_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_draconic
+					AND = {
+						race_has_draconic_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		spell_conjure_elementals_sorc = {
+			only_playable = yes
+			ai_check_interval = 6
+			potential = {
+				z_sorcerer = yes
+				OR = {
+					trait = origin_draconic
+					trait = origin_storm
+					AND = {
+						OR = {
+							race_has_draconic_magic = yes
+							race_has_storm_magic = yes
+						}
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				is_playable = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				war = yes
+				custom_tooltip = {
+					text = HAS12SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 12 }
+					}
+				}
+				custom_tooltip = {
+					text = NOSUMMONEDDEMONS
+					hidden_tooltip = {
+						NOT = { has_earmarked_regiments = sorc_elementals }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_conjure_elementals_cooldown }
+							had_character_flag = { flag = spell_conjure_elementals_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_conjure_elementals_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -12 } }
+				if = {
+					limit = {
+						OR = {
+							trait = sorcerer
+							trait = trained_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_elementals
+								troops = {
+									elemental_troops = { 150 150 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_elementals
+								troops = {
+									elemental_troops = { 300 300 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_elementals
+								troops = {
+									elemental_troops = { 450 450 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						trait = legendary_sorcerer
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_elementals
+								troops = {
+									elemental_troops = { 600 600 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				hidden_tooltip = { character_event = { id = spellaux.40 months = 12 } }
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0
+					war = no
+				}
+			}
+		}
+
+		legend_lore_sorc = {
+			ai_check_interval = 12
+			potential = {
+				OR = {
+					trait = origin_draconic
+					AND = {
+						race_has_draconic_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_legend_lore_cooldown }
+							had_character_flag = { flag = spell_legend_lore_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+				NOT = { has_character_modifier = legend_lore_mod }
+			}
+			effect = {
+				set_character_flag = spell_legend_lore_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_character_modifier = {
+					name = legend_lore_mod
+					months = 12
+				}
+			}
+			ai_will_do = {
+				factor = 0.5
+			}
+		}
+
+		dragon_transformation = {
+			ai_check_interval = 12
+			potential = {
+				OR = {
+					trait = origin_draconic
+					AND = {
+						race_has_draconic_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				hidden_tooltip = {
+					OR = {
+						ai = no
+						AND = {
+							has_character_flag = is_in_duel
+							NOT = { had_character_flag = { flag = is_in_duel months = 1 } }
+						}
+					}
+				}
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_tensers_transformation_cooldown }
+							had_character_flag = { flag = spell_tensers_transformation_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = tensers_transformation_mod }
+				NOT = { has_character_modifier = wild_shape_mod }
+				NOT = { has_character_modifier = improved_wild_shape_mod }
+				NOT = { has_character_modifier = expert_wild_shape_mod }
+				NOT = { has_character_modifier = master_wild_shape_mod }
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_tensers_transformation_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_character_modifier = {
+					name = tensers_transformation_mod
+					months = 12
+				}
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+				modifier = {
+					factor = 0.5
+					trait = proud
+				}
+			}
+		}
+
+	# Shadow
+
+		spell_animate_dead_sorc = {
+			only_playable = yes
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_shadow
+					AND = {
+						race_has_shadow_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				is_playable = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				war = yes
+				custom_tooltip = {
+					text = NOSUMMONEDDEMONS
+					hidden_tooltip = {
+						NOT = { has_earmarked_regiments = sorc_animate_dead }
+					}
+				}
+				custom_tooltip = {
+					text = HAS12SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_animate_dead_cooldown }
+							had_character_flag = { flag = spell_animate_dead_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_animate_dead_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
+				if = {
+					limit = {
+						OR = {
+							trait = sorcerer
+							trait = trained_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_animate_dead
+								troops = {
+									undead_troops = { 400 400 }
+								}
+								attrition = 0.05
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_animate_dead
+								troops = {
+									undead_troops = { 750 750 }
+								}
+								attrition = 0.05
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_animate_dead
+								troops = {
+									undead_troops = { 1200 1200 }
+								}
+								attrition = 0.05
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						trait = legendary_sorcerer
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_animate_dead
+								troops = {
+									undead_troops = { 1600 1600 }
+								}
+								attrition = 0.05
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				hidden_tooltip = { character_event = { id = spellaux.37 months = 12 } }
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0
+					war = no
+				}
+			}
+		}
+
+		# charm person
+
+		spell_create_homunculus_sorc = {
+			ai_check_interval = 12
+			potential = {
+				OR = {
+					trait = origin_shadow
+					AND = {
+						race_has_shadow_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS13SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 13 }
+					}
+				}
+				NOT = { has_artifact = homunculus_artf }
+				NOT = { has_injury_trigger = yes }
+				custom_tooltip = {
+					text = JOURNEYMANSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_homunculus_cooldown }
+							had_character_flag = { flag = spell_homunculus_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_create_homunculus_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -13 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_trait_wounded_effect = yes
+				add_artifact = homunculus_artf
+			}
+			ai_will_do = {
+				factor = 0.5
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+			}
+		}
+
+		spell_summon_lesser_demons_sorc = {
+			only_playable = yes
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_shadow
+					AND = {
+						race_has_shadow_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				is_playable = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 15 }
+					}
+				}
+				war = yes
+				custom_tooltip = {
+					text = NOSUMMONEDDEMONS
+					hidden_tooltip = {
+						NOT = { has_earmarked_regiments = sorc_lesser_demons }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_summon_lesser_demons_cooldown }
+							had_character_flag = { flag = spell_summon_lesser_demons_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_summon_lesser_demons_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+				if = {
+					limit = {
+						OR = {
+							trait = sorcerer
+							trait = trained_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_lesser_demons
+								troops = {
+									archers = { 25 25 }
+									light_infantry = { 200 200 }
+									heavy_infantry = { 25 25 }
+								}
+								attrition = 0.5
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_lesser_demons
+								troops = {
+									archers = { 50 50 }
+									light_infantry = { 400 400 }
+									heavy_infantry = { 50 50 }
+								}
+								attrition = 0.5
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_lesser_demons
+								troops = {
+									archers = { 75 75 }
+									light_infantry = { 600 600 }
+									heavy_infantry = { 75 75 }
+								}
+								attrition = 0.5
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						trait = legendary_sorcerer
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_lesser_demons
+								troops = {
+									archers = { 100 100 }
+									light_infantry = { 800 800 }
+									heavy_infantry = { 100 100 }
+								}
+								attrition = 0.5
+								maintenance_multiplier = 0.1
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				hidden_tooltip = { character_event = { id = spellaux.19 months = 12 } }
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0
+					war = no
+				}
+			}
+		}
+
+		planar_binding_sorc_shadow = {
+			ai_check_interval = 24
+			only_rulers = yes
+			potential = {
+				OR = {
+					trait = origin_shadow
+					AND = {
+						race_has_shadow_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_planar_binding_cooldown }
+							had_character_flag = { flag = spell_planar_binding_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_planar_binding_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				custom_tooltip = {
+					text = OUTSIDERSUMMONED
+					hidden_tooltip = {
+						random_list = {
+							1 = {
+								create_character = {
+									age = 1000
+									attributes = {
+										diplomacy = 5
+										martial = 6
+										stewardship = 5
+										intrigue = 9
+										learning = 5
+									}
+									female = random
+									trait = creature_fiend
+									random_traits = yes
+									religion = infernal
+									culture = baatezu
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 1000
+									attributes = {
+										diplomacy = 4
+										martial = 9
+										stewardship = 4
+										intrigue = 6
+										learning = 5
+									}
+									female = random
+									trait = creature_fiend
+									random_traits = yes
+									religion = abyssal_cult
+									culture = tanarri
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 1000
+									attributes = {
+										diplomacy = 6
+										martial = 7
+										stewardship = 6
+										intrigue = 6
+										learning = 4
+									}
+									female = random
+									trait = creature_fiend
+									random_traits = yes
+									religion = shadow_gods
+									culture = yugoloth
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+						}
+						new_character = {
+							opinion = {
+								modifier = planar_binding_mod
+								who = ROOT
+								years = 10
+							}
+							character_event = { id = spellaux.43 years = 20 }
+							if = {
+								limit = {
+									culture = baatezu
+								}
+								random_list = {
+									65 = {
+										set_graphical_culture = cornugon
+									}
+									20 = {
+										add_trait = greater_fiend
+									}
+									10 = {
+										set_graphical_culture = gelugon
+										add_trait = greater_fiend
+									}
+									5 = {
+										set_graphical_culture = tiefling
+									}
+								}
+							}
+							else_if = {
+								limit = {
+									culture = tanarri
+								}
+								random_list = {
+									65 = {
+										# do nothing - vrock gfx is correct
+									}
+									20 = {
+										set_graphical_culture = succubus
+									}
+									10 = {
+										set_graphical_culture = nalfeshnee
+										add_trait = greater_fiend
+									}
+									10 = {
+										set_graphical_culture = succubus
+										add_trait = greater_fiend # marilith
+									}
+									2 = {
+										set_graphical_culture = baatezu # balors look a lot like pit fiends
+										add_trait = greater_fiend
+									}
+									2 = {
+										set_graphical_culture = yugoloth # or nycaloths
+										add_trait = greater_fiend
+									}
+									2 = {
+										set_graphical_culture = cambion
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			ai_will_do = {
+				factor = 0.1
+				modifier = {
+					factor = 0
+					has_full_court = yes
+				}
+			}
+		}
+
+		spell_blight_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_shadow
+					AND = {
+						race_has_shadow_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+	# Storm
+
+		# spell_conjure_elementals
+
+		# find_familiar
+
+		# longstrider
+
+		elemental_transformation = {
+			ai_check_interval = 12
+			potential = {
+				z_sorcerer = yes
+				OR = {
+					trait = origin_storm
+					AND = {
+						race_has_storm_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				hidden_tooltip = {
+					OR = {
+						ai = no
+						AND = {
+							has_character_flag = is_in_duel
+							NOT = { had_character_flag = { flag = is_in_duel months = 1 } }
+						}
+					}
+				}
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_tensers_transformation_cooldown }
+							had_character_flag = { flag = spell_tensers_transformation_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = tensers_transformation_mod }
+				NOT = { has_character_modifier = wild_shape_mod }
+				NOT = { has_character_modifier = improved_wild_shape_mod }
+				NOT = { has_character_modifier = expert_wild_shape_mod }
+				NOT = { has_character_modifier = master_wild_shape_mod }
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_tensers_transformation_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+				add_character_modifier = {
+					name = tensers_transformation_mod
+					months = 12
+				}
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+				modifier = {
+					factor = 0.5
+					trait = proud
+				}
+			}
+		}
+
+		planar_binding_sorc_storm = {
+			ai_check_interval = 24
+			only_rulers = yes
+			potential = {
+				OR = {
+					trait = origin_storm
+					AND = {
+						race_has_storm_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_planar_binding_cooldown }
+							had_character_flag = { flag = spell_planar_binding_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_planar_binding_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				custom_tooltip = {
+					text = OUTSIDERSUMMONED
+					hidden_tooltip = {
+						random_list = {
+							1 = {
+								create_character = {
+									age = 300
+									female = random
+									trait = creature_genie
+									random_traits = yes
+									religion = ten_thousand_gods
+									culture = jann
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 500
+									attributes = {
+										diplomacy = 6
+										martial = 7
+										stewardship = 8
+										intrigue = 7
+										learning = 7
+									}
+									trait = creature_genie
+									random_traits = yes
+									female = random
+									religion = primordial
+									culture = dao
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 500
+									attributes = {
+										diplomacy = 8
+										martial = 6
+										stewardship = 7
+										intrigue = 7
+										learning = 7
+									}
+									trait = creature_genie
+									random_traits = yes
+									female = random
+									religion = primordial
+									culture = djinn
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 500
+									attributes = {
+										diplomacy = 7
+										martial = 8
+										stewardship = 7
+										intrigue = 7
+										learning = 6
+									}
+									trait = creature_genie
+									random_traits = yes
+									female = random
+									religion = primordial
+									culture = efreet
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+							1 = {
+								create_character = {
+									age = 500
+									attributes = {
+										diplomacy = 7
+										martial = 7
+										stewardship = 6
+										intrigue = 8
+										learning = 7
+									}
+									trait = creature_genie
+									random_traits = yes
+									female = random
+									religion = primordial
+									culture = marid
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+						}
+						new_character = {
+							opinion = {
+								modifier = planar_binding_mod
+								who = ROOT
+								years = 10
+							}
+							character_event = { id = spellaux.43 years = 20 }
+						}
+					}
+				}
+			}
+			ai_will_do = {
+				factor = 0.1
+				modifier = {
+					factor = 0
+					has_full_court = yes
+				}
+			}
+		}
+
+		spell_controlweather_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_storm
+					trait = origin_wild_magic
+					AND = {
+						OR = {
+							race_has_storm_magic = yes
+							race_has_wild_magic = yes
+						}
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+	# Wild Magic
+
+		spell_find_familiar_sorc = {
+			ai_check_interval = 24 #was 12
+			potential = {
+				OR = {
+					trait = origin_wild_magic
+					trait = origin_divine_soul
+					trait = origin_storm
+					trait = origin_draconic
+					trait = origin_aberrant_mind
+					AND = {
+						OR = {
+							race_has_wild_magic = yes
+							race_has_divine_magic = yes
+							race_has_storm_magic = yes
+							race_has_draconic_magic = yes
+							race_has_aberrant_magic = yes
+						}
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				NOT = { has_artifact = wiz_familiar_artf }
+				custom_tooltip = {
+					text = HAS7SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 7 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_find_familiar_cooldown }
+							had_character_flag = { flag = spell_find_familiar_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_find_familiar_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -7 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_artifact = wiz_familiar_artf
+			}
+			ai_will_do = {
+				factor = 0.5
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+			}
+		}
+
+		#This probably could be available to the ai with an interval around 12, but I left it as ai = no to preserve existing balance
+		reckless_dweomer = {
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no # Don't trust the AI to not rapid-fire this
+				z_sorcerer = yes
+				#OR = {
+				#	ai = yes
+					has_character_flag = sorc_spellbook_open
+				#}
+				OR = {
+					trait = origin_wild_magic
+					AND = {
+						race_has_wild_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_nahals_reckless_dweomer_cooldown }
+							had_character_flag = { flag = spell_nahals_reckless_dweomer_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_nahals_reckless_dweomer_cooldown
+				#set_character_flag = spell_clone_cooldown
+				#hidden_tooltip = { change_variable = { which = sorcspellpoints value = -30 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 50
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				hidden_tooltip = {
+					random_list = {
+						10 = {
+							change_variable = { which = sorcspellpoints value = 5 }
+						}
+						5 = {
+							change_variable = { which = sorcspellpoints value = 10 }
+						}
+						1 = {
+							change_variable = { which = sorcspellpoints value = 15 }
+						}
+					}
+				}
+			}
+
+			ai_will_do = {
+				factor = 0
+			}
+		}
+
+		spell_rage_sorc = {
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_wild_magic
+					AND = {
+						race_has_wild_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				in_command = yes
+				custom_tooltip = {
+					text = HAS5SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 5 }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_rage_cooldown }
+							had_character_flag = { flag = spell_rage_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = spell_rage_mod }
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_rage_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -5 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = spell_rage_mod
+					duration = 365
+				}
+			}
+			ai_will_do = {
+				factor = 0.5
+				modifier = {
+					factor = 2
+					trait = diligent
+				}
+				modifier = {
+					factor = 0.5
+					trait = slothful
+				}
+			}
+		}
+
+		spell_fabricate_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_wild_magic
+					AND = {
+						race_has_wild_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		animate_objects = {
+			only_playable = yes
+			ai_check_interval = 6
+			potential = {
+				OR = {
+					trait = origin_wild_magic
+					AND = {
+						race_has_wild_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				z_sorcerer = yes
+				is_playable = yes
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				war = yes
+				custom_tooltip = {
+					text = NOSUMMONEDDEMONS
+					hidden_tooltip = {
+						NOT = { has_earmarked_regiments = sorc_objects }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_phantasmal_force_cooldown }
+							had_character_flag = { flag = spell_phantasmal_force_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_phantasmal_force_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
+				if = {
+					limit = {
+						OR = {
+							trait = sorcerer
+							trait = trained_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_objects
+								troops = {
+									animated_objects = { 150 150 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_objects
+								troops = {
+									animated_objects = { 300 300 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+						}
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_objects
+								troops = {
+									animated_objects = { 450 450 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						trait = legendary_sorcerer
+					}
+					location = {
+						ROOT = {
+							spawn_unit = {
+								province = PREV
+								home = PREV
+								owner = ROOT
+								leader = ROOT
+								earmark = sorc_objects
+								troops = {
+									animated_objects = { 600 600 }
+								}
+								attrition = 0
+								maintenance_multiplier = 0
+								cannot_inherit = yes
+								disband_on_peace = yes
+								can_toggle_looting = no
+								is_looter = no
+								reinforces = no
+							}
+						}
+					}
+				}
+				hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
+			}
+			ai_will_do = {
+				factor = 1
+				modifier = {
+					factor = 0
+					war = no
+				}
+			}
+		}
+
+		# spell_controlweather_fake
+
+	# Divine Soul
+
+		# find_familiar
+
+		spell_lesser_restoration_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_divine_soul
+					AND = {
+						race_has_divine_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		spell_heal_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				OR = {
+					AND = {
+						z_sorcerer = yes
+						has_character_flag = sorc_spellbook_open
+						OR = {
+							trait = origin_divine_soul
+							AND = {
+								race_has_divine_magic = yes
+								olrox_has_specific_sorc_origin = no
+							}
+						}
+					}
+					AND = {
+						z_psion = yes
+						has_character_flag = psi_spellbook_open
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		planar_binding_sorc_divine = {
+			ai_check_interval = 24
+			only_rulers = yes
+			potential = {
+				z_sorcerer = yes
+				OR = {
+					trait = origin_divine_soul
+					AND = {
+						race_has_divine_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+				OR = {
+					ai = yes
+					has_character_flag = sorc_spellbook_open
+				}
+			}
+			allow = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_planar_binding_cooldown }
+							had_character_flag = { flag = spell_planar_binding_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			effect = {
+				set_character_flag = spell_planar_binding_cooldown
+				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
+				hidden_tooltip = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+				custom_tooltip = {
+					text = OUTSIDERSUMMONED
+					hidden_tooltip = {
+						random_list = {
+							1 = {
+								create_character = {
+									age = 1000
+									attributes = {
+										diplomacy = 8
+										martial = 5
+										stewardship = 7
+										intrigue = 4
+										learning = 8
+									}
+									female = random
+									trait = creature_angel
+									random_traits = yes
+									religion = triadic
+									culture = angel
+									dynasty = none
+									immortal_age = 30
+								}
+							}
+						}
+						new_character = {
+							opinion = {
+								modifier = planar_binding_mod
+								who = ROOT
+								years = 10
+							}
+							character_event = { id = spellaux.43 years = 20 }
+						}
+					}
+				}
+			}
+			ai_will_do = {
+				factor = 0.1
+				modifier = {
+					factor = 0
+					has_full_court = yes
+				}
+			}
+		}
+
+		spell_greater_restoration_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_divine_soul
+					AND = {
+						race_has_divine_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+
+		spell_regenerate_sorc_fake = { # This is basically a reminder that you have this spell and who you can use it on
+			ai = no
+			ai_check_interval = 6000
+			potential = {
+				#ai = no
+				z_sorcerer = yes
+				has_character_flag = sorc_spellbook_open
+				OR = {
+					trait = origin_divine_soul
+					AND = {
+						race_has_divine_magic = yes
+						olrox_has_specific_sorc_origin = no
+					}
+				}
+			}
+
+			allow = {
+				always = no
+			}
+
+			effect = {
+				break = yes # doesn't matter
+			}
+
+			ai_will_do = {
+				factor = 0 # Just to be sure
+			}
+		}
+	
+	gather_raiders = {
+		ai_check_interval = 12
+		only_playable = yes
+		potential = {
+			z_barbarian = yes
+			is_incapable = no
+		}
+		allow = {
+			hidden_tooltip = {
+				OR = {
+					ai = no
+					AND = {
+						ai = yes
+						OR = {
+							location = {
+								is_island = no
+							}
+							any_demesne_title = {
+								tier = COUNT
+								count = 3
+							}
+						}
+					}
+				}
+			}
+			prestige = 350
+			custom_tooltip = {
+				text = BARBARMYCD
+				OR = {
+					NOT = { has_character_flag = spawned_barb_raiders }
+					had_character_flag = {
+						flag = spawned_barb_raiders
+						months = 4
+					}
+				}
+			}
+			custom_tooltip = {
+				text = BARBHASARMY
+				NOT = {
+					any_army = {
+						has_earmarked_regiments = barbarian_raiders
+					}
+				}
+			}
+		}
+		effect = {
+			prestige = -350
+			capital_scope = {
+				trigger_switch = {
+					on_trigger = trait
+					barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 350 350 }
+								archers = { 100 100 }
+								heavy_infantry = { 30 30 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					trained_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 400 400 }
+								archers = { 120 120 }
+								heavy_infantry = { 40 40 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					journeyman_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 500 500 }
+								archers = { 140 140 }
+								heavy_infantry = { 40 40 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					expert_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 700 700 }
+								archers = { 180 180 }
+								heavy_infantry = { 50 50 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					master_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 900 900 }
+								archers = { 250 250 }
+								heavy_infantry = { 60 60 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					renowned_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 1100 1100 }
+								archers = { 300 300 }
+								heavy_infantry = { 80 80 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					legendary_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 1300 1300 }
+								archers = { 350 350 }
+								heavy_infantry = { 100 100 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.5
+				olrox_is_good_religion_trigger = yes
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+			modifier = {
+				factor = 2
+				trait = greedy
+			}
+			modifier = {
+				factor = 0.5
+				trait = content
+			}
+			modifier = {
+				factor = 2
+				OR = {
+					government = nomadic_tribal_government
+					government = tribal_government
+				}
+			}
+			modifier = {
+				factor = 0.1
+				is_island = yes
+			}
+		}
+	}
+	
+	gather_warriors = {
+		ai_check_interval = 12
+		only_playable = yes
+		potential = {
+			z_barbarian = yes
+			is_incapable = no
+		}
+		allow = {
+			hidden_tooltip = {
+				OR = {
+					ai = no
+					AND = {
+						ai = yes
+						OR = {
+							location = {
+								is_island = no
+							}
+							any_demesne_title = {
+								tier = COUNT
+								count = 3
+							}
+						}
+					}
+				}
+			}
+			prestige = 350
+			custom_tooltip = {
+				text = BARBARMYCD
+				OR = {
+					NOT = { has_character_flag = spawned_barb_army }
+					had_character_flag = {
+						flag = spawned_barb_army
+						months = 4
+					}
+				}
+			}
+			custom_tooltip = {
+				text = BARBHASARMY
+				NOT = {
+					any_army = {
+						has_earmarked_regiments = spawned_barb_army
+					}
+				}
+			}
+			war = yes
+		}
+		effect = {
+			prestige = -350
+			capital_scope = {
+				trigger_switch = {
+					on_trigger = trait
+					barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 350 350 }
+								archers = { 100 100 }
+								heavy_infantry = { 30 30 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					trained_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 400 400 }
+								archers = { 120 120 }
+								heavy_infantry = { 40 40 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					journeyman_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 500 500 }
+								archers = { 140 140 }
+								heavy_infantry = { 40 40 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					expert_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 700 700 }
+								archers = { 180 180 }
+								heavy_infantry = { 50 50 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					master_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 900 900 }
+								archers = { 250 250 }
+								heavy_infantry = { 60 60 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					renowned_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 1100 1100 }
+								archers = { 300 300 }
+								heavy_infantry = { 80 80 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+					legendary_barbarian = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = barbarian_raiders
+							troops = {
+								light_infantry = { 1300 1300 }
+								archers = { 350 350 }
+								heavy_infantry = { 100 100 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 1
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = no
+						}
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.5
+				olrox_is_good_religion_trigger = yes
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 0.5
+				trait = content
+			}
+			modifier = {
+				factor = 2
+				OR = {
+					government = nomadic_tribal_government
+					government = tribal_government
+				}
+			}
+			modifier = {
+				factor = 0.1
+				is_island = yes
+			}
+		}
+	}
+	
+	lay_on_hands = {
+		ai_check_interval = 24
+		potential = {
+			not_casting = yes
+			z_paladin = yes
+		}
+		allow = {
+			trait = wounded
+			OR = {
+				AND = {
+					trait = paladin
+					piety = 80
+				}
+				AND = {
+					trait = trained_paladin
+					piety = 70
+				}
+				AND = {
+					trait = journeyman_paladin
+					piety = 60
+				}
+				AND = {
+					trait = expert_paladin
+					piety = 50
+				}
+				AND = {
+					trait = master_paladin
+					piety = 40
+				}
+				AND = {
+					trait = renowned_paladin
+					piety = 30
+				}
+				AND = {
+					trait = legendary_paladin
+					piety = 20
+				}
+			}
+		}
+		effect = {
+			if = {
+				limit = {
+					trait = paladin
+				}
+				piety = -80
+			}
+			else_if = {
+				limit = {
+					trait = trained_paladin
+				}
+				piety = -70
+			}
+			else_if = {
+				limit = {
+					trait = journeyman_paladin
+				}
+				piety = -60
+			}
+			else_if = {
+				limit = {
+					trait = expert_paladin
+				}
+				piety = -50
+			}
+			else_if = {
+				limit = {
+					trait = master_paladin
+				}
+				piety = -40
+			}
+			else_if = {
+				limit = {
+					trait = renowned_paladin
+				}
+				piety = -30
+			}
+			else = {
+				piety = -20
+			}
+			remove_trait = wounded
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	paladin_oaths = {
+		ai_check_interval = 36
+		potential = {
+			not_casting = yes
+			z_paladin = yes
+			NOR = {
+				has_character_modifier = oath_of_the_ancients
+				has_character_modifier = oath_of_conquest
+				has_character_modifier = oath_of_the_crown
+				has_character_modifier = oath_of_devotion
+				has_character_modifier = oath_of_redemption
+				has_character_modifier = oath_of_vengeance
+			}
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			character_event = { id = generalmisc.5 }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	buy_instrument = {
+		ai_check_interval = 36
+		potential = {
+			not_casting = yes
+			z_bard = yes
+			NOT = {
+				any_artifact = {
+					has_artifact_flag = instrument
+				}
+			}
+		}
+		allow = {
+			wealth = 10
+		}
+		effect = {
+			wealth = -10
+			random_list = {
+				10 = {
+					add_artifact = bandore
+				}
+				10 = {
+					add_artifact = harp
+				}
+				1 = {
+					add_artifact = kazoo
+				}
+				10 = {
+					add_artifact = lute
+				}
+				10 = {
+					add_artifact = mandolin
+				}
+				10 = {
+					add_artifact = cittern
+				}
+				10 = {
+					add_artifact = lyre
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.7
+		}
+	}
+
+	ranger_pick_terrain = {
+		ai_check_interval = 36
+		potential = {
+			not_casting = yes
+			z_ranger = yes
+			can_have_more_leadership_traits = yes
+			NAND = {
+				trait = desert_terrain_leader
+				trait = flat_terrain_leader
+				trait = jungle_terrain_leader
+				trait = mountain_terrain_leader
+				trait = rough_terrain_leader
+				trait = winter_soldier
+			}
+			NOT = { has_character_flag = picked_favoured_terrain }
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			character_event = { id = generalmisc.7 }
+			set_character_flag = picked_favoured_terrain
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 1.5
+				trait = brave
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	get_animal_companion = {
+		ai_check_interval = 36
+		potential = {
+			not_casting = yes
+			OR = {
+				z_ranger = yes
+				z_druid = yes
+			}
+			NOT = {
+				any_artifact = {
+					has_artifact_flag = animal_companion
+				}
+			}
+		}
+		allow = {
+			piety = 50
+		}
+		effect = {
+			piety = -50
+			add_artifact = animal_companion
+		}
+		ai_will_do = {
+			factor = 0.8
+		}
+	}
+
+	monk_contemplate = {
+		ai = no # They can't handle it
+		ai_check_interval = 1000
+		potential = {
+			not_casting = yes
+			z_monk = yes
+			is_incapable = no
+		}
+		allow = {
+			custom_tooltip = {
+				text = CONTEMPLATECD
+				OR = {
+					NOT = { has_character_flag = monkcont }
+					had_character_flag = {
+						flag = monkcont
+						months = 3
+					}
+				}
+			}
+		}
+		effect = {
+			clr_character_flag = monkcont
+			set_character_flag = monkcont
+			character_event = { id = generalmisc.9 }
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	monk_abandon_focus = {
+		ai = no # They can't handle it
+		ai_check_interval = 1000
+		potential = {
+			not_casting = yes
+			OR = {
+				has_character_modifier = monk_diplo
+				has_character_modifier = monk_martial
+				has_character_modifier = monk_stewardship
+				has_character_modifier = monk_intrigue
+				has_character_modifier = monk_learning
+			}
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			remove_character_modifier = monk_diplo
+			remove_character_modifier = monk_martial
+			remove_character_modifier = monk_stewardship
+			remove_character_modifier = monk_intrigue
+			remove_character_modifier = monk_learning
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	monk_longevity = {
+		ai_check_interval = 150
+		potential = {
+			z_monk = yes
+			not_casting = yes
+			NOR = {
+				faerun_immortal_race_trigger = yes
+				trait = longevity
+			}
+		}
+		allow = {
+			OR = {
+				trait = master_monk
+				trait = renowned_monk
+				trait = legendary_monk
+			}
+			OR = {
+				AND = {
+					trait = master_monk
+					piety = 800
+				}
+				AND = {
+					trait = renowned_monk
+					piety = 600
+				}
+				AND = {
+					trait = legendary_monk
+					piety = 300
+				}
+			}
+			is_incapable = no
+		}
+		effect = {
+			if = {
+				limit = {
+					trait = master_monk
+				}
+				piety = -800
+			}
+			else_if = {
+				limit = {
+					trait = renowned_monk
+				}
+				piety = -600
+			}
+			else_if = {
+				limit = {
+					trait = legendary_monk
+					piety = -300
+				}
+			}
+			add_trait = longevity
+			if = {
+				limit = {
+					trait = infirm
+				}
+				remove_trait = infirm
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.01
+				trait = depressed
+			}
+		}
+	}
+
+	monk_mob = {
+		ai_check_interval = 50
+		only_playable = yes
+		potential = {
+			z_monk = yes
+			not_casting = yes
+		}
+		allow = {
+			is_primary_war_defender = yes
+			piety = 70
+			custom_tooltip = {
+				text = MONKMOB_CD
+				OR = {
+					NOT = { has_character_flag = monkmob }
+					had_character_flag = { flag = monkmob months = 5 }
+				}
+			}
+		}
+		effect = {
+			clr_character_flag = monkmob
+			set_character_flag = monkmob
+			piety = -70
+			capital_scope = {
+				ROOT = {
+					spawn_unit = {
+						province = PREV
+						home = PREV
+						owner = ROOT
+						earmark = monkmob
+						troops = {
+							mob_troops = { 1000 1000 }
+						}
+						disband_on_peace = yes
+						attrition = 1
+						maintenance_multiplier = 1
+						can_toggle_looting = no
+						cannot_inherit = yes
+						reinforces = no
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.7
+		}
+	}
+
+	hire_brigands = {
+		ai_check_interval = 12
+		only_playable = yes
+		potential = {
+			z_rogue = yes
+			is_incapable = no
+		}
+		allow = {
+			hidden_tooltip = {
+				OR = {
+					ai = no
+					AND = {
+						ai = yes
+						OR = {
+							location = {
+								is_island = no
+							}
+							any_demesne_title = {
+								tier = COUNT
+								count = 3
+							}
+						}
+					}
+				}
+			}
+			wealth = 70
+			prestige = 150
+			custom_tooltip = {
+				text = BARBARMYCD
+				OR = {
+					NOT = { has_character_flag = spawned_rogue_raiders }
+					had_character_flag = {
+						flag = spawned_rogue_raiders
+						months = 4
+					}
+				}
+			}
+			custom_tooltip = {
+				text = BARBHASARMY
+				NOT = {
+					any_army = {
+						has_earmarked_regiments = rogue_raiders
+					}
+				}
+			}
+		}
+		effect = {
+			wealth = -70
+			prestige = -150
+			capital_scope = {
+				trigger_switch = {
+					on_trigger = trait
+					rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 350 350 }
+								archers = { 100 100 }
+								mob_troops = { 400 400 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					trained_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 400 400 }
+								archers = { 120 120 }
+								mob_troops = { 500 500 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					journeyman_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 500 500 }
+								archers = { 140 140 }
+								mob_troops = { 600 600 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					expert_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 700 700 }
+								archers = { 180 180 }
+								mob_troops = { 700 700 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					master_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 900 900 }
+								archers = { 250 250 }
+								mob_troops = { 800 800 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					renowned_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 1100 1100 }
+								archers = { 300 300 }
+								mob_troops = { 900 900 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+					legendary_rogue = {
+						spawn_unit = {
+							province = THIS
+							owner = ROOT
+							earmark = rogue_raiders
+							troops = {
+								light_infantry = { 1300 1300 }
+								archers = { 350 350 }
+								mob_troops = { 1000 1000 }
+							}
+							cannot_inherit = yes
+							maintenance_multiplier = 0.75
+							reinforces = no
+							can_toggle_looting = no
+							is_looter = yes
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.5
+				olrox_is_good_religion_trigger = yes
+			}
+			modifier = {
+				factor = 2
+				is_evil_religion = yes
+			}
+			modifier = {
+				factor = 2
+				trait = greedy
+			}
+			modifier = {
+				factor = 0.5
+				trait = content
+			}
+			modifier = {
+				factor = 0.1
+				is_island = yes
+			}
+		}
+	}
+
+	increase_alertness = {
+		ai_check_interval = 250
+		potential = {
+			z_shadow = yes
+			not_casting = yes
+		}
+		allow = {
+			piety = 35
+			prestige = 35
+			custom_tooltip = {
+				text = ALERTCD
+				OR = {
+					NOT = { has_character_flag = alertness }
+					had_character_flag = {
+						flag = alertness
+						years = 7
+					}
+				}
+			}
+		}
+		effect = {
+			clr_character_flag = alertness
+			set_character_flag = alertness
+			piety = -35
+			prestige = -35
+			add_character_modifier = {
+				name = shadow_alertness
+				years = 5
+			}
+			random = {
+				chance = 20
+				add_trait = stressed
+			}
+			random = {
+				chance = 2
+				if = {
+					limit = {
+						trait = trusting
+					}
+					remove_trait = trusting
+				}
+				else = {
+					add_trait = paranoid
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.4
+			modifier = {
+				factor = 0.5
+				trait = trusting
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 2
+				trait = paranoid
+			}
+			modifier = {
+				factor = 1.5
+				trait = diligent
+			}
+		}
+	}
+
+	launder_cash = {
+		ai_check_interval = 250
+		only_playable = yes
+		potential = {
+			z_shadow = yes
+			not_casting = yes
+		}
+		allow = {
+			prestige = 100
+			custom_tooltip = {
+				text = LAUNDERCD
+				OR = {
+					NOT = { has_character_flag = laundered_cash }
+					had_character_flag = {
+						flag = laundered_cash
+						years = 5
+					}
+				}
+			}
+		}
+		effect = {
+			clr_character_flag = laundered_cash
+			set_character_flag = laundered_cash
+			prestige = -100
+			if = {
+				limit = {
+					trait = shadow
+				}
+				wealth = 35
+			}
+			else_if = {
+				limit = {
+					trait = trained_shadow
+				}
+				wealth = 45
+			}
+			else_if = {
+				limit = {
+					trait = journeyman_shadow
+				}
+				wealth = 70
+			}
+			else_if = {
+				limit = {
+					trait = expert_shadow
+				}
+				wealth = 85
+			}
+			else_if = {
+				limit = {
+					trait = master_shadow
+				}
+				wealth = 100
+			}
+			else_if = {
+				limit = {
+					trait = renowned_shadow
+				}
+				wealth = 125
+			}
+			else_if = {
+				limit = {
+					trait = legendary_shadow
+				}
+				wealth = 150
+			}
+			random = {
+				chance = 50
+				modifier = {
+					factor = 0
+					NOT = { trait = just }
+				}
+				remove_trait = just
+			}
+			random = {
+				chance = 100
+				modifier = { # these are meant to stack!
+					factor = 0.7
+					intrigue = 5
+				}
+				modifier = {
+					factor = 0.7
+					intrigue = 8
+				}
+				modifier = {
+					factor = 0.6
+					intrigue = 10
+				}
+				modifier = {
+					factor = 0.6
+					intrigue = 13
+				}
+				modifier = {
+					factor = 0.6
+					intrigue = 15
+				}
+				modifier = {
+					factor = 0.4
+					intrigue = 20
+				}
+				add_character_modifier = {
+					name = corrupt_ruler
+					years = 10
+					stacking = yes
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0.1
+				trait = charitable
+			}
+			modifier = {
+				factor = 0.1
+				trait = just
+			}
+			modifier = {
+				factor = 3
+				trait = greedy
+			}
+			modifier = {
+				factor = 1.5
+				trait = arbitrary
+			}
+		}
+	}
+	
+	spell_heal_cleric_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_lesser_restoration_cleric_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_restoration_prov_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_greater_restoration_cleric_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_cleric = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_regenerate_cleric_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_cleric = yes
+				z_bard = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	spell_conjure_natural_allies = {
+		only_playable = yes
+		ai_check_interval = 6
+		potential = {
+			OR = {
+				z_druid = yes
+				AND = {
+					trait = warlock_fey
+					z_warlock = yes
+				}
+			}
+			OR = {
+				ai = yes
+				AND = {
+					NOT = { not_casting = yes }
+					has_character_flag = rituals_open
+				}
+			}
+		}
+		allow = {
+			war = yes
+			custom_tooltip = {
+				text = ANIMATEDEADCD
+				hidden_tooltip = {
+					NOT = { has_character_flag = druid_summoned_nat_allies }
+				}
+			}
+			OR = {
+				AND = {
+					OR = {
+						trait = druid
+						trait = warlock
+					}
+					wealth = 200
+				}
+				AND = {
+					OR = {
+						trait = trained_druid
+						trait = trained_warlock
+					}
+					wealth = 150
+				}
+				AND = {
+					OR = {
+						trait = journeyman_druid
+						trait = journeyman_warlock
+					}
+					wealth = 125
+				}
+				AND = {
+					OR = {
+						trait = expert_druid
+						trait = expert_warlock
+					}
+					wealth = 100
+				}
+				AND = {
+					OR = {
+						trait = master_druid
+						trait = master_warlock
+					}
+					wealth = 75
+				}
+				AND = {
+					OR = {
+						trait = renowned_druid
+						trait = renowned_warlock
+					}
+					wealth = 55
+				}
+				AND = {
+					OR = {
+						trait = legendary_druid
+						trait = legendary_warlock
+					}
+					wealth = 35
+				}
+			}
+		}
+		effect = {
+			trigger_switch = {
+				on_trigger = trait
+				legendary_druid = {
+					wealth = -35
+				}
+				legendary_warlock = {
+					wealth = -35
+				}
+				renowned_druid = {
+					wealth = -55
+				}
+				renowned_warlock = {
+					wealth = -55
+				}
+				master_druid = {
+					wealth = -75
+				}
+				master_warlock = {
+					wealth = -75
+				}
+				expert_druid = {
+					wealth = -100
+				}
+				expert_warlock = {
+					wealth = -100
+				}
+				journeyman_druid = {
+					wealth = -125
+				}
+				journeyman_warlock = {
+					wealth = -125
+				}
+				trained_druid = {
+					wealth = -150
+				}
+				trained_warlock = {
+					wealth = -150
+				}
+				druid = {
+					wealth = -200
+				}
+				warlock = {
+					wealth = -200
+				}
+			}
+			character_event = { id = druidinit.3 }
+		}
+		ai_will_do = {
+			factor = 0.75
+		}
+	}
+
+	spell_heal_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_druid = yes
+				z_ranger = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_lesser_restoration_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			OR = {
+				z_druid = yes
+				z_ranger = yes
+			}
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_restoration_prov_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			z_druid = yes
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_greater_restoration_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			z_druid = yes
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+
+	spell_regenerate_druid_fake = { # This is basically a reminder that you have this spell and who you can use it on
+		ai = no
+		ai_check_interval = 6000
+		potential = {
+			z_druid = yes
+			AND = {
+				NOT = { not_casting = yes }
+				has_character_flag = rituals_open
+			}
+		}
+
+		allow = {
+			always = no
+		}
+
+		effect = {
+			break = yes # doesn't matter
+		}
+
+		ai_will_do = {
+			factor = 0 # Just to be sure
+		}
+	}
+	
+	engage_in_training = {
+		only_rulers = yes
+		ai_check_interval = 20
+		potential = {
+			z_fighter = yes
+			not_casting = yes
+		}
+		allow = {
+			custom_tooltip = {
+				text = FIGHTABILITYNOCD
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = fighttrain }
+						had_character_flag = {
+							flag = fighttrain
+							years = 3
+						}
+					}
+				}
+			}
+			NOT = { has_severe_disability_trigger = yes }
+			NOT = { is_sick_or_injured_trigger = yes }
+		}
+		effect = {
+			hidden_tooltip = {
+				set_character_flag = fighttrain
+				random_list = {
+					1 = { # Gain Brawny
+						modifier = {
+							factor = 0
+							OR = {
+								trait = strong
+								trait = weak
+								trait = feeble
+								trait = tough
+								trait = hardy
+								trait = soft
+								trait = delicate
+								trait = robust
+								NOT = { trait = sturdy }
+							}
+						}
+						character_event = { id = fighterevt.1 }
+					}
+					1 = { # Gain Sturdy
+						modifier = {
+							factor = 0
+							OR = {
+								trait = strong
+								trait = weak
+								trait = feeble
+								trait = tough
+								trait = hardy
+								trait = soft
+								trait = delicate
+								trait = robust
+								trait = sturdy
+							}
+						}
+						character_event = { id = fighterevt.2 }
+					}
+					1 = { # Lose Frail
+						modifier = {
+							factor = 0
+							NOT = { trait = feeble }
+						}
+						character_event = { id = fighterevt.3 }
+					}
+					1 = { # Lose Fat
+						modifier = {
+							factor = 0
+							NOT = { trait = is_fat }
+						}
+						character_event = { id = fighterevt.4 }
+					}
+					1 = { # Temp +5 Combat
+						character_event = { id = fighterevt.5 }
+					}
+					1 = { # Temp +1 Martial
+						character_event = { id = fighterevt.6 }
+					}
+					1 = { # Temp +10 Combat
+						character_event = { id = fighterevt.7 }
+					}
+					1 = { # Temp +1 Health
+						character_event = { id = fighterevt.8 }
+					}
+					1 = { # Temp +2 Health
+						character_event = { id = fighterevt.9 }
+					}
+					1 = { # Lose -5 Combat (small injury)
+						character_event = { id = fighterevt.10 }
+					}
+					1 = { # Lose Stressed
+						modifier = {
+							factor = 0
+							NOT = { trait = stressed }
+						}
+						character_event = { id = fighterevt.11 }
+					}
+					1 = { # Gain Wounded (big injury)
+						modifier = {
+							factor = 0
+							has_injury_trigger = yes
+						}
+						character_event = { id = fighterevt.12 }
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 1.5
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+	
+	organize_levy_reminder = {
+		only_playable = yes
+		
+		potential = {
+			z_fighter = yes
+			not_casting = yes
+		}
+		
+		allow = {
+			custom_tooltip = {
+				text = THISISSETTLEMENT
+				always = no
+			}
+		}
+		effect = {
+			custom_tooltip = {
+				text = THISISSETTLEMENT
+			}
+		}
+		ai_will_do = {
+			factor = 0
+		}
+	}
+	
+}
+
+targeted_decisions = {
+
+	heal_mind = {
+		ai = no
+		ai_check_interval = 6000
+		filter = realm_including_me
+		ai_target_filter = none
+
+		from_potential = {
+			z_psion = yes
+		}
+		potential = {
+			OR = {
+				trait = stressed
+				trait = lunatic
+				trait = depressed
+				trait = drunkard
+			}
+		}
+		allow = {
+			FROM = {
+				z_psion = yes
+				NOT = { trait = stressed }
+				custom_tooltip = {
+					text = EXPERTPSIHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_psion
+							trait = master_psion
+							trait = renowned_psion
+							trait = legendary_psion
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				custom_tooltip = {
+					text = heavypsi_tt
+					big_psi_stress = yes
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.45 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.46 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLMENTALBADCURED
+				hidden_tooltip = {
+					remove_trait = stressed
+					remove_trait = drunkard
+					remove_trait = depressed
+					remove_trait = lunatic
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+
+		}
+	}
+	
+	spell_forget_past_sorc = { # This will be a player-only spell because the AI can't really deal with the strategy
+		filter = all
+		ai_target_filter = none # So the AI will never see this
+		ai = no #was only_playable
+		ai_check_interval = 6000
+
+		from_potential = {
+			OR = {
+				AND = {
+					z_sorcerer = yes
+					OR = {
+						trait = origin_aberrant_mind
+						AND = {
+							race_has_aberrant_magic = yes
+							olrox_has_specific_sorc_origin = no
+						}
+					}
+				}
+				AND = {
+					z_psion = yes
+				}
+			}
+			ai = no
+		}
+
+		potential = {
+			OR = {
+				is_ruler = yes
+				same_realm = FROM
+			}
+			ai = yes
+		}
+
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						z_sorcerer = yes
+						custom_tooltip = {
+							text = JOURNEYMANSORCHIGHER
+							hidden_tooltip = {
+								OR = {
+									trait = journeyman_sorcerer
+									trait = expert_sorcerer
+									trait = master_sorcerer
+									trait = renowned_sorcerer
+									trait = legendary_sorcerer
+								}
+							}
+						}
+						custom_tooltip = {
+							text = HAS15SPELLPOINTS
+							hidden_tooltip = {
+								check_variable = { which = sorcspellpoints value = 15 }
+							}
+						}
+					}
+					AND = {
+						z_psion = yes
+						custom_tooltip = {
+							text = JOURNEYMANPSIHIGHER
+							hidden_tooltip = {
+								OR = {
+									trait = journeyman_psion
+									trait = expert_psion
+									trait = master_psion
+									trait = renowned_psion
+									trait = legendary_psion
+								}
+							}
+						}
+						NOT = { trait = stressed }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_forget_past_cooldown }
+							had_character_flag = { flag = spell_forget_past_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+
+		effect = {
+			FROM = { set_character_flag = spell_forget_past_cooldown }
+			FROM = {
+				if = {
+					limit = {
+						z_sorcerer = yes
+					}
+					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+					hidden_tooltip = {
+						if = {
+							limit = {
+								trait = origin_wild_magic
+							}
+							random = {
+								chance = 5
+								character_event = { id = spellaux.4 }
+								break = yes
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						z_psion = yes
+					}
+					custom_tooltip = {
+						text = heavypsi_tt
+						big_psi_stress = yes
+					}
+				}
+			}
+			spell_resistance_check = yes
+			custom_tooltip = {
+				text = REMOVEOPINIONS
+				hidden_tooltip = {
+					remove_friend = FROM
+					remove_lover = FROM
+					remove_rival = FROM
+					remove_all_opinions_to_from = yes
+				}
+			}
+		}
+	}
+
+	spell_charm_person_sorc = { # This will be a player-only spell because the AI can't really deal with the strategy
+		filter = all
+		ai_target_filter = none # So the AI will never see this
+		ai = no #was only_playable = yes
+		ai_check_interval = 6000
+
+		from_potential = {
+			OR = {
+				AND = {
+					z_sorcerer = yes
+					OR = {
+						trait = origin_aberrant_mind
+						trait = origin_shadow
+						AND = {
+							OR = {
+								race_has_aberrant_magic = yes
+								race_has_shadow_magic = yes
+							}
+							olrox_has_specific_sorc_origin = no
+						}
+					}
+				}
+				z_psion = yes
+			}
+			ai = no
+		}
+
+		potential = {
+			OR = {
+				is_ruler = yes
+				same_realm = FROM
+			}
+			ai = yes
+		}
+
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						z_sorcerer = yes
+						custom_tooltip = {
+							text = HAS5SPELLPOINTS
+							hidden_tooltip = {
+								check_variable = { which = sorcspellpoints value = 5 }
+							}
+						}
+					}
+					AND = {
+						z_psion = yes
+						NOT = { trait = stressed }
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_charm_person_cooldown }
+							had_character_flag = { flag = spell_charm_person_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { is_foe = ROOT }
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = charm_person_spell
+				}
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = charm_person_spell_after
+				}
+			}
+		}
+
+		effect = {
+			FROM = { set_character_flag = spell_charm_person_cooldown }
+			FROM = {
+				if = {
+					limit = {
+						z_sorcerer = yes
+					}
+					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -5 } }
+					hidden_tooltip = {
+						if = {
+							limit = {
+								trait = origin_wild_magic
+							}
+							random = {
+								chance = 5
+								character_event = { id = spellaux.4 }
+								break = yes
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						z_psion = yes
+					}
+					custom_tooltip = {
+						text = mediumpsi_tt
+						med_psi_stress = yes
+					}
+				}
+			}
+			spell_resistance_check = yes
+			opinion = {
+				modifier = charm_person_spell
+				who = FROM
+				months = 3
+			}
+			repeat_event = { id = spellaux.2 days = 90 }
+		}
+	}
+
+	dominate_person_sorc = {
+		only_rulers = yes #potential already restricted to is_landed
+		ai_check_interval = 12
+		filter = sub_realm
+		ai_target_filter = sub_realm
+
+		from_potential = {
+			is_landed = yes
+			is_inaccessible_or_incapable_trigger = no
+			z_sorcerer = yes
+			OR = {
+				trait = origin_aberrant_mind
+				AND = {
+					race_has_aberrant_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				host = { character = FROM }
+				liege = { character = FROM }
+			}
+			is_adult = yes
+			ai = yes
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_dominate_person_cooldown }
+							had_character_flag = { flag = spell_dominate_person_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			NOR = {
+				trait = creature_illithid
+				trait = creature_yikarian
+			}
+			NOT = {
+				has_opinion_modifier = { who = FROM modifier = mind_control }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_dominate_person_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			spell_resistance_check = yes
+			opinion = {
+				modifier = mind_control who = FROM years = 2
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+
+	spell_lesser_restoration_sorc = {
+		ai = no
+		ai_check_interval = 6000
+		filter = realm_including_me
+		ai_target_filter = none #ai has its own version
+
+		from_potential = {
+			ai = no
+			z_sorcerer = yes
+			OR = {
+				trait = origin_divine_soul
+				AND = {
+					race_has_divine_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+			NOR = { #if it's this bad they need greater restoration
+				trait = incapable
+				trait = sick_incapable
+			}
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ONEDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					remove_character_modifier = mild_illness
+					remove_character_modifier = severe_illness
+					remove_character_modifier = bedridden_illness
+					#remove treatments
+					remove_character_modifier = mystic_treatment_decent
+					remove_character_modifier = mystic_treatment_poor
+					remove_character_modifier = mystic_treatment_terrible
+					remove_character_modifier = symptom_treatment_1
+					remove_character_modifier = symptom_treatment_2
+					remove_character_modifier = symptom_treatment_3
+					remove_character_modifier = symptom_treatment_4
+					remove_character_modifier = successful_treatment_1
+					remove_character_modifier = successful_treatment_2
+					remove_character_modifier = successful_treatment_3
+					remove_character_modifier = failed_treatment_1
+					remove_character_modifier = failed_treatment_2
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						random_list = {
+							40 = {
+								modifier = {
+									NOT = { trait = flu }
+									factor = 0
+								}
+								remove_trait = flu
+								clr_character_flag = manifest_flu
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = dysentery }
+									factor = 0
+								}
+								remove_trait = dysentery
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = rabies }
+									factor = 0
+								}
+								remove_trait = rabies
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = has_measles }
+									factor = 0
+								}
+								remove_trait = has_measles
+							}
+							40 = {
+								modifier = {
+									NOT = {
+										trait = food_poisoning
+									}
+									factor = 0
+								}
+								remove_trait = food_poisoning
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = gout }
+									factor = 0
+								}
+								remove_trait = gout
+							}
+							40 = {
+								modifier = {
+									NOT = { trait = scurvy }
+									factor = 0
+								}
+								remove_trait = scurvy
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = lovers_pox }
+									factor = 0
+								}
+								remove_trait = lovers_pox
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = cancer }
+									factor = 0
+								}
+								remove_trait = cancer
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = pneumonic }
+									factor = 0
+								}
+								remove_trait = pneumonic
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = syphilitic }
+									factor = 0
+								}
+								remove_trait = syphilitic
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = leper }
+									factor = 0
+								}
+								remove_trait = leper
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_tuberculosis}
+									factor = 0
+								}
+								remove_trait = has_tuberculosis
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_aztec_disease}
+									factor = 0
+								}
+								remove_trait = has_aztec_disease
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_small_pox}
+									factor = 0
+								}
+								remove_trait = has_small_pox
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_bubonic_plague}
+									factor = 0
+								}
+								remove_trait = has_bubonic_plague
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhus}
+									factor = 0
+								}
+								remove_trait = has_typhus
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhoid_fever}
+									factor = 0
+								}
+								remove_trait = has_typhoid_fever
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_greater_restoration_sorc = {
+		ai = no
+		ai_check_interval = 6000
+		filter = realm_including_me
+		ai_target_filter = none #ai has its own version
+
+		from_potential = {
+			ai = no
+			z_sorcerer = yes
+			OR = {
+				trait = origin_divine_soul
+				AND = {
+					race_has_divine_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS15SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 15 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						#Greater restoration clears every disease
+						remove_trait = flu
+						remove_trait = dysentery
+						remove_trait = rabies
+						remove_trait = has_measles
+						remove_trait = food_poisoning
+						remove_trait = gout
+						remove_trait = scurvy
+						remove_trait = lovers_pox
+						remove_trait = cancer
+						remove_trait = pneumonic
+						remove_trait = syphilitic
+						remove_trait = leper
+						remove_trait = has_tuberculosis
+						remove_trait = has_aztec_disease
+						remove_trait = has_small_pox
+						remove_trait = has_bubonic_plague
+						remove_trait = has_typhus
+						remove_trait = has_typhoid_fever
+						#We also remove any symptoms even if they haven't developed into disease yet
+						remove_trait = abdominal_pain
+						remove_trait = chest_pain
+						remove_trait = cough
+						remove_trait = cramps
+						remove_trait = diarrhea
+						remove_trait = fatigue
+						remove_trait = fever
+						remove_trait = headache
+						remove_trait = infection
+						remove_trait = malaise
+						remove_trait = rash
+						remove_trait = vomiting
+						#also clear the flags so they don't keep getting sick
+						clr_character_flag = developing_illness
+						clr_character_flag = got_flu
+						clr_character_flag = manifest_flu
+						remove_character_modifier = mild_illness
+						remove_character_modifier = severe_illness
+						remove_character_modifier = bedridden_illness
+						#remove treatments
+						remove_character_modifier = mystic_treatment_decent
+						remove_character_modifier = mystic_treatment_poor
+						remove_character_modifier = mystic_treatment_terrible
+						remove_character_modifier = symptom_treatment_1
+						remove_character_modifier = symptom_treatment_2
+						remove_character_modifier = symptom_treatment_3
+						remove_character_modifier = symptom_treatment_4
+						remove_character_modifier = successful_treatment_1
+						remove_character_modifier = successful_treatment_2
+						remove_character_modifier = successful_treatment_3
+						remove_character_modifier = failed_treatment_1
+						remove_character_modifier = failed_treatment_2
+						#lastly remove incapable
+						remove_trait = incapable
+						remove_trait = sick_incapable
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_heal_sorc = {
+		ai = no
+		ai_check_interval = 6000
+		filter = realm_including_me
+		ai_target_filter = none
+
+		from_potential = {
+			OR = {
+				AND = {
+					z_sorcerer = yes
+					OR = {
+						trait = origin_divine_soul
+						AND = {
+							race_has_divine_magic = yes
+							olrox_has_specific_sorc_origin = no
+						}
+					}
+				}
+				AND = {
+					z_psion
+				}
+			}
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = severely_injured
+				trait = mangled
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = HAS15SPELLPOINTS
+							hidden_tooltip = {
+								check_variable = { which = sorcspellpoints value = 15 }
+							}
+						}
+						custom_tooltip = {
+							text = EXPERTSORCHIGHER
+							hidden_tooltip = {
+								OR = {
+									trait = expert_sorcerer
+									trait = master_sorcerer
+									trait = renowned_sorcerer
+									trait = legendary_sorcerer
+								}
+							}
+						}
+					}
+					AND = {
+						z_psion = yes
+						NOT = { trait = stressed }
+						custom_tooltip = {
+							text = EXPERTPSIHIGHER
+							hidden_tooltip = {
+								OR = {
+									trait = expert_psion
+									trait = master_psion
+									trait = renowned_psion
+									trait = legendary_psion
+								}
+							}
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_healing_cooldown }
+			FROM = {
+				if = {
+					limit = {
+						z_sorcerer = yes
+					}
+					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
+				}
+				else_if = {
+					limit = {
+						z_psion = yes
+					}
+					custom_tooltip = {
+						text = mediumpsi_tt
+						med_psi_stress = yes
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLINJURIESCURED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+
+		}
+	}
+
+	spell_regenerate_sorc = {
+		ai = no
+		ai_check_interval = 6000
+		filter = realm_including_me
+		ai_target_filter = none
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_divine_soul
+				AND = {
+					race_has_divine_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+				trait = disfigured
+				trait = one_eyed
+				trait = one_handed
+				trait = one_legged
+				trait = blinded
+			}
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS30SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 30 }
+					}
+				}
+				custom_tooltip = {
+					text = RENOWNEDSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_healing_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -30 } } }
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLREGENERATED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+					remove_trait = disfigured
+					remove_trait = one_legged
+					remove_trait = one_handed
+					if = {
+						limit = {
+							AND = {
+								trait = creature_beholder
+								OR = {
+									z_wizard = yes
+									z_bard = yes
+									z_warlock = yes
+								}
+							}
+						}
+						remove_trait = blinded
+						add_trait = one_eyed
+					}
+					else = {
+						remove_trait = one_eyed
+						remove_trait = blinded
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 100
+				character = ROOT
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 10
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 10
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = envious
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+				}
+			}
+		}
+	}
+
+	mind_control_dec = {
+		only_playable = yes
+		ai_check_interval = 24
+		filter = sub_realm
+		ai_target_filter = sub_realm
+
+		from_potential = {
+			is_landed = yes
+			is_inaccessible_or_incapable_trigger = no
+			OR = {
+				trait = creature_illithid
+				trait = creature_yikarian
+				AND = {
+					z_psion = yes
+					OR = {
+						ai = yes
+						has_character_flag = psi_spellbook_open
+					}
+				}
+			}
+		}
+		potential = {
+			is_adult = yes
+			ai = yes
+			is_incapable = no
+			OR = {
+				host = { character = FROM }
+				liege = { character = FROM }
+			}
+			NOR = {
+				trait = creature_illithid
+				trait = creature_yikarian
+				z_psion = yes
+			}
+			NOT = { character = FROM }
+		}
+		allow = {
+			FROM = {
+				OR = {
+					AND = {
+						piety = 300
+						OR = {
+							trait = creature_illithid
+							trait = creature_yikarian
+						}
+					}
+					trait = expert_psion
+					trait = master_psion
+					trait = renowned_psion
+					trait = legendary_psion
+				}
+			}
+			NOT = {
+				has_opinion_modifier = { who = FROM modifier = mind_control }
+			}
+		}
+		effect = {
+			FROM = {
+				if = {
+					limit = {
+						OR = {
+							trait = expert_psion
+							trait = master_psion
+							trait = renowned_psion
+							trait = legendary_psion
+						}
+					}
+					custom_tooltip = {
+						text = heavypsi_tt
+						big_psi_stress = yes
+					}
+				}
+				else = {
+					piety = -300
+				}
+			}
+			opinion = {
+				modifier = mind_control who = FROM years = 10 # Need to balance
+			}
+		}
+		ai_will_do = {
+			factor = 0.25
+			modifier = {
+				factor = 0.1
+				ROOT = { is_landed = no }
+			}
+			modifier = {
+				factor = 2
+				ROOT = { opinion = { who = FROM value < 20 } }
+			}
+			modifier = {
+				factor = 1.5
+				olrox_is_good_religion_trigger = no
+			}
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+			modifier = {
+				factor = 0.3
+				olrox_is_good_religion_trigger = yes
+			}
+		}
+	}
+
+	pick_wiz_spec = {
+		is_high_prio = yes
+		ai = no
+		potential = {
+			z_wizard = yes
+			NOT = { has_wiz_spec = yes }
+			not_casting = yes
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			character_event = { id = wizinit.3 }
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	
+	spell_heal = {
+		ai_check_interval = 12
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				z_ranger = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					custom_tooltip = {
+						text = notbard
+						OR = {
+							z_bard = no
+							AND = {
+								z_bard = yes
+								OR = {
+									z_cleric = yes
+									z_druid = yes
+									z_ranger = yes
+									z_paladin = yes
+									z_warlock = yes
+								}
+							}
+						}
+					}
+					custom_tooltip = {
+						text = bardhasinstrument
+						AND = {
+							z_bard = yes
+							any_artifact = {
+								has_artifact_flag = instrument
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = BASECASTER
+							OR = {
+								trait = druid
+								trait = cleric
+								trait = warlock
+								trait = bard
+								trait = journeyman_ranger
+								trait = journeyman_paladin
+							}
+						}
+						wealth = 80
+					}
+					AND = {
+						custom_tooltip = {
+							text = TRAINEDCASTER
+							OR = {
+								trait = trained_druid
+								trait = trained_cleric
+								trait = trained_warlock
+								trait = trained_bard
+								trait = expert_ranger
+								trait = expert_paladin
+							}
+						}
+						wealth = 70
+					}
+					AND = {
+						custom_tooltip = {
+							text = JOURNCASTER
+							OR = {
+								trait = journeyman_druid
+								trait = journeyman_cleric
+								trait = journeyman_warlock
+								trait = journeyman_bard
+								trait = master_ranger
+								trait = master_paladin
+							}
+						}
+						wealth = 60
+					}
+					AND = {
+						custom_tooltip = {
+							text = EXPCASTER
+							OR = {
+								trait = expert_druid
+								trait = expert_cleric
+								trait = expert_warlock
+								trait = expert_bard
+								trait = renowned_ranger
+								trait = renowned_paladin
+							}
+						}
+						wealth = 50
+					}
+					AND = {
+						custom_tooltip = {
+							text = MASTCASTER
+							OR = {
+								trait = master_druid
+								trait = master_cleric
+								trait = master_warlock
+								trait = master_bard
+								trait = legendary_ranger
+								trait = legendary_paladin
+							}
+						}
+						wealth = 40
+					}
+					AND = {
+						custom_tooltip = {
+							text = RENOWNCASTER
+							OR = {
+								trait = renowned_druid
+								trait = renowned_cleric
+								trait = renowned_warlock
+								trait = renowned_bard
+							}
+						}
+						wealth = 30
+					}
+					AND = {
+						custom_tooltip = {
+							text = LEGENDCASTER
+							OR = {
+								trait = legendary_druid
+								trait = legendary_cleric
+								trait = legendary_warlock
+								trait = legendary_bard
+							}
+						}
+						wealth = 20
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_healing_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -20
+					}
+					legendary_cleric = {
+						wealth = -20
+					}
+					legendary_warlock = {
+						wealth = -20
+					}
+					legendary_bard = {
+						wealth = -20
+					}
+					renowned_druid = {
+						wealth = -30
+					}
+					renowned_cleric = {
+						wealth = -30
+					}
+					renowned_warlock = {
+						wealth = -30
+					}
+					renowned_bard = {
+						wealth = -30
+					}
+					master_druid = {
+						wealth = -40
+					}
+					master_cleric = {
+						wealth = -40
+					}
+					master_warlock = {
+						wealth = -40
+					}
+					master_bard = {
+						wealth = -40
+					}
+					legendary_ranger = {
+						wealth = -40
+					}
+					legendary_paladin = {
+						wealth = -40
+					}
+					expert_druid = {
+						wealth = -50
+					}
+					expert_cleric = {
+						wealth = -50
+					}
+					expert_warlock = {
+						wealth = -50
+					}
+					expert_bard = {
+						wealth = -50
+					}
+					renowned_ranger = {
+						wealth = -50
+					}
+					renowned_paladin = {
+						wealth = -50
+					}
+					journeyman_druid = {
+						wealth = -60
+					}
+					journeyman_cleric = {
+						wealth = -60
+					}
+					journeyman_warlock = {
+						wealth = -60
+					}
+					journeyman_bard = {
+						wealth = -60
+					}
+					master_ranger = {
+						wealth = -60
+					}
+					master_paladin = {
+						wealth = -60
+					}
+					trained_druid = {
+						wealth = -70
+					}
+					trained_cleric = {
+						wealth = -70
+					}
+					trained_warlock = {
+						wealth = -70
+					}
+					trained_bard = {
+						wealth = -70
+					}
+					expert_ranger = {
+						wealth = -70
+					}
+					expert_paladin = {
+						wealth = -70
+					}
+					druid = {
+						wealth = -80
+					}
+					cleric = {
+						wealth = -80
+					}
+					warlock = {
+						wealth = -80
+					}
+					bard = {
+						wealth = -80
+					}
+					journeyman_ranger = {
+						wealth = -80
+					}
+					journeyman_paladin = {
+						wealth = -80
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLINJURIESCURED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 100000
+				character = ROOT
+			}
+			modifier = {
+				factor = 0.1
+				NOT = { wealth = 500 }
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 3
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 3
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+					trait = greedy
+				}
+			}
+		}
+	}
+
+	spell_lesser_restoration = {
+		ai_check_interval = 12
+		filter = realm_including_me
+		ai_target_filter = sub_realm_including_me
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				z_ranger = yes
+				z_paladin = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+			NOR = { #if it's this bad they need greater restoration
+				trait = incapable
+				trait = sick_incapable
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					custom_tooltip = {
+						text = notbard
+						OR = {
+							z_bard = no
+							AND = {
+								z_bard = yes
+								OR = {
+									z_cleric = yes
+									z_druid = yes
+									z_ranger = yes
+									z_paladin = yes
+									z_warlock = yes
+								}
+							}
+						}
+					}
+					custom_tooltip = {
+						text = bardhasinstrument
+						AND = {
+							z_bard = yes
+							any_artifact = {
+								has_artifact_flag = instrument
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = JOURNCASTER
+							OR = {
+								trait = journeyman_druid
+								trait = journeyman_cleric
+								trait = journeyman_warlock
+								trait = journeyman_bard
+								trait = master_ranger
+								trait = master_paladin
+							}
+						}
+						wealth = 125
+					}
+					AND = {
+						custom_tooltip = {
+							text = EXPCASTER
+							OR = {
+								trait = expert_druid
+								trait = expert_cleric
+								trait = expert_warlock
+								trait = expert_bard
+								trait = renowned_ranger
+								trait = renowned_paladin
+							}
+						}
+						wealth = 100
+					}
+					AND = {
+						custom_tooltip = {
+							text = MASTCASTER
+							OR = {
+								trait = master_druid
+								trait = master_cleric
+								trait = master_warlock
+								trait = master_bard
+								trait = legendary_ranger
+								trait = legendary_paladin
+							}
+						}
+						wealth = 75
+					}
+					AND = {
+						custom_tooltip = {
+							text = RENOWNCASTER
+							OR = {
+								trait = renowned_druid
+								trait = renowned_cleric
+								trait = renowned_warlock
+								trait = renowned_bard
+							}
+						}
+						wealth = 55
+					}
+					AND = {
+						custom_tooltip = {
+							text = LEGENDCASTER
+							OR = {
+								trait = legendary_druid
+								trait = legendary_cleric
+								trait = legendary_warlock
+								trait = legendary_bard
+							}
+						}
+						wealth = 35
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_remove_disease_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -35
+					}
+					legendary_cleric = {
+						wealth = -35
+					}
+					legendary_warlock = {
+						wealth = -35
+					}
+					legendary_bard = {
+						wealth = -35
+					}
+					renowned_druid = {
+						wealth = -55
+					}
+					renowned_cleric = {
+						wealth = -55
+					}
+					renowned_warlock = {
+						wealth = -55
+					}
+					renowned_bard = {
+						wealth = -55
+					}
+					master_druid = {
+						wealth = -75
+					}
+					master_cleric = {
+						wealth = -75
+					}
+					master_warlock = {
+						wealth = -75
+					}
+					master_bard = {
+						wealth = -75
+					}
+					legendary_ranger = {
+						wealth = -75
+					}
+					legendary_paladin = {
+						wealth = -75
+					}
+					expert_druid = {
+						wealth = -100
+					}
+					expert_cleric = {
+						wealth = -100
+					}
+					expert_warlock = {
+						wealth = -100
+					}
+					expert_bard = {
+						wealth = -100
+					}
+					renowned_ranger = {
+						wealth = -100
+					}
+					renowned_paladin = {
+						wealth = -100
+					}
+					journeyman_druid = {
+						wealth = -125
+					}
+					journeyman_cleric = {
+						wealth = -125
+					}
+					journeyman_warlock = {
+						wealth = -125
+					}
+					journeyman_bard = {
+						wealth = -125
+					}
+					master_ranger = {
+						wealth = -125
+					}
+					master_paladin = {
+						wealth = -125
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ONEDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					remove_character_modifier = mild_illness
+					remove_character_modifier = severe_illness
+					remove_character_modifier = bedridden_illness
+					#remove treatments
+					remove_character_modifier = mystic_treatment_decent
+					remove_character_modifier = mystic_treatment_poor
+					remove_character_modifier = mystic_treatment_terrible
+					remove_character_modifier = symptom_treatment_1
+					remove_character_modifier = symptom_treatment_2
+					remove_character_modifier = symptom_treatment_3
+					remove_character_modifier = symptom_treatment_4
+					remove_character_modifier = successful_treatment_1
+					remove_character_modifier = successful_treatment_2
+					remove_character_modifier = successful_treatment_3
+					remove_character_modifier = failed_treatment_1
+					remove_character_modifier = failed_treatment_2
+					#to avoid unintended permanent regency
+					remove_trait = sick_incapable
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						random_list = {
+							40 = {
+								modifier = {
+									NOT = { trait = flu }
+									factor = 0
+								}
+								remove_trait = flu
+								clr_character_flag = manifest_flu
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = dysentery }
+									factor = 0
+								}
+								remove_trait = dysentery
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = rabies }
+									factor = 0
+								}
+								remove_trait = rabies
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = has_measles }
+									factor = 0
+								}
+								remove_trait = has_measles
+							}
+							40 = {
+								modifier = {
+									NOT = {
+										trait = food_poisoning
+									}
+									factor = 0
+								}
+								remove_trait = food_poisoning
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = gout }
+									factor = 0
+								}
+								remove_trait = gout
+							}
+							40 = {
+								modifier = {
+									NOT = { trait = scurvy }
+									factor = 0
+								}
+								remove_trait = scurvy
+							}
+							20 = {
+								modifier = {
+									NOT = { trait = lovers_pox }
+									factor = 0
+								}
+								remove_trait = lovers_pox
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = cancer }
+									factor = 0
+								}
+								remove_trait = cancer
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = pneumonic }
+									factor = 0
+								}
+								remove_trait = pneumonic
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = syphilitic }
+									factor = 0
+								}
+								remove_trait = syphilitic
+							}
+							5 = {
+								modifier = {
+									NOT = { trait = leper }
+									factor = 0
+								}
+								remove_trait = leper
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_tuberculosis}
+									factor = 0
+								}
+								remove_trait = has_tuberculosis
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_aztec_disease}
+									factor = 0
+								}
+								remove_trait = has_aztec_disease
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_small_pox}
+									factor = 0
+								}
+								remove_trait = has_small_pox
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_bubonic_plague}
+									factor = 0
+								}
+								remove_trait = has_bubonic_plague
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhus}
+									factor = 0
+								}
+								remove_trait = has_typhus
+							}
+							10 = {
+								modifier = {
+									NOT = { trait = has_typhoid_fever}
+									factor = 0
+								}
+								remove_trait = has_typhoid_fever
+							}
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 100000
+				character = ROOT
+			}
+			modifier = {
+				factor = 0.1
+				NOT = { wealth = 500 }
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 3
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 3
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+					trait = greedy
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_greater_restoration = {
+		ai_check_interval = 12
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+		}
+		potential = {
+			OR = {
+				trait = ill
+				trait = sickly
+				character_disease_trigger = yes
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					custom_tooltip = {
+						text = notbard
+						OR = {
+							z_bard = no
+							AND = {
+								z_bard = yes
+								OR = {
+									z_cleric = yes
+									z_druid = yes
+									z_warlock = yes
+								}
+							}
+						}
+					}
+					custom_tooltip = {
+						text = bardhasinstrument
+						AND = {
+							z_bard = yes
+							any_artifact = {
+								has_artifact_flag = instrument
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = MASTCASTER
+							OR = {
+								trait = master_druid
+								trait = master_cleric
+								trait = master_warlock
+								trait = master_bard
+							}
+						}
+						wealth = 100
+					}
+					AND = {
+						custom_tooltip = {
+							text = RENOWNCASTER
+							OR = {
+								trait = renowned_druid
+								trait = renowned_cleric
+								trait = renowned_warlock
+								trait = renowned_bard
+							}
+						}
+						wealth = 75
+					}
+					AND = {
+						custom_tooltip = {
+							text = LEGENDCASTER
+							OR = {
+								trait = legendary_druid
+								trait = legendary_cleric
+								trait = legendary_warlock
+								trait = legendary_bard
+							}
+						}
+						wealth = 50
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_remove_disease_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -50
+					}
+					legendary_cleric = {
+						wealth = -50
+					}
+					legendary_warlock = {
+						wealth = -50
+					}
+					legendary_bard = {
+						wealth = -50
+					}
+					renowned_druid = {
+						wealth = -75
+					}
+					renowned_cleric = {
+						wealth = -75
+					}
+					renowned_warlock = {
+						wealth = -75
+					}
+					renowned_bard = {
+						wealth = -75
+					}
+					master_druid = {
+						wealth = -100
+					}
+					master_cleric = {
+						wealth = -100
+					}
+					master_warlock = {
+						wealth = -100
+					}
+					master_bard = {
+						wealth = -100
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLDISEASECURED
+				hidden_tooltip = {
+					remove_trait = sickly
+					if = {
+						limit = {
+							NOT = { has_dlc = "Reapers" }
+						}
+						remove_trait = ill
+					}
+					else_if = {
+						limit = {
+							has_dlc = "Reapers"
+						}
+						#Greater restoration clears every disease
+						remove_trait = flu
+						remove_trait = dysentery
+						remove_trait = rabies
+						remove_trait = has_measles
+						remove_trait = food_poisoning
+						remove_trait = gout
+						remove_trait = scurvy
+						remove_trait = lovers_pox
+						remove_trait = cancer
+						remove_trait = pneumonic
+						remove_trait = syphilitic
+						remove_trait = leper
+						remove_trait = has_tuberculosis
+						remove_trait = has_aztec_disease
+						remove_trait = has_small_pox
+						remove_trait = has_bubonic_plague
+						remove_trait = has_typhus
+						remove_trait = has_typhoid_fever
+						#We also remove any symptoms even if they haven't developed into disease yet
+						remove_trait = abdominal_pain
+						remove_trait = chest_pain
+						remove_trait = cough
+						remove_trait = cramps
+						remove_trait = diarrhea
+						remove_trait = fatigue
+						remove_trait = fever
+						remove_trait = headache
+						remove_trait = infection
+						remove_trait = malaise
+						remove_trait = rash
+						remove_trait = vomiting
+						#also clear the flags so they don't keep getting sick
+						clr_character_flag = developing_illness
+						clr_character_flag = got_flu
+						clr_character_flag = manifest_flu
+						remove_character_modifier = mild_illness
+						remove_character_modifier = severe_illness
+						remove_character_modifier = bedridden_illness
+						#remove treatments
+						remove_character_modifier = mystic_treatment_decent
+						remove_character_modifier = mystic_treatment_poor
+						remove_character_modifier = mystic_treatment_terrible
+						remove_character_modifier = symptom_treatment_1
+						remove_character_modifier = symptom_treatment_2
+						remove_character_modifier = symptom_treatment_3
+						remove_character_modifier = symptom_treatment_4
+						remove_character_modifier = successful_treatment_1
+						remove_character_modifier = successful_treatment_2
+						remove_character_modifier = successful_treatment_3
+						remove_character_modifier = failed_treatment_1
+						remove_character_modifier = failed_treatment_2
+						#lastly remove incapable
+						remove_trait = incapable
+						remove_trait = sick_incapable
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 100000
+				character = ROOT
+			}
+			modifier = {
+				factor = 0.1
+				NOT = { wealth = 500 }
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 3
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 3
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+					trait = greedy
+				}
+			}
+			modifier = {
+				factor = 0.01
+				trait = patron_talona
+			}
+		}
+	}
+
+	spell_regenerate = {
+		ai_check_interval = 12
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				z_bard = yes
+			}
+		}
+		potential = {
+			OR = {
+				trait = wounded
+				trait = mangled
+				trait = severely_injured
+				trait = disfigured
+				trait = one_eyed
+				trait = one_handed
+				trait = one_legged
+				trait = blinded
+				trait = eunuch
+			}
+		}
+		allow = {
+			FROM = {
+				OR = {
+					custom_tooltip = {
+						text = notbard
+						OR = {
+							z_bard = no
+							AND = {
+								z_bard = yes
+								OR = {
+									z_cleric = yes
+									z_druid = yes
+								}
+							}
+						}
+					}
+					custom_tooltip = {
+						text = bardhasinstrument
+						AND = {
+							z_bard = yes
+							any_artifact = {
+								has_artifact_flag = instrument
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = RENOWNCASTER
+							OR = {
+								trait = renowned_druid
+								trait = renowned_cleric
+								trait = renowned_bard
+							}
+						}
+						wealth = 150
+					}
+					AND = {
+						custom_tooltip = {
+							text = LEGENDCASTER
+							OR = {
+								trait = legendary_druid
+								trait = legendary_cleric
+								trait = legendary_bard
+							}
+						}
+						wealth = 100
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_healing_cooldown }
+							had_character_flag = { flag = spell_healing_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_healing_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -100
+					}
+					legendary_cleric = {
+						wealth = -100
+					}
+					legendary_bard = {
+						wealth = -100
+					}
+					renowned_druid = {
+						wealth = -150
+					}
+					renowned_cleric = {
+						wealth = -150
+					}
+					renowned_bard = {
+						wealth = -150
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						NOT = { character = FROM }
+					}
+					opinion = {
+						modifier = cured_me
+						who = FROM
+						years = 5
+					}
+					if = {
+						limit = {
+							ai = no
+						}
+						repeat_event = { id = spellaux.7 }
+					}
+				}
+				else_if = {
+					limit = {
+						ai = no
+						character = FROM
+					}
+					character_event = { id = spellaux.8 }
+				}
+			}
+			custom_tooltip = {
+				text = ALLREGENERATED
+				hidden_tooltip = {
+					remove_trait = wounded
+					remove_trait = mangled
+					remove_trait = severely_injured
+					remove_trait = disfigured
+					remove_trait = one_legged
+					remove_trait = one_handed
+					remove_trait = eunuch
+					if = {
+						limit = {
+							AND = {
+								trait = creature_beholder
+								OR = {
+									z_wizard = yes
+									z_bard = yes
+									z_warlock = yes
+								}
+							}
+						}
+						remove_trait = blinded
+						add_trait = one_eyed
+					}
+					else = {
+						remove_trait = one_eyed
+						remove_trait = blinded
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 100000
+				character = ROOT
+			}
+			modifier = {
+				factor = 0.1
+				NOT = { wealth = 500 }
+			}
+			modifier = {
+				factor = 0
+				is_foe = ROOT
+			}
+			modifier = {
+				factor = 3
+				trait = kind
+			}
+			modifier = {
+				factor = 10
+				is_friend = ROOT
+			}
+			modifier = {
+				factor = 3
+				opinion = {
+					who = ROOT
+					value = 50
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+			modifier = {
+				factor = 0.1
+				OR = {
+					trait = cruel
+					trait = impaler
+					trait = greedy
+				}
+			}
+		}
+	}
+	
+}
+
+settlement_decisions = {
+
+	spell_fabricate_sorc = {
+		only_rulers = yes
+		ai_check_interval = 24
+		filter = owned #was realm_owned but the potential block means owned
+		ai_target_filter = owned #was realm_owned
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_wild_magic
+				AND = {
+					race_has_wild_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			location = {
+				NOT = { has_province_modifier = spell_fabricate_mod }
+			}
+			FROM = {
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_fabricate_cooldown }
+							had_character_flag = { flag = spell_fabricate_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_fabricate_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = spell_fabricate_mod
+					months = 12
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0
+				FROM = { NOT = { wealth = 100 } }
+			}
+			modifier = {
+				factor = 10
+				FROM = { trait = diligent }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_gond }
+			}
+		}
+	}
+	spell_wall_of_stone_sorc = {
+		only_rulers = yes
+		ai_check_interval = 24
+		filter = owned #was realm_owned
+		ai_target_filter = owned #was realm_owned
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_draconic
+				AND = {
+					race_has_draconic_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		allow = {
+			ROOT = {
+				has_siege = yes
+				NOT = { has_province_modifier = spell_wall_of_stone_mod }
+			}
+			FROM = {
+				custom_tooltip = {
+					text = HAS10SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 10 }
+					}
+				}
+				custom_tooltip = {
+					text = JOURNEYMANSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = journeyman_sorcerer
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_wall_of_stone_cooldown }
+							had_character_flag = { flag = spell_wall_of_stone_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_wall_of_stone_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = spell_wall_of_stone_mod
+					months = 12
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				FROM = { trait = diligent }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+		}
+	}
+
+	spell_blight_sorc = {
+		only_playable = yes
+		ai_check_interval = 36
+		filter = all
+		ai_target_filter = all
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_shadow
+				AND = {
+					race_has_shadow_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+			}
+			location = { NOT = { has_disease = yes } }
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_blight_cooldown }
+							had_character_flag = { flag = spell_blight_cooldown months = 1 }
+						}
+					}
+				}
+				#NOT = { has_character_modifier = burn_path_mod }
+			}
+			location = { holder_scope = { is_foe = FROM } }
+			location = {
+				holder_scope = {
+					reverse_opinion = {
+						who = FROM
+						value <= -50
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_blight_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.39 }
+						}
+					}
+				}
+			}
+			location = {
+				random_list = {
+					1 = {
+						spawn_disease = tuberculosis
+					}
+					1 = {
+						spawn_disease = typhoid_fever
+					}
+					1 = {
+						spawn_disease = typhus
+					}
+					1 = {
+						spawn_disease = measles
+					}
+					1 = {
+						spawn_disease = small_pox
+					}
+					1 = {
+						spawn_disease = syphilis
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+        factor = 0.1
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value >= 50 }
+					}
+				}
+      }
+			modifier = {
+        factor = 0.5
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value >= 25 }
+					}
+				}
+      }
+			modifier = {
+        factor = 2
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value <= 0 }
+					}
+				}
+      }
+			modifier = {
+				factor = 2
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_talona }
+			}
+		}
+	}
+	spell_controlweather_sorc = {
+		only_playable = yes
+		ai_check_interval = 36
+		filter = all
+		ai_target_filter = all
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_storm
+				trait = origin_wild_magic
+				AND = {
+					OR = {
+						race_has_storm_magic = yes
+						race_has_wild_magic = yes
+					}
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			OR = {
+				location = {
+					any_neighbor_province = {
+						holder_scope = { same_realm = FROM }
+					}
+				}
+				location = {
+					holder_scope = {
+						character = FROM
+					}
+				}
+				location = {
+					FROM = {
+						at_location = PREV
+					}
+				}
+			}
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = MASTERSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_controlweather_cooldown }
+							had_character_flag = { flag = spell_controlweather_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+			OR = {
+				location = {
+					holder_scope = {
+						reverse_opinion = {
+							who = FROM
+							value <= -40
+						}
+					}
+				}
+				location = { holder_scope = { is_foe = FROM } }
+				location = {
+					holder_scope = {
+						character = FROM
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_controlweather_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
+			hidden_tooltip = {
+				FROM = {
+					if = {
+						limit = {
+							trait = origin_wild_magic
+						}
+						random = {
+							chance = 5
+							character_event = { id = spellaux.4 }
+							break = yes
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cast_spell_on_me
+								who = FROM
+								years = 1
+							}
+							repeat_event = { id = spellaux.41 }
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+			location = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								character = FROM
+							}
+						}
+					}
+					add_province_modifier = {
+						name = africa_light_rain
+						months = 12
+					}
+                }
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = {
+									character = FROM
+								}
+							}
+						}
+					}
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}
+					}
+				}
+
+
+			}
+			any_neighbor_independent_ruler = {
+				any_realm_province = {
+					random_list = {
+						1 = {
+							add_province_modifier = {
+								name = africa_heavy_rain
+								months = 3
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought_risk
+								months = 12
+							}
+						}
+						1 = {
+							add_province_modifier = {
+								name = africa_drought
+								months = 6
+							}
+						}
+					}
+				}
+				#Insert Control Weather CB here
+
+			}
+			random = {
+				chance = 50
+				any_neighbor_independent_ruler = {
+					any_realm_province = {
+						random_list = {
+							1 = {
+								add_province_modifier = {
+									name = africa_heavy_rain
+									months = 3
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought_risk
+									months = 12
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought
+									months = 6
+								}
+							}
+						}
+					}
+					#Insert Control Weather CB here
+				}
+			}
+
+
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+        factor = 0.1
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value >= 50 }
+					}
+				}
+      }
+			modifier = {
+        factor = 0.5
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value >= 25 }
+					}
+				}
+      }
+			modifier = {
+        factor = 2
+				location = {
+					holder_scope = {
+						opinion = { who = FROM value <= 0 }
+					}
+				}
+      }
+			modifier = {
+				factor = 2
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_talos }
+			}
+			modifier = {
+				factor = 20
+				FROM = { trait = patron_umberlee }
+			}
+			modifier = {
+				factor = 3
+				FROM = { culture = shadovar } #Shadovar canonically caused a war with Cormyr through use of weather manipulation
+			}
+			modifier = {
+				factor = 10
+				FROM = { culture = thayan } #Thay is pretty notorious canonically for doing this, and dgaf about neighbors caring
+			}
+		}
+	}
+	spell_restoration_prov_sorc = {
+		ai_check_interval = 12
+		filter = realm_owned
+		ai_target_filter = realm_owned
+
+		from_potential = {
+			z_sorcerer = yes
+			OR = {
+				trait = origin_divine_soul
+				AND = {
+					race_has_divine_magic = yes
+					olrox_has_specific_sorc_origin = no
+				}
+			}
+		}
+		potential = {
+			location = { has_disease = yes }
+		}
+		allow = {
+			FROM = {
+				custom_tooltip = {
+					text = HAS20SPELLPOINTS
+					hidden_tooltip = {
+						check_variable = { which = sorcspellpoints value = 20 }
+					}
+				}
+				custom_tooltip = {
+					text = EXPERTSORCHIGHER
+					hidden_tooltip = {
+						OR = {
+							trait = expert_sorcerer
+							trait = master_sorcerer
+							trait = renowned_sorcerer
+							trait = legendary_sorcerer
+						}
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+				NOT = { has_character_modifier = burn_path_mod }
+			}
+		}
+		effect = {
+			FROM = { set_character_flag = spell_remove_disease_cooldown }
+			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
+
+			random_list = {
+				1 = {
+					location = {
+						reduce_disease = -1.0 # *should* remove it completely
+					}
+					hidden_tooltip = {
+						if = {
+							limit = {
+								location = {
+									holder_scope = {
+										NOT = { character = FROM }
+									}
+								}
+							}
+							location = {
+								holder_scope = {
+									opinion = {
+										modifier = cured_my_lands
+										who = FROM
+										years = 5
+									}
+									if = {
+										limit = {
+											ai = no
+										}
+										repeat_event = { id = spellaux.9 }
+									}
+								}
+							}
+						}
+						else_if = {
+							limit = {
+								location = {
+									holder_scope = {
+										ai = no
+										character = FROM
+									}
+								}
+							}
+							location = {
+								FROM = { character_event = { id = spellaux.10 } }
+							}
+						}
+					}
+				}
+				1 = {
+					FROM = {
+						if = {
+							limit = {
+								ai = no
+							}
+							character_event = { id = spellaux.11 }
+						}
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 10000
+				location = {
+					holder_scope = {
+						character = ROOT
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+					}
+				}
+			}
+			modifier = {
+				factor = 0.01
+				FROM = { trait = patron_talona }
+			}
+		}
+	}
+
+	rogue_take_over_crime = {
+		is_high_prio = yes
+		ai_check_interval = 100
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		from_potential = {
+			z_rogue = yes
+		}
+		potential = {
+			location = {
+				OR = {
+					has_province_modifier = thieves_guild
+					has_province_modifier = smugglers_ring
+					has_province_modifier = highway_robber_band
+				}
+			}
+		}
+		allow = {
+			FROM = { prestige = 50 }
+		}
+		effect = {
+			FROM = { prestige = -50 }
+			location = {
+				add_province_modifier = {
+					name = organized_crime
+					months = 4
+				}
+				if = {
+					limit = {
+						has_province_modifier = thieves_guild
+					}
+					wealth = 50
+					remove_province_modifier = thieves_guild
+				}
+				if = {
+					limit = {
+						has_province_modifier = smugglers_ring
+					}
+					wealth = 50
+					remove_province_modifier = smugglers_ring
+				}
+				if = {
+					limit = {
+						has_province_modifier = highway_robber_band
+					}
+					wealth = 50
+					remove_province_modifier = highway_robber_band
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0.01
+				trait = just
+			}
+			modifier = {
+				factor = 1.7
+				trait = greedy
+			}
+			modifier = {
+				factor = 1.5
+				trait = arbitrary
+			}
+		}
+	}
+	
+	spell_restoration_prov = {
+		ai_check_interval = 12
+		filter = realm_owned
+		ai_target_filter = realm_owned
+
+		from_potential = {
+			OR = {
+				z_cleric = yes
+				z_druid = yes
+				AND = {
+					trait = warlock_celestial
+					z_warlock = yes
+				}
+				z_bard = yes
+			}
+		}
+		potential = {
+			location = { has_disease = yes }
+		}
+		allow = {
+			FROM = {
+				OR = {
+					custom_tooltip = {
+						text = notbard
+						OR = {
+							z_bard = no
+							AND = {
+								z_bard = yes
+								OR = {
+									z_cleric = yes
+									z_druid = yes
+									z_warlock = yes
+								}
+							}
+						}
+					}
+					custom_tooltip = {
+						text = bardhasinstrument
+						AND = {
+							z_bard = yes
+							any_artifact = {
+								has_artifact_flag = instrument
+							}
+						}
+					}
+				}
+				OR = {
+					AND = {
+						custom_tooltip = {
+							text = EXPCASTER
+							OR = {
+								trait = expert_druid
+								trait = expert_cleric
+								trait = expert_warlock
+								trait = expert_bard
+							}
+						}
+						wealth = 250
+					}
+					AND = {
+						custom_tooltip = {
+							text = MASTCASTER
+							OR = {
+								trait = master_druid
+								trait = master_cleric
+								trait = master_warlock
+								trait = master_bard
+							}
+						}
+						wealth = 200
+					}
+					AND = {
+						custom_tooltip = {
+							text = RENOWNCASTER
+							OR = {
+								trait = renowned_druid
+								trait = renowned_cleric
+								trait = renowned_warlock
+								trait = renowned_bard
+							}
+						}
+						wealth = 150
+					}
+					AND = {
+						custom_tooltip = {
+							text = LEGENDCASTER
+							OR = {
+								trait = legendary_druid
+								trait = legendary_cleric
+								trait = legendary_warlock
+								trait = legendary_bard
+							}
+						}
+						wealth = 100
+					}
+				}
+				custom_tooltip = {
+					text = SPELL_ON_COOLDOWN
+					hidden_tooltip = {
+						OR = {
+							NOT = { has_character_flag = spell_remove_disease_cooldown }
+							had_character_flag = { flag = spell_remove_disease_cooldown months = 1 }
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				set_character_flag = spell_remove_disease_cooldown
+				trigger_switch = {
+					on_trigger = trait
+					legendary_druid = {
+						wealth = -100
+					}
+					legendary_cleric = {
+						wealth = -100
+					}
+					legendary_warlock = {
+						wealth = -100
+					}
+					legendary_bard = {
+						wealth = -100
+					}
+					renowned_druid = {
+						wealth = -150
+					}
+					renowned_cleric = {
+						wealth = -150
+					}
+					renowned_warlock = {
+						wealth = -150
+					}
+					renowned_bard = {
+						wealth = -150
+					}
+					master_druid = {
+						wealth = -200
+					}
+					master_cleric = {
+						wealth = -200
+					}
+					master_warlock = {
+						wealth = -200
+					}
+					master_bard = {
+						wealth = -200
+					}
+					expert_druid = {
+						wealth = -250
+					}
+					expert_cleric = {
+						wealth = -250
+					}
+					expert_warlock = {
+						wealth = -250
+					}
+					expert_bard = {
+						wealth = -250
+					}
+				}
+			}
+
+			location = {
+				reduce_disease = -1.0 # *should* remove it completely
+			}
+			hidden_tooltip = {
+				if = {
+					limit = {
+						location = {
+							holder_scope = {
+								NOT = { character = FROM }
+							}
+						}
+					}
+					location = {
+						holder_scope = {
+							opinion = {
+								modifier = cured_my_lands
+								who = FROM
+								years = 5
+							}
+							if = {
+								limit = {
+									ai = no
+								}
+								repeat_event = { id = spellaux.9 }
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						location = {
+							holder_scope = {
+								ai = no
+								character = FROM
+							}
+						}
+					}
+					location = {
+						FROM = { character_event = { id = spellaux.10 } }
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 10000
+				location = {
+					holder_scope = {
+						character = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = { NOT = { wealth = 500 } }
+			}
+			modifier = {
+				factor = 0
+				location = {
+					holder_scope = {
+						is_foe = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 10
+				location = {
+					holder_scope = {
+						is_friend = FROM
+					}
+				}
+			}
+			modifier = {
+				factor = 3
+				location = {
+					holder_scope = {
+						opinion = {
+							who = FROM
+							value = 50
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = slothful }
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					OR = {
+						trait = cruel
+						trait = impaler
+						trait = greedy
+					}
+				}
+			}
+			modifier = {
+				factor = 0.01
+				FROM = { trait = patron_talona }
+			}
+		}
+	}
+	
+	organize_levy = {
+		filter = owned
+		ai_target_filter = owned
+		
+		ai_check_interval = 30
+		
+		only_playable = yes
+		
+		from_potential = {
+			z_fighter = yes
+		}
+		
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		
+		allow = {
+			location = {
+				NOT = { has_province_modifier = organized_levies }
+			}
+			custom_tooltip = {
+				text = ORGLEVYCD
+				FROM = {
+					OR = {
+						NOT = { has_character_flag = organized_levy }
+						had_character_flag = {
+							flag = organized_levy
+							months = 8
+						}
+					}
+				}
+			}
+			FROM = {
+				scaled_wealth = {
+					value = 0.08
+					min = 15
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				scaled_wealth = {
+					value = -0.08
+					min = -15
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = organized_levies
+					months = 4
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 1.5
+				trait = diligent
+			}
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+		}
+	}
+
+}

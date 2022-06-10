@@ -1,0 +1,4542 @@
+decisions = {
+
+	appease_spirits = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 36
+
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_landed = yes
+			is_adult = yes
+			prisoner = no
+			OR = {
+	      society_rank = {
+	        rank >= 1
+	        society = emerald_enclave
+	      }
+				society_rank = {
+	        rank >= 1
+	        society = shadow_druids
+	      }
+			}
+		}
+
+		allow = {
+			war = no
+			has_society_currency_minor_trigger = yes
+			custom_tooltip = {
+				text = UNOCCUPIED_DEMESNE_TITLE
+				hidden_tooltip = {
+					any_demesne_title = {
+						NOT = { higher_tier_than = count }
+						is_occupied = no
+					}
+				}
+			}
+			NOT = { is_inaccessible_trigger = yes }
+			custom_tooltip = {
+				text = is_not_busy_trigger_tooltip
+				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+			}
+			custom_tooltip = {
+				text = appease_spirits_cooldown_tooltip
+				hidden_tooltip = { NOT = { has_character_modifier = worshipped_spirits_timer } }
+			}
+		}
+
+		effect = {
+			set_character_flag = recent_minor_decision
+			set_character_flag = do_not_disturb
+			if = {
+				limit = { NOT = { has_quest = quest_appease_spirits } }
+				detract_society_currency_minor_effect = yes
+			}
+			if = {
+				limit = { has_quest = quest_appease_spirits }
+				add_society_currency_minor_effect = yes
+				clr_quest = quest_appease_spirits
+				sound_effect = monastic_orders_donate_charity
+			}
+			custom_tooltip = {
+				text = prepare_worship_ancestors
+				hidden_tooltip = {
+					character_event = { id = EME.7000 }
+					add_character_modifier = {
+						name = worshipped_spirits_timer
+						years = 5
+						hidden = yes
+					}
+				}
+			}
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.5
+
+			modifier = {
+				factor = 0
+				has_character_flag = recent_minor_decision
+				NOT = {
+					had_character_flag = {
+						flag = recent_minor_decision
+						days = 730
+					}
+				}
+			}
+		}
+	}
+
+	invite_druid = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36 #check only once every 36 months.
+		potential = {
+			not_casting = yes
+			OR = {
+	      society_rank = {
+	        rank >= 3
+	        society = emerald_enclave
+	      }
+				society_rank = {
+	        rank >= 3
+	        society = shadow_druids
+	      }
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			custom_tooltip = { text = tooltip_summoning_druid }
+			hidden_tooltip = {
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = no
+					attributes = {
+						diplomacy = 4
+						learning = 14
+						stewardship = 4
+						intrigue = 4
+						martial = 4
+					}
+				}
+			}
+			new_character = {
+				remove_trait = weak
+				remove_trait = slow
+				remove_trait = imbecile
+				remove_trait = dull
+				remove_trait = mystic
+				remove_trait = socializer
+				remove_trait = gamer
+				remove_trait = hedonist
+				remove_trait = duelist
+				remove_trait = hunter
+				remove_trait = strategist
+				remove_trait = administrator
+				remove_trait = architect
+				remove_trait = gardener
+				remove_trait = schemer
+				remove_trait = impaler
+				remove_trait = seducer
+				remove_trait = seductress
+				remove_trait = theologian
+				remove_trait = scholar
+
+				remove_education_effect = yes
+				random_list = {
+					60 = { add_trait = scholarly_theologian }
+					40 = { add_trait = mastermind_theologian }
+				}
+
+				random_list = {
+					15 = {
+						change_learning = 2
+					}
+					15 = {
+						add_trait = physician
+					}
+					20 = {
+						add_trait = theologian
+					}
+					20 = {
+						add_trait = mystic
+					}
+					20 = {
+						add_trait = scholar
+					}
+					5 = {
+						add_trait = shrewd
+					}
+					5 = {
+						add_trait = robust
+					}
+				}
+
+				random_list = {
+					60 = { add_trait = expert_druid }
+					40 = { add_trait = master_druid }
+				}
+
+				if = {
+					limit = {
+						ROOT = { society_member_of = emerald_enclave }
+					}
+					join_society = emerald_enclave
+				}
+				else_if = {
+					limit = {
+						ROOT = { society_member_of = shadow_druids }
+					}
+					join_society = shadow_druids
+				}
+
+				set_character_flag = invited_lodge_soldier
+				set_character_flag = lodge_warrior_original_court_@ROOT
+				set_character_flag = no_court_invites
+				save_event_target_as = invited_lodge_soldier
+			}
+			character_event = { id = EME.25000 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0
+				any_courtier = { has_job_title = job_spiritual learning = 20 }
+			}
+		}
+	}
+
+	nature_favor = {
+		is_in_society = yes
+    only_playable = yes
+    ai_check_interval = 6
+
+    potential = {
+			not_casting = yes
+			OR = {
+				society_rank = {
+					rank = 4
+					society = emerald_enclave
+				}
+				society_rank = {
+					rank = 4
+					society = shadow_druids
+				}
+			}
+    }
+
+    allow = {
+      prisoner = no
+      has_society_currency_major_trigger = yes
+			any_war = {
+				OR = {
+					any_defender = {
+						character = ROOT
+						is_primary_war_defender = yes
+					}
+					any_attacker = {
+						character = ROOT
+						is_primary_war_attacker = yes
+					}
+				}
+			}
+      NOR = {
+        trait = incapable
+        is_inaccessible_trigger = yes
+      }
+      custom_tooltip = {
+        text = nature_favor_cooldown_custom_tooltip
+        hidden_tooltip = {
+          NOT = { has_character_modifier = nature_favor_timer }
+        }
+      }
+    }
+
+    effect = {
+		detract_society_currency_major_effect = yes
+		hidden_tooltip = {
+			add_character_modifier = {
+				modifier = nature_favor_timer
+				months = 12
+				hidden = yes
+			}
+		}
+		character_event = {	id = EME.300 }
+    }
+
+    revoke_allowed = {
+      always = no
+    }
+		ai_will_do = {
+      factor = 1
+    }
+	}
+
+	convert_to_tribal_indep  = {
+		only_independent = yes
+		is_high_prio = yes
+		ai_check_interval = 100
+
+		potential = {
+			not_casting = yes
+			is_tribal = no
+			independent = yes
+			society_rank = {
+				rank = 4
+				society = shadow_druids
+			}
+		}
+		allow = {
+			war = no
+			OR = {
+				government = feudal_government
+				government = divine_feudal_government
+				government = muslim_government
+				government = theocratic_feudal_government
+				government = theocracy_government
+			}
+			primary_title = {
+				NOR = {
+					has_law = imperial_administration
+					has_law = ze_administration_laws_1
+					has_law = ze_administration_laws_2
+				}
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					religion = giant_pantheon
+					OR = {
+						culture_group = giant_group
+						culture_group = giantkin_group
+					}
+				}
+				primary_title = {
+					set_government_type = ordning_government
+				}
+			}
+			else = {
+				set_government_type = tribal_government
+			}
+
+			hidden_tooltip = {
+				any_demesne_title = {
+					limit = {
+						tier = baron
+						holding_type = castle
+						#is_capital = yes
+					}
+					convert_to = TRIBAL
+					add_building = tb_hillfort_4
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 1
+						}
+						add_building = tb_market_town_1
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 2
+						}
+						add_building = tb_market_town_2
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 3
+						}
+						add_building = tb_market_town_3
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 4
+						}
+						add_building = tb_market_town_4
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 1
+						}
+						add_building = tb_defensive_fortifications_1
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 2
+						}
+						add_building = tb_defensive_fortifications_2
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 3
+						}
+						add_building = tb_defensive_fortifications_3
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 4
+						}
+						add_building = tb_defensive_fortifications_4
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 1
+						}
+						add_building = tb_shipyard_1
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 2
+						}
+						add_building = tb_shipyard_2
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 3
+						}
+						add_building = tb_shipyard_3
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 4
+						}
+						add_building = tb_shipyard_4
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 1
+						}
+						add_building = tb_training_grounds_1
+						add_building = tb_war_camp_1
+						add_building = tb_practice_range_1
+						add_building = tb_arsenal_1
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 2
+						}
+						add_building = tb_training_grounds_2
+						add_building = tb_war_camp_2
+						add_building = tb_practice_range_2
+						add_building = tb_arsenal_2
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 3
+						}
+						add_building = tb_training_grounds_3
+						add_building = tb_war_camp_3
+						add_building = tb_practice_range_3
+						add_building = tb_arsenal_3
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 4
+						}
+						add_building = tb_training_grounds_4
+						add_building = tb_war_camp_4
+						add_building = tb_practice_range_4
+						add_building = tb_arsenal_4
+					}
+					add_building = tb_beastlairs_1
+					add_building = tb_beastlairs_2
+					add_building = tb_beastlairs_3
+					add_building = tb_beastlairs_4
+					add_building = tb_beastlairs_5
+					refill_holding_levy = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+				NOR = {
+					trait = arbitrary
+					trait = zealous
+					trait = cruel
+					trait = impaler
+					trait = lunatic
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					trait = cynical
+					trait = kind
+					trait = content
+				}
+			}
+			modifier = {
+				factor = 0
+				higher_real_tier_than = DUKE
+			}
+			modifier = {
+				factor = 0
+				num_of_vassals >= 6
+			}
+			modifier = {
+				factor = 0
+				realm_size >= 10
+			}
+		}
+	}
+
+	convert_to_tribal_vassal  = {
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 48
+
+		potential = {
+			not_casting = yes
+			is_tribal = no
+			is_ruler = yes
+			independent = no
+			liege = {
+				is_tribal = yes
+			}
+			society_rank = {
+				rank >= 2
+				society = shadow_druids
+			}
+		}
+		allow = {
+			war = no
+			OR = {
+				government = feudal_government
+				government = divine_feudal_government
+				government = muslim_government
+				government = theocratic_feudal_government
+				government = theocracy_government
+			}
+			primary_title = {
+				NOR = {
+					has_law = imperial_administration
+					has_law = ze_administration_laws_1
+					has_law = ze_administration_laws_2
+				}
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					religion = giant_pantheon
+					OR = {
+						culture_group = giant_group
+						culture_group = giantkin_group
+					}
+				}
+				primary_title = {
+					set_government_type = ordning_government
+				}
+			}
+			else = {
+				set_government_type = tribal_government
+			}
+
+			hidden_tooltip = {
+				any_demesne_title = {
+					limit = {
+						tier = baron
+						holding_type = castle
+						#is_capital = yes
+					}
+					convert_to = TRIBAL
+					add_building = tb_hillfort_4
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 1
+						}
+						add_building = tb_market_town_1
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 2
+						}
+						add_building = tb_market_town_2
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 3
+						}
+						add_building = tb_market_town_3
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 4
+						}
+						add_building = tb_market_town_4
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 1
+						}
+						add_building = tb_defensive_fortifications_1
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 2
+						}
+						add_building = tb_defensive_fortifications_2
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 3
+						}
+						add_building = tb_defensive_fortifications_3
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 4
+						}
+						add_building = tb_defensive_fortifications_4
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 1
+						}
+						add_building = tb_shipyard_1
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 2
+						}
+						add_building = tb_shipyard_2
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 3
+						}
+						add_building = tb_shipyard_3
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 4
+						}
+						add_building = tb_shipyard_4
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 1
+						}
+						add_building = tb_training_grounds_1
+						add_building = tb_war_camp_1
+						add_building = tb_practice_range_1
+						add_building = tb_arsenal_1
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 2
+						}
+						add_building = tb_training_grounds_2
+						add_building = tb_war_camp_2
+						add_building = tb_practice_range_2
+						add_building = tb_arsenal_2
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 3
+						}
+						add_building = tb_training_grounds_3
+						add_building = tb_war_camp_3
+						add_building = tb_practice_range_3
+						add_building = tb_arsenal_3
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 4
+						}
+						add_building = tb_training_grounds_4
+						add_building = tb_war_camp_4
+						add_building = tb_practice_range_4
+						add_building = tb_arsenal_4
+					}
+					add_building = tb_beastlairs_1
+					add_building = tb_beastlairs_2
+					add_building = tb_beastlairs_3
+					add_building = tb_beastlairs_4
+					add_building = tb_beastlairs_5
+					refill_holding_levy = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+				higher_real_tier_than = DUKE
+			}
+			modifier = {
+				factor = 0
+				num_of_vassals >= 10
+			}
+			modifier = {
+				factor = 0
+				realm_size >= 15
+			}
+		}
+	}
+
+}
+
+targeted_decisions = {
+
+	#Power, rank 2: Gain Commander trait
+	knight_order_warrior_training = {
+		is_in_society = yes
+
+		filter = self
+		ai_target_filter = self
+		ai_check_interval = 12
+
+		potential = {
+			character = FROM
+			is_playable = yes
+			is_adult = yes
+			is_member_of_any_knight_order_trigger = yes
+			society_rank >= 2
+			NOT = { has_character_flag = choosing_warrior_training } #to stop you spamming the button
+			has_current_knight_order_leader_trait_trigger = no #to keep it hidden once you're done
+		}
+
+		allow = {
+			has_society_currency_medium_trigger = yes
+			custom_tooltip = {
+				text = has_no_warrior_training_with_current_society_tt
+				has_current_knight_order_leader_trait_trigger = no
+			}
+		}
+
+		effect = {
+			hidden_tooltip = {
+				character_event = { id = KNI.10040 } #Gain trait...
+			}
+			set_character_flag = choosing_warrior_training
+			detract_society_currency_medium_effect = yes
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	#write about a ruler
+	write_about_ruler = {
+		is_in_society = yes
+		only_playable = yes
+
+		ai_target_filter = independent_rulers
+		ai_check_interval = 60
+
+		from_potential = {
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			OR = {
+				society_rank = {
+					society = heralds
+					rank = 4
+				}
+			}
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			is_adult = yes
+			is_ruler = yes
+			is_within_diplo_range = FROM
+		}
+
+		allow = {
+			ROOT = {
+				NOT = { society_member_of = heralds }
+				prisoner = no
+				is_inaccessible_trigger = no
+			}
+			FROM = {
+				has_society_currency_major_trigger = yes
+				is_inaccessible_trigger = no
+				custom_tooltip = {
+					text = write_about_ruler_cooldown_tooltip
+					NOT = { has_character_modifier = write_about_ruler_cooldown }
+				}
+			}
+		}
+
+		effect = {
+			save_event_target_as = writing_target
+			FROM = {
+				detract_society_currency_major_effect = yes
+				character_event = { id = HERA.300 }
+				hidden_effect = {
+					add_character_modifier = {
+						name = write_about_ruler_cooldown
+						years = 5
+						hidden = yes
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+		}
+	}
+
+	harper_prepared_invasion = {
+		is_in_society = yes
+		only_playable = yes
+		filter = independent_rulers
+		ai_target_filter = independent_rulers
+		ai_check_interval = 48
+
+		from_potential = {
+			society_rank = {
+				rank = 4
+				society = harpers
+			}
+			is_playable = yes
+			NOT = { pacifist = yes }
+			NOT = { trait = patron_eldath }
+			war = no
+			mercenary = no
+			holy_order = no
+			is_incapable = no
+			wealth >= 2
+			NOT = { has_character_flag = harp_prep_invader }
+			NOT = { has_character_flag = prep_invader }
+			NOT = { has_truce = ROOT }
+		}
+
+		potential = {
+			NOT = { has_truce = FROM }
+			is_within_diplo_range = FROM
+			independent = yes
+			NOT = { character = FROM }
+			NOT = { is_liege_or_above_of = FROM }
+		}
+
+		allow = {
+			FROM = {
+				has_society_currency_major_trigger = yes
+			}
+			OR = {
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = undead_realm_lord
+				AND = {
+					OR = {
+						realm_size >= 50
+						num_of_count_titles_in_realm >= 20
+					}
+					OR = {
+						trait = cruel
+						trait = impaler
+						is_evil_religion = yes
+					}
+					NOR = {
+						trait = kind
+						trait = just
+					}
+				}
+			}
+			custom_tooltip = {
+				text = fr_prepared_invaded_tip
+				NOT = { has_character_flag = prep_inv_target }
+			}
+			#any_realm_title = { is_valid_viking_invasion_target = ROOT }
+			OR = {
+				tier = EMPEROR
+				tier = KING
+				tier = DUKE
+			}
+			any_demesne_title = {
+				higher_tier_than = COUNT
+				controls_religion = no
+			}
+		}
+
+		effect = {
+			FROM = {
+				detract_society_currency_major_effect = yes
+				increase_visibility_effect = yes
+			}
+			FROM = {
+				save_persistent_event_target = { name = prep_invader_target scope = ROOT }
+				pacifists_lose_piety_effect = yes
+			}
+			custom_tooltip = {
+				text = start_preparing_invasion_TT
+
+				FROM = { set_character_flag = harp_prep_invader }
+				FROM = { add_character_modifier = { name = launched_prepared_invasion years = 2 } } # hidden = yes
+				FROM = { narrative_event = { id = HRP.2 days = 730 } }
+
+				FROM = { character_event = { id = HRP.5 days = 30  } }
+				FROM = { character_event = { id = HRP.10 } }
+			}
+			reverse_opinion = {
+				modifier = preparing_to_invade
+				who = FROM
+				months = 24
+			}
+			opinion = {
+				modifier = preparing_to_invade_me
+				who = FROM
+				months = 24
+			}
+			set_character_flag = prep_inv_target
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+	        modifier = {
+	            factor = 0
+	            FROM = {
+                    OR = {
+                    	trait = content
+                    	trait = slothful
+                    	trait = craven
+                    	trait = shy
+                    }
+	            }
+	        }
+	        modifier = {
+	            factor = 2
+	            FROM = {
+                    trait = ambitious
+	            }
+	        }
+					modifier = {
+	            factor = 2
+	            FROM = {
+                    trait = brave
+	            }
+	        }
+					modifier = {
+	            factor = 2
+	            FROM = {
+                    trait = wroth
+	            }
+	        }
+	        modifier = {
+	            factor = 0.1
+	            FROM = {
+                    lower_tier_than = DUKE
+	            }
+	        }
+		}
+	}
+
+	kuo_tan_become_vassal = {
+		only_independent = yes
+		ai_check_interval = 36
+
+		potential = {
+			e_shou_lung_west_governor = {
+				has_holder = yes
+			}
+		}
+
+		from_potential = {
+			independent = yes
+			mercenary = no
+			holy_order = no
+			is_landed = yes
+			society_member_of = kuo_tan_society
+			society_rank = { rank >= 2 }
+		}
+
+		allow = {
+			show_only_failed_conditions = yes
+			FROM = {
+				show_scope_change = no
+				war = no
+				OR = {
+					custom_tooltip = { #Borders the Western Governate
+						text = shou_lung_grace_become_tributary_allow_governor_neighbor_tt
+						any_neighbor_independent_ruler = {
+							has_landed_title = e_shou_lung_west_governor
+						}
+					}
+					custom_tooltip = { #Borders a shou_lung tributary
+						text = shou_lung_grace_become_tributary_allow_tributary_neighbor_tt
+						any_neighbor_independent_ruler = {
+							suzerain = {
+								has_landed_title = e_shou_lung_west_governor
+							}
+						}
+					}
+					custom_tooltip = { #Borders the eastern edge of the map
+						text = shou_lung_grace_become_tributary_allow_shou_lung_influence_tt
+						any_realm_province = {
+							region = custom_shou_lung_invasion_target_region
+						}
+					}
+					custom_tooltip = { #Within diplo range of shou_lung and has a port in India
+						text = shou_lung_grace_become_tributary_allow_india_tt
+						any_realm_province = {
+							port = yes
+							region = kara_tur_region
+						}
+					}
+				}
+				custom_tooltip = {
+					text = shou_lung_grace_become_tributary_allow_suzerain_tt
+					NOT = {
+						is_tributary = yes
+					}
+				}
+				NOT = { tier = emperor }
+				prisoner = no
+				NOT = { trait = incapable }
+				is_inaccessible_trigger = no
+			}
+		}
+
+		effect = {
+			FROM = {
+				show_scope_change = no
+				set_defacto_liege = ROOT
+				add_society_currency_major_effect = yes
+				sound_effect = china_grace_gain
+				add_offmap_currency = {
+					offmap = shou_lung
+					value = 500
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.01
+			modifier = {
+				factor = 10
+				FROM = { trait = content }
+			}
+			modifier = {
+				factor = 10
+				ROOT = { NOT = { num_of_vassals = 6 } }
+			}
+			modifier = {
+				factor = 0
+				FROM = { trait = ambitious }
+			}
+			modifier = {
+				factor = 0
+				FROM = { trait = envious }
+			}
+			modifier = {
+				factor = 0
+				FROM = { NOT = { culture_group = shou_group } }
+			}
+			modifier = {
+				factor = 0
+				FROM = { NOT = { religion_group = karaturan_group } }
+			}
+		}
+	}
+
+	brew_mood_drug = {
+		is_in_society = yes
+		filter = realm_including_me
+		ai_target_filter = realm_including_me
+		ai_check_interval = 24
+
+		from_potential = {
+			OR = {
+				society_rank = {
+					rank >= 2
+					society = arcane_brotherhood
+				}
+				society_rank = {
+					rank >= 2
+					society = brotherhood_of_true_flame
+				}
+			}
+		}
+
+		potential = {
+			OR = {
+				trait = stressed
+				trait = depressed
+			}
+			OR = {
+				liege = {
+					character = FROM
+				}
+				character = FROM
+			}
+			OR = {
+				FROM = { ai = no }
+				character = FROM
+				is_close_relative = FROM
+				is_friend = FROM
+				is_lover = FROM
+			}
+		}
+
+		allow = {
+			FROM = { has_society_currency_minor_trigger = yes }
+			OR = {
+				trait = stressed
+				trait = depressed
+			}
+			custom_tooltip = {
+				text = must_have_ingredients_tt
+				hidden_tooltip = {
+					FROM = {
+						any_artifact = {
+							count = 2
+							has_artifact_flag = ingredient
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				text = must_not_already_be_preparing_potion_tt
+				hidden_tooltip = { FROM = { NOT = { has_character_flag = preparing_potion } } }
+			}
+		}
+
+		effect = {
+			FROM = { detract_society_currency_minor_effect = yes }
+			FROM = { set_character_flag = preparing_potion }
+
+			if = {
+				limit = { character = FROM } #Making yourself a potion
+				custom_tooltip = {
+					text = brew_happiness_potion_effect_self
+					set_character_flag = potion_target_is_self
+					character_event = { id = BRO.5115 }
+				}
+			}
+
+			if = {
+				limit = { NOT = { character = FROM } } #Making someone else a potion
+				save_event_target_as = potion_target
+				custom_tooltip = {
+					text = brew_happiness_potion_effect_other
+					FROM = { character_event = { id = BRO.5115 } }
+				}
+			}
+
+			tooltip = {
+				if = {
+					limit = { trait = stressed }
+					remove_trait = stressed
+				}
+				if = {
+					limit = { trait = depressed }
+					remove_trait = depressed
+				}
+				if = {
+					limit = { has_character_modifier = apathetic }
+					remove_character_modifier = apathetic
+				}
+			}
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+
+			factor = 0.01
+			modifier = {
+				factor = 100
+				character = FROM
+			}
+			modifier = {
+				factor = 10
+				reverse_opinion = {
+					who = FROM
+					value = 30
+				}
+			}
+		}
+	}
+}
+
+society_decisions = {
+
+	knight_order_summon_commander = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36 #check only once every 36 months.
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			is_member_of_any_knight_order_trigger = yes
+			society_rank = 2
+
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			#custom_tooltip = { text = tooltip_summoning_lodge_commander }
+			hidden_tooltip = {
+			if = {
+				limit = { has_religion_feature = religion_matriarchal }
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = yes
+					attributes = {
+						diplomacy = 4
+						learning = 4
+						stewardship = 4
+						intrigue = 4
+						martial = 14
+					}
+				}
+			}
+			if = {
+				limit = { NOT = { has_religion_feature = religion_matriarchal } }
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = no
+					attributes = {
+						diplomacy = 4
+						learning = 4
+						stewardship = 4
+						intrigue = 4
+						martial = 14
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOR = {
+						has_religion_feature = religion_matriarchal
+						has_religion_feature = religion_patriarchal
+					}
+					has_game_rule = {
+						name = gender
+						value = all
+					}
+				}
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = 50
+					attributes = {
+						diplomacy = 4
+						learning = 4
+						stewardship = 4
+						intrigue = 4
+						martial = 14
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOR = {
+						has_religion_feature = religion_matriarchal
+						has_religion_feature = religion_patriarchal
+						has_game_rule = {
+							name = gender
+							value = all
+						}
+					}
+				}
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = 5
+					attributes = {
+						diplomacy = 4
+						learning = 4
+						stewardship = 4
+						intrigue = 4
+						martial = 14
+					}
+				}
+			}
+			if = {
+				limit = { has_religion_feature = religion_patriarchal }
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = no
+					attributes = {
+						diplomacy = 4
+						learning = 4
+						stewardship = 4
+						intrigue = 4
+						martial = 14
+					}
+				}
+			}
+			}
+			new_character = {
+				remove_trait = weak
+				remove_trait = slow
+				remove_trait = imbecile
+				remove_trait = dull
+
+				remove_trait = mystic
+				remove_trait = socializer
+				remove_trait = gamer
+				remove_trait = hedonist
+				remove_trait = duelist
+				remove_trait = hunter
+				remove_trait = strategist
+				remove_trait = administrator
+				remove_trait = architect
+				remove_trait = gardener
+				remove_trait = schemer
+				remove_trait = impaler
+				remove_trait = seducer
+				remove_trait = seductress
+				remove_trait = theologian
+				remove_trait = scholar
+
+				remove_trait = arbitrary
+				remove_trait = cruel
+				if = {
+					limit = {
+						is_female = yes
+						ROOT = {
+							NOR = {
+								has_religion_feature = religion_matriarchal
+								has_religion_feature = religion_patriarchal
+								has_game_rule = {
+									name = gender
+									value = all
+								}
+							}
+						}
+					}
+					set_character_flag = special_marshal
+				}
+				random_list = {
+					10 = {
+						add_trait = trained_fighter
+					}
+					10 = {
+						add_trait = trained_paladin
+					}
+				}
+				random_list = { # Flavor Randomization
+					35 = {
+						# Nothing
+					}
+					15 = {
+						change_martial = 2
+					}
+					10 = {
+						add_trait = robust
+					}
+					10 = {
+						add_trait = duelist
+					}
+					10 = {
+						add_trait = hunter
+					}
+					5 = {
+						add_trait = strategist
+					}
+					5 = {
+						change_martial = 4
+					}
+					5 = {
+						if = {
+							limit = {
+								has_dlc = "Reapers"
+							}
+							add_trait = one_eyed
+						}
+					}
+					5 = {
+						add_trait = shrewd
+					}
+					3 = {
+						add_trait = giant
+					}
+				}
+				join_prev_knight_order_society_effect = yes
+				add_trait = knight_order_leader
+				set_character_flag = invited_lodge_soldier
+				set_character_flag = lodge_warrior_original_court_@ROOT
+				set_character_flag = no_court_invites
+				save_event_target_as = invited_lodge_soldier
+			}
+			character_event = { id = KNI.25000 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0.5
+				war = no #Only summon in time of need.
+			}
+			modifier = {
+				factor = 0.1
+				any_courtier = { has_job_title = job_marshal martial = 16 }
+			}
+			modifier = {
+				factor = 0 #Only use if empty commander spots.
+           		OR = {
+                	AND = {
+                    	tier = COUNT
+                        any_realm_character = {
+                            count = 2
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+                	AND = {
+                    	tier = DUKE
+                        any_realm_character = {
+                            count = 4
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+                	AND = {
+                    	tier = KING
+                   		 is_nomadic = no
+                        any_realm_character = {
+                            count = 6
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+               		AND = {
+                	    tier = EMPEROR
+                	    is_nomadic = no
+                        any_realm_character = {
+                            count = 8
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+                	AND = {
+                	    tier = KING
+                 	   is_nomadic = yes
+                        any_realm_character = {
+                            count = 2
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+               		AND = {
+                	    tier = EMPEROR
+                	    is_nomadic = yes
+                        any_realm_character = {
+                            count = 4
+                            liege = { character = ROOT }
+                            has_minor_title = title_commander
+                        }
+                	}
+            	}
+			}
+		}
+	}
+
+	hold_a_jousting_tournament  = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 120
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			is_playable = yes
+			NOT = { has_character_modifier = jousting_tournament }
+			is_member_of_any_knight_order_trigger = yes
+			society_rank >= 3
+			location = {
+				owner = { character = ROOT }
+			}
+		}
+		allow = {
+			war = no
+			prisoner = no
+			in_command = no
+			NOT = { is_inaccessible_trigger = yes }
+			age = 16
+			has_society_currency_major_trigger = yes
+			custom_tooltip = {
+				text = is_not_busy_trigger_tooltip
+				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+			}
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			add_character_modifier = {
+				name = jousting_tournament
+				years = 5
+				hidden = yes
+			}
+			set_character_flag = do_not_disturb
+			clr_character_flag = tournament_has_ended
+			save_event_target_as = tourney_sponsor
+			hidden_tooltip = { character_event = { id = KNI.70999 days = 300 } } # Safety catch flag clearing
+			prestige = 50
+			character_event = { id = KNI.70033 tooltip = "tournament_invite" }
+			hidden_tooltip = {
+				clr_character_flag = tournament_has_ended
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				health < 5
+			}
+		}
+	}
+
+	build_knight_bloodline = {
+		is_in_society = yes
+		is_high_prio = yes
+		ai_check_interval = 120
+		only_playable = yes
+		potential = {
+			not_casting = yes
+			reforming_gov = yes
+			NOT = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_knights
+				}
+			}
+			NOT = { # No active created bloodline in dynasty
+				any_dynasty_member = {
+					any_owned_bloodline = {
+						has_bloodline_flag = bloodline_knights
+					}
+				}
+			}
+			is_member_of_any_knight_order_trigger = yes
+			society_rank = 4
+		}
+
+		allow = {
+			has_society_currency_massive_trigger = yes
+			prisoner = no
+			custom_tooltip = {
+				text = build_knight_bloodline_cooldown_tooltip
+				NOT = { has_character_modifier = build_knight_bloodline_cooldown }
+			}
+			NOR = {
+				is_incapable = yes
+				is_inaccessible_trigger = yes
+			}
+		}
+
+		effect = {
+			hidden_effect = {
+				add_character_modifier = {
+					name = build_knight_bloodline_cooldown
+					years = -1
+					hidden = yes
+				}
+			}
+			character_event = { id = KNI.1000 days = 0 }
+		}
+
+		ai_will_do = {
+			factor = 0.25
+			modifier = {
+				factor = 0.5
+				trait = content
+			}
+			modifier = {
+				factor = 0.5
+				trait = humble
+			}
+			modifier = {
+				factor = 2
+				trait = ambitious
+			}
+			modifier = {
+				factor = 2
+				trait = proud
+			}
+		}
+	}
+
+	delve_into_heraldry = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			not_casting = yes
+				society_rank = {
+				society = heralds
+				rank >= 2
+			}
+		}
+
+		allow = {
+			has_society_currency_minor_trigger = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = delve_into_forbidden_cooldown_tooltip
+				NOT = { has_character_modifier = delve_into_heraldry_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = delve_into_heraldry_cooldown
+					years = 5
+					hidden = yes
+				}
+				character_event = { id = HERA.200 }
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+
+			modifier = {
+				factor = 2
+				trait = diligent
+			}
+		}
+	}
+
+	sponsor_arts = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 24
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			society_rank = {
+				rank >= 3
+				society = harpers
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = sponsor_arts_cooldown_custom_tooltip
+				hidden_tooltip = {
+					NOT = {
+						has_character_modifier = sponsor_arts_cooldown
+					}
+				}
+			}
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			increase_visibility_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = sponsor_arts_cooldown
+					years = 8
+					hidden = yes
+				}
+			}
+			character_event = { id = HRP.200 days = 0 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	harper_training = {
+		is_in_society = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			society_rank = {
+				rank >= 3
+				society = harpers
+			}
+		}
+
+		allow = {
+			prisoner = no
+			has_society_currency_medium_trigger = yes
+			NOR = {
+				trait = incapable
+				is_inaccessible_trigger = yes
+			}
+			custom_tooltip = {
+				text = harper_training_cooldown_custom_tooltip
+				hidden_tooltip = {
+					NOT = { has_character_modifier = harper_training_cooldown }
+				}
+			}
+		}
+
+		effect = {
+			detract_society_currency_medium_effect = yes
+			increase_visibility_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = harper_training_cooldown
+					years = 5
+					hidden = yes
+				}
+			}
+			character_event = {	id = HRP.300 }
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	alliance_diplomacy = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 6
+
+		potential = {
+			not_casting = yes
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 1 }
+		}
+
+		allow = {
+			NOT = {
+				has_character_modifier = in_seclusion
+			}
+			custom_tooltip = {
+				text = lord_all_diplo_cooldown_tooltip
+				NOT = { has_character_modifier = lord_all_diplo_cooldown }
+			}
+		}
+
+		effect = {
+			add_character_modifier = {
+				modifier = alliance_member
+				years = 10
+			}
+			hidden_effect = {
+				add_character_modifier = {
+					name = lord_all_diplo_cooldown
+					years = 2
+					hidden = yes
+				}
+				if = {
+					limit = {
+						society_member_of = lord_alliance
+					}
+					character_event = { id = LA.8000 }
+				}
+				else_if = {
+					limit = {
+						society_member_of = dales_council
+					}
+					character_event = { id = DAL.8000 }
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	alliance_raise_ships = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 24
+
+		potential = {
+			not_casting = yes
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 3 }
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_medium_trigger = yes
+		}
+
+		effect = {
+			add_character_modifier = {
+				modifier = alliance_member
+				years = 10
+			}
+			spawn_fleet = {
+				province = closest
+				owner = ROOT
+				disband_on_peace = yes
+				earmark = alliance_ships
+				troops =
+				{
+					galleys = { 45 45 }
+				}
+			}
+			detract_society_currency_medium_effect = yes
+			sound_effect = generic_click_01
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
+
+	alliance_raise_troops = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		is_mercenary = yes
+		ai_check_interval = 6
+
+		potential = {
+			not_casting = yes
+			OR = {
+				is_member_of_any_alliance_society_trigger = yes
+				society_member_of = kuo_tan_society
+			}
+			society_rank = { rank == 4 }
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_major_trigger = yes
+			conditional_tooltip = {
+				trigger = {
+					has_character_modifier = assassins_raise_troops_cooldown
+				}
+				custom_tooltip = {
+					text = assassins_raise_troops_cooldown_TT
+
+					always = no
+				}
+			}
+			any_war = {
+				any_defender = {
+					character = ROOT
+					is_primary_war_defender = yes
+				}
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					is_member_of_any_alliance_society_trigger = yes
+				}
+				add_character_modifier = {
+					modifier = alliance_member
+					years = 10
+				}
+			}
+			if = {
+				limit = {
+					society_member_of = lord_alliance
+				}
+				capital_scope = {
+					ROOT = {
+						spawn_unit = {
+							owner = ROOT
+							province = PREV
+							home = PREV
+							troops = {
+								archers = { 400 400 }
+								pikemen = { 1600 1600 }
+								knights = { 500 500 }
+							}
+							attrition = 1.0
+							disband_on_peace = yes
+							maintenance_multiplier = 1
+							earmark = alliance_troops
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					society_member_of = dales_council
+				}
+				capital_scope = {
+					ROOT = {
+						spawn_unit = {
+							owner = ROOT
+							province = PREV
+							home = PREV
+							troops = {
+								archers = { 1500 1500 }
+								light_infantry = { 2500 2500 }
+								light_cavalry = { 1000 1000 }
+							}
+							attrition = 1.0
+							disband_on_peace = yes
+							maintenance_multiplier = 1
+							earmark = council_troops
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					society_member_of = kuo_tan_society
+				}
+				capital_scope = {
+					ROOT = {
+						spawn_unit = {
+							owner = ROOT
+							province = PREV
+							home = PREV
+							troops = {
+								archers = { 1500 1500 }
+								heavy_infantry = { 400 400 }
+								pikemen = { 1420 1420 }
+							}
+							attrition = 1.0
+							disband_on_peace = yes
+							maintenance_multiplier = 1
+							earmark = kuo_tan_troops
+						}
+					}
+				}
+			}
+
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = assassins_raise_troops_cooldown
+					hidden = yes
+					months = 12
+				}
+			}
+			detract_society_currency_major_effect = yes
+			sound_effect = generic_click_01
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
+		}
+	}
+
+	alliance_mediation = {
+		is_in_society = yes
+		is_high_prio = yes
+		only_playable = yes
+		ai_check_interval = 3
+
+		potential = {
+			not_casting = yes
+			is_member_of_any_alliance_society_trigger = yes
+			society_rank = { rank >= 1 }
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_minor_trigger = yes
+			any_war = {
+				AND = {
+					defender = {
+						character = ROOT
+						is_primary_war_defender = yes
+					}
+					attacker = {
+						same_society_as = ROOT
+						is_primary_war_attacker = yes
+					}
+				}
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			if = {
+				limit = {
+					society_member_of = lord_alliance
+				}
+				character_event = { id = LA.30000 }
+			}
+			else_if = {
+				limit = {
+					society_member_of = dales_council
+				}
+				character_event = { id = DAL.30000 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	call_for_heroes = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 6 #check only once every 6 months.
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			OR = {
+				is_member_of_any_alliance_society_trigger = yes
+				society_member_of = harpers
+			}
+			society_rank = { rank >= 2 }
+			OR = {
+				ai = no
+				any_war = {
+					OR = {
+						any_defender = {
+							character = ROOT
+							is_primary_war_defender = yes
+						}
+						any_attacker = {
+							character = ROOT
+							is_primary_war_attacker = yes
+						}
+					}
+				}
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = call_for_heroes_cooldown
+				hidden_tooltip = {
+					NOT = {
+						has_character_modifier = call_for_heroes_cooldown
+					}
+				}
+			}
+		}
+		effect = {
+			if = {
+				limit = {
+					is_member_of_any_alliance_society_trigger = yes
+				}
+				add_character_modifier = {
+					modifier = alliance_member
+					years = 10
+				}
+			}
+			detract_society_currency_medium_effect = yes
+			add_character_modifier = {
+				modifier = adventurers_boost
+				duration = 365
+			}
+			hidden_effect = {
+				add_character_modifier = {
+					name = call_for_heroes_cooldown
+					years = 2
+					hidden = yes
+				}
+			}
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0.5
+				trait = stubborn
+			}
+			modifier = {
+				factor = 0
+				war = no
+			}
+			modifier = { #I am losing an offensive war
+				factor = 10
+				any_war = {
+					attacker = { character = ROOT }
+					NOT = { war_score = -19 }
+				}
+			}
+			modifier = { #I am losing a defensive war
+				factor = 10
+				any_war = {
+					defender = { character = ROOT }
+					war_score = 20
+				}
+			}
+			modifier = {
+				factor = 2
+				trait = gregarious
+			}
+		}
+	}
+	
+	dwarven_lodge_fighting_style = {
+		is_in_society = yes
+		is_high_prio = yes
+		ai_check_interval = 60
+
+		potential = {
+			not_casting = yes
+			is_adult = yes
+			OR = {
+				society_rank = {
+					society = warrior_lodge_dwarven
+					rank >= 3
+				}
+			}
+			NOT = { has_character_flag = chose_dwarven_style_flag }
+		}
+
+		allow = {
+			has_society_currency_major_trigger = yes
+		}
+
+		effect = {
+			set_character_flag = chose_dwarven_style_flag
+			character_event = { id = morndin.1 }
+			detract_society_currency_major_effect = yes
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	
+	elven_lodge_fighting_style = {
+		is_in_society = yes
+		is_high_prio = yes
+		ai_check_interval = 60
+
+		potential = {
+			not_casting = yes
+			is_adult = yes
+			OR = {
+				society_rank = {
+					society = warrior_lodge_elven
+					rank >= 3
+				}
+			}
+			NOT = { has_character_flag = chose_elven_style_flag }
+		}
+
+		allow = {
+			has_society_currency_major_trigger = yes
+		}
+
+		effect = {
+			set_character_flag = chose_elven_style_flag
+			character_event = { id = seldarine.12 }
+			detract_society_currency_major_effect = yes
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	
+	brotherhood_acquire_ingredients_decision = {
+		is_in_society = yes
+		ai_check_interval = 24
+
+		potential = {
+			not_casting = yes
+			OR = {
+				society_member_of = arcane_brotherhood
+				society_member_of = brotherhood_of_true_flame
+			}
+		}
+
+		allow = {
+			custom_tooltip = {
+				text = tooltip_not_busy
+				hidden_trigger = {
+					block_general_event_trigger = no
+				}
+			}
+			custom_tooltip = {
+				text = acquire_ingredients_decision_cooldown_timer_tt
+				hidden_trigger = {
+					NOT = {
+						has_character_modifier = acquire_ingredients_decision_cooldown_timer
+					}
+				}
+			}
+			custom_tooltip = {
+				text = acquire_ingredients_decision_apprentice_requirement
+				hidden_trigger = {
+					any_courtier_or_vassal = {
+						liege = { character = ROOT }
+						OR = {
+							has_minor_title = title_brotherhood_apprentice
+							has_minor_title = title_flame_brotherhood_apprentice
+						}
+					}
+				}
+			}
+			custom_tooltip = {
+				text = acquire_ingredients_decision_too_many_ingredients
+				hidden_trigger = {
+					NOT = {
+						any_artifact = {
+							count = 5
+							has_artifact_flag = ingredient
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = {
+				text = acquire_ingredients_effect_tooltip
+			}
+			add_character_modifier = {
+				modifier = acquire_ingredients_decision_cooldown_timer
+				years = 5
+				hidden = yes
+			}
+			character_event = { id = BRO.1800 }
+		}
+
+		revoke_allowed = { always = no }
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.01 # Slow down
+			}
+			modifier = {
+				factor = 0 # Already have ingredients
+				any_artifact = {
+					has_artifact_flag = ingredient
+				}
+			}
+		}
+	}
+
+	brotherhood_laboratory = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 36
+
+		potential = {
+			#has_dlc = "Mystics"
+			OR = {
+				society_member_of = arcane_brotherhood
+				society_member_of = brotherhood_of_true_flame
+			}
+			has_quest = quest_hermetics_build_laboratory
+			is_playable = yes
+			not_casting = yes
+			block_general_event_trigger = no
+			NOT = { has_character_flag = building_laboratory }
+			NOT = { has_character_flag = built_laboratory }
+		}
+		allow = {
+			wealth = 50
+		}
+		effect = {
+			wealth = -50
+			set_character_flag = building_laboratory
+			custom_tooltip = { text = start_constructing_laboratory_tooltip }
+			hidden_tooltip = { character_event = { id = BRO.1100 } }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0
+				NOT = { wealth = 75 }
+			}
+
+			modifier = {
+				factor = 0.1
+				NOT = { age = 30 }
+			}
+		}
+	}
+
+	long_live_the_brotherhood = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 12
+
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = arcane_brotherhood
+				rank >= 1
+			}
+		}
+
+		allow = {
+			has_society_currency_minor_trigger = yes
+			NOT = {
+				has_character_modifier = in_seclusion
+				has_landed_title = k_a_brotherhood
+				k_a_brotherhood = {
+					has_holder = no
+				}
+			}
+			custom_tooltip = {
+				text = long_live_the_brotherhood_cooldown_tooltip
+				NOT = { has_character_modifier = long_live_the_brotherhood_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = long_live_the_brotherhood_cooldown
+					years = 10
+					hidden = yes
+				}
+				if = {
+					limit = {
+						OR = {
+							has_landed_title = k_a_brotherhood
+							any_liege = {
+								has_landed_title = k_a_brotherhood
+							}
+						}
+					}
+					add_character_modifier = {
+						modifier = open_arcane_brother
+						duration = 3650
+					}
+				}
+				else = {
+					increase_visibility_effect = yes
+				}
+				character_event = { id = BRO.8000 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	overthrow_archmage = {
+		is_in_society = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = arcane_brotherhood
+				rank >= 4
+			}
+		}
+		allow = {
+			prisoner = no
+			NOT = {
+				has_landed_title = k_a_brotherhood
+			}
+			has_society_currency_major_trigger = yes
+			custom_tooltip = {
+				text = overthrow_archmage_cooldown_tooltip
+				NOT = { has_character_modifier = overthrow_archmage_cooldown }
+      }
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = overthrow_archmage_cooldown
+					years = 20
+					hidden = yes
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_a_brotherhood
+						any_liege = {
+							has_landed_title = k_a_brotherhood
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_arcane_brother
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			character_event = { id = BRO.500 days = 0 }
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0.1
+				trait = content
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = paranoid
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = craven
+			}
+
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+
+			modifier = {
+				factor = 3
+				trait = cruel
+			}
+
+			modifier = {
+				factor = 3
+				trait = brave
+			}
+		}
+	}
+
+	great_ritual = {
+		is_in_society = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			OR = {
+				society_rank = {
+					rank = 4
+					society = arcane_brotherhood
+				}
+				society_rank = {
+					rank = 4
+					society = brotherhood_of_true_flame
+				}
+			}
+		}
+		allow = {
+			has_society_currency_major_trigger = yes
+			is_inaccessible_trigger = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = great_ritual_cooldown_custom_tooltip
+				hidden_tooltip = {
+					NOT = {
+						has_character_modifier = great_ritual_cooldown
+					}
+				}
+			}
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_a_brotherhood
+						any_liege = {
+							has_landed_title = k_a_brotherhood
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_arcane_brother
+					duration = 3650
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_landed_title = d_brotherhood_of_true_flame
+						any_liege = {
+							has_landed_title = d_brotherhood_of_true_flame
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_flame_brother
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			hidden_effect = {
+				add_character_modifier = {
+					name = great_ritual_cooldown
+					years = 100
+					hidden = yes
+				}
+			}
+			character_event = { id = BRO.200 days = 0 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	arcane_experiment = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_adult = yes
+			OR = {
+				society_rank = {
+					rank >= 3
+					society = arcane_brotherhood
+				}
+				society_rank = {
+					rank >= 3
+					society = brotherhood_of_true_flame
+				}
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = arcane_experiment_cooldown_custom_tooltip
+				hidden_tooltip = {
+					NOT = {
+						has_character_modifier = arcane_experiment_cooldown
+					}
+				}
+			}
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_a_brotherhood
+						any_liege = {
+							has_landed_title = k_a_brotherhood
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_arcane_brother
+					duration = 3650
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_landed_title = d_brotherhood_of_true_flame
+						any_liege = {
+							has_landed_title = d_brotherhood_of_true_flame
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_flame_brother
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			hidden_effect = {
+				add_character_modifier = {
+					name = arcane_experiment_cooldown
+					years = 10
+					hidden = yes
+				}
+			}
+			character_event = { id = BRO.300 days = 0 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	
+	discount_mercs = {
+		is_in_society = yes
+		only_playable = yes
+		is_mercenary = yes
+		ai_check_interval = 6
+
+		potential = {
+			not_casting = yes
+			is_member_of_any_zhent_like_society_trigger = yes
+			society_rank >= 2
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_minor_trigger = yes
+			wealth = 50
+			conditional_tooltip = {
+				trigger = {
+					has_character_modifier = assassins_raise_troops_cooldown
+				}
+				custom_tooltip = {
+					text = assassins_raise_troops_cooldown_TT
+
+					always = no
+				}
+			}
+		}
+
+		effect = {
+			capital_scope = {
+				ROOT = {
+					spawn_unit = {
+						owner = ROOT
+						province = PREV
+						home = PREV
+						troops = {
+							archers = { 500 500 }
+							heavy_infantry = { 1000 1000 }
+						}
+						attrition = 1.0
+						disband_on_peace = yes
+						maintenance_multiplier = 1
+						earmark = zhent_troops
+					}
+				}
+			}
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = assassins_raise_troops_cooldown
+					hidden = yes
+					years = 1
+				}
+			}
+			detract_society_currency_minor_effect = yes
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_zhentarim
+						any_liege = {
+							has_landed_title = k_zhentarim
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_zhent
+					duration = 3650
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_landed_title = k_warlock_knights
+						any_liege = {
+							has_landed_title = k_warlock_knights
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_warlock_knight
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			wealth = -50
+			sound_effect = generic_click_01
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
+		}
+	}
+
+	summon_zhent_servant = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36 #check only once every 36 months.
+		potential = {
+			not_casting = yes
+			is_member_of_any_zhent_like_society_trigger = yes
+			society_rank >= 3
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_zhentarim
+						any_liege = {
+							has_landed_title = k_zhentarim
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_zhent
+					duration = 3650
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_landed_title = k_warlock_knights
+						any_liege = {
+							has_landed_title = k_warlock_knights
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_warlock_knight
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			custom_tooltip = { text = tooltip_summoning_lodge_commander }
+			hidden_tooltip = {
+				random_list = {
+					9 = {
+						create_random_soldier = {
+							random_traits = yes
+							dynasty = none
+							female = no
+							attributes = {
+								diplomacy = 4
+								learning = 4
+								stewardship = 4
+								intrigue = 10
+								martial = 12
+							}
+						}
+					}
+					1 = {
+						create_random_soldier = {
+							random_traits = yes
+							dynasty = none
+							attributes = {
+								diplomacy = 4
+								learning = 4
+								stewardship = 4
+								intrigue = 10
+								martial = 12
+							}
+							add_trait = creature_beholder
+							culture = beholder
+							religion = beholder_pantheon
+						}
+					}
+				}
+			}
+			new_character = {
+				remove_trait = weak
+				remove_trait = slow
+				remove_trait = idiot
+				remove_trait = imbecile
+				remove_trait = dull
+				remove_trait = delicate
+				remove_trait = mystic
+				remove_trait = socializer
+				remove_trait = gamer
+				remove_trait = hedonist
+				remove_trait = duelist
+				remove_trait = hunter
+				remove_trait = strategist
+				remove_trait = administrator
+				remove_trait = architect
+				remove_trait = gardener
+				remove_trait = schemer
+				remove_trait = impaler
+				remove_trait = seducer
+				remove_trait = seductress
+				remove_trait = theologian
+				remove_trait = scholar
+				remove_trait = kind
+
+				random_list = {
+					5 = {
+						change_intrigue = 2
+					}
+					15 = {
+						change_martial = 2
+					}
+					10 = {
+						change_intrigue = 4
+					}
+					10 = {
+						add_trait = duelist
+					}
+					10 = {
+						add_trait = schemer
+					}
+					10 = {
+						add_trait = impaler
+					}
+					10 = {
+						add_trait = hunter
+					}
+					5 = {
+						add_trait = strategist
+					}
+					10 = {
+						add_trait = groomed
+					}
+					10 = {
+						add_trait = robust
+					}
+					5 = {
+						add_trait = shrewd
+					}
+				}
+				random_list = {
+					10 = {
+						add_trait = organizer
+					}
+					10 = {
+						add_trait = inspiring_leader
+					}
+					10 = {
+						add_trait = defensive_leader
+					}
+					10 = {
+						add_trait = experimenter
+					}
+					10 = {
+						add_trait = flanker
+					}
+					10 = {
+						add_trait = aggressive_leader
+					}
+					10 = {
+						add_trait = siege_leader
+					}
+					10 = {
+						add_trait = heavy_infantry_leader
+					}
+					10 = {
+						add_trait = cavalry_leader
+					}
+					10 = {
+						add_trait = light_foot_leader
+					}
+				}
+				random_list = {
+					20 = { add_trait = expert_cleric }
+					20 = { add_trait = expert_wizard }
+					20 = { add_trait = expert_rogue }
+					20 = { add_trait = expert_fighter }
+					10 = {
+						modifier = {
+							factor = 8
+							ROOT = { society_member_of = warlock_knights }
+						}
+						add_trait = expert_warlock
+					}
+				}
+				if = {
+					limit = {
+						ROOT = { society_member_of = black_network }
+					}
+					join_society = black_network
+				}
+				else_if = {
+					limit = {
+						ROOT = { society_member_of = tsui_tong }
+					}
+					join_society = tsui_tong
+				}
+				else_if = {
+					limit = {
+						ROOT = { society_member_of = storm_rune_society }
+					}
+					join_society = storm_rune_society
+				}
+				else_if = {
+					limit = {
+						ROOT = { society_member_of = warlock_knights }
+					}
+					join_society = warlock_knights
+				}
+
+				if = {
+					limit = {
+						society_member_of = black_network
+					}
+					random_list = {
+						10 = { set_secret_religion = dead_three }
+						10 = { set_secret_religion = church_of_cyric }
+					}
+				}
+				else_if = {
+					limit = {
+						society_member_of = warlock_knights
+					}
+					random_list = {
+						10 = { set_secret_religion = dead_three }
+						10 = { set_secret_religion = primordial }
+					}
+				}
+				set_character_flag = invited_lodge_soldier
+				set_character_flag = lodge_warrior_original_court_@ROOT
+				set_character_flag = no_court_invites
+				save_event_target_as = invited_lodge_soldier
+			}
+			character_event = { id = ZHE.25000 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0.5
+				war = no #Only summon in time of need.
+			}
+			modifier = {
+				factor = 0 #Only use if empty commander spots.
+				OR = {
+					AND = {
+						tier = COUNT
+						any_realm_character = {
+							count = 2
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = DUKE
+						any_realm_character = {
+							count = 4
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = KING
+						is_nomadic = no
+						any_realm_character = {
+							count = 6
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = EMPEROR
+						is_nomadic = no
+						any_realm_character = {
+							count = 8
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = KING
+						is_nomadic = yes
+						any_realm_character = {
+							count = 2
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+					AND = {
+						tier = EMPEROR
+						is_nomadic = yes
+						any_realm_character = {
+							count = 4
+							liege = { character = ROOT }
+							has_minor_title = title_commander
+						}
+					}
+				}
+			}
+		}
+	}
+
+	zhent_trade_route = {
+		is_high_prio = yes
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 24
+		potential = {
+			not_casting = yes
+			is_member_of_any_zhent_like_society_trigger = yes
+			society_rank = 4
+			NOT = { society_member_of = warlock_knights }
+		}
+
+		allow = {
+			has_society_currency_major_trigger = yes
+			prisoner = no
+			custom_tooltip = {
+				text = zhent_trade_cooldown_tooltip
+				NOT = { has_character_modifier = zhent_trade_cooldown }
+			}
+			NOR = {
+				trait = incapable
+				is_inaccessible_trigger = yes
+			}
+		}
+
+		effect = {
+			hidden_effect = {
+				add_character_modifier = {
+					name = zhent_trade_cooldown
+					years = 30
+					hidden = yes
+				}
+			}
+			detract_society_currency_major_effect = yes
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_zhentarim
+						any_liege = {
+							has_landed_title = k_zhentarim
+						}
+					}
+				}
+				add_character_modifier = {
+				modifier = open_zhent
+				duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			character_event = { id = ZHE.10100 days = 0 }
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	scheme_for_leadership = {
+		is_in_society = yes
+		ai_check_interval = 24
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = black_network
+				rank >= 4
+			}
+		}
+		allow = {
+			prisoner = no
+			NOT = {
+				has_landed_title = k_zhentarim
+			}
+			has_society_currency_major_trigger = yes
+			custom_tooltip = {
+				text = scheme_for_leadership_cooldown_tooltip
+				NOT = { has_character_modifier = scheme_for_leadership_cooldown }
+      }
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = scheme_for_leadership_cooldown
+					years = 20
+					hidden = yes
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = k_zhentarim
+						any_liege = {
+							has_landed_title = k_zhentarim
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_zhent
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			character_event = { id = ZHE.500 days = 0 }
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0.1
+				trait = content
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = paranoid
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = zealous
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = craven
+			}
+
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+
+			modifier = {
+				factor = 3
+				trait = cruel
+			}
+
+			modifier = {
+				factor = 3
+				trait = brave
+			}
+
+			modifier = {
+				factor = 3
+				trait = greedy
+			}
+		}
+	}
+
+	zhent_become_tributary = {
+		only_independent = yes
+		is_in_society = yes
+		ai_check_interval = 60
+
+		potential = {
+			k_zhentarim = {
+				has_holder = yes
+			}
+			NOT = { has_landed_title = k_zhentarim }
+			independent = yes
+			mercenary = no
+			holy_order = no
+			is_landed = yes
+			society_member_of = black_network
+			society_rank = { rank >= 2 }
+		}
+
+		allow = {
+			war = no
+			custom_tooltip = {
+				text = shou_lung_grace_become_tributary_allow_suzerain_tt
+				NOT = {
+					is_tributary = yes
+				}
+			}
+			NOT = { tier = emperor }
+			prisoner = no
+			NOT = { trait = incapable }
+			is_inaccessible_trigger = no
+			k_zhentarim = {
+				holder_scope = {
+					is_within_diplo_range = ROOT
+				}
+			}
+		}
+
+		effect = {
+			add_society_currency_large_effect = yes
+			k_zhentarim = {
+				holder_scope = {
+					make_tributary = {
+						who = ROOT
+						percentage = 0.20
+						tributary_type = default
+					}
+					letter_event = { id = ZHE.2000 days = 0 }
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 10
+				trait = content
+			}
+			modifier = {
+				factor = 0.1
+				trait = ambitious
+			}
+			modifier = {
+				factor = 2
+				trait = craven
+			}
+			modifier = {
+				factor = 0.5
+				trait = brave
+			}
+			modifier = {
+				factor = 2
+				realm_size < 15
+			}
+			modifier = {
+				factor = 0.5
+				realm_size > 30
+			}
+			modifier = {
+				factor = 0.5
+				k_zhentarim = {
+					holder_scope = {
+						realm_size < 15
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				k_zhentarim = {
+					holder_scope = {
+						realm_size > 30
+					}
+				}
+			}
+		}
+	}
+	
+	long_live_the_flame_brotherhood = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 12
+
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = brotherhood_of_true_flame
+				rank >= 1
+			}
+		}
+
+		allow = {
+			has_society_currency_minor_trigger = yes
+			NOT = {
+				has_character_modifier = in_seclusion
+				has_landed_title = d_brotherhood_of_true_flame
+				d_brotherhood_of_true_flame = {
+					has_holder = no
+				}
+			}
+			custom_tooltip = {
+				text = long_live_the_brotherhood_cooldown_tooltip
+				NOT = { has_character_modifier = long_live_the_brotherhood_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = long_live_the_brotherhood_cooldown
+					years = 10
+					hidden = yes
+				}
+				if = {
+					limit = {
+						OR = {
+							has_landed_title = d_brotherhood_of_true_flame
+							any_liege = {
+								has_landed_title = d_brotherhood_of_true_flame
+							}
+						}
+					}
+					add_character_modifier = {
+						modifier = open_flame_brother
+						duration = 3650
+					}
+				}
+				else = {
+					increase_visibility_effect = yes
+				}
+				character_event = { id = BFL.8000 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	overthrow_bonfire = {
+		is_in_society = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = brotherhood_of_true_flame
+				rank >= 4
+			}
+		}
+		allow = {
+			prisoner = no
+			NOT = {
+				has_landed_title = d_brotherhood_of_true_flame
+			}
+			has_society_currency_major_trigger = yes
+			custom_tooltip = {
+				text = overthrow_archmage_cooldown_tooltip
+				NOT = { has_character_modifier = overthrow_archmage_cooldown }
+      }
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = overthrow_archmage_cooldown
+					years = 20
+					hidden = yes
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_landed_title = d_brotherhood_of_true_flame
+						any_liege = {
+							has_landed_title = d_brotherhood_of_true_flame
+						}
+					}
+				}
+				add_character_modifier = {
+					modifier = open_flame_brother
+					duration = 3650
+				}
+			}
+			else = {
+				increase_visibility_effect = yes
+			}
+			character_event = { id = BFL.500 days = 0 }
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0.1
+				trait = content
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = paranoid
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+
+			modifier = {
+				factor = 0.1
+				trait = craven
+			}
+
+			modifier = {
+				factor = 3
+				trait = ambitious
+			}
+
+			modifier = {
+				factor = 3
+				trait = cruel
+			}
+
+			modifier = {
+				factor = 3
+				trait = brave
+			}
+		}
+	}
+	
+	delve_into_forbidden = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			not_casting = yes
+				society_rank = {
+				society = cult_of_the_dragon
+				rank >= 1
+			}
+		}
+
+		allow = {
+			has_society_currency_minor_trigger = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = delve_into_forbidden_cooldown_tooltip
+				NOT = { has_character_modifier = delve_into_forbidden_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_minor_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = delve_into_forbidden_cooldown
+					years = 5
+					hidden = yes
+				}
+				increase_visibility_minor_effect = yes
+				character_event = { id = CDR.200 }
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0.5
+
+			modifier = {
+				factor = 0.5
+				trait = slothful
+			}
+
+			modifier = {
+				factor = 2
+				trait = lunatic
+			}
+		}
+	}
+
+	dragon_minor_gift = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 12
+
+		potential = {
+			not_casting = yes
+				society_rank = {
+				society = cult_of_the_dragon
+				rank >= 2
+			}
+		}
+
+		allow = {
+			has_society_currency_medium_trigger = yes
+			prisoner = no
+			NOT = { trait = incapable }
+			custom_tooltip = {
+				text = dragon_minor_gift_cooldown_tooltip
+				NOT = { has_character_modifier = dragon_minor_gift_cooldown }
+			}
+		}
+
+		effect = {
+			detract_society_currency_medium_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = dragon_minor_gift_cooldown
+					years = 100
+					hidden = yes
+				}
+				increase_visibility_effect = yes
+				character_event = { id = CDR.300 }
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+		}
+	}
+
+	choose_undeath = {
+		is_in_society = yes
+		ai_check_interval = 40
+		potential = {
+			not_casting = yes
+			OR = {
+				society_rank = {
+					society = cult_of_the_dragon
+					rank = 4
+				}
+				society_rank = {
+					society = twisted_rune
+					rank >= 3
+				}
+				society_rank = {
+					society = night_masks
+					rank = 4
+				}
+			}
+		}
+		allow = {
+			prisoner = no
+			is_pregnant = no
+			is_incapable = no
+			is_undead = no
+			undead_incompatible_race = no
+			has_society_currency_major_trigger = yes
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			increase_visibility_effect = yes
+			character_event = { id = CDR.500 days = 0 }
+		}
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 0.1
+				trait = content
+			}
+			modifier = {
+				factor = 0.1
+				trait = kind
+			}
+			modifier = {
+				factor = 2
+				trait = ambitious
+			}
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 5
+				trait = lunatic
+			}
+			modifier = {
+				factor = 0.01
+				trait = depressed
+			}
+			modifier = {
+				factor = 10
+				trait = infirm
+			}
+			modifier = {
+				factor = 10
+				society_member_of = twisted_rune
+			}
+			modifier = {
+				factor = 2
+				society_member_of = night_masks
+			}
+			modifier = {
+				factor = 0.5
+				health >= 7
+			}
+			modifier = {
+				factor = 2
+				health <= 3
+			}
+			modifier = {
+				factor = 0.1
+				faerun_immortal_race_trigger = yes
+			}
+		}
+	}
+
+	invite_dracolich = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 12
+		potential = {
+			not_casting = yes
+			society_rank = {
+				society = cult_of_the_dragon
+				rank = 4
+			}
+		}
+		allow = {
+			has_society_currency_major_trigger = yes
+			is_inaccessible_trigger = no
+			custom_tooltip = {
+				text = invite_dracolich_cooldown_tooltip
+				NOT = { has_character_modifier = invite_dracolich_cooldown }
+			}
+		}
+		effect = {
+			detract_society_currency_major_effect = yes
+			hidden_effect = {
+				add_character_modifier = {
+					name = invite_dracolich_cooldown
+					years = 100
+					hidden = yes
+				}
+				increase_visibility_effect = yes
+			}
+			custom_tooltip = { text = tooltip_summoning_lodge_commander }
+			hidden_tooltip = {
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					age = 400
+					trait = creature_dragon
+					trait = dragon_adult
+					culture = draconic
+					female = no
+					attributes = {
+						diplomacy = 8
+						learning = 12
+						stewardship = 12
+						intrigue = 8
+						martial = 18
+					}
+				}
+				new_character = {
+					remove_trait = weak
+					remove_trait = slow
+					remove_trait = imbecile
+					remove_trait = dull
+					remove_trait = mystic
+					remove_trait = socializer
+					remove_trait = gamer
+					remove_trait = hedonist
+					remove_trait = duelist
+					remove_trait = hunter
+					remove_trait = strategist
+					remove_trait = administrator
+					remove_trait = architect
+					remove_trait = gardener
+					remove_trait = schemer
+					remove_trait = impaler
+					remove_trait = seducer
+					remove_trait = seductress
+					remove_trait = theologian
+					remove_trait = scholar
+					remove_trait = craven
+					add_trait = lich
+					add_artifact = lich_phylactery_artf
+					set_graphical_culture = dracolich
+
+					remove_education_effect = yes
+					random_list = {
+						60 = { add_trait = skilled_tactician }
+						40 = { add_trait = brilliant_strategist }
+					}
+
+					random_list = {
+						40 = { religion = draconic_pantheon }
+						20 = { religion = tiamat }
+						15 = { religion = dead_three }
+						15 = { religion = shadow_gods }
+						10 = { religion = arcane }
+					}
+
+					random_list = {
+						15 = {
+							culture = red_dragon
+						}
+						15 = {
+							culture = black_dragon
+						}
+						15 = {
+							culture = blue_dragon
+						}
+						15 = {
+							culture = green_dragon
+						}
+						15 = {
+							culture = white_dragon
+						}
+						5 = {
+							culture = brass_dragon
+						}
+						5 = {
+							culture = bronze_dragon
+						}
+						5 = {
+							culture = copper_dragon
+						}
+						5 = {
+							culture = gold_dragon
+						}
+						5 = {
+							culture = silver_dragon
+						}
+						1 = {
+							culture = amethyst_dragon
+						}
+						1 = {
+							culture = emerald_dragon
+						}
+						1 = {
+							culture = sapphire_dragon
+						}
+						1 = {
+							culture = topaz_dragon
+						}
+						1 = {
+							culture = crystal_dragon
+						}
+						1 = {
+							culture = shadow_dragon
+						}
+					}
+
+					random_list = {
+						20 = { add_trait = expert_sorcerer }
+						20 = { add_trait = expert_cleric }
+						20 = { add_trait = expert_wizard }
+						20 = { add_trait = expert_warlock }
+						20 = { add_trait = expert_fighter }
+					}
+
+					join_society = cult_of_the_dragon
+					set_character_flag = invited_lodge_soldier
+					set_character_flag = lodge_warrior_original_court_@ROOT
+					set_character_flag = no_court_invites
+					save_event_target_as = invited_lodge_soldier
+				}
+			}
+			character_event = { id = CDR.600 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+		}
+	}
+	
+	concord_thrall_army = {
+		is_in_society = yes
+		only_playable = yes
+		is_mercenary = yes
+		is_high_prio = yes
+		ai_check_interval = 6
+
+		potential = {
+			not_casting = yes
+			society_member_of = elder_concord
+			society_rank >= 2
+		}
+
+		allow = {
+			war = yes
+			has_society_currency_minor_trigger = yes
+			conditional_tooltip = {
+				trigger = {
+					has_character_modifier = assassins_raise_troops_cooldown
+				}
+				custom_tooltip = {
+					text = assassins_raise_troops_cooldown_TT
+
+					always = no
+				}
+			}
+		}
+
+		effect = {
+			capital_scope = {
+				ROOT = {
+					spawn_unit = {
+						owner = ROOT
+						province = PREV
+						home = PREV
+						troops = {
+							light_infantry = { 1500 1500 }
+							beast_troops = { 250 250 }
+						}
+						attrition = 1.0
+						disband_on_peace = yes
+						maintenance_multiplier = 1
+						earmark = thrall_troops
+					}
+				}
+			}
+			hidden_tooltip = {
+				add_character_modifier = {
+					name = assassins_raise_troops_cooldown
+					hidden = yes
+					years = 1
+				}
+			}
+			detract_society_currency_minor_effect = yes
+			sound_effect = generic_click_01
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
+		}
+	}
+	concord_brain_golem = {
+		ai_check_interval = 60
+		only_playable = yes
+		is_in_society = yes
+
+		potential = {
+			not_casting = yes
+			society_member_of = elder_concord
+			society_rank == 4
+		}
+
+		allow = {
+			is_adult = yes
+			prisoner = no
+			is_incapable = no
+			NOT = { is_inaccessible_trigger = yes }
+			has_society_currency_major_trigger = yes
+			NOT = { has_character_modifier = brain_golem_bodyguard }
+		}
+
+		effect = {
+			detract_society_currency_major_effect = yes
+			add_character_modifier = {
+				name = brain_golem_bodyguard
+				years = 5
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.5
+				trait = trusting
+			}
+		}
+	}
+
+}
+
+title_decisions = {
+
+	support_people = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 12
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			OR = {
+				society_rank = {
+					rank >= 1
+					society = harpers
+				}
+				society_rank = {
+					rank >= 2
+					society = kuo_tan_society
+				}
+			}
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				has_society_currency_minor_trigger = yes
+				custom_tooltip = {
+					text = extort_cooldown_custom_tooltip
+					hidden_tooltip = {
+						NOT = { has_character_modifier = support_people_cooldown }
+					}
+				}
+			}
+			location = {
+				NOR = {
+					has_province_modifier = support_people_sneaky
+					has_province_modifier = support_people_direct
+					has_province_modifier = support_people_fundraising
+			  }
+				hidden_tooltip = {
+					any_province_holding = {
+						OR = {
+							holding_type = city
+							holding_type = temple
+							holding_type = castle
+							holding_type = tribal
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			location = {
+				save_event_target_as = tax_discount_target
+			}
+			FROM = {
+				detract_society_currency_minor_effect = yes
+				character_event = {	id = HRP.100 }
+				hidden_effect = {
+					add_character_modifier = {
+						name = support_people_cooldown
+						months = 6
+						hidden = yes
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0.1
+				always = yes
+			}
+
+			modifier = {
+				factor = 0
+				NOT = { wealth = 0 }
+			}
+
+			modifier = {
+				factor = 0.5
+				NOT = { wealth = 100 }
+				independent = yes
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = cruel
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = greedy
+			}
+
+			modifier = {
+				factor = 3
+				trait = charitable
+			}
+
+			modifier = {
+				factor = 2
+				trait = kind
+			}
+
+			modifier = {
+				factor = 2
+				trait = just
+			}
+
+			modifier = {
+				factor = 0.5
+				trait = stressed
+			}
+
+			modifier = {
+				factor = 2
+				trait = content
+			}
+		}
+	}
+
+	ruthless_taxation = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 24
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			is_member_of_any_zhent_like_society_trigger = yes
+			society_rank >= 1
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				has_society_currency_minor_trigger = yes
+				custom_tooltip = {
+					text = extort_cooldown_custom_tooltip
+					hidden_tooltip = {
+						NOT = { has_character_modifier = extort_timer }
+					}
+				}
+			}
+			location = {
+				NOR = {
+					has_province_modifier = extra_tax
+					has_province_modifier = extra_tax_kind
+		      has_province_modifier = ruthless_tax
+					has_province_modifier = ruthless_tax_sneaky
+		      has_province_modifier = ruthless_tax_heist
+			  }
+				hidden_tooltip = {
+					any_province_holding = {
+						OR = {
+							holding_type = city
+							holding_type = temple
+							holding_type = castle
+							holding_type = tribal
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			location = {
+				save_event_target_as = extra_tax_target
+			}
+			FROM = {
+				detract_society_currency_minor_effect = yes
+				character_event = {	id = ZHE.21000 }
+				hidden_effect = {
+					add_character_modifier = {
+						name = extort_timer
+						months = 6
+						hidden = yes
+					}
+					if = {
+						limit = {
+							OR = {
+								has_landed_title = k_zhentarim
+								any_liege = {
+									has_landed_title = k_zhentarim
+								}
+							}
+						}
+						add_character_modifier = {
+							modifier = open_zhent
+							duration = 3650
+						}
+					}
+					else_if = {
+						limit = {
+							OR = {
+								has_landed_title = k_warlock_knights
+								any_liege = {
+									has_landed_title = k_warlock_knights
+								}
+							}
+						}
+						add_character_modifier = {
+							modifier = open_warlock_knight
+							duration = 3650
+						}
+					}
+					else = {
+						increase_visibility_effect = yes
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 5
+				FROM = { NOT = { wealth = 0 } }
+			}
+			modifier = {
+				factor = 2
+				FROM = {
+					NOT = { wealth = 100 }
+					independent = yes
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = charitable }
+			}
+			modifier = {
+				factor = 3
+				FROM = { trait = greedy }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = cruel }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = arbitrary }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = stressed }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = content }
+			}
+		}
+	}
+	
+	establish_cell = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 12
+
+		ai_target_filter = realm_owned
+		filter = realm_owned
+
+		from_potential = {
+			society_rank >= 3
+			society_member_of = cult_of_the_dragon
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				has_society_currency_medium_trigger = yes
+			}
+			custom_tooltip = {
+				text = prepare_grounds_allow_tooltip
+				hidden_trigger = {
+					location = {
+						ROOT_FROM = {
+							NOT = { has_character_flag = preparing_cult_in_@PREV }
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			location = {
+				save_event_target_as = target_cult_province
+			}
+			FROM = {
+				if = {
+					limit = {
+						ai = no
+					}
+					detract_society_currency_medium_effect = yes
+				}
+			}
+			FROM = {
+				if = {
+					limit = {
+						is_society_grandmaster = yes
+					}
+					increase_visibility_minor_effect = yes
+				}
+				if = {
+					limit = {
+						NOT = { is_society_grandmaster = yes }
+					}
+					increase_visibility_effect = yes
+				}
+				set_character_flag = preparing_cult_in_@event_target:target_cult_province
+				character_event = { id = CDR.400 days = 600 }
+			}
+		}
+
+		ai_will_do = {
+			factor = 1
+
+			modifier = {
+				factor = 0
+				FROM = {
+					any_demesne_province = {
+						has_province_modifier = secret_cult_cell
+					}
+				}
+			}
+		}
+	}
+	
+	exploit_economy = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 24
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			society_member_of = elder_concord
+			society_rank >= 1
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				has_society_currency_minor_trigger = yes
+				custom_tooltip = {
+					text = extort_cooldown_custom_tooltip
+					hidden_tooltip = {
+						NOT = { has_character_modifier = extort_timer }
+					}
+				}
+			}
+			location = {
+				NOR = {
+					culture = illithid
+					culture = thoon
+					culture = elder_brain
+				}
+			}
+			location = {
+				NOR = {
+					has_province_modifier = extra_tax
+					has_province_modifier = extra_tax_kind
+		      has_province_modifier = ruthless_tax
+					has_province_modifier = ruthless_tax_sneaky
+		      has_province_modifier = ruthless_tax_heist
+					has_province_modifier = exploit_economy_trade
+					has_province_modifier = exploit_economy_intimidation
+			  }
+				hidden_tooltip = {
+					any_province_holding = {
+						OR = {
+							holding_type = city
+							holding_type = temple
+							holding_type = castle
+							holding_type = tribal
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			location = {
+				save_event_target_as = extra_tax_target
+			}
+			FROM = {
+				detract_society_currency_minor_effect = yes
+				character_event = {	id = ELDC.2000 }
+				hidden_effect = {
+					add_character_modifier = {
+						name = extort_timer
+						months = 6
+						hidden = yes
+					}
+				}
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 5
+				FROM = { NOT = { wealth = 0 } }
+			}
+			modifier = {
+				factor = 2
+				FROM = {
+					NOT = { wealth = 100 }
+					independent = yes
+				}
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = kind }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = charitable }
+			}
+			modifier = {
+				factor = 3
+				FROM = { trait = greedy }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = cruel }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = arbitrary }
+			}
+			modifier = {
+				factor = 2
+				FROM = { trait = stressed }
+			}
+			modifier = {
+				factor = 0.5
+				FROM = { trait = content }
+			}
+		}
+	}
+	plunder_knowledge_wonder = {
+		ai_check_interval = 100
+		only_playable = yes
+		is_in_society = yes
+
+		ai_target_filter = owned
+		filter = owned
+
+		from_potential = {
+			society_member_of = elder_concord
+			society_rank == 4
+		}
+
+		potential = {
+			tier = COUNT
+			holder_scope = {
+				character = FROM
+			}
+		}
+
+		allow = {
+			FROM = {
+				prisoner = no
+				NOT = { trait = incapable }
+				NOT = { is_inaccessible_trigger = yes }
+				war = no
+				independent = yes
+			}
+			location = {
+				OR = {
+					has_wonder = wonder_university
+					has_wonder = wonder_library
+					has_wonder = wonder_netherese_enclave
+					has_wonder = wonder_candlekeep
+					has_wonder = wonder_shade
+				}
+				wonder = {
+					wonder_stage >= 3
+					custom_tooltip = {
+						text = concord_plundered_knowledge_TT
+						NOT = { has_wonder_flag = concord_plundered_knowledge }
+					}
+					is_damaged = no
+					custom_tooltip = {
+						text = concord_original_wonder_owner_TT
+						original_wonder_owner = {
+							NOR = {
+								culture = illithid
+								culture = thoon
+								culture = elder_brain
+								religion = illithid_pantheon
+								trait = creature_illithid
+								trait = creature_ulitharid
+								trait = creature_elder_brain
+							}
+						}
+					}
+				}
+			}
+		}
+
+		effect = {
+			FROM = {
+				character_event = {	id = ELDC.2100 days = 30 }
+			}
+			location = {
+				wonder = {
+					set_wonder_flag = concord_plundered_knowledge
+					set_wonder_damaged = yes
+				}
+			}
+		}
+	}
+	
+}
+
+settlement_decisions = {
+	#Power, rank 3: Inspire Warriors
+	knight_order_inspire_warriors = {
+		is_in_society = yes
+		ai_check_interval = 80 #check only once every 80 months.
+		filter = owned
+		ai_target_filter = owned
+
+		from_potential = {
+			is_playable = yes
+			higher_tier_than = BARON
+			is_member_of_any_knight_order_trigger = yes
+			society_rank >= 3
+			NOT = { has_character_flag = inspiring_warriors }
+		}
+
+		potential = {
+			holder_scope = {
+				character = FROM
+			}
+		}
+		allow = {
+			#show_only_failed_conditions = yes
+			FROM = {
+				show_scope_change = no
+				has_society_currency_minor_trigger = yes
+			}
+			NOT = { holding_total_levy_percent = 1 } #Holding does not have a full garrison or levy
+		}
+		effect = {
+			save_event_target_as = target_holding
+			FROM = {
+				show_scope_change = no
+				set_character_flag = inspiring_warriors
+				detract_society_currency_minor_effect = yes
+				character_event = { id = HF.10059 }	#handle actual effect
+			}
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+	        modifier = { #I am losing the war, help!
+				factor = 1.5
+				any_war = {
+					defender = { character = FROM }
+					attacker = {
+						war_score = -50
+					}
+				}
+			}
+			modifier = { #I am winning the war, no need!
+				factor = 0
+				any_war = {
+					defender = { character = FROM }
+					attacker = {
+						war_score = 50
+					}
+				}
+			}
+			modifier = { #I am not at war, who cares!
+	            factor = 0
+	            FROM = { war = no }
+	        }
+		}
+	}
+}
