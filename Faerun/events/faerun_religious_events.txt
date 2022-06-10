@@ -3,10 +3,10 @@ namespace = conv
 #ROOT is the demander, FROM is the vassal
 character_event = {
 	id = conv.1
-	
+
 	is_triggered_only = yes
 	hide_window = yes
-	
+
 	immediate = {
 		FROM = {
 			character_event = { id = conv.2 }
@@ -17,10 +17,10 @@ character_event = {
 #ROOT is the vassal, FROM is the demander
 character_event = {
 	id = conv.2
-	
+
 	is_triggered_only = yes
 	hide_window = yes
-	
+
 	immediate = {
 		# Fires for the vassal and each of his courtiers and vassals.
 		# Note: needs to fire for vassals/courtier before character
@@ -32,5 +32,163 @@ character_event = {
 		#	character_event = { id = 39700 }
 		#}
 		character_event = { id = 39700 }
+	}
+}
+
+#On_death: chance to get avatar trait from slain avatar
+character_event = {
+	id = conv.11
+	hide_window = yes
+	trigger = {
+		death_duel_kill_trigger = yes
+		trait = avatar
+		killer = {
+			NOT = { trait = avatar }
+			is_incapable = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		killer = {
+			character_event = { id = conv.12 }
+		}
+	}
+}
+character_event = {
+	id = conv.12
+	picture = GFX_evt_angels_1
+
+	is_triggered_only = yes
+
+	desc = {
+		trigger = {
+			olrox_is_good_religion_trigger = yes
+			FROM = { olrox_is_good_religion_trigger = no }
+		}
+		text = EVTDESC_CONV_12_A
+	}
+	desc = {
+		trigger = {
+			olrox_is_good_religion_trigger = no
+			is_evil_religion = no
+		}
+		text = EVTDESC_CONV_12_B
+	}
+	desc = {
+		trigger = { is_evil_religion = yes }
+		text = EVTDESC_CONV_12_C
+	}
+	desc = {
+		trigger = {
+			olrox_is_good_religion_trigger = yes
+			FROM = { olrox_is_good_religion_trigger = yes }
+		}
+		text = EVTDESC_CONV_12_D
+	}
+
+	trigger = {
+		NOT = { trait = avatar }
+		is_incapable = no
+	}
+
+	option = { #take the power
+		name = EVTOPTA_CONV_12
+		ai_chance = {
+			factor = 1
+		}
+		add_trait = avatar
+		if = {
+			limit = {
+				olrox_is_good_religion_trigger = yes
+				FROM = { olrox_is_good_religion_trigger = yes }
+			}
+			religion = faithless
+			add_trait = cynical
+			piety = -250
+		}
+		narrative_event = { id = conv.13 }
+	}
+	option = { #refuse the power
+		name = EVTOPTB_CONV_12
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0
+				OR = {
+					trait = cruel
+					trait = greedy
+					trait = proud
+					trait = impaler
+					trait = ambitious
+					trait = envious
+					is_evil_religion = yes
+				}
+			}
+			modifier = {
+				factor = 3
+				OR = {
+					trait = kind
+					trait = charitable
+					trait = humble
+					trait = content
+				}
+				olrox_is_good_religion_trigger = yes
+				FROM = { olrox_is_good_religion_trigger = yes }
+			}
+			modifier = {
+				factor = 3
+				trait = humble
+			}
+			modifier = {
+				factor = 3
+				trait = content
+			}
+		}
+		if = {
+			limit = {
+				can_apply_super_cool_nickname_trigger = yes
+			}
+			give_nickname = nick_godslayer
+		}
+		piety = 500
+		add_trait = humble
+		#narrative_event = { id = conv.14 }
+	}
+}
+#New Avatar
+narrative_event = {
+	id = conv.13
+	title = "EVTNAMECONV13"
+	desc = EVTDESC_CONV_13
+	major = yes
+
+	picture = GFX_evt_angels_1
+
+	is_triggered_only = yes
+
+	option = {
+		name = {
+			text = EVTOPTA_CONV_13
+			trigger = { trait = avatar }
+		}
+		name = {
+			text = EVTOPTB_CONV_13
+			trigger = { NOT = { trait = avatar } }
+		}
+	}
+
+	after = {
+		if = {
+			limit = {
+				FROM = {
+					is_ruler = no
+				}
+			}
+			FROM = {
+				character_event = { id = ADVN.102 }
+			}
+		}
 	}
 }
