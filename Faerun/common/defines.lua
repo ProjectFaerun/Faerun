@@ -764,9 +764,9 @@ NDiplomacy = {
 	DEFENSIVE_PACT_BASE_SIZE = 0.0,								-- This is the base size requirement at 0% threat
 	MAX_INFAMY_GAIN = 50,										-- This is the max infamy gained from a single source
 
-	EVERY_DEFENSIVE_PACT_JOIN_THREAT = 0.95,					-- If threat is this high, members of all defensive pacts against a target will join
-	EVERY_DEFENSIVE_PACT_EXCEPT_HEADS_JOIN_THREAT = 0.75,		-- If threat is this high, members of all defensive pacts against a target will join, except religious heads that only joins when their own group is attacked
-	OTHER_DEFENSIVE_PACT_JOIN_THREAT = 0.5,						-- If threat is this high, other religious groups band together when attacked, if it's lower every defensive pact acts on it's own
+	EVERY_DEFENSIVE_PACT_JOIN_THREAT = 1.0,					-- If threat is this high, members of all defensive pacts against a target will join
+	EVERY_DEFENSIVE_PACT_EXCEPT_HEADS_JOIN_THREAT = 0.95,		-- If threat is this high, members of all defensive pacts against a target will join, except religious heads that only joins when their own group is attacked
+	OTHER_DEFENSIVE_PACT_JOIN_THREAT = 0.75,						-- If threat is this high, other religious groups band together when attacked, if it's lower every defensive pact acts on it's own
 
 	RELEASE_VASSAL_TRUCE_DAYS = 3650,
 
@@ -1706,7 +1706,7 @@ NAI =
 	STATECRAFT_THREAT_THRESHOLD = 50.0,						-- If threat from realm is greater or equal to threshold then Chancellor will be assigned to Statecraft job
 	ADMINISTER_REALM_REALM_SIZE_THRESHOLD = 200,			-- If Empire and realm size is greater or equal to threshold then Steward will be assigned to Administer Realm job
 	NOMAD_ORGANIZE_ARMY_THRESHOLD = 0.75,					-- If Nomad manpower growth from Train Warriors job is greater or equal to threshold then Marshal will be assigned to Organize Army job
-	
+
 	AI_WONDER_INCOME_THRESHOLD = 40.0,						-- The AI will not consider building a wonder unless it has more monthly income than this
 	AI_WONDER_RESUME_THRESHOLD = 200.0						-- The AI will not resume halted wonder constructions unless over this current wealth
 },
