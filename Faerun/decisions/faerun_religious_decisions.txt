@@ -1,5 +1,55 @@
 decisions = {
 
+	ilsensine_awaken_psi = {
+		ai_check_interval = 1000
+		is_adult = yes
+		
+		potential = {
+			religion = illithid_pantheon
+			NOR = {
+				trait = psi_potential
+				trait = creature_illithid
+				trait = creature_ulitharid
+				trait = creature_elder_brain
+				trait = creature_aboleth
+				AND = {
+					trait = creature_dragon
+					gfx_culture_scope = {
+						OR = {
+							culture = amethyst_dragon
+							culture = sapphire_dragon
+							culture = topaz_dragon
+							culture = emerald_dragon
+							culture = crystal_dragon
+						}
+					}
+				}
+			}
+		}
+		allow = {
+			piety = 300
+			is_incapable = no
+			NOR = {
+				z_monk = yes
+				trait = dim
+				trait = dumb
+				trait = slow
+				trait = idiot
+				trait = imbecile
+				trait = inbred
+			}
+		}
+		
+		effect = {
+			piety = -300
+			character_event = { id = generalmisc.16 }
+		}
+		
+		ai_will_do = {
+			factor = 0.2
+		}
+	}
+
 	# Religion Change Player Decision
 	rlg_chg_player_dec = {
 		ai = no
@@ -5408,6 +5458,344 @@ decisions = {
 }
 
 targeted_decisions = {
+	
+	steal_knowledge = {
+		filter = court
+		ai_target_filter = court
+		only_rulers = yes
+		ai_check_interval = 400
+		
+		from_potential = {
+			religion = illithid
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+		}
+		
+		potential = {
+			NOR = {
+				trait = creature_illithid
+				trait = creature_ulitharid
+				trait = creature_elder_brain
+				trait = creature_construct
+				is_undead = yes
+				trait = construct
+				trait = creature_monster
+				AND = {
+					trait = creature_dwarf
+					gfx_culture_scope = {
+						culture = derro
+					}
+				}
+			}
+			prisoner = yes
+			hidden_tooltip = {
+				ai = yes
+			}
+		}
+		
+		allow = {
+			FROM = {
+				piety = 200
+				NOR = {
+					has_character_modifier = stolen_thoughts_diplo
+					has_character_modifier = stolen_thoughts_intrigue
+					has_character_modifier = stolen_thoughts_learn
+					has_character_modifier = stolen_thoughts_martial
+					has_character_modifier = stolen_thoughts_steward
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				piety = -200
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 65
+					add_trait = cruel
+				}
+				random_list = {
+					1 = {
+						add_character_modifier = {
+							name = stolen_thoughts_diplo
+							years = 2
+						}
+					}
+					1 = {
+						add_character_modifier = {
+							name = stolen_thoughts_martial
+							years = 2
+						}
+					}
+					1 = {
+						add_character_modifier = {
+							name = stolen_thoughts_steward
+							years = 2
+						}
+					}
+					1 = {
+						add_character_modifier = {
+							name = stolen_thoughts_intrigue
+							years = 2
+						}
+					}
+					1 = {
+						add_character_modifier = {
+							name = stolen_thoughts_learn
+							years = 2
+						}
+					}
+				}
+			}
+			opinion = {
+				modifier = opinion_invaded_my_mind
+				who = FROM
+			}
+		}
+		ai_will_do = {
+			factor = 0.3	
+		}
+	}
+	
+	shatter_mind = {
+		filter = court
+		ai_target_filter = court
+		only_rulers = yes
+		ai_check_interval = 400
+		
+		from_potential = {
+			religion = illithid
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+		}
+		
+		potential = {
+			NOR = {
+				trait = creature_illithid
+				trait = creature_ulitharid
+				trait = creature_elder_brain
+				trait = creature_construct
+				is_undead = yes
+				trait = construct
+				trait = creature_monster
+				AND = {
+					trait = creature_dwarf
+					gfx_culture_scope = {
+						culture = derro
+					}
+				}
+			}
+			prisoner = yes
+			hidden_tooltip = {
+				ai = yes
+			}
+		}
+		
+		allow = {
+			NOT = { trait = lunatic }
+			FROM = { piety = 70 }
+		}
+		
+		effect = {
+			FROM = {
+				piety = -70
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 65
+					add_trait = cruel
+				}
+			}
+			random_list = {
+				1 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = genius }
+					}
+					remove_trait = genius
+					add_trait = brilliant
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = brilliant }
+					}
+					remove_trait = brilliant
+					add_trait = quick
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = quick }
+					}
+					remove_trait = quick
+					add_trait = smart
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = smart }
+					}
+					remove_trait = smart
+					add_trait = bright
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = bright }
+					}
+					remove_trait = bright
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = diligent }
+					}
+					remove_trait = diligent
+				}
+				10 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = just }
+					}
+					remove_trait = just
+				}
+				20 = {
+					modifier = {
+						factor = 0
+						NOR = {
+							trait = just
+							trait = arbitrary
+						}
+					}
+					add_trait = arbitrary
+				}
+				15 = {
+					modifier = {
+						factor = 0
+						NOT = { trait = brave }
+					}
+					remove_trait = brave
+				}
+				20 = {
+					modifier = {
+						factor = 0
+						NOR = {
+							trait = brave
+							trait = craven
+						}
+					}
+					add_trait = craven
+				}
+				20 = {
+					modifier = {
+						factor = 0
+						NOR = {
+							trait = trusting
+							trait = paranoid
+						}
+					}
+					add_trait = paranoid
+				}
+				5 = {
+					add_trait = lunatic
+				}
+				1 = {
+					diplomacy = -1
+				}
+				1 = {
+					martial = -1
+				}
+				1 = {
+					stewardship = -1
+				}
+				1 = {
+					learning = -1
+				}
+			}
+			opinion = {
+				modifier = opinion_invaded_my_mind
+				who = FROM
+			}
+		}
+		ai_will_do = {
+			factor = 0.3	
+		}
+	}
+	
+	extract_secret = {
+		filter = court
+		ai_target_filter = court
+		only_rulers = yes
+		ai_check_interval = 400
+		
+		from_potential = {
+			religion = illithid
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+		}
+		
+		potential = {
+			NOR = {
+				trait = creature_illithid
+				trait = creature_ulitharid
+				trait = creature_elder_brain
+				trait = creature_construct
+				is_undead = yes
+				trait = construct
+				trait = creature_monster
+			}
+			prisoner = yes
+			hidden_tooltip = {
+				ai = yes
+			}
+		}
+		
+		allow = {
+			NOT = { owes_favor_to = FROM }
+			FROM = { piety = 150 }
+		}
+		
+		effect = {
+			FROM = {
+				piety = -150
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 25
+					add_trait = cruel
+				}
+			}
+			add_favor =	FROM
+			imprison = no
+			opinion = {
+				modifier = opinion_invaded_my_mind
+				who = FROM
+			}
+		}
+		ai_will_do = {
+			factor = 0.3	
+		}
+	}
 
 	torm_join_war = {
 		only_rulers = yes
@@ -7091,6 +7479,259 @@ targeted_decisions = {
 }
 
 settlement_decisions = {
+	
+	ilsensine_force_efficiency = {
+		only_rulers = yes
+		ai_check_interval = 300
+		
+		from_potential = {
+			religion = illithid_pantheon
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+		}
+		
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		
+		allow = {
+			FROM = {
+				piety = 100
+			}
+			location = {
+				NOR = {
+					has_province_modifier = undead_province
+					has_province_modifier = forced_efficiency
+					culture = illithid
+					culture = thoon
+					culture = aboleth
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				piety = -100
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 40
+					add_trait = cruel
+				}
+			}
+			location = {
+				add_province_modifier = {
+					name = forced_efficiency
+					years = 1
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 0.5
+				FROM = {
+					war = yes
+				}
+			}
+			modifier = {
+				factor = 3
+				wealth = 100
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					trait = kind
+				}
+			}	
+		}
+	}
+	
+	ilsensine_dominate_mob = {
+		only_rulers = yes
+		ai_check_interval = 300
+		
+		from_potential = {
+			religion = illithid_pantheon
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+			hidden_tooltip = {
+				OR = {
+					ai = no
+					war = yes
+				}
+			}
+		}
+		
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		
+		allow = {
+			FROM = {
+				piety = 200
+			}
+			location = {
+				NOR = {
+					has_province_modifier = undead_province
+					has_province_modifier = depopulated_3
+					has_province_modifier = population_missing
+					culture = illithid
+					culture = thoon
+					culture = aboleth
+				}
+			}
+		}
+		effect = {
+			FROM = {
+				piety = -200
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 40
+					add_trait = cruel
+				}
+			}
+			location = {
+				if = {
+					limit = {
+						has_province_modifier = prosperity_modifier_3
+					}
+					FROM = {
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = THIS
+							troops = {
+								mob_troops = { 15 15 }
+								light_infantry = { 1 1 }
+							}
+							match_settlement = ROOT
+							match_mult = 3
+							cannot_inherit = yes
+							attrition = 1.5
+							maintenance_multiplier = 0.5
+							can_toggle_looting = no
+							reinforces = no
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_province_modifier = prosperity_modifier_2
+					}
+					FROM = {
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = THIS
+							troops = {
+								mob_troops = { 15 15 }
+								light_infantry = { 1 1 }
+							}
+							match_settlement = ROOT
+							match_mult = 2
+							cannot_inherit = yes
+							attrition = 1.5
+							maintenance_multiplier = 0.5
+							can_toggle_looting = no
+							reinforces = no
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						has_province_modifier = prosperity_modifier_1
+					}
+					FROM = {
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = THIS
+							troops = {
+								mob_troops = { 15 15 }
+								light_infantry = { 1 1 }
+							}
+							match_settlement = ROOT
+							match_mult = 2
+							cannot_inherit = yes
+							attrition = 1
+							maintenance_multiplier = 0.5
+							can_toggle_looting = no
+							reinforces = no
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						NOR = {
+							has_province_modifier = prosperity_modifier_3
+							has_province_modifier = prosperity_modifier_2
+							has_province_modifier = prosperity_modifier_1
+						}
+					}
+					FROM = {
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = THIS
+							troops = {
+								mob_troops = { 15 15 }
+								light_infantry = { 1 1 }
+							}
+							match_settlement = ROOT
+							match_mult = 2
+							cannot_inherit = yes
+							attrition = 0.65
+							maintenance_multiplier = 0.5
+							can_toggle_looting = no
+							reinforces = no
+						}
+					}
+				}
+				if = {
+					limit = {
+						has_dlc = "Reapers"
+					}
+					increase_depopulation_effect = yes
+				}
+				else = {
+					add_province_modifier = {
+						name = population_missing
+						years = 5
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0.1
+				FROM = {
+					trait = kind
+				}
+			}	
+		}
+	}
 
 	ilmater_prov_health = {
 		ai_check_interval = 40
