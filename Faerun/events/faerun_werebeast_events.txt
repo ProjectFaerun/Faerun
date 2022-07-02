@@ -1181,6 +1181,33 @@ character_event = {
 	
 	is_triggered_only = yes
 	
+	weight_multiplier = {
+		days = 1
+		modifier = {
+			factor = 2
+			trait = paranoid
+		}
+		modifier = {
+			factor = 5
+			OR = {
+				z_rogue = yes
+				z_shadow = yes
+			}
+		}
+		modifier = {
+			factor = 1.5
+			intrigue = 7
+		}
+		modifier = {
+			factor = 1.5
+			intrigue = 10
+		}
+		modifier = {
+			factor = 1.5
+			intrigue = 15
+		}
+	}
+	
 	trigger = {
 		NOR = {
 			trait = afflicted_lycanthrope
@@ -1189,7 +1216,7 @@ character_event = {
 			trait = patron_sebek
 			trait = patron_selune
 		}
-		any_courtier = {
+		any_realm_character = {
 			prisoner = no
 			OR = {
 				trait = afflicted_lycanthrope
@@ -1217,14 +1244,14 @@ character_event = {
 				NOT = {
 					has_opinion_modifier = {
 						who = ROOT
-						name = lycan_secret
+						name = opinion_kept_secret_lycan
 					}
 				}
 			}
 			save_event_target_as = lycanfound
 		}
 		random_list = {
-			1 = { # Saw transformation, wasn't seen
+			10 = { # Saw transformation, wasn't seen
 				modifier = {
 					factor = 5
 					OR = {
@@ -1298,14 +1325,14 @@ character_event = {
 				}
 				character_event = { id = frwerebeast.15 }
 			}
-			1 = { # Saw transformation, was attacked but didn't take a wound
-			
+			20 = { # Saw transformation, was attacked but didn't take a wound
+				character_event = { id = frwerebeast.19 }
 			}
-			1 = { # Saw transformation, was wounded
-			
+			10 = { # Saw transformation, was wounded
+				character_event = { id = frwerebeast.22 }
 			}
 			1 = { # Saw transformation, was killed
-				
+				character_event = { id = frwerebeast.23 }
 			}
 		}
 	}
@@ -1350,12 +1377,787 @@ character_event = {
 	is_triggered_only = yes
 	
 	option = {
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 0
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 30
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 50
+						}
+					}
+				}
+			}
+		}
 		name = FRWEREBEAST.15e
+		any_realm_lord = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
+		any_liege = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
 		event_target:lycanfound = {
 			add_character_modifier = {
 				name = known_lycan_modifier
 				duration = -1
 			}
+			character_event = { id = frwerebeast.16 }
 		}
+	}
+	
+	option = {
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				trait = kind
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_lover = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_friend = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value >= 50
+						}
+					}
+				}
+			}
+		}
+		name = FRWEREBEAST.15f
+		event_target:lycanfound = {
+			character_event = { id = frwerebeast.18 }
+		}
+	}
+}
+
+character_event = {
+	id = frwerebeast.16
+	desc = FRWEREBEAST.16
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRWEREBEAST.16a
+		opinion = {
+			modifier = opinion_exposed_me_lycan
+			who = FROM
+			years = 50
+		}
+		clear_event_target = lycanfound
+	}
+}
+
+character_event = {
+	id = frwerebeast.17
+	desc = {
+		text = FRWEREBEAST.17a
+		trigger = {
+			event_target:lycanfound = {
+				trait = werewolf
+			}
+			NOR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17b
+		trigger = {
+			event_target:lycanfound = {
+				trait = wererat
+			}
+			NOR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17c
+		trigger = {
+			event_target:lycanfound = {
+				trait = weretiger
+			}
+			NOR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17d
+		trigger = {
+			event_target:lycanfound = {
+				trait = werecrocodile
+			}
+			NOR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17e
+		trigger = {
+			event_target:lycanfound = {
+				trait = werewolf
+			}
+			OR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17f
+		trigger = {
+			event_target:lycanfound = {
+				trait = wererat
+			}
+			OR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17g
+		trigger = {
+			event_target:lycanfound = {
+				trait = weretiger
+			}
+			OR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.17h
+		trigger = {
+			event_target:lycanfound = {
+				trait = werecrocodile
+			}
+			OR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+	}
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		trigger = {
+			NOR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+		name = FRWEREBEAST.17i
+		event_target:lycanfound = {
+			ROOT = {
+				opinion = {
+					modifier = opinion_foul_lycan
+					who = PREV
+				}
+			}
+		}
+	}
+	
+	option = {
+		trigger = {
+			OR = {
+				trait = patron_malar
+				trait = patron_sebek
+				trait = patron_selune
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+			}
+		}
+		name = FRWEREBEAST.17j
+	}
+}
+
+character_event = {
+	id = frwerebeast.18
+	desc = FRWEREBEAST.18
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRWEREBEAST.18a
+		opinion = {
+			modifier = opinion_kept_secret_lycan
+			who = FROM
+			years = 50
+		}
+		clear_event_target = lycanfound
+	}
+}
+
+character_event = {
+	id = frwerebeast.19
+	desc = {
+		text = FRWEREBEAST.19a
+		trigger = {
+			event_target:lycanfound = {
+				trait = werewolf
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.19b
+		trigger = {
+			event_target:lycanfound = {
+				trait = wererat
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.19c
+		trigger = {
+			event_target:lycanfound = {
+				trait = weretiger
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.19d
+		trigger = {
+			event_target:lycanfound = {
+				trait = werecrocodile
+			}
+		}
+	}
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 0
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 30
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 50
+						}
+					}
+				}
+			}
+		}
+		name = FRWEREBEAST.15e
+		any_realm_lord = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
+		any_liege = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
+		event_target:lycanfound = {
+			add_character_modifier = {
+				name = known_lycan_modifier
+				duration = -1
+			}
+			character_event = { id = frwerebeast.20 }
+		}
+	}
+	
+	option = {
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				trait = kind
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_lover = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_friend = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value >= 50
+						}
+					}
+				}
+			}
+		}
+		name = FRWEREBEAST.15f
+		event_target:lycanfound = {
+			character_event = { id = frwerebeast.21 }
+		}
+	}
+}
+
+character_event = {
+	id = frwerebeast.20
+	desc = FRWEREBEAST.20
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRWEREBEAST.16a
+		opinion = {
+			modifier = opinion_exposed_me_lycan
+			who = FROM
+			years = 50
+		}
+		clear_event_target = lycanfound
+	}
+}
+
+character_event = {
+	id = frwerebeast.21
+	desc = FRWEREBEAST.21
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRWEREBEAST.18a
+		opinion = {
+			modifier = opinion_kept_secret_lycan
+			who = FROM
+			years = 50
+		}
+		clear_event_target = lycanfound
+	}
+}
+
+character_event = {
+	id = frwerebeast.22
+	desc = {
+		text = FRWEREBEAST.22a
+		trigger = {
+			event_target:lycanfound = {
+				trait = werewolf
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.22b
+		trigger = {
+			event_target:lycanfound = {
+				trait = wererat
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.22c
+		trigger = {
+			event_target:lycanfound = {
+				trait = weretiger
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.22d
+		trigger = {
+			event_target:lycanfound = {
+				trait = werecrocodile
+			}
+		}
+	}
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 0
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 30
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 50
+						}
+					}
+				}
+			}
+		}
+		add_trait_wounded_effect = yes
+		name = FRWEREBEAST.15e
+		any_realm_lord = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
+		any_liege = {
+			limit = {
+				ai = no
+				NOR = {
+					character = PREV
+					event_target:lycanfound = {
+						character = PREV
+					}
+				}
+			}
+			character_event = { id = frwerebeast.17 }
+		}
+		event_target:lycanfound = {
+			add_character_modifier = {
+				name = known_lycan_modifier
+				duration = -1
+			}
+			character_event = { id = frwerebeast.20 }
+		}
+	}
+	
+	option = {
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				trait = kind
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_lover = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 5
+				event_target:lycanfound = {
+					PREV = {
+						is_friend = PREV
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value >= 50
+						}
+					}
+				}
+			}
+		}
+		add_trait_wounded_effect = yes
+		name = FRWEREBEAST.15f
+		event_target:lycanfound = {
+			character_event = { id = frwerebeast.21 }
+		}
+	}
+}
+
+character_event = {
+	id = frwerebeast.23
+	desc = {
+		text = FRWEREBEAST.23a
+		trigger = {
+			event_target:lycanfound = {
+				trait = werewolf
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.23b
+		trigger = {
+			event_target:lycanfound = {
+				trait = wererat
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.23c
+		trigger = {
+			event_target:lycanfound = {
+				trait = weretiger
+			}
+		}
+	}
+	desc = {
+		text = FRWEREBEAST.23d
+		trigger = {
+			event_target:lycanfound = {
+				trait = werecrocodile
+			}
+		}
+	}
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 2
+				trait = cruel
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 0
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 30
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				event_target:lycanfound = {
+					PREV = {
+						opinion = {
+							who = PREV
+							value <= 50
+						}
+					}
+				}
+			}
+		}
+		death = { death_reason = death_accident_monster }
+		name = FRWEREBEAST.23e
+		event_target:lycanfound = {
+			character_event = { id = frwerebeast.24 }
+		}
+	}
+}
+
+character_event = {
+	id = frwerebeast.24
+	desc = FRWEREBEAST.24
+	picture = GFX_evt_werewolf
+	
+	is_triggered_only = yes
+	
+	option = {
+		trigger = {
+			trait = kind
+		}
+		name = FRWEREBEAST.24a
+		clear_event_target = lycanfound
+	}
+	option = {
+		trigger = {
+			NOR = {
+				trait = kind
+				trait = cruel
+				trait = impaler
+			}
+		}
+		name = FRWEREBEAST.24b
+		clear_event_target = lycanfound
+	}
+	option = {
+		trigger = {
+			OR = {
+				trait = cruel
+				trait = impaler
+			}
+		}
+		name = FRWEREBEAST.24c
+		clear_event_target = lycanfound
 	}
 }
