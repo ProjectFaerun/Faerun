@@ -580,6 +580,197 @@ decisions = {
 		}
 	}
 	
+	reveal_as_vampire = {
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			OR = {
+				trait = vampire
+				trait = vampire_spawn
+			}
+			NOT = { has_character_modifier = known_vamp_modifier }
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			add_character_modifier = {
+				name = known_vamp_modifier
+				duration = -1
+			}
+			if = {
+				limit = {
+					OR = {
+						trait = longevity
+						trait = immortal
+					}
+				}
+				remove_trait = longevity
+				remove_trait = immortal
+			}
+			if = {
+				limit = {
+					OR = {
+						trait = creature_human
+						trait = creature_aasimar
+						trait = creature_tiefling
+						trait = creature_hagspawn
+						trait = creature_half_giant
+						trait = creature_gith
+						trait = creature_genasi
+						trait = creature_deep_imaskari
+						trait = creature_spirit_folk
+						trait = creature_lamia
+						trait = creature_pureblood
+					}
+				}
+				set_graphical_culture = vampire
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_elf
+						trait = creature_drow
+						trait = creature_feyri
+						trait = creature_half_elf
+						trait = creature_draegloth
+						trait = creature_centaur
+						trait = creature_malenti
+					}
+				}
+				set_graphical_culture = undeadelf
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_dwarf
+						trait = creature_half_dwarf
+					}
+				}
+				set_graphical_culture = vampiredwarf
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_ogre
+						trait = creature_ogrillon
+						trait = creature_half_ogre
+					}
+				}
+				set_graphical_culture = undeadogre
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_sarrukh
+						trait = creature_naga
+						trait = creature_abomination
+					}
+				}
+				set_graphical_culture = bone_naga
+			}
+			else_if = {
+				limit = {
+					OR = {
+						trait = creature_wemic
+						trait = creature_troll
+						trait = creature_goblin
+						trait = creature_hobgoblin
+						trait = creature_bugbear
+						trait = creature_orc
+						trait = creature_half_orc
+						trait = creature_tanarukk
+					}
+				}
+				set_graphical_culture = undead_creature
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				liege = {
+					has_character_modifier = known_vamp_modifier
+				}
+			}
+			modifier = {
+				factor = 5
+				liege = {
+					has_character_flag = vampire_court
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 1.5
+				trait = proud
+			}
+		}
+	}
+
+	establish_vampire_court = {
+		only_playable = yes
+		ai_check_interval = 36
+
+		potential = {
+			reforming_gov = yes
+			not_casting = yes
+			OR = {
+				trait = vampire
+				trait = vampire_spawn
+			}
+			has_character_modifier = known_vamp_modifier
+			NOT = { has_character_flag = vampire_court }
+		}
+		allow = {
+			always = yes
+			prestige = 30
+		}
+		effect = {
+			set_character_flag = vampire_court
+			prestige = -30
+			custom_tooltip = {
+				text = lycan_court_tt
+			}
+		}
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 10
+				liege = {
+					has_character_modifier = known_vamp_modifier
+				}
+			}
+			modifier = {
+				factor = 5
+				liege = {
+					has_character_flag = vampire_court
+				}
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 2
+				trait = brave
+			}
+			modifier = {
+				factor = 1.5
+				trait = proud
+			}
+		}
+	}
+	
 	illithid_elder_brain = {
 		ai_check_interval = 200
 		only_rulers = yes
@@ -988,6 +1179,7 @@ targetted_decisions = {
 				trait = afflicted_lycanthrope
 				trait = vampire
 				trait = vampire_spawn
+				trait = dhampyr
 				trait = undead
 				trait = lich
 				trait = archlich
@@ -1109,7 +1301,130 @@ targetted_decisions = {
 			}
 		}
 	}
-
+	
+	sire_vampire = {
+		only_playable = yes
+		ai_check_interval = 36
+		filter = home_court
+		ai_target_filter = home_court
+		
+		from_potential = {
+			is_playable = yes
+			trait = vampire
+		}
+		
+		potential = {
+			NOR = {
+				trait = natural_lycanthrope
+				trait = afflicted_lycanthrope
+				trait = vampire
+				trait = vampire_spawn
+				trait = dhampyr
+				trait = undead
+				trait = lich
+				trait = archlich
+				trait = lich_baelnorn
+				trait = avatar
+				trait = creature_fiend
+				trait = creature_angel
+				trait = creature_construct
+				trait = construct
+				trait = creature_treant
+				trait = creature_hag
+				trait = creature_satyr
+				trait = creature_hengeyokai
+				AND = {
+					OR = {
+						trait = creature_illithid
+						trait = creature_ulitharid
+						trait = creature_elder_brain
+					}
+					ai = no
+				}
+			}
+		}
+		
+		allow = {
+			prestige = 200
+			OR = {
+				AND = {
+					olrox_is_good_religion_trigger = yes
+					piety = 50
+				}
+				olrox_is_good_religion_trigger = no
+			}
+			NOT = {
+				has_opinion_modifier = {
+					who = FROM
+					name = attempted_to_infect_me
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				prestige = -200
+				if = {
+					limit = {
+						olrox_is_good_religion_trigger = yes
+					}
+					piety = -50
+				}
+			}
+			if = {
+				limit = {
+					prisoner = no
+				}
+				character_event = { id = frvamp.16 }
+			}
+			else = {
+				character_event = { id = frvamp.20 }
+				FROM = {
+					random = {
+						chance = 50
+						add_trait = cruel
+					}
+					character_event = { id = frvamp.21 }
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.05
+			modifier = {
+				factor = 20
+				FROM = {
+					opinion = {
+						who = ROOT
+						value = 80
+					}
+				}
+			}
+			modifier = {
+				factor = 30
+				FROM = {
+					has_character_modifier = known_vamp_modifier
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					has_character_flag = vampire_court
+				}
+			}
+			modifier = {
+				factor = 0.1
+				FROM = {
+					NOT = {
+						opinion = {
+							who = ROOT
+							value = 0
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 settlement_decisions = {
