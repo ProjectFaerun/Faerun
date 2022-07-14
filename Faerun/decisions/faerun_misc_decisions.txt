@@ -1,5 +1,9 @@
 decisions = {
 
+	go_spelljamming = {
+		ai = no
+	}
+	
 	see_tutorials = {
 		#ai_check_interval = 0
 		ai = no
@@ -792,6 +796,118 @@ targeted_decisions = {
 				factor = 2
 				FROM = { trait = trusting }
 			}
+		}
+	}
+}
+
+settlement_decisions = {
+
+	build_spelljammer_port = {
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		ai_check_interval = 3000
+		is_high_prio = yes
+		
+		from_potential = {
+			age = 16
+			OR = {
+				culture_group = outworlder_group
+				has_spelljammer = yes
+				tier = EMPEROR
+				AND = {
+					OR = {
+						culture = illithid
+						culture = thoon
+					}
+					has_global_flag = nautiloid_rediscovered
+				}
+			}
+			any_demesne_title = {
+				location = {
+					NOT = { has_province_flag = spelljammer_prov }
+				}
+			}
+		}
+		
+		potential = {
+			location = {
+				NOT = { has_province_flag = spelljammer_prov }
+				holder_scope = {
+					character = FROM
+				}
+			}
+			holding_type = city
+		}
+		
+		allow = {
+			FROM = {
+				wealth = 3000
+			}
+		}
+		effect = {
+			FROM = {
+				wealth = -3000
+			}
+			location = {
+				set_province_flag = spelljammer_prov
+			}
+			add_building = ct_spelljammer_port
+		}
+		ai_will_do = {
+			factor = 0.05
+		}
+	}
+	
+	
+	purchase_spelljammer = {
+		ai_check_interval = 2000
+		filter = realm_owned
+		ai_target_filter = realm_owned
+		is_high_prio = yes
+		
+		from_potential = {
+			is_ruler = yes
+			not_casting = yes
+			NOT = {
+				any_artifact = {
+					artifact = spelljammer
+				}
+			}
+		}
+		potential = {
+			has_building = ct_spelljammer_port
+		}
+		allow = {
+			OR = {
+				AND = {
+					FROM = { wealth = 1000 }
+					location = {
+						holder_scope = {
+							character = FROM
+						}
+					}
+				}
+				FROM = { wealth = 2000 }
+			}
+		}
+		effect = {
+			FROM = { add_artifact = spelljammer }
+			if = {
+				limit = {
+					location = {
+						holder_scope = {
+							character = FROM
+						}
+					}
+				}
+				FROM = { wealth = -1000 }
+			}
+			else = {
+				FROM = { wealth = -2000 }
+			}
+		}
+		ai_will_do = {
+			factor = 0.01
 		}
 	}
 }
