@@ -1,0 +1,1267 @@
+namespace = ALWAR
+
+#first event: checks for a suitable target ruler. If cooldowns are up and a target is found, there's a chance next event fires.
+character_event = {
+	id = ALWAR.1
+	hide_window = yes
+	only_playable = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			NOT = { has_global_flag = recent_align_war }
+			had_global_flag = {
+				flag = recent_align_war
+				years >= 50
+			}
+		}
+		total_years_played >= 10 #no invasions right away
+		has_landed_title = c_waterdeep #just somebody
+	}
+
+	immediate = {
+		random_independent_ruler = {
+			limit = {
+				higher_real_tier_than = COUNT
+				NOT = { culture = monster }
+				AND = {
+					realm_size >= 50
+					num_of_count_titles_in_realm >= 20
+				}
+			}
+			random = {
+				chance = 10
+				save_event_target_as = target_ruler
+				random_realm_province = {
+					preferred_limit = {
+						is_capital = no
+						is_island = no
+					}
+					preferred_limit = {
+						is_island = no
+					}
+					preferred_limit = {
+						is_capital = no
+					}
+					save_event_target_as = invasion_province
+				}
+				character_event = { id = ALWAR.2 }
+
+				mult_modifier = {
+					factor = 0.5
+					real_tier = DUKE
+				}
+				#mult_modifier = { #used for testing
+				#	factor = 100
+				#	has_landed_title = k_thay
+				#}
+				mult_modifier = {
+					factor = 1.25
+					real_tier = EMPEROR
+				}
+				mult_modifier = {
+					factor = 2
+					realm_size >= 150
+					num_of_count_titles_in_realm >= 60
+				}
+				mult_modifier = {
+					factor = 2
+					realm_size >= 250
+					num_of_count_titles_in_realm >= 100
+				}
+			}
+		}
+	}
+}
+#second event: an invader character is created.
+character_event = {
+	id = ALWAR.2
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				event_target:target_ruler = {
+					is_evil_religion = yes
+				}
+			}
+			create_random_soldier = { #PLACEHOLDER
+				random_traits = yes
+				female = random
+				attributes = {
+					diplomacy = 8
+					martial = 10
+					stewardship = 6
+					intrigue = 8
+					learning = 6
+				}
+				trait = creature_angel
+				culture = angel
+				religion = triadic #PLACEHOLDER
+				trait = master_fighter #PLACEHOLDER
+				trait = master_cleric #PLACEHOLDER
+				immortal_age = 30
+			}
+			new_character = {
+				wealth = 1000
+				save_event_target_as = invader_char
+				remove_trait = weak
+				remove_trait = delicate
+				remove_trait = soft
+				remove_trait = imbecile
+				remove_trait = idiot
+				remove_trait = slow
+				remove_trait = craven
+				remove_trait = cruel
+				remove_trait = cynical
+				add_trait = zealous
+				character_event = { id = frxp.1 }
+				character_event = { id = ALWAR.3 }
+			}
+		}
+		else = {
+			random_list = {
+				#Archdevils
+				10 = { #Dispater
+					modifier = { has_global_flag = dispater_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Dispater"
+						dynasty = 12854 # of Dis
+						culture = baatezu
+						religion = infernal
+						attributes = {
+							learning = 14
+							intrigue = 14
+							martial = 10
+							diplomacy = 11
+							stewardship = 11
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						trait = strong
+						trait = genius
+						trait = patient
+						trait = paranoid
+						trait = ambitious
+						trait = diligent
+						trait = cruel
+						trait = expert_paladin
+						trait = master_sorcerer
+						trait = expert_fighter
+						trait = brilliant_strategist
+						trait = architect
+						trait = defensive_leader
+						trait = unyielding_leader
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				10 = { #Mammon
+					modifier = { has_global_flag = mammon_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Mammon"
+						dynasty = 12856 # of Minauros
+						culture = baatezu
+						religion = infernal
+						attributes = {
+							learning = 14
+							intrigue = 18
+							martial = 11
+							diplomacy = 7
+							stewardship = 10
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						trait = strong
+						trait = genius
+						trait = greedy
+						trait = lustful
+						trait = ambitious
+						trait = deceitful
+						trait = cruel
+						trait = expert_fighter
+						trait = master_sorcerer
+						trait = expert_rogue
+						trait = schemer
+						trait = elusive_shadow
+						trait = narrow_flank_leader
+						trait = trickster
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				5 = { #Belial
+					modifier = { has_global_flag = belial_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Belial"
+						dynasty = 12857 # of Phlegethos
+						culture = baatezu
+						religion = infernal
+						attributes = {
+							learning = 18
+							intrigue = 14
+							martial = 8
+							diplomacy = 12
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						trait = strong
+						trait = genius
+						trait = fair
+						trait = lustful
+						trait = deceitful
+						trait = ambitious
+						trait = erudite
+						trait = cruel
+						trait = expert_fighter
+						trait = master_sorcerer
+						trait = journeyman_shadow
+						trait = elusive_shadow
+						trait = seducer
+						trait = trickster
+						trait = experimenter
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				5 = { #Fierna
+					modifier = { has_global_flag = fierna_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						female = yes
+						name = "Fierna"
+						dynasty = 12857 # of Phlegethos
+						culture = baatezu
+						religion = infernal
+						attributes = {
+							learning = 14
+							intrigue = 15
+							martial = 8
+							diplomacy = 15
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						trait = strong
+						trait = brilliant
+						trait = beautiful
+						trait = lustful
+						trait = deceitful
+						trait = ambitious
+						trait = slothful
+						trait = cruel
+						trait = journeyman_fighter
+						trait = master_sorcerer
+						trait = expert_shadow
+						trait = elusive_shadow
+						trait = seducer
+						trait = trickster
+						trait = experimenter
+						age = 1000
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				10 = { #Baalzebul
+					modifier = { has_global_flag = baalzebul_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Baalzebul"
+						dynasty = 12858 # of Maladomini
+						culture = baatezu
+						religion = infernal
+						attributes = {
+							learning = 14
+							intrigue = 18
+							martial = 12
+							diplomacy = 10
+							stewardship = 6
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						trait = strong
+						trait = genius
+						trait = unsightly
+						trait = envious
+						trait = brave
+						trait = ambitious
+						trait = deceitful
+						trait = cruel
+						trait = renowned_fighter
+						trait = master_sorcerer
+						trait = expert_shadow
+						trait = schemer
+						trait = elusive_shadow
+						trait = experimenter
+						trait = unyielding_leader
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				#Demon Lords
+				10 = { #Demogorgon
+					modifier = { has_global_flag = demogorgon_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Demogorgon"
+						dynasty = 12855 # of the Gaping Maw
+						attributes = {
+							learning = 16
+							intrigue = 14
+							martial = 16
+							diplomacy = 6
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						culture = tanarri
+						religion = abyssal_cult
+						trait = strong
+						trait = genius
+						trait = lunatic
+						trait = envious
+						trait = paranoid
+						trait = arbitrary
+						trait = deceitful
+						trait = cruel
+						trait = renowned_barbarian
+						trait = master_rogue #can use all magic items like a rogue
+						trait = master_sorcerer
+						trait = elusive_shadow
+						trait = impaler
+						trait = trickster
+						trait = aggressive_leader
+						trait = patron_demogorgon
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				10 = { #Orcus
+					modifier = { has_global_flag = orcus_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Orcus"
+						dynasty = 12859 # of Thanatos
+						attributes = {
+							learning = 18
+							intrigue = 12
+							martial = 16
+							diplomacy = 6
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						culture = tanarri
+						religion = abyssal_cult
+						trait = strong
+						trait = genius
+						trait = undead
+						trait = wroth
+						trait = ambitious
+						trait = arbitrary
+						trait = gluttonous
+						trait = cruel
+						trait = renowned_barbarian
+						trait = master_sorcerer
+						trait = expert_wizard
+						trait = wiz_necromancy
+						trait = brilliant_strategist
+						trait = impaler
+						trait = experimenter
+						trait = aggressive_leader
+						trait = patron_orcus
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				10 = { #Pazuzu
+					modifier = { has_global_flag = pazuzu_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Pazuzu"
+						dynasty = 12860 # of Pazunia
+						attributes = {
+							learning = 14
+							intrigue = 14
+							martial = 10
+							diplomacy = 14
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						culture = tanarri
+						religion = abyssal_cult
+						trait = strong
+						trait = genius
+						trait = greedy
+						trait = patient
+						trait = gregarious
+						trait = deceitful
+						trait = cruel
+						trait = master_ranger #connected to elemental air and flying beasts
+						trait = master_sorcerer
+						trait = expert_shadow
+						trait = elusive_shadow
+						trait = hunter
+						trait = light_foot_leader
+						trait = trickster
+						trait = patron_pazuzu
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+				10 = { #Yeenoghu
+					modifier = { has_global_flag = yeenoghu_spawned factor = 0 }
+					create_character = {
+						random_traits = no
+						name = "Yeenoghu"
+						dynasty = 12861 # of the Seeping Woods
+						attributes = {
+							learning = 14
+							intrigue = 12
+							martial = 16
+							diplomacy = 10
+							stewardship = 8
+						}
+						trait = creature_fiend
+						trait = greater_fiend
+						culture = tanarri
+						religion = abyssal_cult
+						trait = strong
+						trait = genius
+						trait = wroth
+						trait = brave
+						trait = arbitrary
+						trait = stubborn
+						trait = cruel
+						trait = master_barbarian
+						trait = master_sorcerer
+						trait = brilliant_strategist
+						trait = hunter
+						trait = light_foot_leader
+						trait = aggressive_leader
+						trait = patron_yeenoghu
+						age = 1370
+						immortal_age = 30
+						flag = ai_flag_refuse_conversion
+					}
+				}
+			}
+			new_character = {
+				wealth = 1000
+				save_event_target_as = invader_char
+				remove_trait = weak
+				remove_trait = delicate
+				remove_trait = soft
+				remove_trait = imbecile
+				remove_trait = idiot
+				remove_trait = slow
+				remove_trait = craven
+				remove_trait = kind
+				remove_trait = charitable
+				remove_trait = cynical
+				character_event = { id = frxp.1 }
+				character_event = { id = ALWAR.3 }
+				trigger_switch = {
+					on_trigger = culture
+					tanarri = {
+						set_character_flag = chaotic_invader
+					}
+				}
+				trigger_switch = {
+					on_trigger = trait
+					patron_pazuzu = {
+						set_graphical_culture = tengu
+					}
+					patron_yeenoghu = {
+						set_graphical_culture = gnoll
+					}
+				}
+			}
+		}
+	}
+}
+#third event: invader is given a temporary title and troops.
+character_event = {
+	id = ALWAR.3
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		create_title = {
+			tier = DUKE
+			landless = yes
+			temporary = yes
+			culture = ROOT
+			name = "CLAIMANT_ADVENTURE"
+			holder = ROOT
+			adventurer = yes
+		}
+		set_character_flag = duchy_adventurer
+		if = { #good invader
+			limit = {
+				event_target:invader_char = {
+					is_evil_religion = no
+				}
+			}
+			spawn_unit = {
+				province = event_target:invasion_province
+				home = event_target:invasion_province
+				owner = THIS
+				leader = THIS
+				match_character = event_target:target_ruler
+				match_mult = 0.1
+				match_min = 500
+				#earmark = decadence_revolters
+				reinforces = yes
+				reinforce_rate_multiplier = 0.25
+				merge = yes
+				attrition = 0
+			}
+			spawn_fleet = {
+				province = closest # closest sea zone
+				owner = THIS
+				disband_on_peace = yes
+				troops = {
+					galleys = { 400 400 }
+				}
+				earmark = decadence_revolters
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 20
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.1
+					match_min = 500
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 22
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.1
+					match_min = 500
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 24
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.1
+					match_min = 500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 9
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.1
+					match_min = 500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 33
+				attributes = {
+					martial = 9
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.1
+					match_min = 500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+		}
+		else_if = { #evil invaders
+			limit = {
+				event_target:invader_char = {
+					is_evil_religion = yes
+				}
+			}
+			spawn_unit = {
+				province = event_target:invasion_province
+				home = event_target:invasion_province
+				owner = THIS
+				leader = THIS
+				match_character = event_target:target_ruler
+				match_mult = 0.2
+				match_min = 4600
+				#earmark = decadence_revolters
+				reinforces = yes
+				reinforce_rate_multiplier = 0.25
+				attrition = 0
+				merge = yes
+			}
+			spawn_fleet = {
+				province = closest # closest sea zone
+				owner = THIS
+				disband_on_peace = yes
+				troops = {
+					galleys = { 400 400 }
+				}
+				earmark = decadence_revolters
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 20
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 22
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 24
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 9
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 33
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+		}
+		narrative_event = { id = ALWAR.4 days = 1 }
+	}
+}
+#fourth event: war is declared on target. Both invader and target make their automatic call to arms.
+narrative_event = {
+	id = ALWAR.4
+	title = EVTNAME_ALWAR_4
+	portrait = event_target:target_ruler
+	hide_new = yes
+	show_root = yes
+	major = yes
+
+	picture = {
+		trigger = { event_target:invader_char = { culture = angel } }
+		picture = GFX_evt_angels_2
+	}
+	picture = {
+		trigger = { event_target:invader_char = { culture = tanarri } }
+		picture = GFX_evt_demons_1
+	}
+
+	is_triggered_only = yes
+
+	major_trigger = {
+		ai = no
+	}
+
+	desc = {
+		trigger = {
+			event_target:target_ruler = {
+				is_evil_religion = yes
+			}
+		}
+		text = EVTDESC_ALWAR_4_A
+	}
+	desc = {
+		trigger = {
+			event_target:target_ruler = {
+				is_evil_religion = no
+			}
+		}
+		text = EVTDESC_ALWAR_4_B
+	}
+
+	immediate = {
+		event_target:invader_char = {
+			war = {
+				target = event_target:target_ruler
+				casus_belli = great_align_conflict
+			}
+			character_event = { id = ALWAR.10 days = 1 }
+		}
+		event_target:target_ruler = {
+			character_event = { id = ALWAR.10 days = 1 }
+		}
+		clr_global_flag = recent_align_war
+		set_global_flag = recent_align_war
+	}
+
+	option = {
+		name = EVTOPTA_ALWAR_4
+	}
+}
+
+#Call to arms event
+character_event = {
+	id = ALWAR.10
+	desc = EVTDESC_ALWAR_10
+	picture = GFX_evt_large_army
+
+	is_triggered_only = yes
+
+	trigger = {
+		any_war = {
+			using_cb = great_align_conflict
+		}
+		OR = {
+			is_primary_war_attacker = yes
+			is_primary_war_defender = yes
+		}
+	}
+
+	option = {
+		name = EVTOPTA_ALWAR_10
+		any_independent_ruler = {
+			if = {
+				limit = {
+					ROOT = {
+						olrox_is_good_religion_trigger = yes
+					}
+					distance_from_realm = {
+						who = event_target:target_ruler
+						value < 500
+					}
+					NOR = {
+						has_character_modifier = refused_align_war
+						war_with = ROOT
+						war_with = event_target:target_ruler
+						mercenary = yes
+						holy_order = yes
+					}
+					is_landed = yes
+					olrox_is_good_religion_trigger = yes
+				}
+				letter_event = {
+					id = ALWAR.11
+					days = 7
+					random = 21
+					tooltip = EVTTOOLTIP100161
+				}
+			}
+			else_if = {
+				limit = {
+					ROOT = {
+						is_evil_religion = no
+						olrox_is_good_religion_trigger = no
+					}
+					distance_from_realm = {
+						who = event_target:target_ruler
+						value < 500
+					}
+					NOR = {
+						has_character_modifier = refused_align_war
+						war_with = ROOT
+						war_with = event_target:target_ruler
+						mercenary = yes
+						holy_order = yes
+					}
+					is_landed = yes
+					is_evil_religion = no
+					religion_group = ROOT
+				}
+				letter_event = {
+					id = ALWAR.11
+					days = 7
+					random = 21
+					tooltip = EVTTOOLTIP100161
+				}
+			}
+			else_if = {
+				limit = {
+					ROOT = {
+						is_evil_religion = yes
+					}
+					distance_from_realm = {
+						who = event_target:target_ruler
+						value < 500
+					}
+					NOR = {
+						has_character_modifier = refused_align_war
+						war_with = ROOT
+						war_with = event_target:target_ruler
+						mercenary = yes
+						holy_order = yes
+					}
+					is_landed = yes
+					is_evil_religion = yes
+					religion = ROOT
+				}
+				letter_event = {
+					id = ALWAR.11
+					days = 7
+					random = 21
+					tooltip = EVTTOOLTIP100161
+				}
+			}
+		}
+		any_current_enemy = { #try to white peace with other enemies
+			if = {
+				limit = {
+					NOT = { has_character_flag = duchy_adventurer }
+				}
+				letter_event = {
+					id = ALWAR.12
+					days = 5
+				}
+			}
+		}
+		character_event = { id = ALWAR.10 months = 12 } #repeat event if great_align_conflict ongoing
+	}
+	option = {
+		name = EVTOPTB_ALWAR_10
+		ai_chance = {
+			factor = 0
+		}
+		prestige = 30
+		character_event = { id = ALWAR.10 months = 12 } #repeat event if great_align_conflict ongoing
+	}
+}
+#Asked to join align war
+letter_event = {
+	id = ALWAR.11
+	desc = EVTDESC_ALWAR_11
+
+	is_triggered_only = yes
+
+	trigger = {
+		NOT = { has_character_modifier = refused_align_war }
+	}
+
+	option = {
+		name = EVTOPTA_ALWAR_11
+		FROM = {
+			any_war = {
+				limit = {
+					using_cb = great_align_conflict
+				}
+				ROOT = {
+					if = {
+						limit = {
+							FROM = { is_primary_war_defender = yes }
+						}
+						join_defender_wars = PREV
+					}
+					if = {
+						limit = {
+							FROM = {
+								is_primary_war_attacker = yes
+								has_character_flag = duchy_adventurer
+							}
+						}
+						join_attacker_wars = PREV
+					}
+				}
+			}
+			opinion = {
+				modifier = opinion_grateful
+				who = ROOT
+				years = 5
+			}
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 2
+				OR = {
+					is_married = FROM
+					is_parent_of = FROM
+					is_child_of = FROM
+				}
+			}
+			modifier = {
+				factor = 5
+				is_friend = FROM
+			}
+			modifier = {
+				factor = 0.2
+				is_rival = FROM
+			}
+			modifier = {
+				factor = 4
+				OR = {
+					is_allied_with = FROM
+					has_non_aggression_pact_with = FROM
+				}
+			}
+			modifier = {
+				factor = 0.75
+				FROM = {
+					has_character_flag = duchy_adventurer
+					olrox_is_good_religion_trigger = yes
+				}
+			}
+			modifier = {
+				factor = 1.4
+				FROM = {
+					culture = ROOT
+				}
+			}
+			modifier = {
+				factor = 1.4
+				FROM = {
+					religion = ROOT
+				}
+			}
+			modifier = {
+				factor = 0.9
+				FROM = {
+					NOT = { culture_group = ROOT }
+				}
+			}
+			modifier = {
+				factor = 0.9
+				FROM = {
+					NOT = { religion_group = ROOT }
+				}
+			}
+			modifier = {
+				factor = 1.2
+				opinion = { who = FROM value =  20 }
+			}
+			modifier = {
+				factor = 1.2
+				opinion = { who = FROM value =  40 }
+			}
+			modifier = {
+				factor = 1.3
+				opinion = { who = FROM value =  60 }
+			}
+			modifier = {
+				factor = 1.3
+				opinion = { who = FROM value =  80 }
+			}
+			modifier = {
+				factor = 1.3
+				opinion = { who = FROM value =  100 }
+			}
+			modifier = {
+				factor = 0.8
+				NOT = { opinion = { who = FROM value =  0 } }
+			}
+			modifier = {
+				factor = 0.8
+				NOT = { opinion = { who = FROM value =  -20 } }
+			}
+			modifier = {
+				factor = 0.8
+				NOT = { opinion = { who = FROM value =  -40 } }
+			}
+			modifier = {
+				factor = 0.7
+				NOT = { opinion = { who = FROM value =  -60 } }
+			}
+			modifier = {
+				factor = 0.7
+				NOT = { opinion = { who = FROM value =  -80 } }
+			}
+			modifier = {
+				factor = 0.7
+				NOT = { opinion = { who = FROM value =  -99 } }
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_ALWAR_11
+		tooltip = {
+			reverse_opinion = {
+				modifier = opinion_very_disappointed
+				who = FROM
+				years = 5
+			}
+		}
+		add_character_modifier = {
+			modifier = refused_align_war
+			hidden = yes
+			duration = 120
+		}
+		ai_chance = {
+			factor = 1
+		}
+	}
+}
+#Asked to white peace
+letter_event = {
+	id = ALWAR.12
+	desc = EVTDESC_ALWAR_12
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_ALWAR_12
+		any_war = {
+      limit = {
+        AND = {
+          attacker = {
+            character = ROOT
+						is_primary_war_attacker = yes
+          }
+          defender = {
+            character = FROM
+						is_primary_war_defender = yes
+          }
+        }
+      }
+      end_war = whitepeace
+		}
+	}
+	option = {
+		name = EVTOPTB_ALWAR_12
+		tooltip = {
+			reverse_opinion = {
+				modifier = opinion_very_disappointed
+				who = FROM
+				years = 5
+			}
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+#WIP
+#all kinds of invader options (give lifestyle traits)
+#overall balance
