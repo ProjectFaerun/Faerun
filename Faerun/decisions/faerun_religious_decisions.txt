@@ -1,8 +1,77 @@
 decisions = {
 
-	abyssal_summon_demons = {
+	abyssal_bind_demon = { # Character
 		only_playable = yes
-		ai_check_interval = 6
+		ai_check_interval = 300
+		potential = {
+			religion = abyssal_cult
+		}
+		allow = {
+			piety = 150
+			custom_tooltip = {
+				text = ABYSSBINDING
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = abyss_demon_binding }
+						had_character_flag = {
+							flag = abyss_demon_binding
+							years = 5
+						}
+					}
+				}
+			}
+		}
+		effect = {
+			clr_character_flag = abyss_demon_binding
+			set_character_flag = abyss_demon_binding
+			create_character = {
+				age = 666
+				trait = creature_fiend
+				random_traits = yes
+				female = random
+				religion = abyssal_cult
+				culture = tanarri
+				dynasty = culture
+				immortal_age = 30
+			}
+			new_character = {
+				random_list = {
+					65 = {
+						# do nothing - vrock gfx is correct
+					}
+					20 = {
+						set_graphical_culture = succubus
+					}
+					10 = {
+						set_graphical_culture = nalfeshnee
+						add_trait = greater_fiend
+					}
+					10 = {
+						set_graphical_culture = succubus
+						add_trait = greater_fiend # marilith
+					}
+					2 = {
+						set_graphical_culture = baatezu # balors look a lot like pit fiends
+						add_trait = greater_fiend
+					}
+					2 = {
+						set_graphical_culture = yugoloth # or nycaloths
+						add_trait = greater_fiend
+					}
+					2 = {
+						set_graphical_culture = cambion
+					}
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 0.2
+		}
+	}
+
+	abyssal_summon_demons = { # Army
+		only_playable = yes
+		ai_check_interval = 20
 		potential = {
 			religion = abyssal_cult
 		}
@@ -5659,6 +5728,67 @@ decisions = {
 }
 
 targeted_decisions = {
+
+	possess_prisoner = {
+		filter = court
+		ai_target_filter = court
+		only_rulers = yes
+		ai_check_interval = 400
+		
+		from_potential = {
+			religion = abyssal_cult
+			is_incapable = no
+			prisoner = no
+			age = 16
+			is_dumb_trigger = no
+		}
+		
+		potential = {
+			NOR = {
+				trait = creature_fiend
+				trait = creature_construct
+				trait = creature_angel
+				trait = creature_genie
+				is_undead = yes
+				trait = construct
+				trait = creature_monster
+			}
+			prisoner = yes
+			hidden_tooltip = {
+				ai = yes
+			}
+		}
+		
+		allow = {
+			NOT = { trait = possessed }
+			FROM = { piety = 70 }
+		}
+		
+		effect = {
+			FROM = {
+				piety = -70
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 65
+					add_trait = cruel
+				}
+			}
+			add_trait = possessed
+			opinion = {
+				modifier = opinion_tortured_me
+				who = FROM
+			}
+			imprison = no
+		}
+		ai_will_do = {
+			factor = 0.3	
+		}
+	}
 	
 	steal_knowledge = {
 		filter = court
