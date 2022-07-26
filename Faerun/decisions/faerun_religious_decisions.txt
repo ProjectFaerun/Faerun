@@ -5,6 +5,7 @@ decisions = {
 		ai_check_interval = 300
 		potential = {
 			religion = abyssal_cult
+			not_casting = yes
 		}
 		allow = {
 			piety = 150
@@ -74,6 +75,7 @@ decisions = {
 		ai_check_interval = 20
 		potential = {
 			religion = abyssal_cult
+			not_casting = yes
 		}
 		allow = {
 			war = yes
@@ -118,6 +120,7 @@ decisions = {
 			d_magister = {
 				has_holder = no
 			}
+			not_casting = yes
 		}
 		
 		allow = {
@@ -191,6 +194,7 @@ decisions = {
 			k_black_altar = {
 				has_holder = no
 			}
+			not_casting = yes
 		}
 		
 		allow = {
@@ -7798,7 +7802,7 @@ targeted_decisions = {
 					}
 				}
 				death = {
-					death_reason = death_execution_dof_sacrifice
+					death_reason = death_execution_dead_three_sacrifice
 					killer = FROM
 				}
 			}
@@ -8448,6 +8452,9 @@ settlement_decisions = {
 		potential = {
 			location = {
 				NOT = { religion = deities_of_fury }
+				holder_scope = {
+					character = FROM
+				}
 			}
 		}
 
@@ -8499,4 +8506,102 @@ settlement_decisions = {
 		}
 	}
 
+}
+
+title_decisions = {
+
+	orc_claim = {
+		ai_check_interval = 300
+		filter = all
+		ai_target_filter = all
+		
+		from_potential = {
+			orc_religion_trigger = yes
+			only_playable = yes
+			higher_tier_than = BARON
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+		}
+		
+		potential = {
+			holder_scope = {
+				orc_religion_trigger = yes
+				is_within_diplo_range = FROM
+				independent = yes
+			}
+			OR = {
+				tier = COUNT
+				AND = {
+					tier = DUKE
+					FROM = { higher_tier_than = COUNT }
+				}
+				AND = {
+					tier = KING
+					FROM = { higher_tier_than = DUKE }
+				}
+				AND = {
+					tier = EMPEROR
+					FROM = { higher_tier_than = KING }
+				}
+			}
+			NOT = { claimed_by = FROM }
+		}
+		
+		allow = {
+			OR = {
+				conditional_tooltip = {
+					tier = COUNT
+					FROM = { piety = 50 }
+				}
+				conditional_tooltip = {
+					tier = DUKE
+					FROM = { piety = 150 }
+				}
+				conditional_tooltip = {
+					tier = KING
+					FROM = { piety = 300 }
+				}
+				conditional_tooltip = {
+					tier = EMPEROR
+					FROM = { piety = 500 }
+				}
+			}
+		}
+		
+		effect = {
+			if = {
+				limit = {
+					tier = COUNT
+				}
+				FROM = { piety = -50 }
+			}
+			else_if = {
+				limit = {
+					tier = DUKE
+				}
+				FROM = { piety = -150 }
+			}
+			else_if = {
+				limit = {
+					tier = KING
+				}
+				FROM = { piety = -300 }
+			}
+			else_if = {
+				limit = {
+					tier = EMPEROR
+				}
+				FROM = { piety = -500 }
+			}
+			FROM = {
+				add_claim = ROOT
+			}
+			holder_scope = {
+				FROM = {
+					PREV = { character_event = { id = generalmisc.26 } }
+				}
+			}
+		}
+	}
 }
