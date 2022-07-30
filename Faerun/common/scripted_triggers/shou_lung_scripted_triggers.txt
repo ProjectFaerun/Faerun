@@ -125,20 +125,33 @@ shou_lung_offmap_tribute_decisions_enabled_trigger = {
 
 #What goes into the two triggers above...
 shou_lung_offmap_decisions_enabled_trigger = {
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+
 	shou_lung = {
 		NOT = { has_policy = shou_lung_isolationist }
+
 		custom_tooltip = {
-			text = shou_lung_offmap_decisions_enabled_trigger_war_tt #"Is at peace with §Y[From.GetTitledFirstName]§!"
-			NOT = { governor = { war_with = FROM } }
+			text = shou_lung_offmap_decisions_enabled_trigger_war_tt # "Is at peace with §Y[From.GetTitledFirstName]§!"
+
+			governor = {
+				NOT = { war_with = FROM }
+			}
 		}
+
 		governor = {
 			show_scope_change = no
+
 			is_within_diplo_range = FROM
-			hidden_trigger  = { NOT = { character = FROM } } #Governor cannot use boon/tributes decisions
+
+			hidden_trigger = {
+				NOT = { character = FROM } # Governor cannot use boon/tributes decisions
+			}
 		}
 	}
+
 	custom_tooltip = {
 		text = shou_lung_offmap_boon_decisions_enabled_trigger_raiding_tt
+
 		FROM = {
 			NOR = {
 				has_character_modifier = shou_lung_raid_active
@@ -146,16 +159,29 @@ shou_lung_offmap_decisions_enabled_trigger = {
 			}
 		}
 	}
-	hidden_trigger = { has_dlc = "Jade Dragon" }
-	conditional_tooltip = {
-		trigger = { FROM = { primary_title = { has_title_flag = rebel_general_title } } }
+
+	trigger_if = {
+		limit = {
+			FROM = {
+				primary_title = {
+					has_title_flag = rebel_general_title
+				}
+			}
+		}
+
 		custom_tooltip = {
 			text = shou_lung_offmap_decisions_pretender_emperor_tt
 			always = no
 		}
 	}
-	conditional_tooltip = {
-		trigger = { FROM = { has_character_modifier = failed_invasion_of_shou_lung } }
+
+	trigger_if = {
+		limit = {
+			FROM = {
+				has_character_modifier = failed_invasion_of_shou_lung
+			}
+		}
+
 		custom_tooltip = {
 			text = shou_lung_offmap_decisions_failed_invasion_tt
 			always = no
@@ -165,33 +191,59 @@ shou_lung_offmap_decisions_enabled_trigger = {
 
 #Found in the 00_offmap_powers file... and the conditions for the force open shou_lung decision
 shou_lung_offmap_hostile_decisions_enabled_trigger = {
+	hidden_trigger = { has_dlc = "Jade Dragon" }
+
 	shou_lung = {
 		custom_tooltip = {
-			text = shou_lung_offmap_decisions_enabled_trigger_war_tt #"Is at peace with §Y[From.GetTitledFirstName]§!"
-			NOT = { governor = { war_with = FROM } }
+			text = shou_lung_offmap_decisions_enabled_trigger_war_tt # "Is at peace with §Y[From.GetTitledFirstName]§!"
+
+			governor = {
+				NOT = { war_with = FROM }
+			}
 		}
+
 		governor = {
 			show_scope_change = no
+
 			is_within_diplo_range = FROM
-			hidden_trigger  = { NOT = { character = FROM } } #Governor cannot use boon/tributes decisions
+
+			hidden_trigger = {
+				NOT = { character = FROM } # Governor cannot use boon/tributes decisions
+			}
 		}
+
 		offmap_ruler = {
 			NOT = { dynasty = FROM }
 		}
 	}
-	hidden_trigger = { has_dlc = "Jade Dragon" }
 }
 
 #Used with Sending Tribute characters to shou_lung...
+# Used with Sending Tribute characters to China...
 local_third_party_score_low_trigger = {
-	NOT = { check_variable = { which = local_third_party_score value = 91 } }
+	check_variable = {
+		which = local_third_party_score
+		value <= 90
+	}
 }
+
 local_third_party_score_medium_trigger = {
-	check_variable = { which = local_third_party_score value = 91 }
-	NOT = { check_variable = { which = local_third_party_score value = 141 } }
+	check_variable = {
+		which = local_third_party_score
+		value > 90
+	}
+
+	check_variable = {
+		which = local_third_party_score
+		value <= 140
+	}
 }
+
 local_third_party_score_great_trigger = {
-	check_variable = { which = local_third_party_score value = 141 }
+	check_variable = {
+		which = local_third_party_score
+		value > 140
+	}
 }
 
 # For checking the shou_lung Emperor's likes & dislikes
@@ -240,16 +292,27 @@ is_liked_and_disliked_by_shou_lung = {
 
 #Used in the invasion script...
 valid_shou_lung_target = {
-	NOT = { character = ROOT }
-	NOT = { has_character_modifier = peace_deal_with_shou_lung }
-	NOT = { has_character_flag = defeated_shou_lung }
-	NOT = {	is_tributary = { suzerain = ROOT } }
-	in_revolt = no
-	is_within_diplo_range = ROOT
 	is_landed = yes
-	higher_tier_than = BARON
-	NOT = { primary_title = { has_title_flag = rebel_general_title } } #uses special cb to target
-	NOT = { shou_lung = { offmap_ruler = { dynasty = PREVPREV } } }
+	higher_real_tier_than = BARON
+	is_within_diplo_range = ROOT
+	in_revolt = no
+
+	NOR = {
+		character = ROOT
+		has_character_modifier = peace_deal_with_shou_lung
+		has_character_flag = defeated_shou_lung
+		pays_tribute_to = ROOT
+
+		primary_title = {
+			has_title_flag = rebel_general_title # Uses special CB to target
+		}
+
+		offmap_china = {
+			offmap_ruler = {
+				dynasty = PREVPREV
+			}
+		}
+	}
 }
 
 valid_shou_lung_target_location = {
