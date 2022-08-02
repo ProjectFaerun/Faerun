@@ -28,13 +28,6 @@ character_event = {
 		is_pregnant = no
 		has_regent = no
 		
-		OR = {
-			is_female = no
-			NOT = { age = 40 }
-			BR_long_lived_races = yes
-			faerun_immortal_race_trigger = yes
-		}
-		
 		NOR = {
 			trait = infirm
 			trait = celibate
@@ -42,6 +35,8 @@ character_event = {
 			trait = asexual # aces won't initiate
 			trait = in_hiding
 			trait = disfigured
+			spouse = { is_lover = ROOT }
+			has_character_modifier = lustful_affair_timer
 		}
 		
 		OR = {
@@ -88,18 +83,6 @@ character_event = {
 			trait = homosexual # To balance for fewer potential lovers
 		}
 		modifier = {
-			factor = 2.0
-			spouse = {
-				NOT = { age = 30 }
-			}
-		}
-		modifier = {
-			factor = 0.5
-			spouse = {
-				age = 45
-			}
-		}
-		modifier = {
 			factor = 0.5
 			trait = hedonist
 		}
@@ -126,15 +109,6 @@ character_event = {
 	}
 
 	immediate = {
-		if = {
-			limit = {
-				OR = {
-					spouse = { is_lover = ROOT }
-					has_character_modifier = lustful_affair_timer
-				}
-			}
-			break = yes
-		}
 		
 		any_courtier = {
 			limit = {
@@ -146,14 +120,9 @@ character_event = {
 					trait = celibate
 					trait = eunuch
 					trait = chaste
+					trait = asexual
 					trait = in_hiding
 					trait = disfigured
-				}
-				OR = {
-					is_female = no
-					NOT = { age = 40 }
-					BR_long_lived_races = yes
-					faerun_immortal_race_trigger = yes
 				}
 				has_lover = no
 				is_consort = no
@@ -166,6 +135,7 @@ character_event = {
 					trait = lustful
 					trait = deceitful
 					trait = hedonist
+					religion_has_polyamory = yes
 					spouse = {
 						NOT = { is_lover = PREV }
 						NOT = { reverse_opinion = { who = PREV value = 50 } }
@@ -360,10 +330,14 @@ character_event = {
 						if = { 
 							limit = {
 								OR = {
+									religion_has_polyamory = yes
 									AND = {
 										is_female = yes 
 										is_married = no
 										is_consort = no
+									}
+									FROM = {
+										religion_has_polyamory = yes
 									}
 									FROM = {
 										is_female = yes
@@ -389,10 +363,14 @@ character_event = {
 					if = { 
 						limit = {
 							OR = {
+								religion_has_polyamory = yes
 								AND = {
 									is_female = yes 
 									is_married = no
 									is_consort = no
+								}
+								FROM = {
+									religion_has_polyamory = yes
 								}
 								FROM = {
 									is_female = yes
@@ -457,8 +435,18 @@ character_event = {
 	option = {
 		name = EVTOPTC452 # Scream for help!
 		trigger = {
-			FROM = { is_female = no }
-			is_female = yes
+			OR = {
+				AND = {
+					has_religion_feature = religion_matriarchal
+					is_female = no
+					FROM = { is_female = yes }
+				}
+				AND = {
+					religion_matriarchal = religion_patriarchal
+					is_female = yes
+					FROM = { is_female = no }
+				}
+			}
 			NOT = { trait = lustful }
 			NOT = { trait = hedonist }
 		}
@@ -559,14 +547,6 @@ character_event = {
 	trigger = {
 		is_ruler = no
 		is_marriage_adult = yes
-		OR = {
-			is_female = no
-			OR = {
-				NOT = { age = 40 }
-				BR_long_lived_races = yes
-				faerun_immortal_race_trigger = yes
-			}
-		}
 		
 		has_lover = no
 		is_pregnant = no
@@ -621,11 +601,6 @@ character_event = {
 			spouse = { has_lover = yes }
 		}
 		modifier = {
-			factor = 0.5
-			NOT = { age = 30 }
-			spouse = { age = 50 }
-		}
-		modifier = {
 			factor = 0.33
 			trait = homosexual #to balance for fewer potential lovers
 		}
@@ -641,35 +616,12 @@ character_event = {
 			factor = 0.75
 			NOT = { age = 20 }
 		}
-		modifier = {
-			factor = 2.0
-			is_female = yes
-			age = 30
-			BR_long_lived_races = no
-			faerun_immortal_race_trigger = no
-		}
 		
 		# Harems are well guarded...
 		modifier = {
 			factor = 3.0
-			is_female = yes
 			is_married = yes
 			has_polygamy = yes
-		}
-		
-		# Wives and Concubines of rulers have a harder time initiating this (unless it's their Focus)
-		modifier = {
-			factor = 3.0
-			is_female = yes
-			NOT = { has_focus = focus_seduction }
-			liege = {
-				OR = {
-					is_consort = ROOT
-					any_spouse = {
-						character = ROOT
-					}
-				}
-			}
 		}
 	}
 	
@@ -686,6 +638,7 @@ character_event = {
 					
 					NOT = { is_close_relative = ROOT }
 					OR = {
+						trait = bisexual
 						AND = {
 							NOT = { trait = homosexual }
 							ROOT = { NOT = { trait = homosexual } }
@@ -698,11 +651,6 @@ character_event = {
 						}
 					}
 					
-					OR = {
-						is_female = no
-						NOT = { age = 40 }
-					}
-					
 					NOT = {
 						has_character_modifier = lustful_affair_timer
 					}
@@ -711,6 +659,7 @@ character_event = {
 					NOT = { trait = incapable }
 					NOT = { trait = celibate }
 					NOT = { trait = eunuch }
+					NOT = { trait = asexual }
 					NOT = { trait = chaste }
 					
 					OR = {
@@ -718,14 +667,12 @@ character_event = {
 							OR = {
 								trait = inbred
 								trait = imbecile
-								trait = dwarf
 								 has_ugly_trait_trigger = yes
 							}
 						}
 						AND = {
 							NOT = { trait = inbred }
 							NOT = { trait = imbecile }
-							NOT = { trait = dwarf }
 						}
 					}
 					
@@ -744,6 +691,7 @@ character_event = {
 						trait = lustful
 						trait = deceitful
 						trait = arbitrary
+						religion_has_polyamory = yes
 						spouse = {
 							NOT = { reverse_opinion = { who = PREV value = 0 } }
 						}
@@ -754,6 +702,7 @@ character_event = {
 						trait = lustful
 						trait = deceitful
 						trait = arbitrary
+						religion_has_polyamory = yes
 						consort = {
 							NOT = { reverse_opinion = { who = PREV value = 0 } }
 						}
@@ -812,20 +761,6 @@ character_event = {
 				is_opposite_sex = FROM
 				fertility = 0.25
 				FROM = { fertility = 0.25 }
-				OR = {
-					AND = {
-						is_female = yes
-						FROM = { is_female = no }
-						NOT = { age = 45 }
-					}
-					AND = {
-						is_female = no
-						FROM = {
-							is_female = yes
-							NOT = { age = 45 }
-						}
-					}
-				}
 			}
 			if = {
 				limit = {
@@ -837,11 +772,13 @@ character_event = {
 						if = { 
 							limit = {
 								OR = {
+									religion_has_polyamory = yes
 									AND = {
 										is_female = yes 
 										is_married = no
 										is_consort = no
 									}
+									FROM = { religion_has_polyamory = yes }
 									FROM = {
 										is_female = yes
 										is_married = no
@@ -866,11 +803,13 @@ character_event = {
 					if = { 
 						limit = {
 							OR = {
+								religion_has_polyamory = yes
 								AND = {
 									is_female = yes 
 									is_married = no
 									is_consort = no
 								}
+								FROM = { religion_has_polyamory = yes }
 								FROM = {
 									is_female = yes
 									is_married = no
@@ -908,7 +847,6 @@ character_event = {
 				NOT = {
 					OR = {
 						 has_ugly_trait_trigger = yes
-						trait = dwarf
 						trait = imbecile
 						trait = inbred
 					}
@@ -925,13 +863,11 @@ character_event = {
 				NOT = {
 					OR = {
 						 has_ugly_trait_trigger = yes
-						trait = dwarf
 						trait = imbecile
 						trait = inbred
 					}
 				}
 				FROM = {
-					trait = dwarf
 					NOT = { trait = seducer }
 					NOT = { trait = seductress }
 				}
@@ -941,7 +877,6 @@ character_event = {
 				NOT = {
 					OR = {
 						 has_ugly_trait_trigger = yes
-						trait = dwarf
 						trait = imbecile
 						trait = inbred
 					}
@@ -957,7 +892,6 @@ character_event = {
 				NOT = {
 					OR = {
 						 has_ugly_trait_trigger = yes
-						trait = dwarf
 						trait = imbecile
 						trait = inbred
 					}
@@ -974,6 +908,7 @@ character_event = {
 				factor = 60.0
 				is_female = yes
 				has_polygamy = no
+				religion_has_polyamory = no
 				NOT = { has_focus = focus_seduction }
 				liege = {
 					OR = {
@@ -988,6 +923,7 @@ character_event = {
 			# Harems are especially well guarded...
 			modifier = {
 				factor = 200.0
+				religion_has_polyamory = no
 				is_female = yes
 				is_married = yes
 				has_polygamy = yes
@@ -1254,6 +1190,7 @@ character_event = {
 						father_of_unborn = {
 							NOT = { trait = paranoid }
 							NOT = { trait = trusting }
+							religion_has_polyamory = no
 						}
 					}
 					random = {
@@ -1275,7 +1212,18 @@ character_event = {
 # On-action event: Pregnancy out of wedlock!
 character_event = {
 	id = 401
-	desc = EVTDESC401
+	desc = {
+		trigger = {
+			religion_has_polyamory = no
+		}
+		text = EVTDESC401
+	}
+	desc = {
+		trigger = {
+			religion_has_polyamory = yes
+		}
+		text = EVTDESC401a
+	}
 	picture = GFX_evt_pregnancy
 	border = GFX_event_normal_frame_intrigue
 	
@@ -1307,8 +1255,13 @@ character_event = {
 	option = {
 		name = OK
 		tooltip = { add_trait = pregnant }
-		piety = -50
-		prestige = -50
+		if = {
+			limit = {
+				religion_has_polyamory = no
+			}
+			piety = -50
+			prestige = -50
+		}
 		hidden_tooltip = { 
 			if = { 
 				limit = {
@@ -1419,7 +1372,18 @@ character_event = {
 # On-action event: Pregnancy in matrimony, with another father!
 character_event = {
 	id = 402
-	desc = EVTDESC402
+	desc = {
+		trigger = {
+			religion_has_polyamory = no
+		}
+		text = EVTDESC402
+	}
+	desc = {
+		trigger = {
+			religion_has_polyamory = yes
+		}
+		text = EVTDESC402a
+	}
 	picture = GFX_evt_pregnancy
 	border = GFX_event_normal_frame_intrigue
 	
@@ -1444,6 +1408,128 @@ character_event = {
 	}
 	
 	option = {
+		trigger = {
+			religion_has_polyamory = yes
+		}
+		name = EVTOPTA402
+		tooltip = { add_trait = pregnant }
+		
+#		log = "402: [Root.GetTitledName], wife of [Root.Spouse.GetTitledName] in [Root.Employer.PrimaryTitle.GetName] gets pregnant with [Root.FatherOfUnborn.GetTitledName]."
+		
+		spouse = {
+			show_scope_change = no
+			character_event = { id = generalmisc.27 tooltip = EVTTOOLTIP404a }
+		}
+		hidden_tooltip = { 
+			if = { 
+				limit = {
+					ai = no
+					NOT = { any_courtier = { has_minor_title = title_appointed_regent } 
+					has_global_flag = pregnancy_regent_warning } 
+					}
+				character_event = { id = HFP.20400 } 
+			}
+		}
+		hidden_tooltip = { 
+			random_list = { 
+				70 = { 
+					modifier = { 
+						factor = 0.8
+						trait = shy 
+					}
+					modifier = { 
+						factor = 0.8
+						is_ill = yes
+					}
+					modifier = { 
+						factor = 0.8
+						trait = possessed 
+					}
+					modifier = { 
+						factor = 0.8
+						trait = paranoid 
+					}
+					modifier = { 
+						factor = 0.8
+						trait = lunatic 
+					}
+					modifier = { 
+						factor = 0.8
+						trait = weak 
+					}
+					modifier = { 
+						factor = 0.8
+						age = 37 
+					}
+					modifier = { 
+						factor = 0.8
+						NOT = { age = 20 } 
+					}
+					modifier = { 
+						factor = 0.8
+						num_of_children = 3 
+					}
+					modifier = { 
+						factor = 0.8
+						num_of_children = 4 
+					}
+					modifier = { 
+						factor = 0.8
+						num_of_children = 5 
+					}
+					modifier = { 
+						factor = 0.8
+						num_of_children = 6 
+					}
+					modifier = { 
+						factor = 0.8
+						num_of_children = 7 
+					}
+					modifier = { 
+						factor = 0.8
+						has_character_flag = special_marshal
+					}
+					modifier = { 
+						factor = 0.8
+						trait = shieldmaiden
+					}
+					modifier = { 
+						factor = 0.6
+						trait = feeble
+					}
+					modifier = { 
+						factor = 1.75
+						trait = robust
+					}
+					modifier = { 
+						factor = 1.5
+						trait = strong
+					}
+				} 
+				30 = { 
+					modifier = { 
+						factor = 0.5
+						is_ill = no
+					}
+					modifier = { 
+						factor = 0.25
+						age = 18
+						NOT = { age = 40 }
+					}
+					modifier = { 
+						factor = 2
+						trait = drunkard
+					}
+					character_event = { id = HFP.20404	days = 10 random = 5 } #Hard pregnancy
+				}
+			}
+		}
+	}
+	
+	option = {
+		trigger = {
+			religion_has_polyamory = no
+		}
 		name = EVTOPTA402
 		tooltip = { add_trait = pregnant }
 		
@@ -1586,6 +1672,10 @@ character_event = {
 
 	trigger = {
 		NOT = { FROM = { has_character_flag = DW_unholy_mother } }
+		OR = {
+			religion_has_polyamory = no
+			trait = envious
+		}
 	}
 	
 	desc = {
@@ -2855,8 +2945,45 @@ character_event = {
 			} 
 		}
 	}
+	
+	option = {
+		trigger = {
+			mother_even_if_dead = { religion_has_polyamory = yes }
+		}
+		real_father_even_if_dead = {
+			ROOT = {
+				set_father = PREV
+				add_trait = legit_bastard
+			}
+		}
+		if = {
+			limit = {
+				mother_even_if_dead = {
+					OR = {
+						has_law = agnatic_succession
+						has_law = cognatic_succession
+					}
+				}
+				real_father_even_if_dead = {
+					ROOT = {
+						dynasty = PREV
+					}
+				}
+			}
+		}
+		else = {
+			mother_even_if_dead = {
+				ROOT = {
+					dynasty = PREV
+				}
+			}
+		}
+	}
 
 	option = {
+		trigger = {
+			mother = { religion_has_polyamory = no }
+		}
 		name = OK
 		if = { 
 			limit = { 
@@ -4101,7 +4228,6 @@ character_event = {
 			}
 		}
 	}
-
 	option = {
 		name = "OK"
 		mother = {
