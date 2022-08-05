@@ -1,56 +1,42 @@
 # Scripted triggers used by the game
-
 # Check if a character can be assigned to lead troops
-# Root = Character
+# ROOT is Character
 fit_to_lead_troops = {
 	is_adult = yes
-	NOT = { has_character_modifier = in_meditation }
-	NOT = { has_character_modifier = doing_penance }
-	NOT = { has_character_modifier = out_traveling }
-	NOT = { has_character_modifier = mother_dark_rest }
-	OR = {
-		ai = no
-		war = yes
-		has_minor_title = title_commander
-		has_job_title = job_marshal
-		AND = { # Catch-all to make landless adventurers and such lead their troops...
-			primary_title = {
+
+	trigger_if = {
+		limit = { ai = yes }
+
+		OR = {
+			has_minor_title = title_commander
+			has_job_title = job_marshal
+
+			# Catch-all to make landless adventurers and such lead their troops...
+			AND = {
 				higher_tier_than = COUNT
+				is_landed = no
 			}
-			NOT = {
-				any_demesne_title = {
-					lower_tier_than = DUKE
+
+			trigger_if = {
+				limit = { war = no }
+
+				higher_real_tier_than = COUNT
+
+				trigger_if = {
+					limit = { trait = craven }
+					combat_rating >= 10
+				}
+				trigger_else = {
+					combat_rating >= -35
 				}
 			}
 		}
 	}
-	OR = {
-		ai = no
-		has_minor_title = title_commander
-		has_job_title = job_marshal
-		AND = { # Catch-all to make landless adventurers and such lead their troops...
-			primary_title = {
-				higher_tier_than = COUNT
-			}
-			NOT = {
-				any_demesne_title = {
-					lower_tier_than = DUKE
-				}
-			}
-		}
-		AND = {
-			is_ruler = yes
-			higher_real_tier_than = COUNT
-			OR = {
-				AND = { 
-					combat_rating = 10
-					trait = craven
-				}
-				AND = { 
-					combat_rating = -35
-					NOT = { trait = craven }
-				}
-			}
-		}
+
+	NOR = {
+		has_character_modifier = in_meditation
+		has_character_modifier = doing_penance
+		has_character_modifier = out_traveling
+		has_character_modifier = mother_dark_rest
 	}
 }
