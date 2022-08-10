@@ -1,5 +1,226 @@
 decisions = {
 
+	gender_alteration = {
+		ai_check_interval = 5000
+		only_playable = yes
+		potential = {
+			age = 16
+			is_incapable = no
+			is_inaccessible_trigger = no
+			OR = {
+				religion = joyful
+				religion = elven_pantheon
+			}
+			OR = {
+				ai = no
+				AND = {
+					is_married = no
+					has_children = no
+				}
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				text = ONEYEARCD
+				OR = {
+					NOT = { has_character_flag = gender_change }
+					AND = {
+						had_character_flag = {
+							flag = gender_change
+							years = 1
+						}
+						ai = no
+					}
+					AND = {
+						had_character_flag = {
+							flag = gender_change
+							years = 10
+						}
+						ai = yes
+					}
+				}
+			}
+			OR = {
+				conditional_tooltip = {
+					trigger = {
+						trait = androgynous
+					}
+					piety = 30
+				}
+				conditional_tooltip = {
+					trigger = {
+						NOT = { trait = androgynous }
+					}
+					piety = 150
+				}
+			}
+		}
+		
+		effect = {
+			clr_character_flag = gender_change
+			set_character_flag = gender_change
+			set_gender = opposite
+			if = {
+				limit = {
+					trait = androgynous
+				}
+				piety = -30
+			}
+			else = {
+				piety = -150
+			}
+			else
+			if = {
+				limit = {
+					NOR = {
+						trait = asexual
+						trait = bisexual
+					}
+				}
+				if = {
+					limit = {
+						NOT = { trait = homosexual }
+					}
+					add_trait = homosexual # sexuality doesn't change, but has to be re-labeled based on current gender
+				}
+				else = {
+					remove_trait = homosexual
+				}
+			}
+			if = {
+				limit = { is_married = yes }
+				any_spouse = {
+					if = {
+						limit = {
+							NOR = {
+								trait = bisexual
+								trait = asexual
+							}
+						}
+						if = {
+							limit = {
+								opinion = {
+									who = ROOT
+									value = 40
+								}
+							}
+							remove_trait = homosexual
+							add_trait = bisexual # finds they're bi, at least for the spouse
+						}
+						else = {
+							remove_spouse = ROOT
+							ROOT = {
+								character_event = { id = generalmisc.29 }
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+			modifier = {
+				factor = 0.01
+				NOT = { trait = androgynous }
+			}
+			modifier = {
+				factor = 1.2
+				trait = creature_elf
+			}
+		}
+	}
+
+	joyful_etiquette_lessons = {
+		ai_check_interval = 600
+		only_playable = yes
+		potential = {
+			is_incapable = no
+			age = 16
+			religion = joyful
+		}
+		allow = {
+			custom_tooltip = {
+				text = FIVEYEARCD
+				OR = {
+					NOT = { has_character_flag = joyful_etiquette }
+					had_character_flag = {
+						flag = joyful_etiquette
+						years = 5
+					}
+				}
+			}
+			piety = 50
+			scaled_wealth = { value = 0.02 min = 15 max = 200 }
+		}
+		effect = {
+			clr_character_flag = joyful_etiquette
+			set_character_flag = joyful_etiquette
+			piety = -50
+			scaled_wealth = { value = -0.02 min = -15 max = -200 }
+			add_character_modifier = {
+				name = joyful_etiquette_mod
+				years = 3
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.2
+		}
+	}
+
+	joyful_improve_appearance = {
+		ai_check_interval = 600
+		
+		potential = {
+			NOR = {
+				trait = creature_hag
+				trait = groomed
+			}
+			is_incapable = no
+			age = 16
+			religion = joyful
+		}
+		
+		allow = {
+			prestige = 30
+			piety = 50
+			custom_tooltip = {
+				text = ONEYEARCD
+				OR = {
+					NOT = { has_character_flag = joyful_improve_app }
+					had_character_flag = {
+						flag = joyful_improve_app
+						years = 1
+					}
+				}
+			}
+		}
+		
+		effect = {
+			clr_character_flag = joyful_improve_app
+			set_character_flag = joyful_improve_app
+			prestige = -30
+			piety = -50
+			if = {
+				limit = {
+					trait = uncouth
+				}
+				remove_trait = uncouth
+			}
+			else_if = {
+				limit = {
+					NOT = { trait = uncouth }
+				}
+				add_trait = groomed
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.2
+		}
+	}
+
 	abyssal_bind_demon = { # Character
 		only_playable = yes
 		ai_check_interval = 300
@@ -8592,19 +8813,19 @@ title_decisions = {
 		allow = {
 			OR = {
 				conditional_tooltip = {
-					tier = COUNT
+					trigger = { tier = COUNT }
 					FROM = { piety = 50 }
 				}
 				conditional_tooltip = {
-					tier = DUKE
+					trigger = { tier = DUKE }
 					FROM = { piety = 150 }
 				}
 				conditional_tooltip = {
-					tier = KING
+					trigger = { tier = KING }
 					FROM = { piety = 300 }
 				}
 				conditional_tooltip = {
-					tier = EMPEROR
+					trigger = { tier = EMPEROR }
 					FROM = { piety = 500 }
 				}
 			}
