@@ -1,16 +1,73 @@
 decisions = {
 
+	enlightened_schools = {
+		ai_check_interval = 200
+		
+		potential = {
+			age = 16
+			OR = {
+				religion = muhjari
+				religion = pantheist_league
+				religion = ten_thousand_gods
+				religion = qisma
+			}
+			NOR = {
+				trait = moralist
+				trait = ethoist
+				trait = pragmatist
+			}
+			is_inaccessible_trigger = no
+			is_incapable = no
+			prisoner = no
+		}
+		
+		allow = {
+			always = yes
+		}
+		
+		effect = {
+			character_event = { id = generalmisc.31 }
+		}
+		
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 1.5
+				trait = zealous
+			}
+			modifier = {
+				factor = 0.5
+				trait = cynical
+			}
+		}
+		
+	}
+	
 	gender_alteration = {
 		ai_check_interval = 5000
 		only_playable = yes
 		potential = {
 			age = 16
+			prisoner = no
 			is_incapable = no
 			is_inaccessible_trigger = no
 			OR = {
 				religion = joyful
 				religion = elven_pantheon
+				religion = yuir
+				religion = yuir_reformed
+				AND = {
+					trait = patron_najm
+					NOR = {
+						religion = pantheist_league
+						has_character_modifier = syncretic_pantheist
+					}
+				}
+				trait = patron_leira
+				trait = patron_mask
+				trait = patron_grazzt
 			}
+			NOT = { trait = creature_hag }
 			OR = {
 				ai = no
 				AND = {
@@ -18,6 +75,7 @@ decisions = {
 					has_children = no
 				}
 			}
+			is_pregnant = no
 		}
 		allow = {
 			custom_tooltip = {
@@ -43,15 +101,59 @@ decisions = {
 			OR = {
 				conditional_tooltip = {
 					trigger = {
-						trait = androgynous
+						OR = {
+							trait = androgynous
+							trait = creature_celestial
+							trait = creature_fiend
+							trait = creature_genie
+							trait = creature_construct
+							trait = avatar
+						}
+						NOT = { trait = proud }
 					}
 					piety = 30
 				}
 				conditional_tooltip = {
 					trigger = {
-						NOT = { trait = androgynous }
+						OR = {
+							trait = androgynous
+							trait = creature_celestial
+							trait = creature_fiend
+							trait = creature_genie
+							trait = creature_construct
+							trait = avatar
+						}
+						trait = proud
+					}
+					piety = 70
+				}
+				conditional_tooltip = {
+					trigger = {
+						NOR = {
+							trait = androgynous
+							trait = creature_celestial
+							trait = creature_fiend
+							trait = creature_genie
+							trait = creature_construct
+							trait = avatar
+						}
+						NOT = { trait = proud }
 					}
 					piety = 150
+				}
+				conditional_tooltip = {
+					trigger = {
+						NOR = {
+							trait = androgynous
+							trait = creature_celestial
+							trait = creature_fiend
+							trait = creature_genie
+							trait = creature_construct
+							trait = avatar
+						}
+						trait = proud
+					}
+					piety = 250
 				}
 			}
 		}
@@ -62,14 +164,49 @@ decisions = {
 			set_gender = opposite
 			if = {
 				limit = {
-					trait = androgynous
+					OR = {
+						trait = androgynous
+						trait = creature_celestial
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_construct
+						trait = avatar
+					}
+					NOT = { trait = proud }
 				}
 				piety = -30
 			}
-			else = {
+			else_if = {
+				limit = {
+					OR = {
+						trait = androgynous
+						trait = creature_celestial
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_construct
+						trait = avatar
+					}
+					trait = proud
+				}
+				piety = -70
+			}
+			else_if = {
+				limit = {
+					NOR = {
+						trait = androgynous
+						trait = creature_celestial
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_construct
+						trait = avatar
+					}
+					NOT = { trait = proud }
+				}
 				piety = -150
 			}
-			else
+			else = {
+				piety = -250
+			}
 			if = {
 				limit = {
 					NOR = {
@@ -128,6 +265,14 @@ decisions = {
 				factor = 1.2
 				trait = creature_elf
 			}
+			modifier = {
+				factor = 0.3
+				trait = proud
+			}
+			modifier = {
+				factor = 1.2
+				trait = arbitrary
+			}
 		}
 	}
 
@@ -138,6 +283,8 @@ decisions = {
 			is_incapable = no
 			age = 16
 			religion = joyful
+			prisoner = no
+			is_inaccessible_trigger = no
 		}
 		allow = {
 			custom_tooltip = {
@@ -180,6 +327,8 @@ decisions = {
 			is_incapable = no
 			age = 16
 			religion = joyful
+			prisoner = no
+			is_inaccessible_trigger = no
 		}
 		
 		allow = {
@@ -495,7 +644,10 @@ decisions = {
 		
 		potential = {
 			is_adult = yes
-			religion = illithid_pantheon
+			OR = {
+				religion = illithid_pantheon
+				has_character_modifier = syncretic_illithid
+			}
 			NOR = {
 				trait = psi_potential
 				trait = creature_illithid
@@ -590,8 +742,13 @@ decisions = {
 			OR = {
 				religion = triadic
 				religion = mercantile
-				religion = ten_thousand_gods
-				religion = muhjari
+				AND = {
+					religion = muhjari
+					OR = {
+						has_character_modifier = syncretic_triadic
+						has_character_modifier = syncretic_mercantile
+					}
+				}
 			}
 		}
 
@@ -2557,7 +2714,10 @@ decisions = {
 				#religion = kahin
 				religion = qisma
 				religion = pantheist_league
-				religion = muhjari
+				AND = {
+					religion = muhjari
+					has_character_flag = syncretism
+				}
 				religion = adama
 				religion = elven_pantheon
 				religion = dwarven_pantheon
@@ -2576,198 +2736,264 @@ decisions = {
 		effect = {
 			if = {
 				limit = {
-					religion = calishite_faith
+					OR = {
+						religion = calishite_faith
+						has_character_modifier = syncretic_calishite
+					}
 				}
 				character_event = { id = PATRONS_FAE_CF.1 }
 			}
 			else_if = {
 				limit = {
-					religion = triadic
+					OR = {
+						religion = triadic
+						has_character_modifier = syncretic_triadic
+					}
 				}
 				character_event = { id = PATRONS_FAE_TRIAD.1 }
 			}
 			else_if = {
 				limit = {
-					religion = arcane
+					OR = {
+						religion = arcane
+						has_character_modifier = syncretic_arcane
+					}
 				}
 				character_event = { id = PATRONS_FAE_ARCANE.1 }
 			}
 			else_if = {
 				limit = {
-					religion = rasallesian
+					OR = {
+						religion = rasallesian
+						has_character_modifier = syncretic_rashemen
+					}
 				}
 				character_event = { id = PATRONS_FAE_RAS.1 }
 			}
 			else_if = {
 				limit = {
-					religion = chessic
+					OR = {
+						religion = chessic
+						has_character_modifier = syncretic_chessic
+					}
 				}
 				character_event = { id = PATRONS_FAE_CHESSIC.1 }
 			}
 			else_if = {
 				limit = {
-					religion = mercantile
+					OR = {
+						religion = mercantile
+						has_character_modifier = syncretic_mercantile
+					}
 				}
 				character_event = { id = PATRONS_FAE_MERC.1 }
 			}
 			else_if = {
 				limit = {
-					religion = inventive
+					OR = {
+						religion = inventive
+						has_character_modifier = syncretic_inventive
+					}
 				}
 				character_event = { id = PATRONS_FAE_INVENT.1 }
 			}
 			else_if = {
 				limit = {
-					religion = joyful
+					OR = {
+						religion = joyful
+						has_character_modifier = syncretic_joyful
+					}
 				}
 				character_event = { id = PATRONS_FAE_JOY.1 }
 			}
 			else_if = {
 				limit = {
-					religion = solar
+					OR = {
+						religion = solar
+						has_character_modifier = syncretic_solar
+					}
 				}
 				character_event = { id = PATRONS_FAE_SOLAR.1 }
 			}
 			else_if = {
 				limit = {
-					religion = lapal_faith
+					OR = {
+						religion = lapal_faith
+						has_character_modifier = syncretic_lapal
+					}
 				}
 				character_event = { id = PATRONS_FAE_LAPAL.1 }
 			}
 			else_if = {
 				limit = {
-					religion = untheric_faith
+					OR = {
+						religion = untheric_faith
+						has_character_modifier = syncretic_untheric
+					}
 				}
 				character_event = { id = PATRONS_FAE_UNTH.1 }
 			}
 			else_if = {
 				limit = {
-					religion = mulhorandi_faith
+					OR = {
+						religion = mulhorandi_faith
+						has_character_modifier = syncretic_mulhorandi
+					}
 				}
 				character_event = { id = PATRONS_FAE_MUL.1 }
 			}
 			else_if = {
 				limit = {
-					religion = halfling_pantheon
+					OR = {
+						religion = halfling_pantheon
+						has_character_modifier = syncretic_halfling
+					}
 				}
 				character_event = { id = PATRONS_FAE_HALF.1 }
 			}
 			else_if = {
 				limit = {
-					religion = dead_three
+					OR = {
+						religion = dead_three
+						has_character_modifier = syncretic_deadthree
+					}
 				}
 				character_event = { id = PATRONS_FAE_DEAD.1 }
 			}
 			else_if = {
 				limit = {
-					religion = shadow_gods
+					OR = {
+						religion = shadow_gods
+						has_character_modifier = syncretic_shadow
+					}
 				}
 				character_event = { id = PATRONS_FAE_SHADOW.1 }
 			}
 			else_if = {
 				limit = {
-					religion = abyssal_cult
+					OR = {
+						religion = abyssal_cult
+						has_character_modifier = syncretic_abyssal
+					}
 				}
 				character_event = { id = PATRONS_FAE_ABYSS.1 }
 			}
 			else_if = {
 				limit = {
-					religion = scale_cult
+					OR = {
+						religion = scale_cult
+						has_character_modifier = syncretic_scale
+					}
 				}
 				character_event = { id = PATRONS_FAE_SCALE.1 }
 			}
 			else_if = {
 				limit = {
-					religion = deities_of_fury
+					OR = {
+						religion = deities_of_fury
+						has_character_modifier = syncretic_fury
+					}
 				}
 				character_event = { id = PATRONS_FAE_DOF.1 }
 			}
 			else_if = {
 				limit = {
-					religion = tuigan_shamanism
+					OR = {
+						religion = tuigan_shamanism
+						has_character_modifier = syncretic_tuigan
+					}
 				}
 				character_event = { id = PATRONS_FAE_TUI.1 }
 			}
 			else_if = {
 				limit = {
-					religion = natural
+					OR = {
+						religion = natural
+						has_character_modifier = syncretic_natural
+					}
 				}
 				character_event = { id = PATRONS_FAE_NATURAL.1 }
 			}
 			else_if = {
 				limit = {
-					religion = primordial
+					OR = {
+						religion = primordial
+						has_character_modifier = syncretic_primordial
+					}
 				}
 				character_event = { id = PATRONS_FAE_PRIMO.1 }
 			}
 			else_if = {
 				limit = {
-					religion = martial_faith
+					OR = {
+						religion = martial_faith
+						has_character_modifier = syncretic_martial
+					}
 				}
 				character_event = { id = PATRONS_FAE_MARTIAL.1 }
 			}
 			else_if = {
 				limit = {
 					OR = {
-						religion = ten_thousand_gods
-						religion = kahin
 						religion = qisma
 						religion = pantheist_league
-						religion = muhjari
+						has_character_modifier = syncretic_qisma
+						has_character_modifier = syncretic_pantheist
 					}
 				}
 				character_event = { id = PATRONS_FAE_ZAKH.1 }
 			}
 			else_if = {
 				limit = {
-					religion = adama
+					OR = {
+						religion = adama
+						has_character_modifier = syncretic_adama
+					}
 				}
 				character_event = { id = PATRONS_FAE_ADAMA.1 }
 			}
 			else_if = {
 				limit = {
-					religion = elven_pantheon
+					OR = {
+						religion = elven_pantheon
+						has_character_modifier = syncretic_elf
+					}
 				}
 				character_event = { id = PATRONS_FAE_ELF.1 }
 			}
 			else_if = {
 				limit = {
-					religion = dwarven_pantheon
+					OR = {
+						religion = dwarven_pantheon
+						has_character_modifier = syncretic_dwarf
+					}
 				}
 				character_event = { id = PATRONS_FAE_DWARF.1 }
 			}
 			else_if = {
 				limit = {
-					religion = gnome_pantheon
+					OR = {
+						religion = gnome_pantheon
+						has_character_modifier = syncretic_gnome
+					}
 				}
 				character_event = { id = PATRONS_FAE_GNOME.1 }
 			}
 			else_if = {
 				limit = {
-					orc_religion_trigger = yes
-				}
-				character_event = { id = PATRONS_FAE_ORC.1 }
-			}
-			#else_if = {
-			#	limit = {
-			#		religion = draconic_pantheon
-			#	}
-			#	character_event = { id = PATRONS_FAE_DRAGON.1 }
-			#}
-			else_if = {
-				limit = {
 					OR = {
-						religion = ulutiuan
-						religion = ulutiuan_reformed
+						orc_religion_trigger = yes
+						has_character_modifier = syncretic_orc
 					}
 				}
-				character_event = { id = PATRONS_FAE_ULU.1 }
+				character_event = { id = PATRONS_FAE_ORC.1 }
 			}
 			else_if = {
 				limit = {
 					OR = {
 						religion = yuir
 						religion = yuir_reformed
+						has_character_modifier = syncretic_yuir
 					}
 				}
 				character_event = { id = PATRONS_FAE_YUIR.1 }
@@ -2777,6 +3003,7 @@ decisions = {
 					OR = {
 						religion = toteteohuan
 						religion = toteteohuan_reformed
+						has_character_modifier = syncretic_maztica
 					}
 				}
 				character_event = { id = PATRONS_FAE_MAZTICA.1 }
@@ -5608,7 +5835,10 @@ decisions = {
 			is_playable = yes
 			has_character_flag = mound_burial
 			NOT = { has_character_flag = performed_mound_burial }
-			uthgardt_faith_trigger = yes
+			OR = {
+				uthgardt_faith_trigger = yes
+				has_character_modifier = syncretic_uthgardt
+			}
 		}
 		allow = {
 			is_adult = yes
@@ -5647,7 +5877,10 @@ decisions = {
 		potential = {
 			not_casting = yes
 			reforming_gov = yes
-			uthgardt_faith_trigger = yes
+			OR = {
+				uthgardt_faith_trigger = yes
+				has_character_modifier = syncretic_uthgardt
+			}
 			is_adult = yes
 			prisoner = no
 			NOT = { trait = incapable }
@@ -5706,7 +5939,10 @@ decisions = {
 		potential = {
 			not_casting = yes
 			reforming_gov = yes
-			uthgardt_faith_trigger = yes
+			OR = {
+				uthgardt_faith_trigger = yes
+				has_character_modifier = syncretic_uthgardt
+			}
 			is_adult = yes
 			prisoner = no
 			NOT = { trait = incapable }
@@ -8100,12 +8336,68 @@ targeted_decisions = {
 
 settlement_decisions = {
 	
+	muhjari_cultivate_gardens = {
+		only_playable = yes
+		ai_check_interval = 500
+		
+		from_potential = {
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				holder_scope = {
+					character = FROM
+				}
+			}
+		}
+		
+		allow = {
+			FROM = {
+				piety = 50
+				scaled_wealth = 0.08
+			}
+			location = {
+				NOT = {
+					has_province_modifier = muhjari_gardens
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				piety = -50
+				scaled_wealth = -0.08
+			}
+			location = {
+				add_province_modifier = {
+					name = muhjari_gardens
+					years = 10
+				}
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.2
+			modifier = {
+				factor = 4
+				trait = gardener
+			}
+		}
+	}
+	
 	ilsensine_force_efficiency = {
 		only_rulers = yes
 		ai_check_interval = 300
 		
 		from_potential = {
-			religion = illithid_pantheon
+			OR = {
+				religion = illithid_pantheon
+				has_character_modifier = syncretic_illithid
+			}
 			is_incapable = no
 			prisoner = no
 			age = 16
@@ -8181,7 +8473,10 @@ settlement_decisions = {
 		ai_check_interval = 300
 		
 		from_potential = {
-			religion = illithid_pantheon
+			OR = {
+				religion = illithid_pantheon
+				has_character_modifier = syncretic_illithid
+			}
 			is_incapable = no
 			prisoner = no
 			age = 16
@@ -8772,6 +9067,2466 @@ settlement_decisions = {
 }
 
 title_decisions = {
+
+	muhjari_syncretise_triadic = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = triadic
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_triadic
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_10k = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = ten_thousand_gods
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_10k
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_abyssal = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = abyssal_cult
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_abyssal
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_ancestral = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = ancestral_cult
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_ancestral
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_arcane = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = arcane
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_arcane
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_asathalfinare = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = asathalfinare
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_asathalfinare
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_bahamut = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = bahamut
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_bahamut
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_beholder = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = beholder_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_beholder
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_blue_flame = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = blue_flame
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_blue_flame
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_chauntea = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = chauntean_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_chauntea
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_cyric = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = church_of_cyric
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_cyric
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_draconic = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = draconic_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_draconic
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_dwarf = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = dwarven_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_dwarf
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_earthmother = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = earthmother
+					religion = earthmother_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_earthmother
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_eilistraee = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = eilistraee
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_eilistraee
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_elf = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = elven_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_elf
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_enlil = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = enlil
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_enlil
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_entropy = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = entropy
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_entropy
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_faceless = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = faceless_god
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_faceless
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_geomancy = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = geomancy
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_geomancy
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_ghaunadaur = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = ghaunadaur
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_ghaunadaur
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_giant = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = giant_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_giant
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_gnome = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = gnome_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_gnome
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_goblin = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				goblin_religion_trigger = yes
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_goblin
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_halfling = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = halfling_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_halfling
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_illithid = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = illithid_pantheon
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_illithid
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_infernal = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = infernal
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_infernal
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_jaziri = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = jaziri
+					religion = jaziri_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_10k
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_kahin = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = kahin
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_kahin
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_karontor = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = karontor
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_karontor
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_kiaransalee = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = kiaransalee
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_kiaransalee
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_kossuth = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = kossuth
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_kossuth
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_laduguer = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = laduguer
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_laduguer
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_lolth = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = lolth_cult
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_lolth
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_loviatar = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = loviatar
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_loviatar
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_maztica = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = toteteohuan
+					religion = toteteohuan_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_maztica
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_nogari = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = nogari
+					religion = nogari_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_nogari
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_orc = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				orc_religion_trigger = yes
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_orc
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_pantheist = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = pantheist_league
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_pantheist
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_qisma = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = qisma
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_qisma
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_sylvan = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = sylvan
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_sylvan
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_thasmudyanic = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = thasmudyanic
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_thasmudyanic
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_tiamat = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = tiamat
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_tiamat
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_ubtao = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = ubtao_worship
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_ubtao
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_ulutiuan = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = ulutiuan
+					religion = ulutiuan_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_ulutiuan
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_uthgardt = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				uthgardt_faith_trigger = yes
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_uthgardt
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_vaprak = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = vaprak
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_vaprak
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_vhaeraun = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = vhaeraun
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_vhaeraun
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_yuir = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				OR = {
+					religion = yuir
+					religion = yuir_reformed
+				}
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_yuir
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_rashemen = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = rasallesian
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_rashemen
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_chessic = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = chessic
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_chessic
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_mercantile = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = mercantile
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_mercantile
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_inventive = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = inventive
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_inventive
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_joyful = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = joyful
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_joyful
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_calishite = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = calishite_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_calishite
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_lapal = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = lapal_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_lapal
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_mulhorandi = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = mulhorandi_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_mulhorandi
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_untheric = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = untheric_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_untheric
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_solar = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = solar
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_solar
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_fury = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = deities_of_fury
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_fury
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_natural = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = natural
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_natural
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_primordial = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = primordial
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_primordial
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_tuigan = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = tuigan_shamanism
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_tuigan
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_martial = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = martial_faith
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_martial
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_deadthree = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = dead_three
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_deadthree
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_shadow = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = shadow_gods
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_shadow
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_scale = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = scale_cult
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_scale
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_padhran = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = padhran
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_padhran
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_shou = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = the_path
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_shou
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_chung = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = chung_tao
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_chung
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_9t = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = nine_travelers
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_9t
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_adama = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = adama
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_adama
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_animist = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = animist
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_animist
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	muhjari_syncretise_qukoku = {
+		ai_check_interval = 1000
+		only_playable = yes
+		filter = sub_realm_owned
+		ai_target_filter = sub_realm_owned
+		
+		from_potential = {
+			muhjari_has_syncretism = no
+			religion = muhjari
+			is_incapable = no
+			is_inaccessible_trigger = no
+			age = 16
+			prisoner = no
+		}
+		
+		potential = {
+			location = {
+				religion = qukoku
+			}
+		}
+		
+		effect = {
+			add_character_modifier = {
+				name = syncretic_qukoku
+				duration = -1
+			}
+		}
+		
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
 
 	orc_claim = {
 		ai_check_interval = 300
