@@ -554,11 +554,11 @@ character_event = {
 										culture = lightfoot
 										set_graphical_culture = lightfoot
 									}
-									10 = {
+									15 = {
 										culture = strongheart
 										set_graphical_culture = strongheart
 									}
-									10 = {
+									5 = {
 										culture = ghostwise
 										set_graphical_culture = ghostwise
 									}
@@ -823,6 +823,12 @@ character_event = {
 							5 = { add_trait = expert_wizard }
 							5 = { add_trait = expert_warlock add_trait = warlock_elemental }
 							5 = { add_trait = expert_psion add_trait = psi_potential }
+						}
+						random_list = { # nickname
+							20 = {}
+							5 = { give_nickname = nick_the_sword_from_space }
+							5 = { give_nickname = nick_the_falling_star }
+							5 = { give_nickname = nick_the_avenger }
 						}
 						character_event = { id = frxp.1 }
 						character_event = { id = ALWAR.3 }
@@ -1376,10 +1382,12 @@ character_event = {
 					12854 = {
 						set_global_flag = dispater_spawned
 						set_graphical_culture = cambion
+						give_nickname = nick_the_iron_duke
 					}
 					12856 = {
 						set_global_flag = mammon_spawned
 						set_graphical_culture = yugoloth
+						give_nickname = nick_the_lord_of_avarice
 					}
 					12857 = {
 						if = {
@@ -1388,23 +1396,28 @@ character_event = {
 							}
 							set_graphical_culture = succubus
 							set_global_flag = fierna_spawned
+							give_nickname = nick_the_fiery_lady
 						}
 						else = {
 							set_graphical_culture = cambion
 							set_global_flag = belial_spawned
+							give_nickname = nick_the_lord_of_pain
 						}
 					}
 					12858 = {
 						set_global_flag = baalzebul_spawned
 						set_graphical_culture = nalfeshnee
+						give_nickname = nick_lord_of_the_flies
 					}
 					12862 = {
 						set_global_flag = geryon_spawned
 						set_graphical_culture = lamia
+						give_nickname = nick_the_trifold_duke
 					}
 					12855 = {
 						set_global_flag = demogorgon_spawned
 						set_graphical_culture = nalfeshnee
+						give_nickname = nick_the_sibilant_beast
 					}
 					12859 = {
 						set_global_flag = orcus_spawned
@@ -1419,18 +1432,22 @@ character_event = {
 					12860 = {
 						set_global_flag = pazuzu_spawned
 						set_graphical_culture = aarakocra
+						give_nickname = nick_daotfw
 					}
 					12861 = {
 						set_global_flag = yeenoghu_spawned
 						set_graphical_culture = gnoll
+						give_nickname = nick_ruler_of_ruin
 					}
 					12863 = {
 						set_global_flag = baphomet_spawned
 						set_graphical_culture = minotaur
+						give_nickname = nick_the_horned_king
 					}
 					12851 = {
 						set_global_flag = mephistopheles_spawned
 						set_graphical_culture = baatezu
+						give_nickname = nick_duke_of_brimstone
 					}
 				}
 			}
@@ -1825,20 +1842,40 @@ narrative_event = {
 	major = yes
 
 	picture = { #angel
-		trigger = { event_target:invader_char = { culture = angel } }
+		trigger = { 
+			event_target:invader_char = { culture = angel } 
+			NOT = { event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor } }
+		}
 		picture = GFX_evt_angels_2
 	}
 	picture = { #tanarri
-		trigger = { event_target:invader_char = { culture = tanarri } }
+		trigger = { 
+			event_target:invader_char = { culture = tanarri } 
+			NOT = { event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor } }
+		}
 		picture = GFX_evt_demons_1
 	}
 	picture = { #baatezu
-		trigger = { event_target:invader_char = { culture = baatezu } }
+		trigger = { 
+			event_target:invader_char = { culture = baatezu } 
+			NOT = { event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor } }
+		}
 		picture = GFX_evt_devils_1
 	}
 	picture = { #scro
 		trigger = { event_target:invader_char = { culture = scro } }
 		picture = GFX_evt_orcs
+	}
+	picture = { # giants in grey
+		trigger = {
+			OR = {
+				event_target:invader_char = { culture = angel }
+				event_target:invader_char = { culture = tanarri }
+				event_target:invader_char = { culture = baatezu }
+			}
+			event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor }
+		}
+		picture = GFX_evt_giants_in_grey
 	}
 	picture = { #mortal crusader, update trigger when more invaders are added
 		trigger = {
@@ -1867,26 +1904,12 @@ narrative_event = {
 		}
 		text = EVTDESC_ALWAR_4_1
 	}
-	desc = { #angel in shou
-		trigger = {
-			event_target:invader_char = { culture = angel }
-			event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor }
-		}
-		text = EVTDESC_ALWAR_4_1_SHOU
-	}
 	desc = { #tanarri
 		trigger = {
 			event_target:invader_char = { culture = tanarri }
 			NOT = { event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor } }
 		}
 		text = EVTDESC_ALWAR_4_2
-	}
-	desc = { #tanarri in shou
-		trigger = {
-			event_target:invader_char = { culture = tanarri }
-			event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor }
-		}
-		text = EVTDESC_ALWAR_4_2_SHOU
 	}
 	desc = { #baatezu
 		trigger = {
@@ -1895,12 +1918,16 @@ narrative_event = {
 		}
 		text = EVTDESC_ALWAR_4_3
 	}
-	desc = { #baatezu in shou
+	desc = { # giants in grey, for all outsider attacks on Shou Lung
 		trigger = {
-			event_target:invader_char = { culture = baatezu }
+			OR = {
+				event_target:invader_char = { culture = angel }
+				event_target:invader_char = { culture = tanarri }
+				event_target:invader_char = { culture = baatezu }
+			}
 			event_target:target_ruler = { has_landed_title = e_shou_lung_west_governor }
 		}
-		text = EVTDESC_ALWAR_4_3_SHOU
+		text = EVTDESC_ALWAR_4_1_SHOU
 	}
 	desc = { #scro
 		trigger = { event_target:invader_char = { culture = scro } }
