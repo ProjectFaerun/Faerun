@@ -846,6 +846,7 @@ character_event = {
 					AND = {
 						event_target:target_ruler = { is_evil_religion = yes }
 						NOT = { event_target:target_ruler = { religion = abyssal_cult } }
+						NOT = { event_target:target_ruler = { culture = tanarri } }
 					}
 					factor = 0
 				}
@@ -1291,6 +1292,7 @@ character_event = {
 							age = 1370
 							immortal_age = 30
 							flag = ai_flag_refuse_conversion
+							flag = is_mephisto
 						}
 						new_character = {
 							wealth = 1000
@@ -1313,6 +1315,7 @@ character_event = {
 					AND = {
 						event_target:target_ruler = { is_evil_religion = yes }
 						NOT = { event_target:target_ruler = { religion = infernal } }
+						NOT = { event_target:target_ruler = { culture = baatezu } }
 					}
 					factor = 0
 				}			
@@ -1465,6 +1468,7 @@ character_event = {
 							age = 1370
 							immortal_age = 30
 							flag = ai_flag_refuse_conversion
+							flag = is_grazzt
 						}
 						new_character = {
 							wealth = 1000
@@ -1689,6 +1693,107 @@ character_event = {
 					}
 				}
 			}
+			# gehreleths
+			2 = {
+				modifier = {
+					AND = {
+						event_target:target_ruler = { is_evil_religion = yes }
+						NOT = { event_target:target_ruler = { culture = yugoloth } }
+						NOT = { event_target:target_ruler = { has_character_flag = is_grazzt } }
+					}
+					factor = 0
+				}
+				random_list = {
+					10 = { #Adimarchus
+						modifier = { has_global_flag = adimarchus_spawned factor = 0 }
+						modifier = { event_target:target_ruler = { has_character_flag = is_grazzt } factor = 20 } # Just itching for a rematch
+						create_character = {
+							random_traits = no
+							name = "Adimarchus"
+							dynasty = 12867 # of Occipitus
+							culture = gehreleth
+							religion = entropy
+							attributes = {
+								learning = 13
+								intrigue = 13
+								martial = 13
+								diplomacy = 6
+								stewardship = 10
+							}
+							trait = creature_fiend
+							trait = greater_fiend
+							trait = archfiend
+							trait = strong
+							trait = genius
+							trait = lunatic
+							trait = envious
+							trait = paranoid
+							trait = arbitrary
+							trait = deceitful
+							trait = cruel
+							trait = renowned_wizard
+							trait = wiz_necromancy
+							trait = master_paladin
+							trait = mastermind_theologian
+							trait = aggressive_leader
+							trait = one_eyed
+							age = 1370
+							immortal_age = 30
+							flag = ai_flag_refuse_conversion
+						}
+						new_character = {
+							wealth = 1000
+							save_event_target_as = invader_char
+							character_event = { id = frxp.1 }
+							character_event = { id = ALWAR.3 }
+							set_character_flag = chaotic_invader
+							create_bloodline = {
+								type = demon_lord_bloodline
+							}
+							set_global_flag = adimarchus_spawned
+							set_graphical_culture = planetar
+							give_nickname = nick_the_demon_prince_of_madness
+						}
+					}
+					25 = { # Generic
+						create_character = {
+							random_traits = no
+							culture = gehreleth
+							religion = shadow_gods
+							attributes = {
+								learning = 10
+								intrigue = 10
+								martial = 12
+								diplomacy = 10
+								stewardship = 8
+							}
+							trait = creature_fiend
+							trait = greater_fiend
+							trait = strong
+							trait = wroth
+							trait = ambitious
+							trait = arbitrary
+							trait = gluttonous
+							trait = cruel
+							trait = master_barbarian
+							trait = master_sorcerer
+							trait = brilliant_strategist
+							trait = impaler
+							trait = aggressive_leader
+							age = 1370
+							immortal_age = 30
+							flag = ai_flag_refuse_conversion
+						}
+						new_character = {
+							wealth = 1000
+							save_event_target_as = invader_char
+							character_event = { id = frxp.1 }
+							character_event = { id = ALWAR.3 }
+							set_character_flag = chaotic_invader
+						}
+					}
+				}
+			}			
 		}
 	}
 }
@@ -2081,9 +2186,16 @@ narrative_event = {
 
 	picture = { #angel
 		trigger = {
-			event_target:invader_char = { culture = angel }
+			event_target:invader_char = { culture_group = angelic_group }
 			event_target:target_ruler = {
 				NOR = {
+					capital_scope = {
+						OR = {
+							region = shou_lung_region
+							region = katakoro_plateau_region
+							region = ama_region
+						}
+					}
 					has_landed_title = e_shou_lung_west_governor
 					primary_title = {
 						has_title_flag = pretender_shou_lung_empire
@@ -2095,9 +2207,19 @@ narrative_event = {
 	}
 	picture = { #tanarri
 		trigger = {
-			event_target:invader_char = { culture = tanarri }
+			OR = {
+				event_target:invader_char = { culture = tanarri }
+				event_target:invader_char = { culture = gehreleth }
+			}
 			event_target:target_ruler = {
 				NOR = {
+					capital_scope = {
+						OR = {
+							region = shou_lung_region
+							region = katakoro_plateau_region
+							region = ama_region
+						}
+					}
 					has_landed_title = e_shou_lung_west_governor
 					primary_title = {
 						has_title_flag = pretender_shou_lung_empire
@@ -2112,6 +2234,13 @@ narrative_event = {
 			event_target:invader_char = { culture = baatezu }
 			event_target:target_ruler = {
 				NOR = {
+					capital_scope = {
+						OR = {
+							region = shou_lung_region
+							region = katakoro_plateau_region
+							region = ama_region
+						}
+					}				
 					has_landed_title = e_shou_lung_west_governor
 					primary_title = {
 						has_title_flag = pretender_shou_lung_empire
@@ -2128,12 +2257,18 @@ narrative_event = {
 	picture = { # giants in grey
 		trigger = {
 			OR = {
-				event_target:invader_char = { culture = angel }
-				event_target:invader_char = { culture = tanarri }
-				event_target:invader_char = { culture = baatezu }
+				event_target:invader_char = { culture_group = celestial_group }
+				event_target:invader_char = { culture_group = fiendish_group }
 			}
 			event_target:target_ruler = {
 				OR = {
+					capital_scope = {
+						OR = {
+							region = shou_lung_region
+							region = katakoro_plateau_region
+							region = ama_region
+						}
+					}				
 					has_landed_title = e_shou_lung_west_governor
 					primary_title = {
 						has_title_flag = pretender_shou_lung_empire
@@ -2147,9 +2282,8 @@ narrative_event = {
 		trigger = {
 			event_target:invader_char = {
 				NOR = {
-					culture = angel
-					culture = tanarri
-					culture = baatezu
+					culture_group = angelic_group
+					culture_group = fiendish_group
 					culture = scro
 				}
 			}
@@ -2186,7 +2320,10 @@ narrative_event = {
 	}
 	desc = { #tanarri
 		trigger = {
-			event_target:invader_char = { culture = tanarri }
+			OR = {
+				event_target:invader_char = { culture = tanarri }
+				event_target:invader_char = { culture = gehreleth }
+			}
 			event_target:target_ruler = {
 				NOR = {
 					capital_scope = {
@@ -2230,8 +2367,7 @@ narrative_event = {
 		trigger = {
 			OR = {
 				event_target:invader_char = { culture_group = celestial_group }
-				event_target:invader_char = { culture = tanarri }
-				event_target:invader_char = { culture = baatezu }
+				event_target:invader_char = { culture_group = fiendish_group }
 			}
 			event_target:target_ruler = {
 				OR = {
