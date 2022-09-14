@@ -3513,7 +3513,7 @@ narrative_event = {
 
 	option = {
 		name = EVTOPTA_ALWAR_4
-		narrative_event = { id = ALWAR.5 days = 120 random = 30 }
+		narrative_event = { id = ALWAR.5 days = 150 random = 150 }
 	}
 }
 #fifth event: war is declared on target. Both invader and target make their automatic call to arms.
@@ -3668,6 +3668,8 @@ character_event = {
 	id = ALWAR.10
 	desc = EVTDESC_ALWAR_10
 	picture = GFX_evt_large_army
+	portrait = event_target:invader_char
+	hide_new = yes
 
 	is_triggered_only = yes
 
@@ -3683,100 +3685,102 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_ALWAR_10
-		any_independent_ruler = {
-			if = {
-				limit = {
-					ROOT = {
+		hidden_tooltip = {
+			any_independent_ruler = {
+				if = {
+					limit = {
+						ROOT = {
+							olrox_is_good_religion_trigger = yes
+						}
+						distance_from_realm = {
+							who = event_target:target_ruler
+							value < 500
+						}
+						NOR = {
+							has_character_modifier = refused_align_war
+							war_with = ROOT
+							war_with = event_target:target_ruler
+							mercenary = yes
+							holy_order = yes
+						}
+						is_landed = yes
 						olrox_is_good_religion_trigger = yes
 					}
-					distance_from_realm = {
-						who = event_target:target_ruler
-						value < 500
+					letter_event = {
+						id = ALWAR.11
+						days = 7
+						random = 21
+						tooltip = EVTTOOLTIP100161
 					}
-					NOR = {
-						has_character_modifier = refused_align_war
-						war_with = ROOT
-						war_with = event_target:target_ruler
-						mercenary = yes
-						holy_order = yes
-					}
-					is_landed = yes
-					olrox_is_good_religion_trigger = yes
 				}
-				letter_event = {
-					id = ALWAR.11
-					days = 7
-					random = 21
-					tooltip = EVTTOOLTIP100161
-				}
-			}
-			else_if = {
-				limit = {
-					ROOT = {
+				else_if = {
+					limit = {
+						ROOT = {
+							is_evil_religion = no
+							olrox_is_good_religion_trigger = no
+						}
+						distance_from_realm = {
+							who = event_target:target_ruler
+							value < 500
+						}
+						NOR = {
+							has_character_modifier = refused_align_war
+							war_with = ROOT
+							war_with = event_target:target_ruler
+							mercenary = yes
+							holy_order = yes
+						}
+						is_landed = yes
 						is_evil_religion = no
-						olrox_is_good_religion_trigger = no
+						religion_group = ROOT
 					}
-					distance_from_realm = {
-						who = event_target:target_ruler
-						value < 500
+					letter_event = {
+						id = ALWAR.11
+						days = 7
+						random = 21
+						tooltip = EVTTOOLTIP100161
 					}
-					NOR = {
-						has_character_modifier = refused_align_war
-						war_with = ROOT
-						war_with = event_target:target_ruler
-						mercenary = yes
-						holy_order = yes
-					}
-					is_landed = yes
-					is_evil_religion = no
-					religion_group = ROOT
 				}
-				letter_event = {
-					id = ALWAR.11
-					days = 7
-					random = 21
-					tooltip = EVTTOOLTIP100161
-				}
-			}
-			else_if = {
-				limit = {
-					ROOT = {
+				else_if = {
+					limit = {
+						ROOT = {
+							is_evil_religion = yes
+						}
+						distance_from_realm = {
+							who = event_target:target_ruler
+							value < 500
+						}
+						NOR = {
+							has_character_modifier = refused_align_war
+							war_with = ROOT
+							war_with = event_target:target_ruler
+							mercenary = yes
+							holy_order = yes
+						}
+						is_landed = yes
 						is_evil_religion = yes
+						religion = ROOT
 					}
-					distance_from_realm = {
-						who = event_target:target_ruler
-						value < 500
+					letter_event = {
+						id = ALWAR.11
+						days = 7
+						random = 21
+						tooltip = EVTTOOLTIP100161
 					}
-					NOR = {
-						has_character_modifier = refused_align_war
-						war_with = ROOT
-						war_with = event_target:target_ruler
-						mercenary = yes
-						holy_order = yes
-					}
-					is_landed = yes
-					is_evil_religion = yes
-					religion = ROOT
-				}
-				letter_event = {
-					id = ALWAR.11
-					days = 7
-					random = 21
-					tooltip = EVTTOOLTIP100161
 				}
 			}
-		}
-		any_current_enemy = { #try to white peace with other enemies
-			if = {
-				limit = {
-					NOT = { has_character_flag = duchy_adventurer }
-					ROOT = {
-						NOT = { character = event_target:invader_char }
+			any_current_enemy = { #try to white peace with other enemies
+				if = {
+					limit = {
+						NOT = { has_character_flag = duchy_adventurer }
+						ROOT = {
+							NOT = { character = event_target:invader_char }
+						}
 					}
-				}
-				letter_event = {
-					id = ALWAR.12
-					days = 5
+					letter_event = {
+						id = ALWAR.12
+						days = 5
+					}
 				}
 			}
 		}
@@ -3787,7 +3791,11 @@ character_event = {
 		ai_chance = {
 			factor = 0
 		}
-		prestige = 30
+		scaled_prestige = {
+			value = 0.5
+			min = 50
+			max = 250
+		}
 		character_event = { id = ALWAR.10 months = 12 } #repeat event if great_align_conflict ongoing
 	}
 }
@@ -3795,6 +3803,8 @@ character_event = {
 letter_event = {
 	id = ALWAR.11
 	desc = EVTDESC_ALWAR_11
+	portrait = event_target:invader_char
+	hide_new = yes
 
 	is_triggered_only = yes
 
@@ -3970,6 +3980,8 @@ letter_event = {
 letter_event = {
 	id = ALWAR.12
 	desc = EVTDESC_ALWAR_12
+	portrait = event_target:invader_char
+	hide_new = yes
 
 	is_triggered_only = yes
 
