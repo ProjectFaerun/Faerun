@@ -1,269 +1,5 @@
 decisions = {
 
-	#intimidate ruler
-	shadow_scare_ruler = {
-		is_in_society = yes
-		only_playable = yes
-
-		ai_target_filter = realm
-		ai_check_interval = 60
-
-		from_potential = {
-			has_dlc = "Conclave"
-			is_playable = yes
-			is_adult = yes
-			NOT = { trait = incapable }
-			is_member_of_any_thieves_guild_trigger = yes
-			society_rank >= 2
-			prisoner = no
-		}
-
-		potential = {
-			NOT = { character = FROM }
-			age = 10
-			is_ruler = yes
-			OR = {
-				FROM = { ai = yes } # Only checks realm, so by definition in range
-				is_within_diplo_range = FROM
-			}
-		}
-
-		allow = {
-			ROOT = {
-				is_member_of_any_thieves_guild_trigger = no
-				prisoner = no
-				is_inaccessible_trigger = no
-				NOT = { owes_favor_to = FROM }
-			}
-			OR = {
-				FROM = { society_rank == 4 }
-				ROOT = { same_realm = FROM }
-			}
-			FROM = {
-				has_society_currency_medium_trigger = yes
-				is_inaccessible_trigger = no
-			}
-			NOT = {
-				has_opinion_modifier = {
-					modifier = opinion_threatened_me
-					who = FROM
-				}
-			}
-		}
-
-		effect = {
-			FROM = { detract_society_currency_medium_effect = yes }
-						FROM = { increase_visibility_effect = yes }
-
-			random_list = {
-				50 = {
-					modifier = {
-						factor = 9
-						FROM = { society_rank == 4 }
-					}
-					modifier = {
-						factor = 3
-						FROM = { society_rank == 3 }
-					}
-					hidden_effect = { character_event = { id = MNM.6840 days = 1 } }
-					FROM = { add_favor = ROOT }
-				}
-				50 = {
-					modifier = { #Makes it even harder to threaten someone 2 steps above you
-						factor = 3
-						OR = {
-							AND = {
-								tier = EMPEROR
-								FROM = { lower_tier_than = KING }
-							}
-							AND = {
-								tier = KING
-								FROM = { tier = BARON }
-							}
-						}
-					}
-					modifier = { #Makes it harder to threaten someone above you
-						factor = 3
-						higher_tier_than = FROM
-					}
-					custom_tooltip = { text = assassins_scare_ruler_fail }
-					hidden_effect = { FROM = { character_event = { id = MNM.6980 days = 1 } } }
-				}
-			}
-
-		}
-
-		revoke_allowed = {
-			always = no
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # slow down
-			}
-			modifier = {
-				FROM = { is_benevolent_trigger = yes }
-				factor = 0.1
-			}
-			modifier = {
-				FROM = { is_evil_trigger = yes }
-				factor = 2
-			}
-			modifier = {
-				OR = {
-					is_friend = FROM
-					is_lover = FROM
-					NOR = {
-						liege = { character = FROM }
-						is_liege_of = FROM
-					}
-				}
-				factor = 0
-			}
-		}
-	}
-
-	#sabotage
-	shadow_sabotage = {
-		is_in_society = yes
-		only_playable = yes
-
-		ai_target_filter = independent_rulers
-		ai_check_interval = 48
-
-		from_potential = {
-			is_playable = yes
-			is_adult = yes
-			NOT = { trait = incapable }
-			is_member_of_any_thieves_guild_trigger = yes
-			prisoner = no
-		}
-
-		potential = {
-			NOT = { character = FROM }
-			is_ruler = yes
-			is_within_diplo_range = FROM
-		}
-
-		allow = {
-			ROOT = {
-				is_member_of_any_thieves_guild_trigger = no
-				prisoner = no
-				is_inaccessible_trigger = no
-			}
-			FROM = {
-				has_society_currency_minor_trigger = yes
-				is_inaccessible_trigger = no
-			}
-			custom_tooltip = {
-				text = shadow_sabotage_cooldown_tooltip
-				NOT = { has_character_modifier = shadow_sabotage_cooldown }
-			}
-		}
-
-		effect = {
-			FROM = { detract_society_currency_minor_effect = yes }
-			FROM = { increase_visibility_effect = yes }
-			hidden_effect = {
-				add_character_modifier = {
-					name = shadow_sabotage_cooldown
-					years = 4
-					hidden = yes
-				}
-			}
-
-			random_list = {
-				33 = {
-					ROOT = {
-						random_demesne_province = {
-							limit = {
-								NOT = {
-									has_province_modifier = smugglers_ring
-								}
-							}
-							add_province_modifier = {
-								name = smugglers_ring
-								years = 4
-							}
-						}
-					}
-				}
-				33 = {
-					ROOT = {
-						random_demesne_province = {
-							limit = {
-								NOT = {
-									has_province_modifier = thieves_guild
-								}
-							}
-							add_province_modifier = {
-								name = thieves_guild
-								years = 4
-							}
-						}
-					}
-				}
-				33 = {
-					ROOT = {
-						random_demesne_province = {
-							limit = {
-								NOT = {
-									has_province_modifier = highway_robber_band
-								}
-							}
-							add_province_modifier = {
-								name = highway_robber_band
-								years = 4
-							}
-						}
-					}
-				}
-			}
-
-		}
-
-		revoke_allowed = {
-			always = no
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # slow down
-			}
-			modifier = {
-				is_foe = FROM
-				factor = 100
-			}
-			modifier = {
-				factor = 5
-				FROM = {
-					opinion = {
-						who = ROOT
-						value <= -5
-					}
-				}
-			}
-			modifier = {
-				factor = 10
-				FROM = {
-					opinion = {
-						who = ROOT
-						value <= -50
-					}
-				}
-			}
-			modifier = {
-				OR = {
-					is_friend = FROM
-					is_lover = FROM
-				}
-				factor = 0
-			}
-		}
-	}
-
 	appease_spirits = {
 		is_in_society = yes
 		only_playable = yes
@@ -335,9 +71,6 @@ decisions = {
 					}
 				}
 			}
-		}
-		revoke_allowed = {
-			always = no
 		}
 		ai_will_do = {
 			factor = 0.5
@@ -470,9 +203,6 @@ decisions = {
 			}
 			character_event = { id = EME.25000 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -482,8 +212,8 @@ decisions = {
 		}
 	}
 
-	nature_favor = {
-		is_in_society = yes
+nature_favor = {
+	is_in_society = yes
     only_playable = yes
     ai_check_interval = 6
 
@@ -539,14 +269,10 @@ decisions = {
 		}
 		character_event = {	id = EME.300 }
     }
-
-    revoke_allowed = {
-      always = no
-    }
-		ai_will_do = {
+	ai_will_do = {
       factor = 1
     }
-	}
+}
 
 	convert_to_tribal_indep  = {
 		only_independent = yes
@@ -589,9 +315,7 @@ decisions = {
 						culture_group = giantkin_group
 					}
 				}
-				primary_title = {
-					set_government_type = ordning_government
-				}
+				set_government_type = ordning_government
 			}
 			else = {
 				set_government_type = tribal_government
@@ -604,7 +328,7 @@ decisions = {
 						holding_type = castle
 						#is_capital = yes
 					}
-					convert_to = TRIBAL
+					convert_to = tribal
 					add_building = tb_hillfort_4
 					if = {
 						limit = {
@@ -804,9 +528,7 @@ decisions = {
 						culture_group = giantkin_group
 					}
 				}
-				primary_title = {
-					set_government_type = ordning_government
-				}
+				set_government_type = ordning_government
 			}
 			else = {
 				set_government_type = tribal_government
@@ -819,7 +541,7 @@ decisions = {
 						holding_type = castle
 						#is_capital = yes
 					}
-					convert_to = TRIBAL
+					convert_to = tribal
 					add_building = tb_hillfort_4
 					if = {
 						limit = {
@@ -960,6 +682,262 @@ decisions = {
 
 targeted_decisions = {
 
+	#intimidate ruler
+	shadow_scare_ruler = {
+		is_in_society = yes
+		only_playable = yes
+
+		ai_target_filter = realm
+		ai_check_interval = 60
+
+		from_potential = {
+			has_dlc = "Conclave"
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			is_member_of_any_thieves_guild_trigger = yes
+			society_rank >= 2
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			age = 10
+			is_ruler = yes
+			OR = {
+				FROM = { ai = yes } # Only checks realm, so by definition in range
+				is_within_diplo_range = FROM
+			}
+		}
+
+		allow = {
+			ROOT = {
+				is_member_of_any_thieves_guild_trigger = no
+				prisoner = no
+				is_inaccessible_trigger = no
+				NOT = { owes_favor_to = FROM }
+			}
+			OR = {
+				FROM = { society_rank == 4 }
+				ROOT = { same_realm = FROM }
+			}
+			FROM = {
+				has_society_currency_medium_trigger = yes
+				is_inaccessible_trigger = no
+			}
+			NOT = {
+				has_opinion_modifier = {
+					modifier = opinion_threatened_me
+					who = FROM
+				}
+			}
+		}
+
+		effect = {
+			FROM = { detract_society_currency_medium_effect = yes }
+						FROM = { increase_visibility_effect = yes }
+
+			random_list = {
+				50 = {
+					modifier = {
+						factor = 9
+						FROM = { society_rank == 4 }
+					}
+					modifier = {
+						factor = 3
+						FROM = { society_rank == 3 }
+					}
+					hidden_effect = { character_event = { id = MNM.6840 days = 1 } }
+					FROM = { add_favor = ROOT }
+				}
+				50 = {
+					modifier = { #Makes it even harder to threaten someone 2 steps above you
+						factor = 3
+						OR = {
+							AND = {
+								tier = EMPEROR
+								FROM = { lower_tier_than = KING }
+							}
+							AND = {
+								tier = KING
+								FROM = { tier = BARON }
+							}
+						}
+					}
+					modifier = { #Makes it harder to threaten someone above you
+						factor = 3
+						higher_tier_than = FROM
+					}
+					custom_tooltip = { text = assassins_scare_ruler_fail }
+					hidden_effect = { FROM = { character_event = { id = MNM.6980 days = 1 } } }
+				}
+			}
+
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1 # slow down
+			}
+			modifier = {
+				FROM = { is_benevolent_trigger = yes }
+				factor = 0.1
+			}
+			modifier = {
+				FROM = { is_evil_trigger = yes }
+				factor = 2
+			}
+			modifier = {
+				OR = {
+					is_friend = FROM
+					is_lover = FROM
+					NOR = {
+						liege = { character = FROM }
+						is_liege_of = FROM
+					}
+				}
+				factor = 0
+			}
+		}
+	}
+
+	#sabotage
+	shadow_sabotage = {
+		is_in_society = yes
+		only_playable = yes
+
+		ai_target_filter = independent_rulers
+		ai_check_interval = 48
+
+		from_potential = {
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			is_member_of_any_thieves_guild_trigger = yes
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			is_ruler = yes
+			is_within_diplo_range = FROM
+		}
+
+		allow = {
+			ROOT = {
+				is_member_of_any_thieves_guild_trigger = no
+				prisoner = no
+				is_inaccessible_trigger = no
+			}
+			FROM = {
+				has_society_currency_minor_trigger = yes
+				is_inaccessible_trigger = no
+			}
+			custom_tooltip = {
+				text = shadow_sabotage_cooldown_tooltip
+				NOT = { has_character_modifier = shadow_sabotage_cooldown }
+			}
+		}
+
+		effect = {
+			FROM = { detract_society_currency_minor_effect = yes }
+			FROM = { increase_visibility_effect = yes }
+			hidden_effect = {
+				add_character_modifier = {
+					name = shadow_sabotage_cooldown
+					years = 4
+					hidden = yes
+				}
+			}
+
+			random_list = {
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = smugglers_ring
+								}
+							}
+							add_province_modifier = {
+								name = smugglers_ring
+								years = 4
+							}
+						}
+					}
+				}
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = thieves_guild
+								}
+							}
+							add_province_modifier = {
+								name = thieves_guild
+								years = 4
+							}
+						}
+					}
+				}
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = highway_robber_band
+								}
+							}
+							add_province_modifier = {
+								name = highway_robber_band
+								years = 4
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1 # slow down
+			}
+			modifier = {
+				is_foe = FROM
+				factor = 100
+			}
+			modifier = {
+				factor = 5
+				FROM = {
+					opinion = {
+						who = ROOT
+						value <= -5
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					opinion = {
+						who = ROOT
+						value <= -50
+					}
+				}
+			}
+			modifier = {
+				OR = {
+					is_friend = FROM
+					is_lover = FROM
+				}
+				factor = 0
+			}
+		}
+	}
+
 	twisted_blackmail = {
 		is_in_society = yes
 		only_playable = yes
@@ -1077,10 +1055,6 @@ targeted_decisions = {
 				}
 			}
 
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -1332,10 +1306,6 @@ targeted_decisions = {
 			}
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 1
 			modifier = {
@@ -1390,8 +1360,6 @@ targeted_decisions = {
 			detract_society_currency_medium_effect = yes
 		}
 
-		revoke_allowed = { always = no }
-
 		ai_will_do = {
 			factor = 1
 		}
@@ -1409,11 +1377,9 @@ targeted_decisions = {
 			is_playable = yes
 			is_adult = yes
 			NOT = { trait = incapable }
-			OR = {
-				society_rank = {
-					society = heralds
-					rank = 4
-				}
+			society_rank = {
+				society = heralds
+				rank = 4
 			}
 			prisoner = no
 		}
@@ -1454,10 +1420,6 @@ targeted_decisions = {
 					}
 				}
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -1569,10 +1531,6 @@ targeted_decisions = {
 			set_character_flag = prep_inv_target
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 0.5
 	        modifier = {
@@ -1629,7 +1587,10 @@ targeted_decisions = {
 			holy_order = no
 			is_landed = yes
 			society_member_of = kuo_tan_society
-			society_rank = { rank >= 2 }
+			society_rank = {
+				society = kuo_tan_society
+				rank >= 2
+			}
 		}
 
 		allow = {
@@ -1690,10 +1651,6 @@ targeted_decisions = {
 					value = 500
 				}
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -1824,8 +1781,6 @@ targeted_decisions = {
 				}
 			}
 		}
-
-		revoke_allowed = { always = no }
 
 		ai_will_do = {
 
@@ -1969,9 +1924,6 @@ society_decisions = {
 			}
 			character_event = { id = TWI.25000 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -2037,8 +1989,6 @@ society_decisions = {
 			detract_society_currency_minor_effect = yes
 		}
 
-		revoke_allowed = { always = no }
-
 		ai_will_do = {
 			factor = 1
 			modifier = {
@@ -2057,11 +2007,9 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_adult = yes
-			OR = {
-				society_rank = {
-					society = shadow_telflamm
-					rank == 4
-				}
+			society_rank = {
+				society = shadow_telflamm
+				rank == 4
 			}
 			NOT = { has_character_flag = is_telflamm_walker }
 		}
@@ -2079,8 +2027,6 @@ society_decisions = {
 			increase_visibility_effect = yes
 			detract_society_currency_major_effect = yes
 		}
-
-		revoke_allowed = { always = no }
 
 		ai_will_do = {
 			factor = 1
@@ -2156,11 +2102,9 @@ society_decisions = {
 			}
 			if = {
 				limit = {
-					AND = {
-						independent = yes
-						d_shadow_thieves = {
-							has_holder = no
-						}
+					independent = yes
+					d_shadow_thieves = {
+						has_holder = no
 					}
 				}
 				grant_title = d_shadow_thieves
@@ -2408,9 +2352,6 @@ society_decisions = {
 			}
 			character_event = { id = KNI.25000 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -2639,10 +2580,6 @@ society_decisions = {
 			}
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 0.5
 
@@ -2696,9 +2633,6 @@ society_decisions = {
 			}
 			character_event = { id = HRP.200 days = 0 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 1
 		}
@@ -2742,10 +2676,6 @@ society_decisions = {
 			}
 			character_event = {	id = HRP.300 }
 		}
-
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 1
 		}
@@ -2760,7 +2690,7 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_member_of_any_alliance_society_trigger = yes
-			society_rank = { rank >= 1 }
+			society_rank >= 1
 		}
 
 		allow = {
@@ -2812,7 +2742,7 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_member_of_any_alliance_society_trigger = yes
-			society_rank = { rank >= 3 }
+			society_rank >= 3
 		}
 
 		allow = {
@@ -2839,10 +2769,6 @@ society_decisions = {
 			sound_effect = generic_click_01
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 0
 		}
@@ -2861,7 +2787,7 @@ society_decisions = {
 				is_member_of_any_alliance_society_trigger = yes
 				society_member_of = kuo_tan_society
 			}
-			society_rank = { rank == 4 }
+			society_rank == 4 
 		}
 
 		allow = {
@@ -2976,10 +2902,6 @@ society_decisions = {
 			sound_effect = generic_click_01
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
@@ -2994,22 +2916,20 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_member_of_any_alliance_society_trigger = yes
-			society_rank = { rank >= 1 }
+			society_rank >= 1
 		}
 
 		allow = {
 			war = yes
 			has_society_currency_minor_trigger = yes
 			any_war = {
-				AND = {
-					defender = {
-						character = ROOT
-						is_primary_war_defender = yes
-					}
-					attacker = {
-						same_society_as = ROOT
-						is_primary_war_attacker = yes
-					}
+				defender = {
+					character = ROOT
+					is_primary_war_defender = yes
+				}
+				attacker = {
+					same_society_as = ROOT
+					is_primary_war_attacker = yes
 				}
 			}
 		}
@@ -3047,7 +2967,7 @@ society_decisions = {
 				is_member_of_any_alliance_society_trigger = yes
 				society_member_of = harpers
 			}
-			society_rank = { rank >= 2 }
+			society_rank >= 2
 			OR = {
 				ai = no
 				any_war = {
@@ -3100,9 +3020,6 @@ society_decisions = {
 				}
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -3142,11 +3059,9 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_adult = yes
-			OR = {
-				society_rank = {
-					society = warrior_lodge_dwarven
-					rank >= 3
-				}
+			society_rank = {
+				society = warrior_lodge_dwarven
+				rank >= 3
 			}
 			NOT = { has_character_flag = chose_dwarven_style_flag }
 		}
@@ -3161,8 +3076,6 @@ society_decisions = {
 			detract_society_currency_major_effect = yes
 		}
 
-		revoke_allowed = { always = no }
-
 		ai_will_do = {
 			factor = 1
 		}
@@ -3176,11 +3089,9 @@ society_decisions = {
 		potential = {
 			not_casting = yes
 			is_adult = yes
-			OR = {
-				society_rank = {
-					society = warrior_lodge_elven
-					rank >= 3
-				}
+			society_rank = {
+				society = warrior_lodge_elven
+				rank >= 3
 			}
 			NOT = { has_character_flag = chose_elven_style_flag }
 		}
@@ -3194,8 +3105,6 @@ society_decisions = {
 			character_event = { id = seldarine.12 }
 			detract_society_currency_major_effect = yes
 		}
-
-		revoke_allowed = { always = no }
 
 		ai_will_do = {
 			factor = 1
@@ -3266,8 +3175,6 @@ society_decisions = {
 			character_event = { id = BRO.1800 }
 		}
 
-		revoke_allowed = { always = no }
-
 		ai_will_do = {
 			factor = 1
 			modifier = {
@@ -3309,9 +3216,6 @@ society_decisions = {
 			set_character_flag = building_laboratory
 			custom_tooltip = { text = start_constructing_laboratory_tooltip }
 			hidden_tooltip = { character_event = { id = BRO.1100 } }
-		}
-		revoke_allowed = {
-			always = no
 		}
 		ai_will_do = {
 			factor = 1
@@ -3553,9 +3457,6 @@ society_decisions = {
 			}
 			character_event = { id = BRO.200 days = 0 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 1
 		}
@@ -3634,9 +3535,6 @@ society_decisions = {
 				}
 			}
 			character_event = { id = BRO.300 days = 0 }
-		}
-		revoke_allowed = {
-			always = no
 		}
 		ai_will_do = {
 			factor = 1
@@ -3730,10 +3628,6 @@ society_decisions = {
 			}
 			wealth = -50
 			sound_effect = generic_click_01
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -3977,9 +3871,6 @@ society_decisions = {
 			}
 			character_event = { id = ZHE.25000 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -4219,7 +4110,10 @@ society_decisions = {
 			holy_order = no
 			is_landed = yes
 			society_member_of = black_network
-			society_rank = { rank >= 2 }
+			society_rank = {
+				society = black_network
+				rank >= 2
+			}
 		}
 
 		allow = {
@@ -4253,10 +4147,6 @@ society_decisions = {
 					letter_event = { id = ZHE.2000 days = 0 }
 				}
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -4492,10 +4382,6 @@ society_decisions = {
 			}
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
 		ai_will_do = {
 			factor = 0.5
 
@@ -4546,10 +4432,6 @@ society_decisions = {
 				increase_visibility_effect = yes
 				character_event = { id = CDR.300 }
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -4798,9 +4680,6 @@ society_decisions = {
 			}
 			character_event = { id = CDR.600 }
 		}
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 1
 		}
@@ -4861,10 +4740,6 @@ society_decisions = {
 			}
 			detract_society_currency_minor_effect = yes
 			sound_effect = generic_click_01
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
@@ -5107,10 +4982,6 @@ title_decisions = {
 				}
 			}
 		}
-
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 1
 
@@ -5121,48 +4992,50 @@ title_decisions = {
 
 			modifier = {
 				factor = 0
-				NOT = { wealth = 0 }
+				FROM = {  NOT = { wealth = 0 } }
 			}
 
 			modifier = {
 				factor = 0.5
-				NOT = { wealth = 100 }
-				independent = yes
+				FROM = { 
+					NOT = { wealth = 100 }
+					independent = yes
+				}
 			}
 
 			modifier = {
 				factor = 0.5
-				trait = cruel
+				FROM = { trait = cruel }
 			}
 
 			modifier = {
 				factor = 0.5
-				trait = greedy
+				FROM = { trait = greedy }
 			}
 
 			modifier = {
 				factor = 3
-				trait = charitable
+				FROM = { trait = charitable }
 			}
 
 			modifier = {
 				factor = 2
-				trait = kind
+				FROM = { trait = kind }
 			}
 
 			modifier = {
 				factor = 2
-				trait = just
+				FROM = { trait = just }
 			}
 
 			modifier = {
 				factor = 0.5
-				trait = stressed
+				FROM = { trait = stressed }
 			}
 
 			modifier = {
 				factor = 2
-				trait = content
+				FROM = { trait = content }
 			}
 		}
 	}
@@ -5267,10 +5140,6 @@ title_decisions = {
 					}
 				}
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 		ai_will_do = {
 			factor = 0.1
@@ -5478,10 +5347,6 @@ title_decisions = {
 				}
 			}
 		}
-
-		revoke_allowed = {
-			always = no
-		}
 		ai_will_do = {
 			factor = 0.1
 			modifier = {
@@ -5638,10 +5503,6 @@ settlement_decisions = {
 				detract_society_currency_minor_effect = yes
 				character_event = { id = HF.10059 }	#handle actual effect
 			}
-		}
-
-		revoke_allowed = {
-			always = no
 		}
 
 		ai_will_do = {
