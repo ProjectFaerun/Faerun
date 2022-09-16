@@ -678,6 +678,7 @@ nature_favor = {
 		}
 	}
 
+
 }
 
 targeted_decisions = {
@@ -1083,7 +1084,6 @@ targeted_decisions = {
 			}
 		}
 	}
-
 	twisted_turn_vassal = {
 		only_playable = yes
 		filter = court
@@ -1798,6 +1798,269 @@ targeted_decisions = {
 			}
 		}
 	}
+
+	#intimidate ruler
+	shadow_scare_ruler = {
+		is_in_society = yes
+		only_playable = yes
+
+		ai_target_filter = realm
+		ai_check_interval = 60
+
+		from_potential = {
+			has_dlc = "Conclave"
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			is_member_of_any_thieves_guild_trigger = yes
+			society_rank >= 2
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			age = 10
+			is_ruler = yes
+			OR = {
+				FROM = { ai = yes } # Only checks realm, so by definition in range
+				is_within_diplo_range = FROM
+			}
+		}
+
+		allow = {
+			ROOT = {
+				is_member_of_any_thieves_guild_trigger = no
+				prisoner = no
+				is_inaccessible_trigger = no
+				NOT = { owes_favor_to = FROM }
+			}
+			OR = {
+				FROM = { society_rank == 4 }
+				ROOT = { same_realm = FROM }
+			}
+			FROM = {
+				has_society_currency_medium_trigger = yes
+				is_inaccessible_trigger = no
+			}
+			NOT = {
+				has_opinion_modifier = {
+					modifier = opinion_threatened_me
+					who = FROM
+				}
+			}
+		}
+
+		effect = {
+			FROM = { detract_society_currency_medium_effect = yes }
+						FROM = { increase_visibility_effect = yes }
+
+			random_list = {
+				50 = {
+					modifier = {
+						factor = 9
+						FROM = { society_rank == 4 }
+					}
+					modifier = {
+						factor = 3
+						FROM = { society_rank == 3 }
+					}
+					hidden_effect = { character_event = { id = MNM.6840 days = 1 } }
+					FROM = { add_favor = ROOT }
+				}
+				50 = {
+					modifier = { #Makes it even harder to threaten someone 2 steps above you
+						factor = 3
+						OR = {
+							AND = {
+								tier = EMPEROR
+								FROM = { lower_tier_than = KING }
+							}
+							AND = {
+								tier = KING
+								FROM = { tier = BARON }
+							}
+						}
+					}
+					modifier = { #Makes it harder to threaten someone above you
+						factor = 3
+						higher_tier_than = FROM
+					}
+					custom_tooltip = { text = assassins_scare_ruler_fail }
+					hidden_effect = { FROM = { character_event = { id = MNM.6980 days = 1 } } }
+				}
+			}
+
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1 # slow down
+			}
+			modifier = {
+				FROM = { is_benevolent_trigger = yes }
+				factor = 0.1
+			}
+			modifier = {
+				FROM = { is_evil_trigger = yes }
+				factor = 2
+			}
+			modifier = {
+				OR = {
+					is_friend = FROM
+					is_lover = FROM
+					NOR = {
+						liege = { character = FROM }
+						is_liege_of = FROM
+					}
+				}
+				factor = 0
+			}
+		}
+	}
+	#sabotage
+	shadow_sabotage = {
+		is_in_society = yes
+		only_playable = yes
+
+		ai_target_filter = independent_rulers
+		ai_check_interval = 48
+
+		from_potential = {
+			is_playable = yes
+			is_adult = yes
+			NOT = { trait = incapable }
+			is_member_of_any_thieves_guild_trigger = yes
+			prisoner = no
+		}
+
+		potential = {
+			NOT = { character = FROM }
+			is_ruler = yes
+			is_within_diplo_range = FROM
+		}
+
+		allow = {
+			ROOT = {
+				is_member_of_any_thieves_guild_trigger = no
+				prisoner = no
+				is_inaccessible_trigger = no
+			}
+			FROM = {
+				has_society_currency_minor_trigger = yes
+				is_inaccessible_trigger = no
+			}
+			custom_tooltip = {
+				text = shadow_sabotage_cooldown_tooltip
+				NOT = { has_character_modifier = shadow_sabotage_cooldown }
+			}
+		}
+
+		effect = {
+			FROM = { detract_society_currency_minor_effect = yes }
+			FROM = { increase_visibility_effect = yes }
+			hidden_effect = {
+				add_character_modifier = {
+					name = shadow_sabotage_cooldown
+					years = 4
+					hidden = yes
+				}
+			}
+
+			random_list = {
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = smugglers_ring
+								}
+							}
+							add_province_modifier = {
+								name = smugglers_ring
+								years = 4
+							}
+						}
+					}
+				}
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = thieves_guild
+								}
+							}
+							add_province_modifier = {
+								name = thieves_guild
+								years = 4
+							}
+						}
+					}
+				}
+				33 = {
+					ROOT = {
+						random_demesne_province = {
+							limit = {
+								NOT = {
+									has_province_modifier = highway_robber_band
+								}
+							}
+							add_province_modifier = {
+								name = highway_robber_band
+								years = 4
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		revoke_allowed = {
+			always = no
+		}
+
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0.1 # slow down
+			}
+			modifier = {
+				is_foe = FROM
+				factor = 100
+			}
+			modifier = {
+				factor = 5
+				FROM = {
+					opinion = {
+						who = ROOT
+						value <= -5
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				FROM = {
+					opinion = {
+						who = ROOT
+						value <= -50
+					}
+				}
+			}
+			modifier = {
+				OR = {
+					is_friend = FROM
+					is_lover = FROM
+				}
+				factor = 0
+			}
+		}
+	}
 }
 
 society_decisions = {
@@ -1997,7 +2260,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	shadow_telflamm_walker = {
 		is_in_society = yes
 		only_playable = yes
@@ -2036,7 +2298,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	revenge_waterdeep  = {
 		is_in_society = yes
 		only_playable = yes
@@ -2421,7 +2682,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	hold_a_jousting_tournament  = {
 		is_in_society = yes
 		only_playable = yes
@@ -2475,7 +2735,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	build_knight_bloodline = {
 		is_in_society = yes
 		is_high_prio = yes
@@ -2637,7 +2896,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	harper_training = {
 		is_in_society = yes
 		ai_check_interval = 12
@@ -2733,7 +2991,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	alliance_raise_ships = {
 		is_in_society = yes
 		only_playable = yes
@@ -2773,7 +3030,6 @@ society_decisions = {
 			factor = 0
 		}
 	}
-
 	alliance_raise_troops = {
 		is_in_society = yes
 		only_playable = yes
@@ -2906,7 +3162,6 @@ society_decisions = {
 			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
 	}
-
 	alliance_mediation = {
 		is_in_society = yes
 		is_high_prio = yes
@@ -2954,7 +3209,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	call_for_heroes = {
 		is_in_society = yes
 		only_playable = yes
@@ -3050,7 +3304,7 @@ society_decisions = {
 			}
 		}
 	}
-	
+
 	dwarven_lodge_fighting_style = {
 		is_in_society = yes
 		is_high_prio = yes
@@ -3080,7 +3334,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-	
 	elven_lodge_fighting_style = {
 		is_in_society = yes
 		is_high_prio = yes
@@ -3110,7 +3363,7 @@ society_decisions = {
 			factor = 1
 		}
 	}
-	
+
 	brotherhood_acquire_ingredients_decision = {
 		is_in_society = yes
 		ai_check_interval = 24
@@ -3188,7 +3441,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	brotherhood_laboratory = {
 		is_in_society = yes
 		only_playable = yes
@@ -3231,7 +3483,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	long_live_the_brotherhood = {
 		is_in_society = yes
 		only_playable = yes
@@ -3294,7 +3545,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	overthrow_archmage = {
 		is_in_society = yes
 		ai_check_interval = 12
@@ -3383,7 +3633,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	great_ritual = {
 		is_in_society = yes
 		ai_check_interval = 12
@@ -3461,7 +3710,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	arcane_experiment = {
 		is_in_society = yes
 		only_playable = yes
@@ -3540,7 +3788,7 @@ society_decisions = {
 			factor = 1
 		}
 	}
-	
+
 	discount_mercs = {
 		is_in_society = yes
 		only_playable = yes
@@ -3634,7 +3882,6 @@ society_decisions = {
 			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
 	}
-
 	summon_zhent_servant = {
 		is_in_society = yes
 		only_playable = yes
@@ -3936,7 +4183,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	zhent_trade_route = {
 		is_high_prio = yes
 		is_in_society = yes
@@ -3995,7 +4241,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	scheme_for_leadership = {
 		is_in_society = yes
 		ai_check_interval = 24
@@ -4094,7 +4339,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	zhent_become_tributary = {
 		only_independent = yes
 		is_in_society = yes
@@ -4193,7 +4437,7 @@ society_decisions = {
 			}
 		}
 	}
-	
+
 	long_live_the_flame_brotherhood = {
 		is_in_society = yes
 		only_playable = yes
@@ -4256,7 +4500,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	overthrow_bonfire = {
 		is_in_society = yes
 		ai_check_interval = 12
@@ -4345,7 +4588,7 @@ society_decisions = {
 			}
 		}
 	}
-	
+
 	delve_into_forbidden = {
 		is_in_society = yes
 		only_playable = yes
@@ -4396,7 +4639,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	dragon_minor_gift = {
 		is_in_society = yes
 		only_playable = yes
@@ -4438,7 +4680,6 @@ society_decisions = {
 			factor = 1
 		}
 	}
-
 	choose_undeath = {
 		is_in_society = yes
 		ai_check_interval = 40
@@ -4524,7 +4765,6 @@ society_decisions = {
 			}
 		}
 	}
-
 	invite_dracolich = {
 		is_in_society = yes
 		only_playable = yes
@@ -4684,7 +4924,7 @@ society_decisions = {
 			factor = 1
 		}
 	}
-	
+
 	concord_thrall_army = {
 		is_in_society = yes
 		only_playable = yes
@@ -4779,6 +5019,694 @@ society_decisions = {
 			modifier = {
 				factor = 0.5
 				trait = trusting
+			}
+		}
+	}
+
+	appease_spirits = {
+		is_in_society = yes
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 36
+
+		potential = {
+			not_casting = yes
+			is_playable = yes
+			is_landed = yes
+			is_adult = yes
+			prisoner = no
+			OR = {
+	      society_rank = {
+	        rank >= 1
+	        society = emerald_enclave
+	      }
+				society_rank = {
+	        rank >= 1
+	        society = shadow_druids
+	      }
+			}
+		}
+
+		allow = {
+			war = no
+			has_society_currency_minor_trigger = yes
+			custom_tooltip = {
+				text = UNOCCUPIED_DEMESNE_TITLE
+				hidden_tooltip = {
+					any_demesne_title = {
+						NOT = { higher_tier_than = count }
+						is_occupied = no
+					}
+				}
+			}
+			NOT = { is_inaccessible_trigger = yes }
+			custom_tooltip = {
+				text = is_not_busy_trigger_tooltip
+				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+			}
+			custom_tooltip = {
+				text = appease_spirits_cooldown_tooltip
+				hidden_tooltip = { NOT = { has_character_modifier = worshipped_spirits_timer } }
+			}
+		}
+
+		effect = {
+			set_character_flag = recent_minor_decision
+			set_character_flag = do_not_disturb
+			if = {
+				limit = { NOT = { has_quest = quest_appease_spirits } }
+				detract_society_currency_minor_effect = yes
+			}
+			if = {
+				limit = { has_quest = quest_appease_spirits }
+				add_society_currency_minor_effect = yes
+				clr_quest = quest_appease_spirits
+				sound_effect = monastic_orders_donate_charity
+			}
+			custom_tooltip = {
+				text = prepare_worship_ancestors
+				hidden_tooltip = {
+					character_event = { id = EME.7000 }
+					add_character_modifier = {
+						name = worshipped_spirits_timer
+						years = 5
+						hidden = yes
+					}
+				}
+			}
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.5
+
+			modifier = {
+				factor = 0
+				has_character_flag = recent_minor_decision
+				NOT = {
+					had_character_flag = {
+						flag = recent_minor_decision
+						days = 730
+					}
+				}
+			}
+		}
+	}
+	invite_druid = {
+		is_in_society = yes
+		only_playable = yes
+		ai_check_interval = 36 #check only once every 36 months.
+		potential = {
+			not_casting = yes
+			OR = {
+	      society_rank = {
+	        rank >= 3
+	        society = emerald_enclave
+	      }
+				society_rank = {
+	        rank >= 3
+	        society = shadow_druids
+	      }
+			}
+		}
+		allow = {
+			has_society_currency_medium_trigger = yes
+			is_inaccessible_trigger = no
+		}
+		effect = {
+			detract_society_currency_medium_effect = yes
+			custom_tooltip = { text = tooltip_summoning_druid }
+			hidden_tooltip = {
+				create_random_soldier = {
+					random_traits = yes
+					dynasty = random
+					female = no
+					attributes = {
+						diplomacy = 4
+						learning = 14
+						stewardship = 4
+						intrigue = 4
+						martial = 4
+					}
+				}
+			}
+			new_character = {
+				remove_trait = weak
+				remove_trait = slow
+				remove_trait = imbecile
+				remove_trait = dull
+				remove_trait = mystic
+				remove_trait = socializer
+				remove_trait = gamer
+				remove_trait = hedonist
+				remove_trait = duelist
+				remove_trait = hunter
+				remove_trait = strategist
+				remove_trait = administrator
+				remove_trait = architect
+				remove_trait = gardener
+				remove_trait = schemer
+				remove_trait = impaler
+				remove_trait = seducer
+				remove_trait = seductress
+				remove_trait = theologian
+				remove_trait = scholar
+
+				remove_education_effect = yes
+				random_list = {
+					60 = { add_trait = scholarly_theologian }
+					40 = { add_trait = mastermind_theologian }
+				}
+
+				random_list = {
+					15 = {
+						change_learning = 2
+					}
+					15 = {
+						add_trait = physician
+					}
+					20 = {
+						add_trait = theologian
+					}
+					20 = {
+						add_trait = mystic
+					}
+					20 = {
+						add_trait = scholar
+					}
+					5 = {
+						add_trait = shrewd
+					}
+					5 = {
+						add_trait = robust
+					}
+				}
+
+				random_list = {
+					60 = { add_trait = expert_druid }
+					40 = { add_trait = master_druid }
+				}
+
+				if = {
+					limit = {
+						ROOT = { society_member_of = emerald_enclave }
+					}
+					join_society = emerald_enclave
+				}
+				else_if = {
+					limit = {
+						ROOT = { society_member_of = shadow_druids }
+					}
+					join_society = shadow_druids
+				}
+
+				set_character_flag = invited_lodge_soldier
+				set_character_flag = lodge_warrior_original_court_@ROOT
+				set_character_flag = no_court_invites
+				save_event_target_as = invited_lodge_soldier
+			}
+			character_event = { id = EME.25000 }
+		}
+		revoke_allowed = {
+			always = no
+		}
+		ai_will_do = {
+			factor = 0.1
+			modifier = {
+				factor = 0
+				any_courtier = { has_job_title = job_spiritual learning = 20 }
+			}
+		}
+	}
+	nature_favor = {
+		is_in_society = yes
+    only_playable = yes
+    ai_check_interval = 6
+
+    potential = {
+			not_casting = yes
+			OR = {
+				society_rank = {
+					rank = 4
+					society = emerald_enclave
+				}
+				society_rank = {
+					rank = 4
+					society = shadow_druids
+				}
+			}
+    }
+
+    allow = {
+      prisoner = no
+      has_society_currency_major_trigger = yes
+			any_war = {
+				OR = {
+					any_defender = {
+						character = ROOT
+						is_primary_war_defender = yes
+					}
+					any_attacker = {
+						character = ROOT
+						is_primary_war_attacker = yes
+					}
+				}
+			}
+      NOR = {
+        trait = incapable
+        is_inaccessible_trigger = yes
+      }
+      custom_tooltip = {
+        text = nature_favor_cooldown_custom_tooltip
+        hidden_tooltip = {
+          NOT = { has_character_modifier = nature_favor_timer }
+        }
+      }
+    }
+
+    effect = {
+		detract_society_currency_major_effect = yes
+		hidden_tooltip = {
+			add_character_modifier = {
+				modifier = nature_favor_timer
+				months = 12
+				hidden = yes
+			}
+		}
+		character_event = {	id = EME.300 }
+    }
+
+    revoke_allowed = {
+      always = no
+    }
+		ai_will_do = {
+      factor = 1
+    }
+	}
+	convert_to_tribal_indep  = {
+		only_independent = yes
+		is_high_prio = yes
+		ai_check_interval = 100
+
+		potential = {
+			not_casting = yes
+			is_tribal = no
+			independent = yes
+			society_rank = {
+				rank = 4
+				society = shadow_druids
+			}
+		}
+		allow = {
+			war = no
+			OR = {
+				government = feudal_government
+				government = divine_feudal_government
+				government = muslim_government
+				government = theocratic_feudal_government
+				government = theocracy_government
+			}
+			primary_title = {
+				NOR = {
+					has_law = imperial_administration
+					has_law = ze_administration_laws_1
+					has_law = ze_administration_laws_2
+				}
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					religion = giant_pantheon
+					OR = {
+						culture_group = giant_group
+						culture_group = giantkin_group
+					}
+				}
+				primary_title = {
+					set_government_type = ordning_government
+				}
+			}
+			else = {
+				set_government_type = tribal_government
+			}
+
+			hidden_tooltip = {
+				any_demesne_title = {
+					limit = {
+						tier = baron
+						holding_type = castle
+						#is_capital = yes
+					}
+					convert_to = TRIBAL
+					add_building = tb_hillfort_4
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 1
+						}
+						add_building = tb_market_town_1
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 2
+						}
+						add_building = tb_market_town_2
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 3
+						}
+						add_building = tb_market_town_3
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 4
+						}
+						add_building = tb_market_town_4
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 1
+						}
+						add_building = tb_defensive_fortifications_1
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 2
+						}
+						add_building = tb_defensive_fortifications_2
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 3
+						}
+						add_building = tb_defensive_fortifications_3
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 4
+						}
+						add_building = tb_defensive_fortifications_4
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 1
+						}
+						add_building = tb_shipyard_1
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 2
+						}
+						add_building = tb_shipyard_2
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 3
+						}
+						add_building = tb_shipyard_3
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 4
+						}
+						add_building = tb_shipyard_4
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 1
+						}
+						add_building = tb_training_grounds_1
+						add_building = tb_war_camp_1
+						add_building = tb_practice_range_1
+						add_building = tb_arsenal_1
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 2
+						}
+						add_building = tb_training_grounds_2
+						add_building = tb_war_camp_2
+						add_building = tb_practice_range_2
+						add_building = tb_arsenal_2
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 3
+						}
+						add_building = tb_training_grounds_3
+						add_building = tb_war_camp_3
+						add_building = tb_practice_range_3
+						add_building = tb_arsenal_3
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 4
+						}
+						add_building = tb_training_grounds_4
+						add_building = tb_war_camp_4
+						add_building = tb_practice_range_4
+						add_building = tb_arsenal_4
+					}
+					add_building = tb_beastlairs_1
+					add_building = tb_beastlairs_2
+					add_building = tb_beastlairs_3
+					add_building = tb_beastlairs_4
+					add_building = tb_beastlairs_5
+					refill_holding_levy = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+				NOR = {
+					trait = arbitrary
+					trait = zealous
+					trait = cruel
+					trait = impaler
+					trait = lunatic
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					trait = cynical
+					trait = kind
+					trait = content
+				}
+			}
+			modifier = {
+				factor = 0
+				higher_real_tier_than = DUKE
+			}
+			modifier = {
+				factor = 0
+				num_of_vassals >= 6
+			}
+			modifier = {
+				factor = 0
+				realm_size >= 10
+			}
+		}
+	}
+	convert_to_tribal_vassal  = {
+		only_playable = yes
+		is_high_prio = yes
+		ai_check_interval = 48
+
+		potential = {
+			not_casting = yes
+			is_tribal = no
+			is_ruler = yes
+			independent = no
+			liege = {
+				is_tribal = yes
+			}
+			society_rank = {
+				rank >= 2
+				society = shadow_druids
+			}
+		}
+		allow = {
+			war = no
+			OR = {
+				government = feudal_government
+				government = divine_feudal_government
+				government = muslim_government
+				government = theocratic_feudal_government
+				government = theocracy_government
+			}
+			primary_title = {
+				NOR = {
+					has_law = imperial_administration
+					has_law = ze_administration_laws_1
+					has_law = ze_administration_laws_2
+				}
+			}
+		}
+
+		effect = {
+			if = {
+				limit = {
+					religion = giant_pantheon
+					OR = {
+						culture_group = giant_group
+						culture_group = giantkin_group
+					}
+				}
+				primary_title = {
+					set_government_type = ordning_government
+				}
+			}
+			else = {
+				set_government_type = tribal_government
+			}
+
+			hidden_tooltip = {
+				any_demesne_title = {
+					limit = {
+						tier = baron
+						holding_type = castle
+						#is_capital = yes
+					}
+					convert_to = TRIBAL
+					add_building = tb_hillfort_4
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 1
+						}
+						add_building = tb_market_town_1
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 2
+						}
+						add_building = tb_market_town_2
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 3
+						}
+						add_building = tb_market_town_3
+					}
+					if = {
+						limit = {
+							TECH_CITY_CONSTRUCTION = 4
+						}
+						add_building = tb_market_town_4
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 1
+						}
+						add_building = tb_defensive_fortifications_1
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 2
+						}
+						add_building = tb_defensive_fortifications_2
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 3
+						}
+						add_building = tb_defensive_fortifications_3
+					}
+					if = {
+						limit = {
+							TECH_FORTIFICATIONS_CONSTRUCTION = 4
+						}
+						add_building = tb_defensive_fortifications_4
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 1
+						}
+						add_building = tb_shipyard_1
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 2
+						}
+						add_building = tb_shipyard_2
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 3
+						}
+						add_building = tb_shipyard_3
+					}
+					if = {
+						limit = {
+							TECH_NAVAL = 4
+						}
+						add_building = tb_shipyard_4
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 1
+						}
+						add_building = tb_training_grounds_1
+						add_building = tb_war_camp_1
+						add_building = tb_practice_range_1
+						add_building = tb_arsenal_1
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 2
+						}
+						add_building = tb_training_grounds_2
+						add_building = tb_war_camp_2
+						add_building = tb_practice_range_2
+						add_building = tb_arsenal_2
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 3
+						}
+						add_building = tb_training_grounds_3
+						add_building = tb_war_camp_3
+						add_building = tb_practice_range_3
+						add_building = tb_arsenal_3
+					}
+					if = {
+						limit = {
+							TECH_CASTLE_CONSTRUCTION = 4
+						}
+						add_building = tb_training_grounds_4
+						add_building = tb_war_camp_4
+						add_building = tb_practice_range_4
+						add_building = tb_arsenal_4
+					}
+					add_building = tb_beastlairs_1
+					add_building = tb_beastlairs_2
+					add_building = tb_beastlairs_3
+					add_building = tb_beastlairs_4
+					add_building = tb_beastlairs_5
+					refill_holding_levy = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 0
+				higher_real_tier_than = DUKE
+			}
+			modifier = {
+				factor = 0
+				num_of_vassals >= 10
+			}
+			modifier = {
+				factor = 0
+				realm_size >= 15
 			}
 		}
 	}
@@ -5184,7 +6112,7 @@ title_decisions = {
 			}
 		}
 	}
-	
+
 	establish_cell = {
 		is_in_society = yes
 		only_playable = yes
@@ -5267,7 +6195,7 @@ title_decisions = {
 			}
 		}
 	}
-	
+
 	exploit_economy = {
 		is_in_society = yes
 		only_playable = yes
@@ -5463,7 +6391,7 @@ title_decisions = {
 			}
 		}
 	}
-	
+
 }
 
 settlement_decisions = {
