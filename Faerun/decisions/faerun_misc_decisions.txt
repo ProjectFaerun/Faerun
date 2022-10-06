@@ -1,6 +1,63 @@
 decisions = {
-
+	
+	velsharoon_ascend = {
+		is_high_prio = yes
+		only_playable = yes
+		potential = {
+			is_incapable = no
+			has_character_flag = i_am_velsharoon
+			NOT = { trait = avatar }
+		}
+		allow = {
+			prisoner = no
+			custom_tooltip = {
+				text = VELSHAROONCOND
+				OR = {
+					hidden_tooltip = {
+						ai = yes
+						year = 1368
+					}
+					check_variable = { which = veladv value >= 9 }
+				}
+			}
+		}
+		effect = {
+			hidden_tooltip = {
+				remove_character_modifier = veladvmod
+				evilcat_remove_patrons = yes
+				if = {
+					limit = {
+						NOR = {
+							religion = deities_of_fury
+							religion = arcane
+						}
+					}
+					random_list = {
+						1 = {
+							religion = deities_of_fury
+						}
+						1 = {
+							religion = arcane
+						}
+					}
+				}
+				add_trait = patron_velsharoon
+			}
+			add_trait = avatar
+			add_trait = lich
+			set_graphical_culture = lich
+			piety = 500
+			prestige = 500
+			narrative_event = { id = frstory.85 }
+		}
+		ai_will_do = {
+			factor = 100
+		}
+	}
+	
 	create_many_arrows = {
+		ai_check_interval = 30
+		is_high_prio = yes
 		potential = {
 			dynasty = 5118
 			OR = {
@@ -71,45 +128,6 @@ decisions = {
 		}
 		ai_will_do = {
 			factor = 1
-		}
-	}
-	
-	steer_spelljammer = {
-		ai = no
-		potential = {
-			not_casting = yes
-			always = no # for now
-			trait = is_spelljamming
-		}
-		allow = {
-			always = yes
-			#NOT = { has_character_flag = sj_in_transit }
-		}
-		effect = {
-			#character_event = { id = frsm.3 }
-		}
-		ai_will_do = {
-			factor = 0
-		}
-	}
-	
-	go_spelljamming = {
-		ai = no
-		potential = {
-			has_spelljammer = yes
-			not_casting = yes
-			always = no # for now
-			NOT = { trait = is_spelljamming }
-		}
-		allow = {
-			is_incapable = no
-			is_inaccessible_trigger = no
-		}
-		effect = {
-			#character_event = { id = frsm.1 }
-		}
-		ai_will_do = {
-			factor = 0
 		}
 	}
 	
@@ -421,6 +439,49 @@ decisions = {
 }
 
 targeted_decisions = {
+
+	velsharoon_sacrifice = {
+		only_rulers = yes
+		ai_check_interval = 30
+		filter = home_court
+		ai_target_filter = home_court
+		is_high_prio = yes
+		
+		from_potential = {
+			is_incapable = no
+			NOT = { trait = avatar }
+			has_character_flag = i_am_velsharoon
+		}
+		potential = {
+			prisoner = yes
+			trait = adventurer
+			ai = yes
+		}
+		allow = {
+			always = yes
+		}
+		effect = {
+			death = { death_reason = death_sacrifice killer = FROM }
+			FROM = {
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				if = {
+					limit = {
+						NOT = { trait = cruel }
+					}
+					add_trait = cruel
+				}
+				change_variable = { which = veladv value = 1 }
+			}
+		}
+		ai_will_do = {
+			factor = 100
+		}
+	}
 
 	same_gender_marry = {
 		only_rulers = yes
