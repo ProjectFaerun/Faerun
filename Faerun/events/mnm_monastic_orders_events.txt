@@ -56,7 +56,7 @@ letter_event = {
 }
 
 ########################AI JOIN AND AI RANK UP###########################
-#FOR SUN SOUL,LONG DEATH, EMPTY HAND, OLD ORDER. CHANGE WITH NEW SOCIETIES
+#FOR SUN SOUL,LONG DEATH, EMPTY HAND, OLD ORDER, NOG. CHANGE WITH NEW SOCIETIES
 
 character_event = { #force the AI to join a society
   id = MNM.4453
@@ -95,8 +95,11 @@ character_event = { #force the AI to join a society
         olrox_is_good_religion_trigger = yes
         NOT = {
           capital_scope = {
-      			region = kara_tur_region
-      		}
+            OR = {
+        			region = kara_tur_region
+              region = zakhara_region
+        		}
+          }
         }
       }
       character_event = { id = MNM.4454 }
@@ -115,8 +118,11 @@ character_event = { #force the AI to join a society
         is_evil_religion = yes
         NOT = {
           capital_scope = {
-      			region = kara_tur_region
-      		}
+            OR = {
+        			region = kara_tur_region
+              region = zakhara_region
+        		}
+          }
         }
       }
 			character_event = { id = MNM.4455 }
@@ -134,8 +140,11 @@ character_event = { #force the AI to join a society
         #society specific conditions below
         NOT = {
           capital_scope = {
-      			region = kara_tur_region
-      		}
+            OR = {
+        			region = kara_tur_region
+              region = zakhara_region
+        		}
+          }
         }
       }
       character_event = { id = MNM.4457 }
@@ -162,6 +171,33 @@ character_event = { #force the AI to join a society
         }
       }
       character_event = { id = MNM.4456 }
+    }
+    else_if = { #NOG AI join event
+      limit = {
+        ai = yes
+        prisoner = no
+        NOT = { trait = incapable }
+        is_adult = yes
+        is_in_society = no
+        controls_religion = no
+        block_general_event_trigger = no
+
+        #society specific conditions below
+        capital_scope = {
+          region = zakhara_region
+        }
+        OR = {
+    			culture_group = zakharan_group
+    			culture_group = old_zakharan_group
+    			religion_group = qismaite_group
+    			religion = primordial
+    			religion = nogari_reformed
+    			religion = nogari
+    			religion = jaziri
+    			religion = jaziri_reformed
+    		}
+      }
+      character_event = { id = MNM.4458 }
     }
 	}
 }
@@ -244,7 +280,6 @@ character_event = { #SUN SOUL AI join event
     }
   }
 }
-
 character_event = { #LONG DEATH AI join event
 	id = MNM.4455
 	hide_window = yes
@@ -327,7 +362,6 @@ character_event = { #LONG DEATH AI join event
     }
   }
 }
-
 character_event = { #EMPTY HAND AI join event
 	id = MNM.4456
 	hide_window = yes
@@ -402,7 +436,6 @@ character_event = { #EMPTY HAND AI join event
     }
   }
 }
-
 character_event = { #OLD ORDER AI join event
 	id = MNM.4457
 	hide_window = yes
@@ -451,6 +484,76 @@ character_event = { #OLD ORDER AI join event
         }
 
         join_society = monastic_order_old_order
+        random_list = {
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+character_event = { #NOG AI join event
+	id = MNM.4458
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = { #meet the requirement
+          can_join_society = monastic_order_nog
+        }
+        modifier = {
+          factor = 2
+          z_monk = yes
+        }
+        modifier = {
+          factor = 2
+          trait = mystic
+        }
+        modifier = {
+          factor = 2
+          trait = erudite
+        }
+        modifier = {
+          factor = 2
+          trait = just
+        }
+        modifier = {
+          factor = 2
+          trait = honest
+        }
+        modifier = {
+          factor = 0.1
+          OR = {
+            trait = deceitful
+            trait = arbitrary
+            trait = slothful
+          }
+        }
+
+        join_society = monastic_order_nog
         random_list = {
           75 = {
             modifier = {
@@ -3122,7 +3225,7 @@ character_event = {
 	id = MNM.4024
 	is_triggered_only = yes
 	hide_window = yes
-	
+
 	trigger = {
 		has_quest = monastic_orders_temple_construction
 		FROM = {
@@ -3130,7 +3233,7 @@ character_event = {
 		}
 		NOT = { has_character_flag = monastic_orders_temple_construction_ongoing } #flag to avoid doubling of letter events when finishing two buildings at the same time
 	}
-	
+
 	immediate = {
 		set_character_flag = monastic_orders_temple_construction_ongoing
 		random_society_member = {
@@ -3167,7 +3270,7 @@ letter_event = {
 	border = GFX_event_letter_frame_religion
 
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPT_MNM_4026
 		clr_quest = monastic_orders_temple_construction
@@ -3182,7 +3285,7 @@ letter_event = {
 			add_society_currency_large_effect = yes
 		}
 		else = {
-			add_society_currency_major_effect = yes		
+			add_society_currency_major_effect = yes
 		}
 	}
 	after = {
