@@ -1,19 +1,16 @@
 decisions = {
-
 	adventuring_quest = {
 		only_playable = yes
 		is_high_prio = yes
 		ai_check_interval = 60
 
 		potential = {
-			is_allowed_to_loot = no
 			not_casting = yes
 			has_assigned_minor_title = {
 				title = title_party_member
 				count = 4
 			}
 		}
-
 		allow = {
 			scaled_wealth = {
 				value = 1
@@ -33,8 +30,11 @@ decisions = {
 					}
 				}
 			}
+			custom_tooltip = {
+				text = is_not_busy_trigger_tooltip
+				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+			}
 		}
-
 		effect = {
 			set_character_flag = adventuring_quest_cooldown
 			add_character_modifier = {
@@ -80,11 +80,76 @@ decisions = {
 			}
 		}
 	}
-
+	go_raiding = {
+		only_playable = yes
+		ai_check_interval = 18
+		is_high_prio = yes
+		potential = {
+			has_game_rule = {
+				name = raiding
+				value = off
+			}
+			raiding_ruler_trigger = yes
+			not_casting = yes
+			age = 16
+		}
+		allow = {
+			is_incapable = no
+			prisoner = no
+			is_inaccessible_trigger = no
+			war = no
+			custom_tooltip = {
+				text = call_for_heroes_cooldown
+				hidden_tooltip = {
+					OR = {
+						NOT = { has_character_flag = going_raiding_cooldown }
+						had_character_flag = { flag = going_raiding_cooldown years = 1 }
+					}
+				}
+			}
+			custom_tooltip = {
+				text = is_not_busy_trigger_tooltip
+				hidden_tooltip = { NOT = { has_character_flag = do_not_disturb } }
+			}
+		}
+		effect = {
+			set_character_flag = going_raiding
+			clr_character_flag = going_raiding_cooldown
+			set_character_flag = going_raiding_cooldown
+			scaled_prestige = {
+				value = -1
+				min = -10
+				max = -200
+			}
+			character_event = { id = RAID.1 }
+		}
+		ai_will_do = {
+			factor = 0.5
+			modifier = {
+				factor = 2
+				wealth < 100
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+			modifier = {
+				factor = 0.5
+				trait = content
+			}
+			modifier = {
+				factor = 1.5
+				trait = brave
+			}
+			modifier = {
+				factor = 1.5
+				trait = ambitious
+			}
+		}
+	}
 }
 
 targeted_decisions = {
-
 	anti_host_adventuring = {
 		only_playable = yes
 		ai_check_interval = 24
@@ -92,7 +157,6 @@ targeted_decisions = {
 		ai_target_filter = independent_rulers
 
 		from_potential = {
-			is_allowed_to_loot = no
 			has_assigned_minor_title = {
 				title = title_party_member
 				count = 4
@@ -173,5 +237,4 @@ targeted_decisions = {
 			}
 		}
 	}
-
 }
