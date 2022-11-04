@@ -8876,9 +8876,78 @@ character_event = {
     }
     after = {
         hidden_effect = {
-            event_target:other_combatant = { character_event = { id = HF.12201 } } #"I was decapitated" event
+            event_target:other_combatant = { character_event = { id = ADVN.112 } }
         }
         tooltip = {
+            clean_up_after_duel_effect = yes
+        }
+    }
+}
+#DEATH: I died in the duel - I lost
+character_event = {
+    id = ADVN.112
+    picture = GFX_evt_duel_scene
+    border = GFX_event_normal_frame_war
+    title = getDuelTitle
+    is_triggered_only = yes
+    portrait = event_target:other_combatant
+
+    immediate = {
+        set_loser_flags_and_save_opponent_effect = yes
+        if = {
+            limit = { multiplayer = yes }
+            if = {
+                limit = { event_target:combatant_1 = { character = ROOT } } #if you instigated this...
+                death = {
+                    death_reason = death_legendary_fail_duel #you died trying...
+                    killer = event_target:other_combatant
+                }
+            }
+            else = {
+                death = {
+                    death_reason = death_legendary_win_duel #you successfully killed someone on your hunt for glory!
+                    killer = event_target:other_combatant
+                }
+            }
+        }
+    }
+
+		desc = {
+			trigger = {
+				event_target:combatant_2 = { culture = monster }
+			}
+			text = EVTDESC_ADVN_112_A
+		}
+		desc = {
+			trigger = {
+				NOT = { event_target:combatant_2 = { culture = monster } }
+			}
+			text = EVTDESC_ADVN_112_B
+		}
+
+    option = {
+        name = EVTOPTA_HFP_10104 #Nooooo...!
+        custom_tooltip = { text = you_lose_the_duel_tt }
+        if = {
+            limit = { multiplayer = no }
+            if = {
+                limit = { event_target:combatant_1 = { character = ROOT } } #if you instigated this...
+                death = {
+                    death_reason = death_legendary_fail_duel #you died trying...
+                    killer = event_target:other_combatant
+                }
+            }
+            else = {
+                death = {
+                    death_reason = death_legendary_win_duel #you successfully killed someone on your hunt for glory!
+                    killer = event_target:other_combatant
+                }
+            }
+        }
+    }
+    after = {
+        hidden_effect = {
+            FROM = { clean_up_after_duel_effect = yes } #test if this works, even if character is_dying
             clean_up_after_duel_effect = yes
         }
     }
