@@ -336,6 +336,12 @@ character_event = {
         trigger = { #Ruler should be allowed to loot at all in the first place
           is_landed = yes
           is_allowed_to_loot = yes
+          NOT = {
+            has_game_rule = {
+      				name = raiding
+      				value = off
+      			}
+          }
           OR = {
             independent = yes
             top_liege = {
@@ -402,6 +408,19 @@ character_event = {
         }
         event_target:quest_giver = {
           character_event = { id = ELDC.1001 }
+        }
+			}
+      20 = { #Complete a raid - raid decision version of the mission
+        trigger = { #Ruler should be allowed to raid
+          is_landed = yes
+          has_game_rule = {
+    				name = raiding
+    				value = off
+    			}
+    			raiding_ruler_trigger = yes
+        }
+        event_target:quest_giver = {
+          character_event = { id = ELDC.1006 }
         }
 			}
 			20 = {
@@ -748,6 +767,77 @@ character_event = {
 	}
 }
 
+#MISSION:Complete a raid - raid decision version of the mission
+#Ping event for the mission
+character_event = {
+	id = ELDC.1006
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { FROM = { society_quest_event = { id = ELDC.1007 days = 7 random = 7 } } }
+}
+#Assign event
+society_quest_event = {
+	id = ELDC.1007
+	desc = EVTDESCELDC_1007
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		society_member_of = elder_concord
+		has_any_quest = no
+		same_society_as = FROM
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+		is_landed = yes
+    has_game_rule = {
+      name = raiding
+      value = off
+    }
+    raiding_ruler_trigger = yes
+	}
+
+	option = {
+		name = ACCEPT
+		set_quest = quest_go_raiding
+	}
+	option  = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		add_character_modifier = {
+			name = quest_cooldown_timer
+			hidden = yes
+			days = 1000
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+#Raid successful, end the quest.
+character_event = {
+	id = ELDC.1008
+	desc = EVTDESCELDC_1008
+	picture = GFX_evt_mind_flayers_2
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	trigger = {
+		society_member_of = elder_concord
+		has_quest = quest_go_raiding
+	}
+
+	option = {
+		name = EVTOPTAELDC25503
+		add_society_currency_medium_effect = yes
+    scaled_wealth = { value = 1.0 min = 50 max = 150 }
+    clr_quest = quest_go_raiding
+	}
+}
 
 #################################DECISIONS######################################
 

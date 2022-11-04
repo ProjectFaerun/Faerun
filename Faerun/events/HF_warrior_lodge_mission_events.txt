@@ -47,6 +47,12 @@ character_event = {
 				trigger = { #Ruler should be allowed to loot at all in the first place
 					is_landed = yes
 					is_allowed_to_loot = yes
+					NOT = {
+            has_game_rule = {
+      				name = raiding
+      				value = off
+      			}
+          }
 					NOR = {
 						society_member_of = warrior_lodge_elven
 						society_member_of = warrior_lodge_dwarven
@@ -130,6 +136,19 @@ character_event = {
 				event_target:lodge_hero = {
 					character_event = { id = HF.25501 } #Raid and loot barony.
 				}
+			}
+			20 = { #Complete a raid - raid decision version of the mission
+        trigger = { #Ruler should be allowed to raid
+          is_landed = yes
+          has_game_rule = {
+    				name = raiding
+    				value = off
+    			}
+    			raiding_ruler_trigger = yes
+        }
+        event_target:lodge_hero = {
+          character_event = { id = HF.25512 }
+        }
 			}
 			20 = {
 				trigger = {
@@ -974,6 +993,77 @@ character_event = {
 	}
 }
 
+#MISSION:Complete a raid - raid decision version of the mission
+#Ping event for the mission
+character_event = {
+	id = HF.25512
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = { FROM = { society_quest_event = { id = HF.25513 days = 7 random = 7 } } }
+}
+#Assign event
+society_quest_event = {
+	id = HF.25513
+	desc = EVTDESCHF_25513
+
+	is_triggered_only = yes
+	is_in_society = yes
+	only_capable = yes
+
+	trigger = {
+		is_member_of_any_warrior_lodge_trigger = yes
+		has_any_quest = no
+		same_society_as = FROM
+		NOT = { has_character_modifier = quest_cooldown_timer }
+		NOT = { is_inaccessible_trigger = yes }
+		is_landed = yes
+    has_game_rule = {
+      name = raiding
+      value = off
+    }
+    raiding_ruler_trigger = yes
+	}
+
+	option = {
+		name = ACCEPT
+		set_quest = quest_go_raiding
+	}
+	option  = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		add_character_modifier = {
+			name = quest_cooldown_timer
+			hidden = yes
+			days = 1000
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+#Raid successful, end the quest.
+character_event = {
+	id = HF.25514
+	desc = EVTDESCHF_25514
+	picture = GFX_evt_vikings_arriving_oldgods
+	border = GFX_event_normal_frame_war
+
+	is_triggered_only = yes
+
+	trigger = {
+		is_member_of_any_warrior_lodge_trigger = yes
+		has_quest = quest_go_raiding
+	}
+
+	option = {
+		name = EVTOPTAELDC25503
+		add_society_currency_medium_effect = yes
+    scaled_wealth = { value = 1.0 min = 50 max = 150 }
+    clr_quest = quest_go_raiding
+	}
+}
 
 #MISSION:
 #Ping event for the mission Duel <someone>
