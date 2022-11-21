@@ -888,28 +888,26 @@ can_be_spiritual_trigger = {
 	# }
 }
 
-is_inaccessible_trigger = { #Remember to write this "is_inaccessible_trigger = no" when scripting, or the tooltip will be messed up (it reads "Is NOT in Hiding, in Seclusion, or out traveling")
+# Remember to write this "is_inaccessible_trigger = no" when scripting, or the tooltip will be messed up (it reads "Is NOT in Hiding, in Seclusion, or out traveling")
+is_inaccessible_trigger = {
 	custom_tooltip = {
 		text = is_inaccessible_tooltip
-		hidden_tooltip = {
-			OR = {
-				has_character_flag = flag_holding_great_tribal_festival
-				trait = in_hiding
-				# trait = on_hajj
-				# trait = on_pilgrimage
-				trait = kow_tow_travels
-				trait = travelling
-				trait = troubled_pregnancy
-				trait = pregnancy_finishing
-				has_character_modifier = mother_minor_rest
-				has_character_modifier = in_seclusion
-				has_character_modifier = in_meditation
-				has_character_modifier = doing_penance
-				has_character_modifier = out_traveling
-				trait = creature_monster
-				trait = is_spelljamming
-				#trait = creature_elder_brain
-			}
+
+		OR = {
+			has_character_flag = do_not_disturb
+			has_character_flag = flag_holding_great_tribal_festival
+			trait = in_hiding
+			trait = troubled_pregnancy
+			trait = pregnancy_finishing
+			is_pilgrim = yes
+			in_seclusion = yes
+			has_character_modifier = mother_minor_rest
+			has_character_modifier = in_meditation
+			has_character_modifier = doing_penance
+			has_character_modifier = out_traveling
+			trait = creature_monster
+			trait = is_spelljamming
+			#trait = creature_elder_brain
 		}
 	}
 }
@@ -920,19 +918,22 @@ is_unimportant_trigger = {
 		is_landed = yes
 		has_job_title = yes
 		has_minor_title = yes
-		AND = {
-			NOT = { dynasty = none }
-			num_of_dynasty_members = 2
+
+		trigger_if = {
+			limit = { is_lowborn = no }
+			num_of_dynasty_members >= 2
 		}
+
 		any_lover = { ai = no }
 		any_close_relative = { ai = no }
 		any_friend = { ai = no }
 		any_rival = { ai = no }
 		any_consort = { ai = no }
-		num_of_claims = 1
+
+		num_of_claims >= 1
 		has_character_flag = eternal_life_mystic
 		trait = horse
-		has_character_modifier = in_seclusion
+		in_seclusion = yes
 		has_character_modifier = elder_long_life_modifier
 		immortal = yes
 	}
@@ -1021,11 +1022,11 @@ has_prev_education_trigger = {
 
 useless_character_trigger = {
 	OR = {
-		NOT = { health = 2.5 }
+		health < 2.5
+		is_incapable = yes
 		trait = lunatic
 		trait = maimed
 		trait = infirm
-		trait = incapable
 		trait = mangled
 		trait = severely_injured
 		trait = imbecile
@@ -1133,19 +1134,19 @@ assassins_appropriate_target_trigger = {
 
 interesting_face_trigger = {
 	OR = {
+		is_ill = yes
+		has_scarred_trait_trigger = yes
+		is_strong_trigger = yes
+		is_weak_trigger = yes
 		trait = fair
 		trait = groomed
 		trait = ugly
 		trait = uncouth
-		has_scarred_trait_trigger = yes
-		is_ill = yes
 		trait = disfigured
 		trait = blinded
 		trait = one_eyed
 		trait = leper
 		trait = harelip
-		is_strong_trigger = yes
-		is_weak_trigger = yes
 		trait = lunatic
 		trait = possessed
 		trait = rabies
@@ -1284,12 +1285,21 @@ is_ascetic_trigger = {
 }
 
 is_virgin_trigger = {
+	OR = {
+		practical_age < 25
+		trait = celibate
+		trait = chaste
+		trait = shy
+		is_ascetic_trigger = yes
+	}
+
+	has_children = no
+	has_lover = no
+	is_pregnant = no
+
 	NOR = {
-		any_lover = { always = yes }
-		any_child_even_if_dead = { always = yes }
 		any_spouse_even_if_dead = { always = yes }
 		has_focus = focus_seduction
-		is_pregnant = yes
 		trait = pregnant
 		trait = lustful
 		trait = hedonist
@@ -1298,13 +1308,6 @@ is_virgin_trigger = {
 		trait = lovers_pox
 		trait = has_aztec_disease
 		trait = syphilitic
-	}
-	OR = {
-		NOT = { age = 25 }
-		trait = celibate
-		trait = chaste
-		trait = shy
-		is_ascetic_trigger = yes
 	}
 }
 
@@ -3395,8 +3398,104 @@ is_mongol_empire_leader_trigger = {
 }
 
 is_single_player_observer_mode = {
-	AND = {
-		multiplayer = no
-		is_local_human_observer = yes
+	multiplayer = no
+	is_local_human_observer = yes
+}
+
+# Used to check if a character would have a regent if the game rule wasn't disabled
+# Uses many separate 'trigger_if's for a nicer tooltip
+# Expand with traits with any of the following flags:
+# - incapacitating
+# - pilgrimage
+# - in_hiding
+is_not_in_regency_trigger = {
+	show_only_failed_conditions = yes
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = on
+			}
+		}
+
+		has_regent = no
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		is_adult = yes
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		prisoner = no
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		is_incapable = no
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		NOT = { trait = travelling }
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		NOT = { trait = on_pilgrimage }
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		NOT = { trait = troubled_pregnancy }
+	}
+
+	trigger_if = {
+		limit = {
+			has_game_rule = {
+				name = regencies
+				value = off
+			}
+		}
+
+		NOT = { trait = pregnancy_finishing }
 	}
 }
