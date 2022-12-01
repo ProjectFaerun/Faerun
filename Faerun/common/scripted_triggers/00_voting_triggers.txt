@@ -1,0 +1,144 @@
+# this_is_warrior_culture_trigger
+# this_is_diplomatic_culture_trigger
+# this_is_spiritual_culture_trigger
+
+# parent_for_elective_succession_trigger
+
+# Not really about culture - Used in AI voting logic
+this_is_warrior_culture_trigger = {
+	pacifist = no
+
+	OR = {
+		culture_group = dwarf_group
+		culture_group = taan_group
+		culture = aslanlar
+		culture = shaaran
+		culture = arkaiun
+		culture = centaur
+		culture = wemic
+		culture = eraka
+		culture = orc
+		culture = orog
+		culture = scro
+		culture = oscray
+		culture = tanarukk
+		culture = hobgoblin
+		is_muslim_trigger = yes
+		religion = toteteohuan
+		religion = uthgardt_faith
+		religion = deities_of_fury
+		religion = dwarven_pantheon
+		religion = giant_pantheon
+		religion = tuigan_shamanism
+		religion = nogari
+		religion = ulutiuan
+		religion = abyssal_cult
+		religion = orc_pantheon
+		has_religion_feature = religion_warlike
+		is_tribal = yes
+		# is_nomadic = yes
+	}
+}
+
+# Not really about culture - Used in AI voting logic
+this_is_diplomatic_culture_trigger = {
+	OR = {
+		is_feudal = yes
+		is_patrician = yes
+	}
+
+	OR = {
+		religion_group = good_human_pantheon_group
+		religion_group = qismaite_group
+		religion = church_of_cyric
+		religion = asathalfinare
+		religion = the_path
+		has_religion_feature = religion_cosmopolitan
+	}
+}
+
+# Not really about culture - Used in AI voting logic
+this_is_spiritual_culture_trigger = {
+	OR = {
+		religion = adama
+		religion = padhran
+		religion = elven_pantheon
+		religion = chung_tao
+		has_religion_feature = religion_peaceful
+	}
+}
+
+# Used in succession voting to decide valid candidates
+parent_for_elective_succession_trigger = {
+	OR = {
+		has_claim = ROOT_FROMFROM
+
+		trigger_if = {
+			limit = { is_close_relative = ROOT }
+
+			OR = {
+				dynasty = ROOT
+
+				AND = {
+					is_landed = yes
+					higher_real_tier_than = BARON
+				}
+			}
+		}
+
+		trigger_if = {
+			limit = { higher_real_tier_than = COUNT }
+
+			# Either defacto direct vassal, or independent ruler who is dejure vassal
+			OR = {
+				vassal_of = ROOT
+
+				AND = {
+					independent = yes
+
+					any_dejure_liege = {
+						title = FROMFROM
+					}
+				}
+			}
+		}
+	}
+
+	# Candidate should not be a landless Courtier who is about to inherit a Theocracy or Republic
+	trigger_if = {
+		limit = {
+			any_heir_title = {
+				OR = {
+					is_republic = yes
+					is_theocracy = yes
+					is_merchant_republic = yes
+				}
+			}
+		}
+
+		is_landed = yes
+		is_republic = no
+		is_theocracy = no
+		is_merchant_republic = no
+	}
+
+	# If the title controls the religion, candidates must be of the same religion
+	trigger_if = {
+		limit = { ROOT = { controls_religion = yes } }
+		religion = ROOT
+	}
+
+	is_ascetic_trigger = no
+	is_theocracy = no
+	is_republic = no
+	is_merchant_republic = no
+
+	NOR = {
+		trait = disinherited
+		trait = eunuch
+		trait = bastard
+		trait = cat
+		trait = horse
+		character = ROOT # Not the current ruler
+	}
+}

@@ -1,0 +1,249 @@
+# has_society_currency_trivial_trigger
+# has_society_currency_tiny_trigger
+# has_society_currency_minor_trigger
+# has_society_currency_medium_trigger
+# has_society_currency_major_trigger
+
+# is_devil_worshiper_trigger
+# is_christian_monastic_member_trigger
+# is_dharmic_monastic_member_trigger
+# is_monastic_member_trigger
+
+# has_common_devilworship_prerequisites
+# has_satanists_prerequisites
+
+# has_assassins_prerequisites
+
+# higher_society_rank_than_prev_trigger
+# higher_society_rank_than_root_trigger
+
+# ok_sr_induction_mission_target_trigger
+# ok_sr_sympathy_mission_target_trigger
+
+has_society_currency_trivial_trigger = {
+	society_currency >= 15
+}
+
+has_society_currency_tiny_trigger = {
+	society_currency >= 50
+}
+
+has_society_currency_minor_trigger = {
+	society_currency >= 150
+}
+
+has_society_currency_medium_trigger = {
+	society_currency >= 300
+}
+
+has_society_currency_major_trigger = {
+	society_currency >= 500
+}
+
+# TODO: replace with society flags?
+is_devil_worshiper_trigger = {
+	custom_tooltip = {
+		text = IS_DEVIL_WORSHIPPER_TRIGGER
+		
+		society_member_of = the_satanists
+	}
+}
+
+# TODO: replace with society flags?
+# is_christian_monastic_member_trigger removed for Faerun
+
+# TODO: replace with society flags?
+is_dharmic_monastic_member_trigger = {
+	OR = {
+		society_member_of = monastic_order_sun_soul
+		society_member_of = monastic_order_long_death
+		society_member_of = monastic_order_empty_hand
+		society_member_of = monastic_order_old_order
+		society_member_of = monastic_order_nog
+	}
+}
+
+# TODO: replace with society flags?
+is_monastic_member_trigger = {
+	is_dharmic_monastic_member_trigger = yes
+}
+
+has_common_devilworship_prerequisites = {
+	is_adult = yes
+	prisoner = no
+
+	custom_tooltip = {
+		text = must_be_a_sinner_tooltip
+
+		OR = {
+			has_impious_trait_trigger = yes
+			has_vice_trigger = yes
+			trait = cruel
+			trait = possessed
+			trait = lunatic
+		}
+		NOR = {
+			trait = kind
+			trait = zealous
+			evilcat_is_chosen = yes
+		}
+	}
+}
+
+has_satanists_prerequisites = {
+	has_common_devilworship_prerequisites = yes
+}
+
+# not cleanslate becuase its messy
+has_assassins_prerequisites = {
+	is_adult = yes
+	conditional_tooltip = { #recruitment decision
+		trigger = {
+			FROM = {
+				OR = {
+					society_member_of = eldreth_veluuthra
+					society_member_of = everlasting
+				}
+			}
+		}
+		OR = {
+			FROM = { ai = no }
+			hidden_trigger = { ai = no }
+			religion = elven_pantheon
+			religion = qisma
+		}
+	}
+	conditional_tooltip = { #showing interest via interface
+		trigger = {
+			NOT = {
+				FROM = {
+					OR = {
+						society_member_of = eldreth_veluuthra
+						society_member_of = everlasting
+					}
+				}
+			}
+		}
+		OR = {
+			true_religion = elven_pantheon
+			religion = elven_pantheon
+			true_religion = qisma
+			religion = qisma
+		}
+	}
+	# OR = {
+		# is_female = no
+		# has_game_rule = {
+			# name = gender
+			# value = all
+		# }
+	# }
+}
+
+same_society_rank_as_prev_trigger = {
+	trigger_if = {
+		limit = { society_rank == 1 }
+		PREV = { society_rank == 1 }
+	}
+	trigger_else_if = {
+		limit = { society_rank == 2 }
+		PREV = { society_rank == 2 }
+	}
+	trigger_else_if = {
+		limit = { society_rank == 3 }
+		PREV = { society_rank == 3 }
+	}
+	trigger_else_if = {
+		limit = { society_rank == 4 }
+		PREV = { society_rank == 4 }
+	}
+}
+
+higher_society_rank_than_prev_trigger = {
+	trigger_if = {
+		limit = { society_rank == 2 }
+		PREV = { society_rank < 2 }
+	}
+	trigger_else_if = {
+		limit = { society_rank == 3 }
+		PREV = { society_rank < 3 }
+	}
+	trigger_else = {
+		society_rank == 4
+		PREV = { society_rank < 4 }
+	}
+}
+
+higher_society_rank_than_root_trigger = {
+	trigger_if = {
+		limit = { society_rank == 2 }
+		ROOT = { society_rank < 2 }
+	}
+	trigger_else_if = {
+		limit = { society_rank == 3 }
+		ROOT = { society_rank < 3 }
+	}
+	trigger_else = {
+		society_rank == 4
+		ROOT = { society_rank < 4 }
+	}
+}
+
+ok_sr_induction_mission_target_trigger = {
+	is_adult = yes
+
+	OR = {
+		religion_group = {
+			target_type = secret
+			target = ROOT
+		}
+
+		has_sympathy_for_true_religion_of_root_trigger = yes
+	}
+
+	prisoner = no
+	is_incapable = no
+	is_inaccessible_trigger = no
+
+	NOR = {
+		secret_religion = ROOT
+
+		religion = {
+			target_type = secret
+			target = ROOT
+		}
+
+		has_character_modifier = secret_religion_sympathy_timer
+	}
+}
+
+ok_sr_sympathy_mission_target_trigger = {
+	is_adult = yes
+	has_secret_religion = no
+	prisoner = no
+	is_inaccessible_trigger = no
+	is_incapable = no
+	NOT = { has_character_modifier = secret_religion_sympathy_timer }
+
+	ROOT = {
+		NOR = {
+			secret_religion = {
+				target_type = public
+				target = PREV
+			}
+
+			has_sympathy_for_true_religion_of_prev_trigger = yes
+		}
+
+		PREV = {
+			NOR = {
+				religion = {
+					target = PREV
+					target_type = secret
+				}
+
+				has_sympathy_for_true_religion_of_prev_trigger = yes
+			}
+		}
+	}
+}
