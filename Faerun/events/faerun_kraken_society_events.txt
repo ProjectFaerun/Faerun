@@ -1,0 +1,241 @@
+namespace = KRAK
+
+########################JOINING############################
+
+#From on_character_ask_to_join_society
+character_event = {
+    id = KRAK.100
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	FROM = { leader = { society_member_of = kraken_society } }
+    }
+    immediate = {
+    	if = { #Find a non-prisoner member
+    		limit = { FROM = { leader = { prisoner = yes } } }
+    		FROM = {
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kraken_society
+    					society_rank == 4
+    					prisoner = no
+    				}
+    				character_event = { id = KRAK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kraken_society
+    					society_rank == 3
+    					prisoner = no
+    				}
+    				character_event = { id = KRAK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kraken_society
+    					society_rank == 2
+    					prisoner = no
+    				}
+    				character_event = { id = KRAK.101 }
+    				break = yes
+    			}
+    			any_society_member = {
+    				limit = {
+    					society_member_of = kraken_society
+    					society_rank == 1
+    					prisoner = no
+    				}
+    				character_event = { id = KRAK.101 }
+    				break = yes
+    			}
+    		}
+			#Everyone is somehow in prison so just use teh leader anyway
+    	}
+    	FROM = { leader = { character_event = { id = KRAK.101 } } }
+    }
+}
+
+#Ping event
+character_event = {
+    id = KRAK.101
+    hide_window = yes
+    is_triggered_only = yes
+    immediate = {
+    	FROM = { letter_event = { id = KRAK.102 } }
+    }
+}
+
+#Welcome letter
+letter_event = {
+    id = KRAK.102
+    desc = EVTDESC_KRAK_102
+    border = GFX_event_letter_frame_religion
+
+    is_triggered_only = yes
+
+    immediate = { set_character_flag = society_join_block }
+
+    option = {
+      name = EVTOPTA_KRAK_102
+
+      join_society = kraken_society
+
+      clr_character_flag = society_join_block
+    }
+}
+
+########################AI JOIN AND AI RANK UP###########################
+
+character_event = { #force the AI to join a society
+	id = KRAK.110
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { #if he's already a member, will force a rank up 25% of the time
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				society_member_of = kraken_society
+				society_rank <= 3
+				society_can_rank_up = yes
+			}
+			random_list = {
+				75 = {}
+				25 = {
+					society_rank_up = 1
+				}
+			}
+		}
+		if = { #force the joining event on AI
+			limit = {
+				ai = yes
+				prisoner = no
+				NOT = { trait = incapable }
+				is_adult = yes
+				is_in_society = no
+				controls_religion = no
+				block_general_event_trigger = no
+			}
+			character_event = { id = KRAK.111 }
+		}
+	}
+}
+
+character_event = { #AI join event
+	id = KRAK.111
+	hide_window = yes
+
+	is_triggered_only = yes
+
+  immediate = {
+    random_list = {
+      60 = { # do nothing
+      }
+      40 = {
+        trigger = {
+          can_join_society = kraken_society
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = impaler
+            trait = schemer
+            trait = mystic
+          }
+        }
+        modifier = {
+          factor = 2
+          OR = {
+            trait = creature_aboleth
+            trait = creature_sahuagin
+            trait = creature_kuotoa
+            trait = creature_malenti
+          }
+        }
+        modifier = {
+          factor = 2
+          trait = cruel
+        }
+        modifier = {
+          factor = 2
+          trait = deceitful
+        }
+        modifier = {
+          factor = 2
+          trait = lunatic
+        }
+        modifier = {
+          factor = 0
+          trait = kind
+        }
+        modifier = {
+          factor = 0
+          is_benevolent_trigger = yes
+        }
+        modifier = {
+          factor = 0.1
+          is_landed = no
+        }
+        modifier = {
+          factor = 0.5
+          trait = honest
+        }
+        join_society = kraken_society
+        random_list = { # Artificially increase society influence for balance purposes, not really useful in my opinion.
+          75 = {
+            modifier = {
+              factor = 0
+              society_influence >= 30
+            }
+          }
+          25 = {
+          }
+        }
+        if = { # Make grandmaster is there is none
+          limit = {
+            NOT = {
+              society = {
+                any_society_member = {
+                  is_society_grandmaster = yes
+                }
+              }
+            }
+          }
+          set_society_grandmaster = yes
+        }
+      }
+    }
+  }
+}
+
+#################################DECISIONS######################################
+
+#fish invited
+character_event = {
+    id = KRAK.2500
+    desc = EVTDESC_KRAK_2500
+		picture = GFX_evt_kraken
+    border = GFX_event_normal_frame_war
+
+    is_triggered_only = yes
+
+    option = {
+        name = EVTOPTA_KRAK_2500
+        event_target:invited_lodge_soldier = {
+            show_scope_change = no
+            opinion = {
+                modifier = opinion_loyal_servant
+                who = ROOT
+                years = 10
+            }
+        }
+        ai_chance = {
+            factor = 100
+        }
+    }
+}
