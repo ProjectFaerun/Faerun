@@ -750,7 +750,10 @@ character_event = {
 			15 = {
 				character_event = { id = TWI.1001 } #Agent Elimination
 			}
-			20 = {
+            15 = {
+              character_event = { id = TWI.1011 } #Dig up dirt on someone
+            }
+			30 = {
 				modifier = {
 					factor = 0
 					ai = no
@@ -837,7 +840,6 @@ character_event = {
 		}
 	}
 }
-
 #Ping event for quest giver
 character_event = {
 	id = TWI.1002
@@ -852,7 +854,6 @@ character_event = {
 		}
 	}
 }
-
 #You get your target
 society_quest_event = {
 	id = TWI.1003
@@ -944,7 +945,6 @@ society_quest_event = {
 		ai_chance = { factor = 0 }
 	}
 }
-
 #Helps AI do mission
 character_event = {
   id = TWI.1004
@@ -958,7 +958,6 @@ character_event = {
   	character_event = { id = TWI.1008 }
   }
 }
-
 #AI clean-up
 character_event = {
     id = TWI.1005
@@ -975,7 +974,6 @@ character_event = {
     	}
     }
 }
-
 #AI mission assassination attempt
 character_event = {
 	id = TWI.1008
@@ -1133,6 +1131,288 @@ character_event = {
           factor = 1.3
           event_target:elimination_target = { combat_rating_diff = { character = event_target:assassin value = 30 } }
         }
+      }
+    }
+	}
+}
+
+#MISSION: #Dig Up Dirt
+character_event = {
+  id = TWI.1011
+  hide_window = yes
+
+  is_triggered_only = yes
+
+  trigger = {
+    any_realm_character = {
+      is_incapable = no
+      same_realm = ROOT
+      NOT = { character = ROOT }
+      NOT = { same_society_as = ROOT }
+      prisoner = no
+      is_ruler = yes
+    }
+  }
+
+	immediate = {
+    random_realm_character = {
+      limit = {
+        is_incapable = no
+  			same_realm = ROOT
+  			NOT = { character = ROOT }
+        NOT = { same_society_as = ROOT }
+        prisoner = no
+        is_ruler = yes
+      }
+      save_event_target_as = dirt_target
+    }
+
+    if = {
+			limit = {
+				event_target:dirt_target = { always = yes }
+				is_within_diplo_range = event_target:dirt_target
+			}
+			event_target:quest_giver = {
+				character_event = { id = TWI.1012 }
+			}
+		}
+	}
+}
+#Ping event for quest giver
+character_event = {
+	id = TWI.1012
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { event_target:dirt_target = { always = yes } }
+			FROM = { society_quest_event = { id = TWI.1013 days = 7 random = 7 } }
+		}
+	}
+}
+#You get your target
+society_quest_event = {
+	id = TWI.1013
+	title = quest_dig_dirt
+	quest_target = event_target:dirt_target
+  desc = EVTDESC_TWI_1013
+
+	trigger = {
+		is_in_society = yes
+		event_target:dirt_target = {
+			is_alive = yes
+      prisoner = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = ACCEPT
+
+		event_target:dirt_target = {
+			set_quest_target = {
+				id = quest_dig_dirt
+				holder = ROOT
+			}
+		}
+
+		hidden_effect = {
+			if = { #Makes sure the AI actually does the mission
+				limit = { ai = yes }
+				random_list = {
+					20 = {
+						trigger = {
+							attribute_diff = { character = event_target:dirt_target attribute = intrigue value = 6 }
+						}
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = TWI.1014 days = 150 random = 100 } #Triggers plot event
+					}
+					20 = {
+						trigger = { attribute_diff = { character = event_target:dirt_target attribute = intrigue value = 3 } }
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = TWI.1014 days = 300 random = 100 } #Triggers plot event
+					}
+					20 = {
+						modifier = { intrigue = 12 factor = 1.2 }
+						modifier = { intrigue = 14 factor = 1.2 }
+						modifier = { intrigue = 16 factor = 1.2 }
+						modifier = { intrigue = 18 factor = 1.2 }
+						character_event = { id = TWI.1014 days = 500 random = 300 } #Triggers plot event
+					}
+					40 = {
+						modifier = { event_target:dirt_target = { intrigue = 12 } factor = 1.2 }
+						modifier = { event_target:dirt_target = { intrigue = 14 } factor = 1.2 }
+						modifier = { event_target:dirt_target = { intrigue = 16 } factor = 1.2 }
+						modifier = { event_target:dirt_target = { intrigue = 18 } factor = 1.2 }
+						modifier = { event_target:dirt_target = { tier = COUNT } factor = 1.5 }
+						modifier = { event_target:dirt_target = { tier = DUKE } factor = 2 }
+						modifier = { event_target:dirt_target = { tier = KING } factor = 2.5 }
+						modifier = { event_target:dirt_target = { tier = EMPEROR } factor = 5 }
+						character_event = { id = TWI.1015 } #Clears quest
+					}
+				}
+			}
+		}
+		event_target:dirt_target = {
+			set_character_flag = appear_in_option
+			clr_character_flag = appear_in_option
+		}
+	}
+
+	option = {
+		name = DECLINE
+		custom_tooltip = { text = decline_quest_tooltip }
+
+		hidden_effect = {
+			add_character_modifier = {
+				name = quest_cooldown_timer
+				hidden = yes
+				days = 1000
+			}
+		}
+
+		ai_chance = { factor = 0 }
+	}
+}
+#Helps AI do mission
+character_event = {
+  id = TWI.1014
+  hide_window = yes
+  is_triggered_only = yes
+  trigger = {
+  	has_quest = quest_dig_dirt
+  }
+  immediate = {
+  	character_event = { id = TWI.1018 }
+  }
+}
+#AI clean-up
+character_event = {
+    id = TWI.1015
+    hide_window = yes
+    is_triggered_only = yes
+    trigger = {
+    	has_quest = quest_dig_dirt
+    }
+    immediate = {
+    	clr_quest = {
+    		id = quest_dig_dirt
+    		failure = yes
+    	}
+    }
+}
+#Quest ending event
+character_event = {
+  id = TWI.1017
+  picture = GFX_evt_shady_meeting
+  desc = EVTDESC_TWI_1017
+  border = GFX_event_normal_frame_intrigue
+
+  is_triggered_only = yes
+
+  trigger = {
+  	has_quest = quest_dig_dirt
+  }
+
+  option = {
+    name = EVTOPTA_TWI_1017
+    clr_quest = quest_dig_dirt
+
+		if = {
+			limit = { event_target:dirt_target = { higher_tier_than = DUKE } }
+			add_society_currency_medium_effect = yes
+		}
+		else = {
+			add_society_currency_minor_effect = yes
+		}
+    hidden_tooltip = {
+      if = {
+  			limit = { society_member_of = kraken_society }
+  			add_legend_progress_trivial_effect = yes
+  		}
+    }
+  }
+}
+#AI mission spying attempt
+character_event = {
+	id = TWI.1018
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = { save_event_target_as = spy }
+    random_list = {
+      60 = { #Success
+        modifier = {
+          factor = 3
+          event_target:dirt_target = { trait = incapable }
+        }
+        modifier = {
+          factor = 2
+          event_target:dirt_target = { prisoner = yes }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:dirt_target attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:dirt_target attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { attribute_diff = { character = event_target:dirt_target attribute = intrigue value = 6 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:dirt_target value = 10 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:dirt_target value = 20 } }
+        }
+        modifier = {
+          factor = 1.3
+          FROM = { combat_rating_diff = { character = event_target:dirt_target value = 30 } }
+        }
+        character_event = { id = TWI.1017 days = 1 } #Completes mission
+      }
+      40 = { #Fail
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { attribute_diff = { character = event_target:spy attribute = intrigue value = 2 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { attribute_diff = { character = event_target:spy attribute = intrigue value = 4 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { attribute_diff = { character = event_target:spy attribute = intrigue value = 6 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { combat_rating_diff = { character = event_target:spy value = 10 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { combat_rating_diff = { character = event_target:spy value = 20 } }
+        }
+        modifier = {
+          factor = 1.3
+          event_target:dirt_target = { combat_rating_diff = { character = event_target:spy value = 30 } }
+        }
+        character_event = { id = TWI.1015 } #Clears quest
       }
     }
 	}
