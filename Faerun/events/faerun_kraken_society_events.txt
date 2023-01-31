@@ -239,3 +239,815 @@ character_event = {
         }
     }
 }
+
+#################################INVASION######################################
+
+character_event = {
+    id = KRAK.3000
+    hide_window = yes
+    is_triggered_only = yes
+
+    trigger = {
+        FROM = { is_society = kraken_society }
+    }
+
+    immediate = {
+      FROM = {
+      	set_flag = block_society_progress #So progress is halted for members...
+      	save_event_target_as = legendary_society
+      }
+      random_province = { #Because societies cannot process events
+        limit = { is_land = yes }
+        set_province_flag = initiating_legendary_journey
+        province_event = { id = KRAK.3001 days = 5 random = 7 } #Checks status of society...
+        holder_scope = { save_event_target_as = province_holder }
+  		}
+    }
+}
+# Sent from event_target:legendary_society (above)
+province_event = {
+	id = KRAK.3001
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		event_target:legendary_society = { society_has_members = yes }
+		has_province_flag = initiating_legendary_journey
+	}
+
+	fail_trigger_effect = {
+		if = {
+			limit = { NOT = { has_province_flag = initiating_legendary_journey } } #@event_target:legendary_society } }
+		}
+		else = {
+			event_target:legendary_society = {
+				clr_flag = block_society_progress
+				set_society_progress = 0
+			}
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				has_province_flag = initiating_legendary_journey
+			}
+			event_target:legendary_society = {
+				random_society_member = {
+					limit = {
+						society_rank == 4
+						NOT = { is_inaccessible_trigger = yes }
+					}
+					preferred_limit = { ai = no } #We'd rather it was a player...
+
+					character_event = { id = KRAK.3002 } #START
+				}
+			}
+			clr_province_flag = initiating_legendary_journey
+		}
+		else = {
+      event_target:legendary_society = {
+        clr_flag = block_society_progress
+        set_society_progress = 0
+      }
+		}
+	}
+}
+#START
+character_event = {
+    id = KRAK.3002
+    title = KRAK_3002_title
+    desc = EVTDESC_KRAK_3002
+    picture = GFX_evt_kraken
+    border = GFX_event_normal_frame_war
+    is_triggered_only = yes
+
+    trigger = {
+        society_member_of = kraken_society
+        NOT = { is_inaccessible_trigger = yes }
+        any_independent_ruler = {
+          NOR = {
+            religion = deities_of_fury
+            society_member_of = kraken_society
+          }
+          any_realm_province = { port = yes }
+          primary_title = {
+            is_landless_type_title = no
+          }
+        }
+    }
+    fail_trigger_effect = {
+			event_target:legendary_society = {
+				clr_flag = block_society_progress
+				set_society_progress = 0
+			}
+  	}
+
+    portrait = event_target:target_ruler
+
+    immediate = {
+        # For loc purposes, to have somewhere to refer to, and also for choosing a target...
+        if = {
+            limit = { is_landed = yes }
+            capital_scope = { save_event_target_as = home_capital }
+        }
+        else_if = {
+            limit = { liege = { is_landed = yes } }
+            liege = { capital_scope = { save_event_target_as = home_capital } }
+        }
+        else = {
+            random_society_member = {
+                limit = { is_landed = yes }
+                capital_scope = { save_event_target_as = home_capital }
+            }
+        }
+
+        #select target realm...
+        any_independent_ruler = {
+            limit = {
+                NOR = {
+                  religion = deities_of_fury
+                  society_member_of = kraken_society
+                }
+                any_realm_province = { port = yes }
+                primary_title = {
+                  is_landless_type_title = no
+                }
+                distance = { where = event_target:home_capital distance < 1000 }
+            }
+            score_value = { #Prioritizes selecting some Emperor, if it can...
+                value = 10
+                title_tier_increase_score = yes
+            }
+            score_value = { #Prioritizes selecting some Emperor, if it can...
+                value = 10
+                nomad_reduction_score = yes
+            }
+            save_event_target_as = target_ruler
+            primary_title = {
+                save_event_target_as = target_title
+            }
+        }
+        save_persistent_event_target = { #also saves the same as a persistent target, for safety (on_death)
+            name = target_title
+            scope = event_target:target_title
+        }
+        event_target:target_ruler = {
+          random_realm_province = {
+            preferred_limit = {
+              is_capital = no
+              port = yes
+            }
+            preferred_limit = {
+              port = yes
+            }
+            preferred_limit = {
+              is_capital = no
+            }
+            save_event_target_as = invasion_province
+          }
+        }
+
+        save_event_target_as = original_hero
+        set_character_flag = call_to_legend_active
+    }
+
+    option = {
+        name = EVTOPTA_KRAK_3002 #Start the whole thing
+
+        show_portrait = event_target:province_holder
+
+        hidden_effect = {
+            set_variable = {
+                which = legendary_event_progress
+                value = 0
+            }
+        }
+        hidden_effect = { add_1_point_to_legendary_progress_effect = yes }
+        evaluate_legendary_progress_effect = yes
+
+        hidden_effect = {
+            any_society_member = {
+                limit = {
+                    same_society_as = ROOT
+                    NOT = { has_character_flag = call_to_legend_active }
+                    NOT = { character = ROOT }
+                }
+                character_event = { id = KRAK.3010 } # Let other society members know what is going on
+            }
+        }
+
+        hidden_effect = { character_event = { id = KRAK.3003 days = 5 } } #Invasion events
+    }
+}
+
+#An invader character is created.
+character_event = {
+	id = KRAK.3003
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+    create_character = {
+      random_traits = yes
+      age = 750
+      immortal_age = 30
+      female = random
+      religion = deities_of_fury
+      attributes = {
+        diplomacy = 4
+        martial = 10
+        stewardship = 6
+        intrigue = 8
+        learning = 10
+      }
+      trait = strong
+      trait = robust
+      trait = brilliant_strategist
+      trait = holy_warrior
+      trait = zealous
+      trait = cruel
+      trait = patron_umberlee
+    }
+    new_character = {
+      wealth = 1000
+      save_event_target_as = invader_char
+      join_society = kraken_society
+      society_rank_up = 2
+      remove_trait = weak
+      remove_trait = delicate
+      remove_trait = soft
+      remove_trait = imbecile
+      remove_trait = idiot
+      remove_trait = slow
+      remove_trait = clubfooted
+      remove_trait = craven
+      remove_trait = kind
+      remove_trait = cynical
+      random_list = {
+        10 = { #aboleth
+          remove_all_race_traits = yes
+          culture = aboleth
+          add_trait = creature_aboleth
+          set_graphical_culture = aboleth
+          add_trait = genius
+          add_trait = master_shadow
+          add_trait = master_psion
+        }
+        9 = { #sahuagin
+          remove_all_race_traits = yes
+          culture = sahuagin
+          add_trait = creature_sahuagin
+          set_graphical_culture = sahuagin
+          add_trait = master_ranger
+          add_trait = master_cleric
+          add_trait = sahuagin_king
+        }
+        1 = { #malenti
+          remove_all_race_traits = yes
+          culture = aboleth
+          add_trait = creature_malenti
+          set_graphical_culture = malenti
+          add_trait = genius
+          add_trait = master_rogue
+          add_trait = master_psion
+          add_trait = immortal
+        }
+        10 = { #kuo_toa
+          remove_all_race_traits = yes
+          culture = kuo_toa
+          add_trait = creature_kuotoa
+          set_graphical_culture = kuo_toa
+          add_trait = genius
+          add_trait = master_rogue
+          add_trait = master_cleric
+          add_trait = immortal
+        }
+      }
+      character_event = { id = frxp.1 }
+      character_event = { id = KRAK.3004 }
+    }
+	}
+}
+#invader is given a temporary title and troops.
+character_event = {
+	id = KRAK.3004
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		create_title = {
+			tier = DUKE
+			landless = yes
+			temporary = yes
+			culture = ROOT
+			name = "CLAIMANT_ADVENTURE"
+			holder = ROOT
+			adventurer = yes
+		}
+		set_character_flag = duchy_adventurer
+		if = { #evil-vs-evil
+			limit = {
+				event_target:target_ruler = {
+					OR = {
+						has_character_modifier = true_villain_modifier
+						is_evil_religion = yes
+					}
+				}
+			}
+			spawn_unit = {
+				province = event_target:invasion_province
+				home = event_target:invasion_province
+				owner = THIS
+				leader = THIS
+				match_character = event_target:target_ruler
+				match_mult = 0.15
+				match_min = 2500
+				#earmark = decadence_revolters
+				reinforces = yes
+				reinforce_rate_multiplier = 0.25
+				attrition = 0
+				merge = yes
+			}
+			spawn_fleet = {
+				province = closest # closest sea zone
+				owner = THIS
+				disband_on_peace = yes
+				troops = {
+					galleys = { 400 400 }
+				}
+				earmark = decadence_revolters
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 20
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 22
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 24
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 9
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 33
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.15
+					match_min = 2500
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+		}
+		else_if = { #evil invader vs non-evil
+			limit = {
+				event_target:target_ruler = {
+					is_evil_religion = no
+					NOT = { has_character_modifier = true_villain_modifier }
+				}
+			}
+			spawn_unit = {
+				province = event_target:invasion_province
+				home = event_target:invasion_province
+				owner = THIS
+				leader = THIS
+				match_character = event_target:target_ruler
+				match_mult = 0.2
+				match_min = 4600
+				#earmark = decadence_revolters
+				reinforces = yes
+				reinforce_rate_multiplier = 0.25
+				attrition = 0
+				merge = yes
+			}
+			spawn_fleet = {
+				province = closest # closest sea zone
+				owner = THIS
+				disband_on_peace = yes
+				troops = {
+					galleys = { 400 400 }
+				}
+				earmark = decadence_revolters
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 20
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 22
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					#earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 24
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 9
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 30
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+			create_character = {
+				random_traits = yes
+				dynasty = NONE
+				religion = ROOT
+				culture = ROOT
+				female = no
+				age = 33
+				attributes = {
+					martial = 7
+				}
+				trait = skilled_tactician
+			}
+			new_character = {
+				spawn_unit = {
+					province = event_target:invasion_province
+					home = event_target:invasion_province
+					owner = PREV
+					match_character = event_target:target_ruler
+					match_mult = 0.2
+					match_min = 4600
+					earmark = decadence_revolters
+					reinforces = yes
+					reinforce_rate_multiplier = 0.25
+					attrition = 0
+					merge = yes
+				}
+			}
+		}
+		narrative_event = { id = KRAK.3005 days = 1 }
+	}
+}
+#a major narrative event warning of a potential invasion
+narrative_event = {
+	id = KRAK.3005
+	title = EVTNAME_KRAK_3005
+  desc = EVTDESC_KRAK_3005
+  picture = GFX_evt_kraken
+	portrait = event_target:target_ruler
+	hide_new = yes
+	show_root = yes
+	major = yes
+
+	is_triggered_only = yes
+
+	major_trigger = {
+		ai = no
+	}
+
+	option = {
+    name = {
+      text = EVTOPTA_KRAK_3005_A
+      trigger = { NOT = { society_member_of = kraken_society } }
+    }
+    name = {
+      text = EVTOPTA_KRAK_3005_B
+      trigger = { society_member_of = kraken_society }
+    }
+		narrative_event = { id = KRAK.3006 days = 150 random = 150 }
+	}
+}
+#war is declared on target. Both invader and target make their automatic call to arms.
+narrative_event = {
+	id = KRAK.3006
+	title = EVTNAME_KRAK_3006
+  desc = EVTDESC_KRAK_3006
+  picture = GFX_evt_kraken
+	portrait = event_target:target_ruler
+	hide_new = yes
+	show_root = yes
+	major = yes
+
+	is_triggered_only = yes
+
+	major_trigger = {
+		ai = no
+	}
+
+	immediate = {
+		event_target:invader_char = {
+			war = {
+				target = event_target:target_ruler
+				casus_belli = great_align_conflict
+			}
+			character_event = { id = ALWAR.10 days = 1 }
+		}
+		event_target:target_ruler = {
+			character_event = { id = ALWAR.10 days = 1 }
+		}
+	}
+
+	option = {
+    name = {
+      text = EVTOPTA_ALWAR_5
+      trigger = { NOT = { society_member_of = kraken_society } }
+    }
+    name = {
+      text = EVTOPTA_KRAK_3006
+      trigger = { society_member_of = kraken_society }
+    }
+	}
+}
+
+character_event = { # Let other society members know what is going on
+  id = KRAK.3010
+  title = KRAK_3002_title
+  desc = EVTDESC_KRAK_3002
+  picture = GFX_evt_kraken
+  border = GFX_event_normal_frame_war
+  is_triggered_only = yes
+
+  option = {
+    name = EVTOPTA_KRAK_3002
+  }
+}
+
+#LEGEND TESTING EVENT
+character_event = {
+  id = KRAK.1
+  picture = GFX_evt_shady_meeting
+  desc = EVTDESC_TWI_1017
+  border = GFX_event_normal_frame_intrigue
+
+  is_triggered_only = yes
+
+  option = {
+    name = EVTOPTA_TWI_1017
+    hidden_tooltip = {
+      if = {
+  			limit = { society_member_of = kraken_society }
+  			add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+        add_legend_progress_massive_effect = yes
+  		}
+    }
+  }
+}
