@@ -326,9 +326,11 @@ character_event = {
         society_member_of = kraken_society
         NOT = { is_inaccessible_trigger = yes }
         any_independent_ruler = {
+          higher_real_tier_than = COUNT
           NOR = {
             religion = deities_of_fury
             society_member_of = kraken_society
+            culture = monster
           }
           any_realm_province = { port = yes }
           primary_title = {
@@ -363,31 +365,47 @@ character_event = {
         }
 
         #select target realm...
-        any_independent_ruler = {
-            limit = {
-                NOR = {
-                  religion = deities_of_fury
-                  society_member_of = kraken_society
-                }
-                any_realm_province = { port = yes }
-                primary_title = {
-                  is_landless_type_title = no
-                }
-                distance = { where = event_target:home_capital distance < 1000 }
+        random_independent_ruler = {
+          limit = {
+            higher_real_tier_than = COUNT
+            NOR = {
+              religion = deities_of_fury
+              society_member_of = kraken_society
+              culture = monster
             }
-            score_value = { #Prioritizes selecting some Emperor, if it can...
-                value = 10
-                title_tier_increase_score = yes
-            }
-            score_value = { #Prioritizes selecting some Emperor, if it can...
-                value = 10
-                nomad_reduction_score = yes
-            }
-            save_event_target_as = target_ruler
+            any_realm_province = { port = yes }
             primary_title = {
-                save_event_target_as = target_title
+              is_landless_type_title = no
             }
+          }
+          preferred_limit = {
+            realm_size >= 250
+            num_of_count_titles_in_realm >= 100
+            distance = { where = event_target:home_capital distance < 500 }
+          }
+          preferred_limit = {
+            realm_size >= 150
+            num_of_count_titles_in_realm >= 60
+            distance = { where = event_target:home_capital distance < 500 }
+          }
+          preferred_limit = {
+            realm_size >= 50
+            num_of_count_titles_in_realm >= 20
+            distance = { where = event_target:home_capital distance < 500 }
+          }
+          preferred_limit = {
+            distance = { where = event_target:home_capital distance < 500 }
+          }
+          preferred_limit = {
+            distance = { where = event_target:home_capital distance < 1000 }
+          }
+
+          save_event_target_as = target_ruler
+          primary_title = {
+            save_event_target_as = target_title
+          }
         }
+
         save_persistent_event_target = { #also saves the same as a persistent target, for safety (on_death)
             name = target_title
             scope = event_target:target_title
@@ -977,25 +995,47 @@ narrative_event = {
 	portrait = event_target:target_ruler
 	hide_new = yes
 	show_root = yes
-	major = yes
+	#major = yes
 
 	is_triggered_only = yes
 
-	major_trigger = {
-		ai = no
-	}
+	#major_trigger = {
+	#	ai = no
+	#}
 
 	immediate = {
-		event_target:invader_char = {
-			war = {
-				target = event_target:target_ruler
-				casus_belli = great_align_conflict
-			}
-			character_event = { id = ALWAR.10 days = 1 }
-		}
-		event_target:target_ruler = {
-			character_event = { id = ALWAR.10 days = 1 }
-		}
+    if = {
+      limit = {
+        event_target:target_ruler = { is_alive = yes }
+      }
+      event_target:invader_char = {
+  			war = {
+  				target = event_target:target_ruler
+  				casus_belli = great_align_conflict
+  			}
+  			character_event = { id = ALWAR.10 days = 1 }
+  		}
+  		event_target:target_ruler = {
+  			character_event = { id = ALWAR.10 days = 1 }
+  		}
+    }
+    else = {
+      event_target:target_title = {
+        owner = {
+          save_event_target_as = target_ruler
+        }
+      }
+      event_target:invader_char = {
+        war = {
+          target = event_target:target_ruler
+          casus_belli = great_align_conflict
+        }
+        character_event = { id = ALWAR.10 days = 1 }
+      }
+      event_target:target_ruler = {
+        character_event = { id = ALWAR.10 days = 1 }
+      }
+    }
 	}
 
 	option = {
