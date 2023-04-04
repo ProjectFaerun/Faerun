@@ -209,3 +209,320 @@ narrative_event = {
 		}
 	}
 }
+
+#Lolth's test
+character_event = {
+	id = conv.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				OR = {
+					is_incapable = yes
+					is_pilgrim = yes
+					trait = wounded
+					trait = severely_injured
+					trait = mangled
+					trait = infirm
+					trait = pregnant
+					is_ill = yes
+				}
+			}
+			character_event = { id = conv.20 days = 180 }
+		}
+		else = {
+			character_event = { id = conv.21 }
+		}
+	}
+}
+character_event = {
+	id = conv.21
+	desc = EVTDESC_CONV_21
+	picture = GFX_evt_drow_2
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = {
+				any_courtier = {
+					is_adult = yes
+					z_has_class = yes
+					is_incapable = no
+					is_pilgrim = no
+					is_ill = no
+					prisoner = no
+					religion = lolth_cult
+					is_ruler = no
+					NOR = {
+						trait = kind
+						trait = wounded
+						trait = severely_injured
+						trait = mangled
+						trait = infirm
+						trait = pregnant
+					}
+				}
+			}
+			random_host_courtier = {
+				limit = {
+					is_adult = yes
+					z_has_class = yes
+					is_incapable = no
+					is_pilgrim = no
+					is_ill = no
+					prisoner = no
+					religion = lolth_cult
+					is_ruler = no
+					NOR = {
+						trait = kind
+						trait = wounded
+						trait = severely_injured
+						trait = mangled
+						trait = infirm
+						trait = pregnant
+					}
+				}
+				preferred_limit = {
+					is_evil_trigger = yes
+				}
+				save_event_target_as = combatant_1
+			}
+		}
+		else = {
+			create_random_priest = {
+				random_traits = yes
+				dynasty = random
+				female = yes
+				culture = drow
+				religion = lolth_cult
+				attributes = {
+					learning = 6
+				}
+				trait = creature_drow
+			}
+			new_character = {
+				remove_trait = slow
+				remove_trait = imbecile
+				remove_trait = dull
+				remove_trait = mystic
+				remove_trait = socializer
+				remove_trait = gamer
+				remove_trait = hedonist
+				remove_trait = duelist
+				remove_trait = hunter
+				remove_trait = strategist
+				remove_trait = administrator
+				remove_trait = architect
+				remove_trait = gardener
+				remove_trait = schemer
+				remove_trait = impaler
+				remove_trait = seducer
+				remove_trait = seductress
+				remove_trait = theologian
+				remove_trait = scholar
+				remove_trait = zealous
+
+				random_list = { # Flavor Randomization
+					30 = {  } # Nothing
+					15 = { change_learning = 2 }
+					10 = { change_learning = 4 }
+					5 = { change_learning = 6 }
+					20 = { add_trait = theologian }
+					5 = { add_trait = scholar }
+					5 = { add_trait = mystic }
+					5 = { add_trait = shrewd }
+					5 = { add_trait = robust }
+				}
+				random_list = { # Class
+					10 = { add_trait = trained_cleric }
+					10 = { add_trait = trained_paladin }
+					25 = { add_trait = journeyman_cleric }
+					25 = { add_trait = journeyman_paladin }
+					15 = { add_trait = expert_cleric }
+					15 = { add_trait = expert_paladin }
+				}
+
+				save_event_target_as = combatant_1
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_CONV_21
+		set_character_flag = lolth_tested_flag
+		save_event_target_as = target_lolth_test
+		save_event_target_as = combatant_2
+
+		event_target:combatant_1 = {
+			hidden_tooltip = {
+				set_character_flag = adventure_duel@event_target:combatant_2
+				character_event = { id = HFP.10100 }
+			}
+		}
+	}
+}
+character_event = {
+	id = conv.22
+	desc = EVTDESC_CONV_22
+	picture = GFX_evt_drow_3
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_CONV_22
+			random_list = {
+				25 = { #stronger
+					if = {
+						limit = {
+							trait = feeble
+						}
+						remove_trait = feeble
+					}
+					else_if = {
+						limit = {
+							NOT = {
+								trait = robust
+							}
+						}
+						add_trait = robust
+					}
+					else_if = {
+						limit = {
+							NOR = {
+								trait = hardy
+								trait = tough
+								trait = strong
+							}
+						}
+						add_trait = hardy
+					}
+					else_if = {
+						limit = {
+							trait = hardy
+						}
+						remove_trait = hardy
+						add_trait = tough
+					}
+					else_if = {
+						limit = {
+							trait = strong
+						}
+						change_martial = 2
+					}
+					else = {
+						remove_trait = tough
+						add_trait = strong
+					}
+				}
+				25 = { #smarter
+					if = {
+						limit = {
+							trait = dull
+						}
+						remove_trait = dull
+					}
+					else_if = {
+						limit = {
+							NOT = {
+								trait = shrewd
+							}
+						}
+						add_trait = shrewd
+					}
+					else_if = {
+						limit = {
+							NOR = {
+								trait = quick
+								trait = brilliant
+								trait = genius
+							}
+						}
+						add_trait = quick
+					}
+					else_if = {
+						limit = {
+							trait = quick
+						}
+						remove_trait = quick
+						add_trait = brilliant
+					}
+					else_if = {
+						limit = {
+							trait = genius
+						}
+						change_learning = 1
+						change_intrigue = 1
+						change_stewardship = 1
+					}
+					else = {
+						remove_trait = brilliant
+						add_trait = genius
+					}
+				}
+				25 = { #prettier
+					if = {
+						limit = {
+							trait = uncouth
+						}
+						remove_trait = uncouth
+					}
+					else_if = {
+						limit = {
+							NOT = {
+								trait = groomed
+							}
+						}
+						add_trait = groomed
+					}
+					else_if = {
+						limit = {
+							NOR = {
+								trait = fair
+								trait = pretty
+								trait = beautiful
+							}
+						}
+						add_trait = fair
+					}
+					else_if = {
+						limit = {
+							trait = fair
+						}
+						remove_trait = fair
+						add_trait = pretty
+					}
+					else_if = {
+						limit = {
+							trait = beautiful
+						}
+						change_diplomacy = 2
+					}
+					else = {
+						remove_trait = pretty
+						add_trait = beautiful
+					}
+				}
+				25 = { #reward
+					random_magic_item_effect = yes
+				}
+			}
+	}
+}
+character_event = {
+	id = conv.23
+	desc = EVTDESC_CONV_23
+	picture = GFX_evt_drow_3
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_CONV_23
+		death = {
+			death_reason = death_transformation_horror
+		}
+	}
+}
