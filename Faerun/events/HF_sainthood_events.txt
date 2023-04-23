@@ -32,25 +32,25 @@ character_event = {
             has_character_modifier = corrupting_magic_minor
             has_character_modifier = corrupting_magic_major
 		}
-		#OR = {
-		#	AND = {
-		#		tier = Emperor
-		#		piety >= 1250
-		#	}
-		#
-		#	AND = {
-		#		tier = King
-		#		piety >= 1000
-		#	}
-		#	AND = {
-		#		tier = Duke
-		#		piety >= 750
-		#	}
-		#	AND = {
-		#		tier = Count
-		#		piety >= 500
-		#	}
-		#}
+		OR = {
+			AND = {
+				tier = Emperor
+				piety >= 1250
+			}
+
+			AND = {
+				tier = King
+				piety >= 1000
+			}
+			AND = {
+				tier = Duke
+				piety >= 750
+			}
+			AND = {
+				tier = Count
+				piety >= 500
+			}
+		}
 		has_vice_trigger = no
 		is_benevolent_trigger = yes
 		is_pious_trigger = yes
@@ -85,46 +85,49 @@ character_event = {
         	save_event_target_as = random_saint_realm_province
         }
         if = {
-            random_realm_character = {
-                limit = {
-                    ai = yes
-					has_job_title = job_spiritual
-                    religion = triadic
-                }
-                random = {
-                    chance = 100
-                    modifier = {
-                        factor = 0.25
-                        event_target:saint_person = {
-                            any_owned_bloodline = {
-                                has_bloodline_flag = saintly_bloodline
-                            }
-                        }
-                    }
-                    modifier = {
-                        factor = 0.25
-                        event_target:saint_person = {
-                            any_dynasty_member = {
-                                any_owned_bloodline = {
-                                    has_bloodline_flag = saintly_bloodline
-                                }
-                            }
-                        }
-                    }
-                    modifier = {
-                        factor = 0.8
-                        event_target:saint_person = {
-                            trait = cynical
-                        }
-                    }
-                    random_realm_province = {
-                        province_event = { id = HF.40001 }
-                    }
-                    event_target:saint_person = {
-                        set_character_flag = beatified
-                    }
-                }
-            }
+									limit = {
+										any_realm_character = {
+											ai = yes
+											OR = {
+												z_cleric = yes
+												is_priest = yes
+											}
+											religion = triadic
+										}
+									}
+				          random = {
+				              chance = 100
+				              modifier = {
+				                  factor = 0.25
+				                  event_target:saint_person = {
+				                      any_owned_bloodline = {
+				                          has_bloodline_flag = saintly_bloodline
+				                      }
+				                  }
+				              }
+				              modifier = {
+				                  factor = 0.25
+				                  event_target:saint_person = {
+				                      any_dynasty_member = {
+				                          any_owned_bloodline = {
+				                              has_bloodline_flag = saintly_bloodline
+				                          }
+				                      }
+				                  }
+				              }
+				              modifier = {
+				                  factor = 0.8
+				                  event_target:saint_person = {
+				                      trait = cynical
+				                  }
+				              }
+				              random_realm_province = {
+				                  province_event = { id = HF.40001 }
+				              }
+				              event_target:saint_person = {
+				                  set_character_flag = beatified
+				              }
+				          }
         }
 
         if = {
@@ -174,7 +177,10 @@ province_event = {
 	        random_realm_character = {
 	            limit = {
 					ai = yes
-					has_job_title = job_spiritual
+					OR = {
+						z_cleric = yes
+						is_priest = yes
+					}
 					religion = event_target:saint_person
 	            }
 				character_event = { id = HF.40003 }
@@ -307,7 +313,7 @@ character_event = {
                 OR = {
                     has_global_flag = qa_testing
                     event_target:saint_person = {
-                        has_religion_feature = religion_beatification
+                        NOT = { religion = triadic }
                     }
                 }
             }
@@ -337,7 +343,7 @@ province_event = {
         event_target:saint_person = {
             OR = {
                 trait = beatified
-                has_religion_feature = religion_beatification
+                NOT = { religion = triadic }
             }
             NOT = {
                 has_character_flag = blessed_ancestor_prestige
@@ -360,133 +366,42 @@ province_event = {
 						limit = {
 							religion = triadic
 						}
-						if = {
+						random_character = {
 							limit = {
-								any_realm_character = {
+								ai = yes
+								OR = {
 									z_cleric = yes
-									religion = triadic
+									is_priest = yes
 								}
+								religion = triadic
 							}
-							if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = legendary_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = legendary_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = legendary_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = renowned_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = renowned_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = renowned_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = master_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = master_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = master_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = expert_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = expert_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = expert_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = journeyman_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = journeyman_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = journeyman_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = trained_cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = trained_cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = trained_cleric
 							}
-							else_if = {
-								limit = {
-									any_realm_character = {
-										religion = triadic
-										trait = cleric
-									}
-								}
-								random_realm_character = {
-									limit = {
-										religion = triadic
-										trait = cleric
-									}
-									character_event = { id = HF.40020 }
-								}
+							preferred_limit = {
+								trait = cleric
 							}
-						}
-						else = {
-							random_realm_character = {
-								limit = {
-									ai = yes
-									has_job_title = job_spiritual
-									religion = triadic
-								}
-								character_event = { id = HF.40020 }
-							}
+							character_event = { id = HF.40020 }
 						}
 					}
 					else_if = {
 						limit = {
-							religion_group = pagan_group
+							NOT = { religion = triadic }
 						}
 						rightful_religious_head_scope = {
 							character_event = { id = HF.40020 }
@@ -494,146 +409,6 @@ province_event = {
 					}
                 }
             }
-        }
-        else = {
-			if = {
-				limit = {
-					religion = triadic
-				}
-				if = {
-					limit = {
-						any_playable_ruler = {
-							z_cleric = yes
-							religion = triadic
-						}
-					}
-					if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = legendary_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = legendary_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = renowned_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = renowned_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = master_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = master_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = expert_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = expert_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = journeyman_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = journeyman_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = trained_cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = trained_cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-					else_if = {
-						limit = {
-							any_playable_ruler = {
-								religion = triadic
-								trait = cleric
-							}
-						}
-						random_playable_ruler = {
-							limit = {
-								religion = triadic
-								trait = cleric
-							}
-							character_event = { id = HF.40020 }
-						}
-					}
-				}
-				else = {
-					random_character = {
-						limit = {
-							ai = yes
-							has_job_title = job_spiritual
-							religion = triadic
-						}
-						character_event = { id = HF.40020 }
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					religion_group = pagan_group
-				}
-				event_target:saint_person = {
-					rightful_religious_head_scope = {
-						character_event = { id = HF.40020 }
-					}
-				}
-			}
         }
     }
 }
@@ -652,7 +427,7 @@ character_event = {
     desc = {
         trigger = {
             event_target:saint_person = {
-                religion_group = pagan_group
+                NOT = { religion = triadic }
             }
         }
         text = EVTDESC_HF_40020_B
@@ -678,7 +453,7 @@ character_event = {
         }
         else_if = {
             limit = {
-                religion_group = pagan_group
+                NOT = { religion = triadic }
             }
             custom_tooltip = {
                 text = pagan_pope_cannonize_choice_TT
@@ -804,7 +579,7 @@ character_event = {
                 }
                 else_if = {
                     limit = {
-                        religion_group = pagan_group
+                        NOT = { religion = triadic }
                     }
                     add_trait = blessed_ancestor
                     set_special_character_title = BLESSED_TITLE
@@ -914,7 +689,7 @@ character_event = {
 						if = {
 							limit = {
 								event_target:saint_person = {
-                                    NOT = { religion_group = pagan_group }
+                                    religion = triadic
                                 }
 							}
 							random_list  = {
@@ -993,7 +768,7 @@ character_event = {
                         else_if = {
                             limit = {
                                 event_target:saint_person = {
-                                    religion_group = pagan_group
+                                    NOT = { religion = triadic }
                                 }
                             }
                             new_bloodline = {
@@ -1021,7 +796,7 @@ character_event = {
                     event_target:saint_person = {
                         if = {
                             limit = {
-                                NOT = { religion_group = pagan_group }
+                                religion = triadic
                             }
 							random_list = {
 								1 = {
@@ -1104,7 +879,7 @@ character_event = {
                         else_if = {
                             limit = {
                                 event_target:saint_person = {
-                                    religion_group = pagan_group
+                                    NOT = { religion = triadic }
                                 }
                             }
                             new_bloodline = {
@@ -1201,7 +976,7 @@ character_event = {
                         else_if = {
                             limit = {
                                 event_target:saint_person = {
-                                    religion_group = pagan_group
+                                    NOT = { religion = triadic }
                                 }
                             }
                             new_bloodline = {
@@ -1309,7 +1084,7 @@ character_event = {
                         else_if = {
                             limit = {
                                 event_target:saint_person = {
-                                    religion_group = pagan_group
+                                    NOT = { religion = triadic }
                                 }
                             }
                             new_bloodline = {
@@ -1406,7 +1181,7 @@ character_event = {
                         else_if = {
                             limit = {
                                 event_target:saint_person = {
-                                    religion_group = pagan_group
+                                    NOT = { religion = triadic }
                                 }
                             }
                             new_bloodline = {
@@ -1476,7 +1251,7 @@ narrative_event = {
     desc = {
         trigger = {
             event_target:saint_person = {
-                religion_group = pagan_group
+                NOT = { religion = triadic }
             }
         }
         text = EVTDESC_HF_40025_B
@@ -1523,7 +1298,7 @@ narrative_event = {
             }
             else_if = {
                 limit = {
-                    religion_group = pagan_group
+                    NOT = { religion = triadic }
                 }
                 custom_tooltip = { text = TT_PAGAN_CANONIZATION_FAMILY}
             }
