@@ -673,12 +673,14 @@ decisions = {
 
 	abyssal_summon_demons = { # Army
 		only_playable = yes
-		ai_check_interval = 20
+		is_mercenary = yes
+		ai_check_interval = 10
 		potential = {
 			OR = {
 				religion = abyssal_cult
 				has_character_modifier = syncretic_abyssal
 			}
+			reforming_gov = yes
 			not_casting = yes
 		}
 		allow = {
@@ -689,53 +691,86 @@ decisions = {
 					NOT = { has_character_flag = abyss_summon_fiends }
 				}
 			}
-			piety = 250
+			OR = {
+				piety = 250
+				AND = {
+					OR = {
+						trait = patron_orcus
+						trait = patron_yeenoghu
+					}
+					piety = 125
+				}
+			}
 		}
 		effect = {
-			piety = -250
+			if = {
+				limit = {
+					OR = {
+						trait = patron_orcus
+						trait = patron_yeenoghu
+					}
+				}
+				piety = -125
+			}
+			else = {
+				piety = -250
+			}
 			hidden_tooltip = {
 				set_character_flag = abyss_summon_fiends
 				character_event = { id = wizinit.37 days = 1000 }
 			}
 			location = {
 				ROOT = {
-					spawn_unit = {
-						province = PREV
-						home = PREV
-						owner = ROOT
-						leader = ROOT
-						earmark = abysssummonedfiends
-						troops = {
-							light_infantry = { 1000 1000 }
-							beast_troops = { 200 200 }
+					if = {
+						limit = {
+							OR = {
+								trait = patron_orcus
+								trait = patron_yeenoghu
+							}
 						}
-						attrition = 0.5
-						maintenance_multiplier = 0.1
-						cannot_inherit = yes
-						disband_on_peace = yes
-						can_toggle_looting = no
-						is_looter = no
-						reinforces = no
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = ROOT
+							leader = ROOT
+							earmark = abysssummonedfiends
+							troops = {
+								undead_troops = { 1500 1500 }
+							}
+							attrition = 0
+							maintenance_multiplier = 0
+							cannot_inherit = yes
+							disband_on_peace = yes
+							can_toggle_looting = no
+							is_looter = no
+							reinforces = no
+						}
+					}
+					else = {
+						spawn_unit = {
+							province = PREV
+							home = PREV
+							owner = ROOT
+							leader = ROOT
+							earmark = abysssummonedfiends
+							troops = {
+								light_infantry = { 1000 1000 }
+								beast_troops = { 200 200 }
+							}
+							attrition = 0.5
+							maintenance_multiplier = 0.1
+							cannot_inherit = yes
+							disband_on_peace = yes
+							can_toggle_looting = no
+							is_looter = no
+							reinforces = no
+						}
 					}
 				}
 			}
 		}
 		ai_will_do = {
-			factor = 0.5
-			modifier = { #I am losing an offensive war
-				factor = 10
-				any_war = {
-					attacker = { character = ROOT }
-					NOT = { war_score = -19 }
-				}
-			}
-			modifier = { #I am losing a defensive war
-				factor = 10
-				any_war = {
-					defender = { character = ROOT }
-					war_score = 20
-				}
-			}
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
 	}
 
@@ -4962,6 +4997,7 @@ decisions = {
 
 	highmagic_celestial_army = {
 		only_playable = yes
+		is_mercenary = yes
 		ai_check_interval = 100
 		potential = {
 			OR = {
@@ -5069,7 +5105,7 @@ decisions = {
 			clr_character_flag = high_magic_success
 		}
 		ai_will_do = {
-			factor = 0.7
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
 	}
 
@@ -6300,6 +6336,7 @@ decisions = {
 	uthgardt_ancestral_host = {
 		only_playable = yes
 		is_high_prio = yes
+		is_mercenary = yes
 		ai_check_interval = 10
 		potential = {
 			not_casting = yes
@@ -6355,7 +6392,7 @@ decisions = {
 			}
 		}
 		ai_will_do = {
-			factor = 0.7
+			factor = 0 # decisions with the "is_mercenary" will not be calculated from the script
 		}
 	}
 
@@ -6702,9 +6739,9 @@ decisions = {
 						troops = {
 							undead_troops = { 1500 1500 }
 						}
-						attrition = 0.05
+						attrition = 0
 						disband_on_peace = yes
-						maintenance_multiplier = 0.1
+						maintenance_multiplier = 0
 						can_toggle_looting = no
 						is_looter = no
 						reinforces = no
