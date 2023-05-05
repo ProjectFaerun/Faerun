@@ -1,4 +1,4 @@
-# Faerun - polyamory events - by neutrondecay (edits by teneb)
+# Faerun - polyamory events - by neutrondecay & teneb
 
 namespace = polyam
 
@@ -509,6 +509,140 @@ character_event = { # Positive reaction reported to newcomer
 		opinion = {
 			name = opinion_popular_metamour
 			who = event_target:polyam_established
+		}
+	}
+	after = {
+		event_target:polyam_newcomer = {
+			character_event = {
+				id = polyam.9
+				months = 1
+				random = 90
+			}
+		}
+	}
+}
+
+# metamour reactions
+# we begin by checking for metamour status and if they've been through this event together
+character_event = {
+	id = polyam.9
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		if = {
+			limit = {
+				NOT = {
+					has_opinion_modifier = {
+						name = opinion_metamour_check
+						who = event_target:polyam_established
+					}
+				}
+			}
+			break = yes
+		}
+		if = {
+			limit = {
+				has_opinion_modifier = {
+					name = opinion_unpopular_metamour
+					who = event_target:polyam_established
+				}
+				NOT = { rival = event_target:polyam_established }
+			}
+			character_event = { id = polyam.10 }
+			event_target:polyam_established = { id = polyam.10 }
+		}
+		else_if = {
+			limit = {
+				has_opinion_modifier = {
+					name = opinion_popular_metamour
+					who = event_target:polyam_established
+				}
+			}
+			if = {
+				limit = {
+					event_target:polyam_established = { is_romance_compatible_with_root = yes }
+				}
+				character_event = { id = polyam.11 }
+				event_target:polyam_established = { id = polyam.11 }
+			}
+			else = {
+				character_event = { id = polyam.12 }
+				event_target:polyam_established = { id = polyam.12 }
+			}
+		}
+	}
+}
+
+character_event = {
+	id = polyam.10
+	desc = {
+		trigger = {
+			NOT = { character = event_target:polyam_established }
+		}
+		text = EVTDESCA_POLYAM_10 # can't stand them, etc etc
+	}
+	desc = {
+		trigger = {
+			character = event_target:polyam_established
+		}
+		text = EVTDESCB_POLYAM_10 # as above, just change the names
+	}
+	picture = GFX_evt_quarrel
+	
+	option = {
+		name = EVTOPTA_POLYAM_10 # something rivalryesque
+		event_target:polyam_established = {
+			add_rival = event_target:polyam_newcomer
+		}
+	}
+}
+
+character_event = {
+	id = polyam.11
+	desc = {
+		trigger = {
+			NOT = { character = event_target:polyam_established }
+		}
+		text = EVTDESCA_POLYAM_11 # something about becoming friend, etc etc
+	}
+	desc = {
+		trigger = {
+			character = event_target:polyam_established
+		}
+		text = EVTDESCB_POLYAM_11 # as above, just change the names
+	}
+	
+	option = {
+		name = EVTOPTA_POLYAM_11 # something friendlyesque
+		event_target:polyam_established = {
+			add_friend = event_target:polyam_newcomer
+		}
+	}
+}
+
+character_event = {
+	id = polyam.12
+	desc = {
+		trigger = {
+			NOT = { character = event_target:polyam_established }
+		}
+		text = EVTDESCA_POLYAM_12 # something about becoming friend, etc etc
+	}
+	desc = {
+		trigger = {
+			character = event_target:polyam_established
+		}
+		text = EVTDESCB_POLYAM_12 # as above, just change the names
+	}
+	
+	option = {
+		name = EVTOPTA_POLYAM_12 # something loveryesque
+		event_target:polyam_newcomer = {
+			event_target:polyam_established = {
+				add_lover = event_target:polyam_newcomer
+			}
 		}
 	}
 }
