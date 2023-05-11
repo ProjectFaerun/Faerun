@@ -562,14 +562,34 @@ character_event = {
 			}
 			if = {
 				limit = {
-					event_target:polyam_established = { is_romance_compatible_with_root = yes }
+					event_target:polyam_established = {
+						is_romance_compatible_with_root = yes 
+						NOT = { is_lover = ROOT }
+					}
 				}
 				character_event = { id = polyam.11 }
 				event_target:polyam_established = { id = polyam.11 }
 			}
-			else = {
+			else_if = {
+				limit = {
+					event_target:polyam_established = {
+						NOT = { is_friend = ROOT }
+					}
+				}
 				character_event = { id = polyam.12 }
 				event_target:polyam_established = { id = polyam.12 }
+			}
+		}
+	}
+	after = {
+		opinion = {
+			name = opinion_metamour_check
+			who = event_target:polyam_established
+		}
+		event_target:polyam_established = {
+			opinion = {
+				name = opinion_metamour_check
+				who = event_target:polyam_newcomer
 			}
 		}
 	}
@@ -599,6 +619,18 @@ character_event = {
 			}
 		}
 	}
+	option = {
+		name = EVTOPTB_POLYAM_10 # I sheath my sword
+		if = {
+			limit = {
+				NOT = { trait = stressed }
+			}
+			random = {
+				chance = 30
+				add_trait = stressed
+			}
+		}			
+	}
 }
 
 character_event = {
@@ -615,14 +647,34 @@ character_event = {
 		}
 		text = EVTDESCB_POLYAM_11 # as above, just change the names
 	}
-	
+	picture = GFX_evt_gossip_1	
 	option = {
 		name = EVTOPTA_POLYAM_11 # something friendlyesque
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0.2
+				trait = shy
+			}
+			modifer = {
+				factor = 4
+				trait = gregarious
+			}
+		}
 		event_target:polyam_newcomer = {
 			event_target:polyam_established = {
 				add_friend = event_target:polyam_newcomer
 			}
-		event_target:polyam_newcomer = {
+		}
+	}
+	option = {
+		name = {
+			EVTOPTB_POLYAM_11 # let's not go overboard
+			# nothing happens
+		}
+		ai_chance = {
+			factor = 50
+		}
 	}
 }
 
@@ -640,13 +692,134 @@ character_event = {
 		}
 		text = EVTDESCB_POLYAM_12 # as above, just change the names
 	}
-	
+	picture = GFX_evt_gossip_1
 	option = {
 		name = EVTOPTA_POLYAM_12 # something loveryesque
-		event_target:polyam_newcomer = {
-			event_target:polyam_established = {
-				add_lover = event_target:polyam_newcomer
+		ai_chance = {
+			factor = 75
+			modifier = {
+				factor = 0
+				trait = chaste
+			}
+			modifer = {
+				factor = 3
+				trait = lustful
 			}
 		}
+		if = {
+			limit = {
+				character = event_target:polyam_established
+			}
+			event_target:polyam_newcomer = {
+				character_event = {	id = polyam.13 }
+			}
+		}
+		else = {
+			event_target:polyam_established = {
+				character_event = { id = polyam.13 }
+			}
+		}
+	}
+	option = {
+		name = EVTOPTB_POLYAM_12 # not lovers, but friends
+		ai_chance = {
+			factor = 15
+			modifier = {
+				factor = 0.1
+				trait = shy
+			}
+			modifer = {
+				factor = 2
+				trait = gregarious
+			}
+		}
+		trigger = {
+			event_target:polyam_established = {
+				NOT = { is_friend = event_target:polyam_newcomer }
+			}
+		}	
+		event_target:polyam_newcomer = {
+			event_target:polyam_established = {
+				add_friend = event_target:polyam_newcomer
+			}
+		}
+	}
+	option = {
+		name = {
+			EVTOPTC_POLYAM_12 # not striking enough to tempt me
+			ai_chance = {
+				factor = 10
+			}
+			# nothing happens
+		}
+	}
+}
+character_event = {
+	id = polyam.13
+	desc = {
+		text = EVTDESC_POLYAM_13 # My metamour wants to be my lover
+	}
+	picture = GFX_evt_lovers
+	option = {
+		name = EVTOPTA_POLYAM_13 # Accept
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				trait = chaste
+			}
+			modifer = {
+				factor = 3
+				trait = lustful
+			}
+		}
+		FROM = { save_event_target_as = new_lover }
+		new_lover_effect = yes
+		any_lover = {
+			limit = {
+				any_lover = {
+					character = FROM
+				}
+				ai = no
+			}
+			character_event = { id = polyam.14 }
+		}
+	}
+	option = {
+		name = EVTOPTB_POLYAM_13 # friends
+		ai_chance = {
+			factor = 25
+			modifier = {
+				factor = 0.1
+				trait = shy
+			}
+			modifer = {
+				factor = 2
+				trait = gregarious
+			}
+		}
+		add_friend = FROM
+	}
+	option = {
+		name = EVTOPTC_POLYAM_13 # Decline
+		ai_chance = {
+			factor = 25
+		}
+		reverse_opinion = {
+			name = opinion_rejected_friend
+			who = FROM
+			months = 6
+		}
+	}
+}
+
+character_event = {
+	id = polyam.14
+	desc = {
+		text = EVTDESC_POLYAM_14 # My lovers are lovers
+	}
+	picture = GFX_evt_lovers
+	option = {
+		name = EVTOPTA_POLYAM_14
 	}
 }
