@@ -6,7 +6,19 @@ namespace = polyam
 
 # begin by setting the scopes
 
-character_event = {
+character_event = { # polyam.0
+	id = polyam.0 # effect starts with new lover, as intended
+	is_triggered_only = yes
+	hide_window = yes
+	immediate = {
+		any_lover = {
+			character_event = polyam.1
+		}
+	}
+}
+
+
+character_event = { # polyam.1
 	id = polyam.1
 	hide_window = yes
 	is_triggered_only = yes
@@ -16,15 +28,15 @@ character_event = {
 	trigger = {
 		OR = {
 			any_lover = {
-				NOT = {	character = event_target:polyam_newcomer }
+				NOT = {	character = FROM }
 				is_metamour_of_root = no
 			}
 			any_spouse = {
-				NOT = {	character = event_target:polyam_newcomer }
+				NOT = {	character = FROM }
 				is_metamour_of_root = no
 			}
 			any_consort = {
-				NOT = {	character = event_target:polyam_newcomer }
+				NOT = {	character = FROM }
 				is_metamour_of_root = no
 			}
 		}
@@ -33,9 +45,10 @@ character_event = {
 	immediate = {
 		any_spouse = {
 			limit = {
-				NOT = { character = event_target:polyam_newcomer }
+				NOT = { character = FROM }
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
+				is_metamour_of_root = no
 			}
 			character_event = {
 				id = polyam.2
@@ -45,7 +58,7 @@ character_event = {
 		}
 		any_consort = {
 			limit = {
-				NOT = { character = event_target:polyam_newcomer }
+				NOT = { character = FROM }
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
 			}
@@ -57,7 +70,7 @@ character_event = {
 		}
 		any_lover = {
 			limit = {
-				NOT = { character = event_target:polyam_newcomer }
+				NOT = { character = FROM }
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
 			}
@@ -70,34 +83,34 @@ character_event = {
 	}
 }
 
-character_event = {
+character_event = { # polyam.2
 	id = polyam.2
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_2
 		trigger = {
 			NOR = {
-				is_friend = polyam_newcomer
-				is_lover = polyam_newcomer
+				is_friend = FROMFROM
+				is_lover = FROMFROM
 			}
 		}
 	}
 	desc = {
 		text = EVTDESC_POLYAM_2_FRIENDS
 		trigger = {
-			is_friend = polyam_newcomer
-			NOT = { is_lover = polyam_newcomer }
+			is_friend = FROMFROM
+			NOT = { is_lover = FROMFROM }
 		}
 	}
 	desc = {
 		text = EVTDESC_POLYAM_2_LOVERS
 		trigger = {
-			is_lover = polyam_newcomer
+			is_lover = FROMFROM
 		}
 	}
 	picture = GFX_evt_gossip_1
 	immediate = {
-		save_event_target_as = polyam_established
+		log = "[ROOT.GetBestName] is flagged as a metamour of [FROMFROM.GetBestName]."
 	}
 	option = {
 		name = EVTOPTA_POLYAM_2 # Terrible news!
@@ -105,16 +118,23 @@ character_event = {
 			OR = {
 				religion_has_polyamory = no
 				NOR = {
-					is_friend = polyam_newcomer
-					is_lover = polyam_newcomer
+					is_friend = FROMFROM
+					is_lover = FROMFROM
 				}
 			}
 		}
 		ai_chance = {
 			factor = 10.0
 			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value <= -25
+				}
+			}
+			modifier = {
 				factor = 0.2
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = kind 
 						trait = temperate
@@ -123,7 +143,7 @@ character_event = {
 			}
 			modifier = {
 				factor = 3.0
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = envious
 						trait = proud
@@ -132,7 +152,7 @@ character_event = {
 			}
 			modifier = {
 				factor = 5.0
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = wroth
 						trait = cruel
@@ -145,7 +165,7 @@ character_event = {
 			}
 			modifier = {
 				factor = 10.0
-				is_rival = event_target:polyam_newcomer
+				is_rival = FROMFROM
 			}
 			modifier = {
 				factor = 3.5
@@ -161,7 +181,7 @@ character_event = {
 		}
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = event_target:polyam_newcomer
+			who = FROMFROM
 		}
 		FROM = {
 			character_event = { id = polyam.3 }
@@ -171,6 +191,19 @@ character_event = {
 		name = EVTOPTB_POLYAM_2 # This is fine.
 		ai_chance = {
 			factor = 50.0
+			modifier = {
+				factor = 3.0
+				AND = {
+					opinion = {
+						who = FROMFROM
+						value >= -25
+					}
+					opinion = {
+						who = FROMFROM
+						value <= 25
+					}
+				}
+			}
 			modifier = {
 				factor = 0.3
 				trait = wroth
@@ -182,7 +215,7 @@ character_event = {
 		}
 		opinion = {
 			name = opinion_accepted_metamour
-			who = event_target:polyam_newcomer
+			who = FROMFROM
 		}
 		FROM = {
 			character_event = { id = polyam.4 }
@@ -193,8 +226,15 @@ character_event = {
 		ai_chance = {
 			factor = 10.0
 			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value >= 25
+				}
+			}
+			modifier = {
 				factor = 2.5
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = kind 
 						trait = temperate
@@ -203,7 +243,7 @@ character_event = {
 			}
 			modifier = {
 				factor = 0.3
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = envious
 						trait = proud
@@ -212,7 +252,7 @@ character_event = {
 			}
 			modifier = {
 				factor = 0.02
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					OR = {
 						trait = wroth
 						trait = cruel
@@ -229,11 +269,11 @@ character_event = {
 			}
 			modifier = {
 				factor = 10.0
-				is_lover = event_target:polyam_newcomer
+				is_lover = FROMFROM
 			}
 			modifier = {
 				factor = 5.0
-				is_friend = event_target:polyam_newcomer
+				is_friend = FROMFROM
 			}
 			modifier = {
 				factor = 1.5
@@ -242,7 +282,7 @@ character_event = {
 		}
 		opinion = {
 			name = opinion_popular_metamour
-			who = event_target:polyam_newcomer
+			who = FROMFROM
 		}
 		FROM = {
 			character_event = { id = polyam.5 }
@@ -250,11 +290,14 @@ character_event = {
 	}
 	option = {
 		name = EVTOPTD_POLYAM_2 # That's my kin
+		trigger = {
+			is_close_relative = FROMFROM
+		}
 		ai_chance = {
 			factor = 100
 			modifier = {
 				factor = 0.02
-				event_target:polyam_newcomer = { 
+				FROMFROM = { 
 					religion_has_incest = yes
 				}
 				religion_has_incest = yes
@@ -265,8 +308,9 @@ character_event = {
 		}
 	}
 }
-character_event = { # Bad initial reaction reported to central partner
-	id = polyam.3
+
+character_event = { # polyam.3 
+	id = polyam.3 # Bad initial reaction reported to central partner
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_3
@@ -274,15 +318,14 @@ character_event = { # Bad initial reaction reported to central partner
 	picture = GFX_evt_quarrel
 	option = {
 		name = EVTOPTA_POLYAM_3
-		event_target:polyam_newcomer = {
+		FROMFROMFROM = {
 			character_event = { id = polyam.6 }
 		}
 	}
 }
 
-
-character_event = { # Neutral reaction reported to central partner
-	id = polyam.4
+character_event = { # polyam.4
+	id = polyam.4 # Neutral reaction reported to central partner
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_4
@@ -290,14 +333,14 @@ character_event = { # Neutral reaction reported to central partner
 	picture = GFX_evt_gossip_1
 	option = {
 		name = EVTOPTA_POLYAM_4
-		event_target:polyam_newcomer = {
+		FROMFROMFROM = {
 			character_event = { id = polyam.7 }
 		}
 	}
 }
 
-character_event = { # Positive reaction reported to central partner
-	id = polyam.5
+character_event = { # polyam.5
+	id = polyam.5 # Positive reaction reported to central partner
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_5
@@ -305,14 +348,14 @@ character_event = { # Positive reaction reported to central partner
 	picture = GFX_evt_lovers
 	option = {
 		name = EVTOPTA_POLYAM_5
-		event_target:polyam_newcomer = {
+		FROMFROMFROM = {
 			character_event = { id = polyam.8 }
 		}
 	}
 }
 
-character_event = { # Negative reaction reported to newcomer
-	id = polyam.6
+character_event = { # polyam.6
+	id = polyam.6 # Negative reaction reported to newcomer
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_6
@@ -322,6 +365,13 @@ character_event = { # Negative reaction reported to newcomer
 		name = EVTOPTA_POLYAM_6
 		ai_chance = {
 			factor = 75.0
+			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value <= -25
+				}
+			}
 			modifier = {
 				factor = 0.5
 				OR = {
@@ -344,7 +394,7 @@ character_event = { # Negative reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # we can keep the peace
@@ -361,7 +411,7 @@ character_event = { # Negative reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_accepted_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # I shall be good
@@ -371,12 +421,22 @@ character_event = { # Negative reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_popular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
+		}
+	}
+	after = {
+		FROMFROM = {
+			character_event = {
+				id = polyam.9
+				months = 1
+				random = 90
+			}
 		}
 	}
 }
-character_event = { # Neutral reaction reported to newcomer
-	id = polyam.7
+
+character_event = { # polyam.7
+	id = polyam.7 # Neutral reaction reported to newcomer
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_7
@@ -386,6 +446,13 @@ character_event = { # Neutral reaction reported to newcomer
 		name = EVTOPTA_POLYAM_7
 		ai_chance = {
 			factor = 10.0
+			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value <= -25
+				}
+			}
 			modifier = {
 				factor = 0.2
 				OR = {
@@ -408,7 +475,7 @@ character_event = { # Neutral reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # We shall do well
@@ -426,13 +493,20 @@ character_event = { # Neutral reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_accepted_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # I can do better
 		name = EVTOPTC_POLYAM_7
 		ai_chance = {
 			factor = 15.0
+			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value >= 25
+				}
+			}
 			modifier = {
 				factor = 5.0
 				OR = {
@@ -443,12 +517,22 @@ character_event = { # Neutral reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_popular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
+		}
+	}
+	after = {
+		FROMFROM = {
+			character_event = {
+				id = polyam.9
+				months = 1
+				random = 90
+			}
 		}
 	}
 }
-character_event = { # Positive reaction reported to newcomer
-	id = polyam.8
+
+character_event = { # polyam.8
+	id = polyam.8 # Positive reaction reported to newcomer
 	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_8
@@ -465,7 +549,7 @@ character_event = { # Positive reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # They're fine, I suppose
@@ -483,13 +567,20 @@ character_event = { # Positive reaction reported to newcomer
 		}
 		opinion = {
 			name = opinion_accepted_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	option = { # We shall be bosom friends
 		name = EVTOPTC_POLYAM_8
 		ai_chance = {
 			factor = 50.0
+			modifier = {
+				factor = 3.0
+				opinion = {
+					who = FROMFROM
+					value >= 25
+				}
+			}
 			modifier = {
 				factor = 2.0
 				OR = {
@@ -499,20 +590,20 @@ character_event = { # Positive reaction reported to newcomer
 			}
 			modifier = {
 				factor = 10.0
-				is_lover = event_target:polyam_established
+				is_lover = FROMFROM
 			}
 			modifier = {
 				factor = 5.0
-				is_friend = event_target:polyam_established
+				is_friend = FROMFROM
 			}				
 		}
 		opinion = {
 			name = opinion_popular_metamour
-			who = event_target:polyam_established
+			who = FROMFROM
 		}
 	}
 	after = {
-		event_target:polyam_newcomer = {
+		FROMFROM = {
 			character_event = {
 				id = polyam.9
 				months = 1
@@ -524,7 +615,7 @@ character_event = { # Positive reaction reported to newcomer
 
 # metamour reactions
 # we begin by checking for metamour status and if they've been through this event together
-character_event = {
+character_event = { # polyam.9
 	id = polyam.9
 	hide_window = yes
 	
@@ -533,10 +624,16 @@ character_event = {
 	immediate = {
 		if = {
 			limit = {
+				ROOT = { character = FROM }
+			}
+			break = yes
+		}
+		if = {
+			limit = {
 				NOT = {
 					has_opinion_modifier = {
 						name = opinion_metamour_check
-						who = event_target:polyam_established
+						who = FROM
 					}
 				}
 			}
@@ -546,81 +643,103 @@ character_event = {
 			limit = {
 				has_opinion_modifier = {
 					name = opinion_unpopular_metamour
-					who = event_target:polyam_established
+					who = FROM
 				}
-				NOT = { rival = event_target:polyam_established }
+				NOT = { is_rival = FROM }
 			}
 			character_event = { id = polyam.10 }
-			event_target:polyam_established = { id = polyam.10 }
+#			FROM = { id = polyam.10 }
 		}
 		else_if = {
 			limit = {
 				has_opinion_modifier = {
 					name = opinion_popular_metamour
-					who = event_target:polyam_established
+					who = FROM
 				}
 			}
 			if = {
 				limit = {
-					event_target:polyam_established = {
+					FROM = {
 						is_romance_compatible_with_root = yes 
 						NOT = { is_lover = ROOT }
 					}
 				}
 				character_event = { id = polyam.11 }
-				event_target:polyam_established = { id = polyam.11 }
+#				FROM = { id = polyam.11 }
 			}
 			else_if = {
 				limit = {
-					event_target:polyam_established = {
+					FROM = {
 						NOT = { is_friend = ROOT }
 					}
 				}
 				character_event = { id = polyam.12 }
-				event_target:polyam_established = { id = polyam.12 }
+#				FROM = { id = polyam.12 }
 			}
 		}
 	}
 	after = {
 		opinion = {
 			name = opinion_metamour_check
-			who = event_target:polyam_established
+			who = FROM
 		}
-		event_target:polyam_established = {
+		FROM = {
 			opinion = {
 				name = opinion_metamour_check
-				who = event_target:polyam_newcomer
+				who = ROOT
 			}
 		}
 	}
 }
 
-character_event = {
+character_event = { # polyam.10
 	id = polyam.10
+	is_triggered_only = yes
 	desc = {
-		trigger = {
-			NOT = { character = event_target:polyam_established }
-		}
-		text = EVTDESCA_POLYAM_10 # can't stand them, etc etc
-	}
-	desc = {
-		trigger = {
-			character = event_target:polyam_established
-		}
-		text = EVTDESCB_POLYAM_10 # as above, just change the names
+		text = EVTDESC_POLYAM_10 # can't stand them, etc etc
 	}
 	picture = GFX_evt_quarrel
 	
 	option = {
 		name = EVTOPTA_POLYAM_10 # something rivalryesque
-		event_target:polyam_newcomer = {
-			event_target:polyam_established = {
-				add_rival = event_target:polyam_newcomer
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				is_close_relative = FROM
+				NOR = {
+					trait = wroth
+					is_any_kinslayer_trigger = yes
+					religion_tolerates_kinslaying = yes
+				}
+			}
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_unpopular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_unpopular_metamour
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 5
+				trait = patron_hoar
 			}
 		}
+		add_rival = FROM
 	}
 	option = {
 		name = EVTOPTB_POLYAM_10 # I sheath my sword
+		ai_chance = {
+			factor = 50
+		}
 		if = {
 			limit = {
 				NOT = { trait = stressed }
@@ -633,19 +752,11 @@ character_event = {
 	}
 }
 
-character_event = {
+character_event = { # polyam.11
 	id = polyam.11
+	is_triggered_only = yes
 	desc = {
-		trigger = {
-			NOT = { character = event_target:polyam_established }
-		}
-		text = EVTDESCA_POLYAM_11 # something about becoming friend, etc etc
-	}
-	desc = {
-		trigger = {
-			character = event_target:polyam_established
-		}
-		text = EVTDESCB_POLYAM_11 # as above, just change the names
+		text = EVTDESC_POLYAM_11 # something about becoming friend, etc etc
 	}
 	picture = GFX_evt_gossip_1	
 	option = {
@@ -656,41 +767,42 @@ character_event = {
 				factor = 0.2
 				trait = shy
 			}
-			modifer = {
+			modifier = {
 				factor = 4
 				trait = gregarious
 			}
-		}
-		event_target:polyam_newcomer = {
-			event_target:polyam_established = {
-				add_friend = event_target:polyam_newcomer
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_popular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_popular_metamour
+						}
+					}
+				}
 			}
 		}
+		add_friend = FROM
 	}
 	option = {
-		name = {
-			EVTOPTB_POLYAM_11 # let's not go overboard
-			# nothing happens
-		}
+		name = EVTOPTB_POLYAM_11 # let's not go overboard
+		# nothing happens
 		ai_chance = {
 			factor = 50
 		}
 	}
 }
 
-character_event = {
+character_event = { # polyam.12
 	id = polyam.12
+	is_triggered_only = yes
 	desc = {
-		trigger = {
-			NOT = { character = event_target:polyam_established }
-		}
-		text = EVTDESCA_POLYAM_12 # something about becoming lovers, etc etc
-	}
-	desc = {
-		trigger = {
-			character = event_target:polyam_established
-		}
-		text = EVTDESCB_POLYAM_12 # as above, just change the names
+		text = EVTDESC_POLYAM_12 # something about becoming lovers, etc etc
 	}
 	picture = GFX_evt_gossip_1
 	option = {
@@ -701,24 +813,35 @@ character_event = {
 				factor = 0
 				trait = chaste
 			}
-			modifer = {
+			modifier = {
 				factor = 3
 				trait = lustful
 			}
-		}
-		if = {
-			limit = {
-				character = event_target:polyam_established
+			modifier = {
+				factor = 0
+				is_close_relative = FROM
+				OR = {
+					religion_has_incest = no
+					FROM = { religion_has_incest = no }
+				}
+			}	
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_popular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_popular_metamour
+						}
+					}
+				}
 			}
-			event_target:polyam_newcomer = {
-				character_event = {	id = polyam.13 }
-			}
 		}
-		else = {
-			event_target:polyam_established = {
-				character_event = { id = polyam.13 }
-			}
-		}
+		FROM = { character_event = { id = polyam.13 } }
 	}
 	option = {
 		name = EVTOPTB_POLYAM_12 # not lovers, but friends
@@ -728,21 +851,30 @@ character_event = {
 				factor = 0.1
 				trait = shy
 			}
-			modifer = {
+			modifier = {
 				factor = 2
 				trait = gregarious
 			}
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_popular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_popular_metamour
+						}
+					}
+				}
+			}
 		}
 		trigger = {
-			event_target:polyam_established = {
-				NOT = { is_friend = event_target:polyam_newcomer }
-			}
+			NOT = { is_friend = FROM }
 		}	
-		event_target:polyam_newcomer = {
-			event_target:polyam_established = {
-				add_friend = event_target:polyam_newcomer
-			}
-		}
+		add_friend = FROM
 	}
 	option = {
 		name = {
@@ -754,8 +886,10 @@ character_event = {
 		}
 	}
 }
-character_event = {
+
+character_event = { # polyam.13
 	id = polyam.13
+	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_13 # My metamour wants to be my lover
 	}
@@ -768,9 +902,24 @@ character_event = {
 				factor = 0
 				trait = chaste
 			}
-			modifer = {
+			modifier = {
 				factor = 3
 				trait = lustful
+			}
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_popular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_popular_metamour
+						}
+					}
+				}
 			}
 		}
 		FROM = { save_event_target_as = new_lover }
@@ -793,9 +942,24 @@ character_event = {
 				factor = 0.1
 				trait = shy
 			}
-			modifer = {
+			modifier = {
 				factor = 2
 				trait = gregarious
+			}
+			modifier = {
+				factor = 0.1
+				NAND = {
+					has_opinion_modifier = {
+						who = FROM
+						name = opinion_popular_metamour
+					}
+					FROM = {
+						has_opinion_modifier = {
+							who = ROOT
+							name = opinion_popular_metamour
+						}
+					}
+				}
 			}
 		}
 		add_friend = FROM
@@ -813,8 +977,9 @@ character_event = {
 	}
 }
 
-character_event = {
+character_event = { # polyam.14
 	id = polyam.14
+	is_triggered_only = yes
 	desc = {
 		text = EVTDESC_POLYAM_14 # My lovers are lovers
 	}
