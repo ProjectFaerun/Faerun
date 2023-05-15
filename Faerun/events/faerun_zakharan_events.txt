@@ -1,0 +1,189 @@
+namespace = frzakh
+
+# By Teneb
+
+character_event = {
+	id = frzakh.1
+	desc = EVTDESC_FRZAKH_1 # something about the caliph being weak and unworthy
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_1 # "Zakhara will see I'm worthier" or like that
+		hidden_tooltip = {
+			character_event { id = frzakh.3 months = 2 }
+		}
+	}
+}
+
+character_event = {
+	id = frzakh.2
+	desc = EVTDESC_FRZAKH_2 # something about the audacity of the challenger
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_2 # "So be it" or similar
+	}
+}
+
+character_event = {
+	id = frzakh.3
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		export_to_variable = { which = challenger_learn value = learning }
+		export_to_variable = { which = challenger_diplo value = diplomacy }
+		export_to_variable = { which = challenger_dec value = decadence }
+		export_to_variable = { which = challenger_piety value = piety }
+		change_variable = { which = challenger_score which = challenger_learn }
+		change_variable = { which = challenger_score which = challenger_diplo }
+		change_variable = { which = challenger_score which = challenger_piety }
+		subtract_variable = { which = challenger_score which = challenger_dec }
+		event_target:current_caliph = {
+			export_to_variable = { which = caliph_learn value = learning }
+			export_to_variable = { which = caliph_diplo value = diplomacy }
+			export_to_variable = { which = caliph_dec value = decadence }
+			export_to_variable = { which = caliph_piety value = piety }
+			change_variable = { which = global_caliph_score which = caliph_learn }
+			change_variable = { which = global_caliph_score which = caliph_diplo }
+			change_variable = { which = global_caliph_score which = caliph_piety }
+			subtract_variable = { which = global_caliph_score which = caliph_dec }
+		}
+		if = {
+			limit = {
+				check_variable = { which = global_caliph_score which >= challenger_score }
+			}
+			character_event = { id = frzakh.4 } # gets informed, loses prestige
+			event_target:current_caliph = {
+				character_event = { id = frzakh.5 } # gets informed, gains prestige
+			}
+		}
+		else = {
+			character_event = { id = frzakh.6 } # gets informed, gains the caliphate
+			event_target:current_caliph = {
+				character_event = { id = frzakh.7 } # gets informed, loses the caliphate
+			}
+		}
+	}
+}
+
+character_event = {
+	id = frzakh.4
+	desc = EVTDESC_FRZAKH_4
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_4
+		prestige = -250
+	}
+}
+
+character_event = {
+	id = frzakh.5
+	desc = EVTDESC_FRZAKH_5
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_5
+		prestige = 250
+	}
+}
+
+character_event = {
+	id = frzakh.6
+	desc = EVTDESC_FRZAKH_6
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_6
+		prestige = 1000
+		grant_title = k_grand_caliphate
+		hidden_tooltip = {
+			trigger_switch = {
+				on_trigger = religion
+				qisma = { # this is a trigger, like an if
+					qisma = { # this is a scope
+						set_religion_head = k_grand_caliphate
+					}
+				}
+				ten_thousand_gods = {
+					ten_thousand_gods = {
+						set_religion_head = k_grand_caliphate
+					}
+				}
+				pantheist_league = {
+					pantheist_league = {
+						set_religion_head = k_grand_caliphate
+					}
+				}
+				muhjari = {
+					muhjari = {
+						set_religion_head = k_grand_caliphate
+					}
+				}
+			}
+			event_target:current_caliph = {
+				set_defacto_liege = ROOT
+				trigger_switch = {
+					on_trigger = religion
+					qisma = { # this is a trigger, like an if
+						qisma = { # this is a scope
+							set_religion_head = d_qisma
+						}
+						grant_title = d_qisma
+					}
+					ten_thousand_gods = {
+						ten_thousand_gods = {
+							set_religion_head = d_myriadic
+						}
+						grant_title = d_myriadic
+					}
+					pantheist_league = {
+						pantheist_league = {
+							set_religion_head = d_pantheist
+						}
+						grant_title = d_pantheist
+					}
+					muhjari = {
+						muhjari = {
+							set_religion_head = d_muhjari
+						}
+						grant_title = d_muhjari
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:current_caliph = {
+					has_landed_title = e_zakhara
+				}
+			}
+			grant_title = e_zakhara
+		}
+	}
+}
+
+character_event = {
+	id = frzakh.7
+	desc = EVTDESC_FRZAKH_7
+	picture = GFX_evt_bishop
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EVTOPTA_FRZAKH_7
+		prestige = -250
+	}
+}
