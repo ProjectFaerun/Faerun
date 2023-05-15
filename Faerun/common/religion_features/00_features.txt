@@ -1034,52 +1034,75 @@ religion_doctrine = {
 			}
 		}
 	}
+
 	religion_matriarchal = {
 		picture = GFX_religion_feature_matriarchal
+
 		trigger = {
 			NOR = {
 				has_selected_religion_feature = religion_patriarchal
 				has_selected_religion_feature = religion_equal
-				#has_selected_religion_feature = religion_feature_bon
 				has_selected_religion_feature = religion_meritocratic
 				has_selected_religion_feature = religion_feature_goblin_good
 				has_selected_religion_feature = religion_feature_ulutiuan
 				has_selected_religion_feature = religion_feature_earthmother
 				has_selected_religion_feature = religion_feature_yuir
+
 				trigger_if = {
 					limit = { has_game_started = yes }
+
 					FROM = {
 						character = yes
 						government = merchant_republic_government
 					}
 				}
 			}
-			OR = {
-				religion = lolth_cult
-			}
+			religion = lolth_cult
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_matriarchal }
-			custom_tooltip = { text = tooltip_religion_feature_open_succession }
-			custom_tooltip = { text = tooltip_religion_feature_matriarchal_negatives }
-			hidden_tooltip = {
+			custom_tooltip = {
+				text = tooltip_religion_feature_matriarchal
+
+				# Enatic law is enforced
+				# Laws are set in on_reform event 670
+				# Other gender succession laws check for this religion feature
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_open_succession
+
+				# Open succession is unlocked
+				# Succession checks for this religion feature
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_matriarchal_negatives
+
+				# Male characters are not allowed in the council
+				# Job titles check for this religion feature
+			}
+
+			hidden_effect = {
 				set_allows_matrilineal_marriage = yes
 				set_feminist = yes
-				set_women_can_take_consorts = yes
-				set_men_can_take_consorts = no
 				set_female_temple_holders = yes
 				set_male_temple_holders = no
+				set_men_can_take_consorts = no
+				set_women_can_take_consorts = yes
 			}
-			#hidden_tooltip = { FROM = { any_demesne_title = { add_law = enatic_succession add_law = status_of_women_4 } } }
 		}
+
 		ai_will_do = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.001
 				NOT = {
 					FROM = {
 						character = yes
 						is_female = yes
+
 						OR = {
 							trait = lunatic
 							trait = possessed
@@ -1090,11 +1113,12 @@ religion_doctrine = {
 			}
 		}
 	}
+
 	religion_ritual_sacrifice = {
 		picture = GFX_religion_feature_ritual_sacrifice
+
 		trigger = {
 			NOR = {
-				# religion_openly_aztec_or_reformed_trigger = yes
 				has_selected_religion_feature = religion_peaceful
 				has_selected_religion_feature = religion_feature_earthmother
 				has_selected_religion_feature = religion_feature_orc_good #kinda opposite
@@ -1104,24 +1128,23 @@ religion_doctrine = {
 				has_selected_religion_feature = religion_proselytizing
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_aztec_sacrifices }
-			custom_tooltip = { text = tooltip_religion_feature_bloodthirsty_mechanics }
-			hidden_tooltip = {
-				if = {
-					limit = { #Unlock looting for religions which do not have it already.
-						FROM = {
-						character = yes
-							NOT = { has_selected_religion_feature = religion_peaceful }
-						}
-					}
-					set_allow_looting = yes
-				}
+			custom_tooltip = {
+				text = tooltip_religion_feature_aztec_sacrifices
+				# Decision checks for this religion feature
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_bloodthirsty_mechanics
+				# Various decisions and events check for this religion feature
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.1
 				FROM = {
 					character = yes
@@ -1133,45 +1156,66 @@ religion_doctrine = {
 			}
 		}
 	}
+
 	religion_adventuring = {
 		picture = GFX_religion_feature_adventuring
+
 		trigger = {
-			NOT = {
+			NOR = {
 				has_selected_religion_feature = religion_peaceful
 				has_selected_religion_feature = religion_feature_orc_good
 				has_selected_religion_feature = religion_feature_goblin_evil #redundant
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_adventuring }
-			custom_tooltip = { text = tooltip_religion_feature_pirating }
-			hidden_tooltip = { enable_prepared_invasion = ROOT }
+			custom_tooltip = {
+				text = tooltip_religion_feature_adventuring
+				enable_prepared_invasion = THIS
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_pirating
+				# Requires seafaring, not compatible with peaceful nature
+			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
 	}
+
 	religion_seafaring = {
 		picture = GFX_religion_feature_seafaring
+
 		trigger = {
-			NOT = {
+			NOR = {
 				has_selected_religion_feature = religion_peaceful
-				#has_selected_religion_feature = religion_feature_norse #Redundant
-				#has_selected_religion_feature = religion_feature_aztec
 				#has_selected_religion_feature = religion_feature_toteteohuan
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_rivermovement }
-			custom_tooltip = { text = tooltip_religion_feature_ship_maintenance }
-			custom_tooltip = { text = tooltip_religion_feature_seafaring }
-			hidden_tooltip = {
-				set_seafaring = yes
+			custom_tooltip = {
+				text = tooltip_religion_feature_rivermovement
 				set_allow_rivermovement = yes
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_ship_maintenance
+				# Part of seafaring, see below
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_seafaring
+				set_seafaring = yes
+			}
+
+			hidden_effect = {
 				if = {
-					limit = { #Unlock looting for religions which do not have it already.
+					limit = { # Unlock looting for religions which do not have it already
 						FROM = {
-						character = yes
+							character = yes
 							NOT = { has_selected_religion_feature = religion_peaceful }
 						}
 					}
@@ -1179,37 +1223,41 @@ religion_doctrine = {
 				}
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
-			modifier = {
+
+			trigger = {
+				FROM = {
+					trigger_if = {
+						limit = { character = yes }
+
+						any_demesne_province = {
+							is_coastal = yes
+							TECH_NAVAL >= 1
+							owned_by = PREV
+						}
+					}
+				}
+			}
+
+			mult_modifier = {
 				factor = 0.1
 				FROM = {
 					character = yes
 					government = nomadic_government
 				}
 			}
-			modifier = {
-				factor = 0
-				FROM = {
-					character = yes
-					NOT = {
-						any_demesne_province = {
-							port = yes
-							TECH_NAVAL = 1
-						}
-					}
-				}
-			}
 		}
 	}
+
 	religion_relentless = {
 		picture = GFX_religion_feature_relentless
+
 		trigger = {
 			NOR = {
 				has_selected_religion_feature = religion_peaceful
 				has_selected_religion_feature = religion_defensive
-				#has_selected_religion_feature = religion_feature_aztec #Redundant
-				#has_selected_religion_feature = religion_feature_tengri
 				has_selected_religion_feature = religion_feature_earthmother
 				has_selected_religion_feature = religion_feature_orc_good
 				#has_selected_religion_feature = religion_feature_toteteohuan
@@ -1217,8 +1265,10 @@ religion_doctrine = {
 			}
 		}
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_anti_attrition }
-			custom_tooltip = { text = tooltip_religion_feature_offensive }
+			custom_tooltip = {
+				text = tooltip_religion_feature_anti_attrition
+				set_ignores_defensive_attrition = yes
+			}
 			hidden_tooltip = {
 				set_ignores_defensive_attrition = yes
 				if = {
@@ -1230,6 +1280,11 @@ religion_doctrine = {
 					}
 					set_allow_looting = yes
 				}
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_offensive
+
 				set_unit_modifier = {
 					light_infantry_offensive = 0.1
 					mob_troops_offensive = 0.1
@@ -1248,54 +1303,76 @@ religion_doctrine = {
 					horse_archers_offensive = 0.1
 					camel_cavalry_offensive = 0.1
 					war_elephants_offensive = 0.1
-					key = "RELENTLESS_RELIGION"
+
+					key = RELENTLESS_RELIGION
 				}
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
 	}
+
 	religion_animistic = {
 		picture = GFX_religion_feature_animistic
+
 		trigger = {
 			NOR = {
 				has_selected_religion_feature = religion_feature_orc_good # Redundant Doctrine
 				has_selected_religion_feature = religion_feature_nogari # Redundant Doctrine
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_land_morale }
-			custom_tooltip = { text = tooltip_religion_feature_adulthood_rite }
-			hidden_tooltip = {
+			custom_tooltip = {
+				text = tooltip_religion_feature_land_morale
+
 				set_unit_modifier = {
 					land_morale = 0.05
-					key = "ANIMISTIC_RELIGION"
+					key = ANIMISTIC_RELIGION
 				}
 			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_adulthood_rite
+				# Event checks for this religion feature
+			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
 	}
+
 	religion_beatification = {
 		picture = GFX_religion_feature_beatification
+
 		trigger = {
 			NOR = {
 				has_selected_religion_feature = religion_no_leader
-				#religion_group = christian #Random World redundancy.
 				religion = triadic
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_beatification }
-			custom_tooltip = { text = tooltip_religion_feature_eldership }
+			custom_tooltip = {
+				text = tooltip_religion_feature_beatification
+				# Event checks for this religion feature
+			}
+
+			custom_tooltip = {
+				text = tooltip_religion_feature_eldership
+				# Succession law checks for this religion feature
+			}
 		}
+
 		ai_will_do = {
 			factor = 1
-			modifier = { #Handles feature randomization in AltStart to make unreformed pagans still have "paganish" features.
-				factor = 0
-				has_game_started = no
+
+			# Handles feature randomization in AltStart to make unreformed pagans still have "paganish" features
+			trigger = {
+				has_game_started = yes
 				religion_group = humanoid_group
 			}
 		}
@@ -1303,11 +1380,16 @@ religion_doctrine = {
 
 	religion_feature_pyramids = {
 		picture = GFX_religion_feature_pyramids
+
 		potential = {
 			has_game_started = yes
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_pyramids }
+			custom_tooltip = {
+				text = tooltip_religion_feature_pyramids
+				# Wonder checks for this religion feature
+			}
 		}
 	}
 }
@@ -1317,63 +1399,97 @@ religion_leadership = {
 
 	religion_temporal_head = {
 		picture = GFX_religion_feature_temporal_head
+
 		potential = {
 			has_game_started = yes
 		}
+
 		trigger = {
 			FROM = {
 				character = yes
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_temporal_head }
-			hidden_tooltip = {
+			custom_tooltip = {
+				text = tooltip_religion_feature_temporal_head
+				make_reformer_head_of_religion = yes
+			}
+
+			
+			custom_tooltip = {
+				text = tooltip_religion_feature_no_crusade
+				set_can_call_crusade = no
+			}
+
+			hidden_effect = {
 				set_can_excommunicate = no
 				set_can_grant_divorce = no
 				set_can_grant_claim = no
-				make_reformer_head_of_religion = yes
-				set_can_call_crusade = no
 			}
 		}
+
 		ai_will_do = {
 			factor = 50
 		}
 	}
+
 	religion_theocratic_head = {
 		picture = GFX_religion_feature_theocratic_head
+
 		potential = {
 			has_game_started = yes
 		}
+
 		effect = {
 			custom_tooltip = { text = tooltip_religion_feature_theocratic_head }
-			hidden_tooltip = {
-				set_can_excommunicate = no
+
+			
+			custom_tooltip = {
+				text = tooltip_religion_feature_no_crusade
+				set_can_call_crusade = no
+			}
+
+			hidden_effect = {
+				set_can_excommunicate = yes
 				set_can_grant_divorce = yes
 				set_can_grant_invasion_cb = yes
 				set_can_grant_claim = yes
-				set_can_call_crusade = no
 			}
 		}
+
 		ai_will_do = {
 			factor = 50
 		}
 	}
+
 	religion_autocephaly = {
 		picture = GFX_religion_feature_autocephaly
+
 		potential = {
 			has_game_started = yes
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_autocephaly }
-			hidden_tooltip = {
+			custom_tooltip = {
+				text = tooltip_religion_feature_autocephaly
 				set_autocephaly = yes
-				set_can_excommunicate = no
+			}
+
+			
+			custom_tooltip = {
+				text = tooltip_religion_feature_no_crusade
+				set_can_call_crusade = no
+			}
+
+			hidden_effect = {
+				set_can_excommunicate = yes
 				set_can_grant_divorce = yes
 				set_can_grant_invasion_cb = yes
 				set_can_grant_claim = yes
-				set_can_call_crusade = no
 			}
 		}
+
 		ai_will_do = {
 			factor = 50
 		}
@@ -1381,17 +1497,23 @@ religion_leadership = {
 
 	religion_no_leader = {
 		picture = GFX_religion_feature_no_leader
+
 		potential = {
 			has_game_started = yes
 		}
+
 		trigger = {
-			NOT = {
+			NOR = {
 				has_selected_religion_feature = religion_dogmatic
 				has_selected_religion_feature = religion_beatification
 			}
 		}
+
 		effect = {
-			custom_tooltip = { text = tooltip_religion_feature_branches }
+			custom_tooltip = {
+				text = tooltip_religion_feature_branches
+				set_religious_branch = pagan_reformation
+			}
 			custom_tooltip = { text = tooltip_religion_feature_dynamic }
 			custom_tooltip = { text = tooltip_religion_feature_no_leader }
 			custom_tooltip = { text = tooltip_religion_feature_no_crusade }
@@ -1399,7 +1521,6 @@ religion_leadership = {
 				set_no_head_of_religion = yes
 				set_religion_head = none
 				set_can_call_crusade = no
-				set_religious_branch = pagan_reformation
 			}
 			if = {
 				limit = {
