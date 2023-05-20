@@ -46,6 +46,7 @@ character_event = { # polyam.1
 		any_spouse = {
 			limit = {
 				NOT = { character = FROM }
+				NOT = { character = ROOT } # should never happen
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
 				is_metamour_of_root = no
@@ -59,8 +60,10 @@ character_event = { # polyam.1
 		any_consort = {
 			limit = {
 				NOT = { character = FROM }
+				NOT = { character = ROOT } # should never happen
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
+				is_metamour_of_root = no
 			}
 			character_event = {
 				id = polyam.2
@@ -71,8 +74,10 @@ character_event = { # polyam.1
 		any_lover = {
 			limit = {
 				NOT = { character = FROM }
+				NOT = { character = ROOT } # should never happen
 				NOT = { trait = incapable }
 				is_inaccessible_trigger = no
+				is_metamour_of_root = no
 			}
 			character_event = {
 				id = polyam.2
@@ -111,6 +116,16 @@ character_event = { # polyam.2
 	picture = GFX_evt_gossip_1
 	immediate = {
 		log = "[ROOT.GetBestName] is flagged as a metamour of [FROMFROM.GetBestName]."
+		if = {
+			limit = {
+				OR = {
+					FROM = { character = ROOT }
+					FROM = { character = FROMFROM }
+					FROMFROM = { character = ROOT }
+				}
+			}
+			break = yes # fails out if the three parties aren't all distinct
+		}		
 	}
 	option = {
 		name = EVTOPTA_POLYAM_2 # Terrible news!
@@ -818,6 +833,10 @@ character_event = { # polyam.12
 				trait = lustful
 			}
 			modifier = {
+				factor = 2
+				trait = hedonist
+			}
+			modifier = {
 				factor = 0
 				is_close_relative = FROM
 				OR = {
@@ -899,6 +918,15 @@ character_event = { # polyam.13
 			modifier = {
 				factor = 0
 				trait = chaste
+			}
+			modifier = {
+				factor = 0
+				AND = {
+					FROM = {
+						is_romance_compatible_with_root = no					
+					}
+					NOT = { trait = hedonist }
+				}
 			}
 			modifier = {
 				factor = 3
