@@ -11,9 +11,13 @@ character_event = {
 	
 	option = {
 		trigger = {
-			NOR = {
-				trait = proud
-				trait = ambitious
+			OR = {
+				NOR = {
+					trait = proud
+					trait = ambitious
+				}
+				has_landed_title = d_muhjari
+				has_landed_title = k_calimshan
 			}
 		}
 		name = EVTOPTA_FRZAKH_1 # A dignified assertion
@@ -27,11 +31,18 @@ character_event = {
 				trait = proud
 				trait = ambitious
 			}
+			NOR = { # Already titled Caliph/Caleph
+				has_landed_title = d_muhjari
+				has_landed_title = k_calimshan
+			}
 		}
 		name = EVTOPTB_FRZAKH_1 # A grasping assertion
 		hidden_tooltip = {
 			character_event = { id = frzakh.3 months = 2 }
 		}
+	}
+	after = {
+		narrative_event = { id = frzakh.8 }
 	}
 }
 
@@ -58,19 +69,77 @@ character_event = {
 		export_to_variable = { which = challenger_diplo value = diplomacy }
 		export_to_variable = { which = challenger_dec value = decadence }
 		export_to_variable = { which = challenger_piety value = piety }
+		export_to_variable = { which = challenger_authority value = religion_authority }
 		change_variable = { which = challenger_score which = challenger_learn }
 		change_variable = { which = challenger_score which = challenger_diplo }
 		change_variable = { which = challenger_score which = challenger_piety }
 		subtract_variable = { which = challenger_score which = challenger_dec }
+		change_variable = { which = challenger_score which = challenger_authority }
+		if = {
+			limit = {
+				has_landed_title = c_huzuz
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
+		if = {
+			limit = {
+				has_landed_title = e_zakhara
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
+		if = {
+			limit = {
+				independent = yes
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
 		event_target:current_caliph = {
 			export_to_variable = { which = caliph_learn value = learning }
 			export_to_variable = { which = caliph_diplo value = diplomacy }
 			export_to_variable = { which = caliph_dec value = decadence }
 			export_to_variable = { which = caliph_piety value = piety }
+			export_to_variable = { which = caliph_authority value = religion_authority }
 			change_variable = { which = global_caliph_score which = caliph_learn }
 			change_variable = { which = global_caliph_score which = caliph_diplo }
 			change_variable = { which = global_caliph_score which = caliph_piety }
 			subtract_variable = { which = global_caliph_score which = caliph_dec }
+			change_variable = { which = global_caliph_score = which = caliph_authority }
+			if = {
+				limit = {
+					has_landed_title = c_huzuz
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
+			if = {
+				limit = {
+					has_landed_title = e_zakhara
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
+			if = {
+				limit = {
+					independent = yes
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
 		}
 		if = {
 			limit = {
@@ -129,8 +198,9 @@ character_event = {
 		name = EVTOPTC_FRZAKH_4 # A humble retraction
 		prestige = -250
 	}
-}
-
+	after = {
+		narrative_event = { id = frzakh.9 }
+	}
 }
 
 character_event = {
@@ -163,21 +233,25 @@ character_event = {
 				qisma = { # this is a trigger, like an if
 					qisma = { # this is a scope
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_qisma
 					}
 				}
 				ten_thousand_gods = {
 					ten_thousand_gods = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_myriadic
 					}
 				}
 				pantheist_league = {
 					pantheist_league = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_pantheist
 					}
 				}
 				muhjari = {
 					muhjari = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_muhjari
 					}
 				}
 			}
@@ -220,14 +294,9 @@ character_event = {
 			}
 			grant_title = e_zakhara
 		}
-		if = {
-			limit = {
-				event_target:current_caliph = {
-					has_landed_title = c_huzuz
-				}
-			}
-			grant_title = c_huzuz
-		}
+	}
+	after = {
+		narrative_event = { id = frzakh.10 }
 	}
 }
 
@@ -241,5 +310,95 @@ character_event = {
 	option = {
 		name = EVTOPTA_FRZAKH_7
 		prestige = -250
+	}
+}
+narrative_event = {
+	id = frzakh.8
+	title = frzakh_8.title
+	desc = EVTDESC_FRZAKH_8
+	picture = GFX_evt_imam
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			any_liege = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+			religion_head = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_8
+	}
+}
+narrative_event = {
+	id = frzakh.9
+	title = frzakh_9.title
+	desc = EVTDESC_FRZAKH_9
+	picture = GFX_evt_imam
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			any_liege = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+			religion_head = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_9
+	}
+}
+narrative_event = {
+	id = frzakh.10
+	title = frzakh_10.title
+	desc = EVTDESC_FRZAKH_10
+	picture = GFX_evt_desert_rider
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			is_within_diplo_range = event_target:current_caliph
+			is_within_diplo_range = event_target:caliph_challenger
+			religion_group = qismaite_group
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_10
 	}
 }
