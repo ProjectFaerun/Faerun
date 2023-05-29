@@ -934,23 +934,13 @@ character_event = {
 				OR = {
 					AND = {
 						mother_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-								trait = creature_feyri
-								trait = creature_draegloth
-							}
+							race_is_elven = yes
 						}
 						true_father_even_if_dead = { trait = creature_tanarukk }
 					}
 					AND = {
 						true_father_even_if_dead = {
-							OR = {
-								trait = creature_elf
-								trait = creature_drow
-								trait = creature_feyri
-								trait = creature_draegloth
-							}
+							race_is_elven = yes
 						}
 						mother_even_if_dead = { trait = creature_tanarukk }
 					}
@@ -1150,15 +1140,7 @@ character_event = {
 				}
 				1 = {
 					add_trait = creature_ogre
-					if = {
-						limit = {
-							mother_even_if_dead = { trait = creature_ogrillon }
-						}
-						mother_even_if_dead = { tb_graph_culture_racial = yes }
-					}
-					else = {
-						true_father_even_if_dead = { tb_graph_culture_racial = yes }
-					}
+					set_graphical_culture = ogre
 				}
 			}
 		}
@@ -1385,7 +1367,12 @@ character_event = {
 			limit = {
 				OR = {
 					AND = {
-						true_father_even_if_dead = { trait = creature_ogre }
+						true_father_even_if_dead = {
+							OR = {
+								trait = creature_ogre
+								race_is_giantkin = yes
+							}
+						}
 						mother_even_if_dead = {
 							OR = {
 								trait = creature_orc
@@ -1394,7 +1381,12 @@ character_event = {
 						}
 					}
 					AND = {
-						mother_even_if_dead = { trait = creature_ogre }
+						mother_even_if_dead = {
+							OR = {
+								trait = creature_ogre
+								race_is_giantkin = yes
+							}
+						}
 						true_father_even_if_dead = {
 							OR = {
 								trait = creature_orc
@@ -1405,15 +1397,7 @@ character_event = {
 				}
 			}
 			add_trait = creature_ogrillon
-			if = {
-				limit = {
-					mother_even_if_dead = { trait = creature_ogre }
-				}
-				mother_even_if_dead = { tb_graph_culture_racial = yes }
-			}
-			else = {
-				true_father_even_if_dead = { tb_graph_culture_racial = yes }
-			}
+			set_graphical_culture = ogre
 		}
 		#ogre + ogrillon = 4/1 ogrillon or ogre
 		else_if = {
@@ -1599,35 +1583,6 @@ character_event = {
 				true_father_even_if_dead = { tb_graph_culture_racial = yes }
 			}
 		}
-		#minotaurs + humans
-		else_if = {
-			limit = {
-				OR = {
-					AND = {
-						true_father_even_if_dead = { trait = creature_minotaur }
-						mother_even_if_dead = {
-							race_is_part_human = yes
-						}
-					}
-					AND = {
-						mother_even_if_dead = { trait = creature_minotaur }
-						true_father_even_if_dead = {
-							race_is_part_human = yes
-						}
-					}
-				}
-			}
-			random_list = {
-				3 = {
-					add_trait = creature_half_ogre
-					set_graphical_culture = ogre
-				}
-				1 = {
-					add_trait = creature_minotaur
-					set_graphical_culture = minotaur
-				}
-			}
-		}
 		#ogres + minotaur/yikarian = 50/50 ogre or minotaur
 		else_if = {
 			limit = {
@@ -1694,6 +1649,57 @@ character_event = {
 					}
 					add_trait = creature_yikarian
 					set_graphical_culture = yikarian
+				}
+			}
+		}
+		#minotaurs + humans
+		else_if = {
+			limit = {
+				OR = {
+					AND = {
+						true_father_even_if_dead = { trait = creature_minotaur }
+						mother_even_if_dead = {
+							OR = {
+								race_is_part_human = yes
+								race_is_orcish = yes
+							}
+						}
+					}
+					AND = {
+						mother_even_if_dead = { trait = creature_minotaur }
+						true_father_even_if_dead = {
+							OR = {
+								race_is_part_human = yes
+								race_is_orcish = yes
+							}
+						}
+					}
+				}
+			}
+			random_list = {
+				3 = {
+					trigger = {
+						OR = {
+							mother_even_if_dead = { race_is_part_human = yes }
+							true_father_even_if_dead = { race_is_part_human = yes }
+						}
+					}
+					add_trait = creature_half_ogre
+					set_graphical_culture = ogre
+				}
+				3 = {
+					trigger = {
+						OR = {
+							mother_even_if_dead = { race_is_orcish = yes }
+							true_father_even_if_dead = { race_is_orcish = yes }
+						}
+					}
+					add_trait = creature_ogrillon
+					set_graphical_culture = ogre
+				}
+				1 = {
+					add_trait = creature_minotaur
+					set_graphical_culture = minotaur
 				}
 			}
 		}
@@ -5029,6 +5035,7 @@ character_event = {
 			}
 		}
 
+		# Half-Dragon inheritance
 		if = {
 			limit = {
 				true_father_even_if_dead = { trait = half_dragon }
@@ -5093,185 +5100,7 @@ character_event = {
 				chance = 5
 				remove_all_race_traits = yes
 				remove_trait = half_dragon
-				add_trait = creature_dragon
-				random_list = {
-					1 = {
-						trigger = {
-							mother_even_if_dead = { trait = creature_dragon }
-						}
-						mother_even_if_dead = {
-							tb_graph_culture_racial = yes
-						}
-					}
-					1 = {
-						trigger = {
-							true_father_even_if_dead = { trait = creature_dragon }
-						}
-						true_father_even_if_dead = {
-							tb_graph_culture_racial = yes
-						}
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_red_dragon }
-								true_father_even_if_dead = { has_character_flag = is_red_dragon }
-							}
-						}
-						set_graphical_culture = red_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_green_dragon }
-								true_father_even_if_dead = { has_character_flag = is_green_dragon }
-							}
-						}
-						set_graphical_culture = green_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_blue_dragon }
-								true_father_even_if_dead = { has_character_flag = is_blue_dragon }
-							}
-						}
-						set_graphical_culture = blue_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_black_dragon }
-								true_father_even_if_dead = { has_character_flag = is_black_dragon }
-							}
-						}
-						set_graphical_culture = black_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_amethyst_dragon }
-								true_father_even_if_dead = { has_character_flag = is_amethyst_dragon }
-							}
-						}
-						set_graphical_culture = amethyst_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_ruby_dragon }
-								true_father_even_if_dead = { has_character_flag = is_ruby_dragon }
-							}
-						}
-						set_graphical_culture = ruby_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_gold_dragon }
-								true_father_even_if_dead = { has_character_flag = is_gold_dragon }
-							}
-						}
-						set_graphical_culture = gold_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_silver_dragon }
-								true_father_even_if_dead = { has_character_flag = is_silver_dragon }
-							}
-						}
-						set_graphical_culture = silver_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_bronze_dragon }
-								true_father_even_if_dead = { has_character_flag = is_bronze_dragon }
-							}
-						}
-						set_graphical_culture = bronze_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_brass_dragon }
-								true_father_even_if_dead = { has_character_flag = is_brass_dragon }
-							}
-						}
-						set_graphical_culture = brass_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_copper_dragon }
-								true_father_even_if_dead = { has_character_flag = is_copper_dragon }
-							}
-						}
-						set_graphical_culture = copper_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_shadow_dragon }
-								true_father_even_if_dead = { has_character_flag = is_shadow_dragon }
-							}
-						}
-						set_graphical_culture = shadow_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = { has_character_flag = is_song_dragon }
-								true_father_even_if_dead = { has_character_flag = is_song_dragon }
-							}
-						}
-						set_graphical_culture = song_dragon
-					}
-					1 = {
-						trigger = {
-							OR = {
-								mother_even_if_dead = {
-									has_character_flag = secret_dragon
-									NOR = {
-										has_character_flag = is_red_dragon
-										has_character_flag = is_green_dragon
-										has_character_flag = is_blue_dragon
-										has_character_flag = is_black_dragon
-										has_character_flag = is_amethyst_dragon
-										has_character_flag = is_ruby_dragon
-										has_character_flag = is_gold_dragon
-										has_character_flag = is_silver_dragon
-										has_character_flag = is_bronze_dragon
-										has_character_flag = is_brass_dragon
-										has_character_flag = is_copper_dragon
-										has_character_flag = is_shadow_dragon
-										has_character_flag = is_song_dragon
-									}
-								}
-								true_father_even_if_dead = {
-									has_character_flag = secret_dragon
-									NOR = {
-										has_character_flag = is_red_dragon
-										has_character_flag = is_green_dragon
-										has_character_flag = is_blue_dragon
-										has_character_flag = is_black_dragon
-										has_character_flag = is_amethyst_dragon
-										has_character_flag = is_ruby_dragon
-										has_character_flag = is_gold_dragon
-										has_character_flag = is_silver_dragon
-										has_character_flag = is_bronze_dragon
-										has_character_flag = is_brass_dragon
-										has_character_flag = is_copper_dragon
-										has_character_flag = is_shadow_dragon
-										has_character_flag = is_song_dragon
-									}
-								}
-							}
-						}
-						set_graphical_culture = steel_dragon
-					}
-				}
+				dragon_race_inheritance = yes
 			}
 		}
 		if = {
