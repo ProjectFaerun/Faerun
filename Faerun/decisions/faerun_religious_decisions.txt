@@ -235,20 +235,33 @@ decisions = {
 				ai = no
 				AND = {
 					ai = yes
-					trait = ambitious
-					k_grand_caliphate = {
-						holder_scope = {
-							NOT = { opinion = 0 }
+					OR = {
+						trait = ambitious
+						k_grand_caliphate = {
+							holder_scope = {
+								OR = {
+									AND = {
+										NOT = { opinion = 0 }
+										independent = no
+									}
+									NOT = { opinion = -75 }
+								}
+							}
 						}
 					}
 				}
 			}
 			is_landed = yes
-			capital_scope = {
-				region = zakhara_region
-			}
+			is_inaccessible_trigger = no
+			is_incapable = no
+#			not_casting = yes
 			OR = {
-				independent = yes
+				AND = {
+					independent = yes
+					capital_scope = {
+						region = zakhara_region
+					}
+				}
 				liege = {
 					has_landed_title = k_grand_caliphate
 				}
@@ -279,20 +292,107 @@ decisions = {
 		effect = {
 			set_character_flag = has_challenged_caliph
 			save_event_target_as = caliph_challenger
-			character_event = { id = frzakh.1 }
-			set_variable = { which = challenger_score value = 0 }
+			hidden_tooltip = {
+				set_variable = { which = challenger_score value = 0 }
+			}
 			k_grand_caliphate = {
 				holder_scope = {
 					save_event_target_as = current_caliph
-					set_variable = { which = global_caliph_score value = 0 } # has to be global
+					hidden_tooltip = {
+						set_variable = { which = global_caliph_score value = 0 } # has to be global
+					}
 					character_event = { id = frzakh.2 }
 				}
 			}
+			character_event = { id = frzakh.1 }
 		}
 		ai_will_do = {
 			factor = 0.05 # 5% chance
+			modifier = {
+				factor = 5
+				trait = ambitious
+			}
+			modifier = {
+				factor = 10
+				event_target:current_caliph = { independent = no }
+			}
 		}
 	}
+	
+	create_grand_caliphate = {
+		ai_check_interval = 300
+		potential = {
+			any_demesne_title = {
+				OR = {
+					title = d_muhjari
+					title = d_myriadic
+					title = d_qisma
+					title = d_pantheist
+				}
+			}
+#			is_playable = yes
+#			is_inaccessible_trigger = no
+#			is_incapable = no
+#			not_casting = yes
+#			has_global_flag = found_loregiver_lore # future-proofing
+#			k_grand_caliphate = {
+#				holder_scope = {
+#					is_alive = no
+#				}
+#			}
+		}
+		
+		allow = {
+			prestige = 500
+			piety = 500
+			has_landed_title = c_huzuz
+			independent = yes
+			is_playable = yes
+			is_inaccessible_trigger = no
+			is_incapable = no
+#			not_casting = yes
+			has_global_flag = found_loregiver_lore # future-proofing
+			k_grand_caliphate = {
+				has_holder = no
+			}
+		}
+		
+		effect = {
+			prestige = -500
+			piety = -500
+			save_event_target_as = new_grand_caliph
+			grant_title = k_grand_caliphate
+			trigger_switch = {
+				on_trigger = religion
+				qisma = { # this is a trigger, like an if
+					qisma = { # this is a scope
+						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_qisma
+					}
+				}
+				ten_thousand_gods = {
+					ten_thousand_gods = {
+						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_myriadic
+					}
+				}
+				pantheist_league = {
+					pantheist_league = {
+						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_pantheist
+					}
+				}
+				muhjari = {
+					muhjari = {
+						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_muhjari
+					}
+				}
+			}
+			narrative_event = { id = frzakh.11 }
+		}
+	}
+
 
 	kaitotem = {
 		ai_check_interval = 300
@@ -502,6 +602,8 @@ decisions = {
 		}
 
 		effect = {
+			wealth = -20
+			piety = -35
 			character_event = { id = generalmisc.50 days = 3  }
 			set_character_flag = religious_winter_soldier
 		}
@@ -1219,9 +1321,7 @@ decisions = {
 			}
 			NOR = {
 				trait = psi_potential
-				trait = creature_illithid
-				trait = creature_ulitharid
-				trait = creature_elder_brain
+				race_is_illithid = yes
 				trait = creature_aboleth
 				AND = {
 					trait = creature_dragon
@@ -1713,8 +1813,7 @@ decisions = {
 				faerun_immortal_race_trigger = yes
 				trait = creature_kobold
 				trait = creature_dragonborn
-				trait = creature_illithid
-				trait = creature_ulitharid
+				race_is_aberrant = yes
 			}
 		}
 
@@ -2816,49 +2915,7 @@ decisions = {
 
 		potential = {
 			is_adult = yes
-			NOR = {
-				trait = natural_lycanthrope
-				trait = afflicted_lycanthrope
-				trait = vampire
-				trait = vampire_spawn
-				trait = undead
-				trait = lich
-				trait = archlich
-				trait = lich_baelnorn
-				trait = avatar
-			}
-			OR = {
-				trait = creature_drow
-				trait = creature_elf
-				trait = creature_half_elf
-				trait = creature_feyri
-				trait = creature_draegloth
-				trait = creature_spirit_folk
-				trait = creature_dwarf
-				trait = creature_half_dwarf
-				trait = creature_giant
-				trait = creature_half_giant
-				trait = creature_ogre
-				trait = creature_half_ogre
-				trait = creature_ogrillon
-				trait = creature_troll
-				trait = creature_goliath
-				trait = creature_gnome
-				trait = creature_gith
-				trait = creature_goblin
-				trait = creature_hobgoblin
-				trait = creature_bugbear
-				trait = creature_hagspawn
-				trait = creature_halfling
-				trait = creature_human
-				trait = creature_deep_imaskari
-				trait = creature_orc
-				trait = creature_half_orc
-				trait = creature_tanarukk
-				trait = creature_genasi
-				trait = creature_tiefling
-				trait = creature_aasimar
-			}
+			is_lycanthrope_compatible = yes
 			trait = patron_malar
 			reforming_gov = yes
 			not_casting = yes
@@ -2951,7 +3008,7 @@ decisions = {
 				religion = gnome_pantheon
 				religion = orc_pantheon
 				religion = orc_reformed
-				#religion = draconic_pantheon
+				religion = draconic_pantheon
 				#religion = ulutiuan
 				#religion = ulutiuan_reformed
 				religion = yuir
@@ -6743,9 +6800,7 @@ targeted_decisions = {
 
 		potential = {
 			NOR = {
-				trait = creature_illithid
-				trait = creature_ulitharid
-				trait = creature_elder_brain
+				race_is_illithid = yes
 				trait = creature_construct
 				is_undead = yes
 				trait = construct
@@ -6848,9 +6903,7 @@ targeted_decisions = {
 
 		potential = {
 			NOR = {
-				trait = creature_illithid
-				trait = creature_ulitharid
-				trait = creature_elder_brain
+				race_is_illithid = yes
 				trait = creature_construct
 				is_undead = yes
 				trait = construct
@@ -7023,9 +7076,7 @@ targeted_decisions = {
 
 		potential = {
 			NOR = {
-				trait = creature_illithid
-				trait = creature_ulitharid
-				trait = creature_elder_brain
+				race_is_illithid = yes
 				trait = creature_construct
 				is_undead = yes
 				trait = construct

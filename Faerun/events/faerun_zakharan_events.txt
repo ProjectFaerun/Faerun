@@ -5,22 +5,51 @@ namespace = frzakh
 character_event = {
 	id = frzakh.1
 	desc = EVTDESC_FRZAKH_1 # something about the caliph being weak and unworthy
-	picture = GFX_evt_bishop
+	picture = GFX_evt_huzuz_1
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = EVTOPTA_FRZAKH_1 # "Zakhara will see I'm worthier" or like that
+		trigger = {
+			OR = {
+				NOR = {
+					trait = proud
+					trait = ambitious
+				}
+				has_landed_title = d_muhjari
+				has_landed_title = k_calimshan
+			}
+		}
+		name = EVTOPTA_FRZAKH_1 # A dignified assertion
 		hidden_tooltip = {
 			character_event = { id = frzakh.3 months = 2 }
 		}
+	}
+	option = {
+		trigger = {
+			OR = {
+				trait = proud
+				trait = ambitious
+			}
+			NOR = { # Already titled Caliph/Caleph
+				has_landed_title = d_muhjari
+				has_landed_title = k_calimshan
+			}
+		}
+		name = EVTOPTB_FRZAKH_1 # A grasping assertion
+		hidden_tooltip = {
+			character_event = { id = frzakh.3 months = 2 }
+		}
+	}
+	after = {
+		narrative_event = { id = frzakh.8 }
 	}
 }
 
 character_event = {
 	id = frzakh.2
 	desc = EVTDESC_FRZAKH_2 # something about the audacity of the challenger
-	picture = GFX_evt_bishop
+	picture = GFX_evt_huzuz_1
 	
 	is_triggered_only = yes
 	
@@ -40,19 +69,77 @@ character_event = {
 		export_to_variable = { which = challenger_diplo value = diplomacy }
 		export_to_variable = { which = challenger_dec value = decadence }
 		export_to_variable = { which = challenger_piety value = piety }
+		export_to_variable = { which = challenger_authority value = religion_authority }
 		change_variable = { which = challenger_score which = challenger_learn }
 		change_variable = { which = challenger_score which = challenger_diplo }
 		change_variable = { which = challenger_score which = challenger_piety }
 		subtract_variable = { which = challenger_score which = challenger_dec }
+		change_variable = { which = challenger_score which = challenger_authority }
+		if = {
+			limit = {
+				has_landed_title = c_huzuz
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
+		if = {
+			limit = {
+				has_landed_title = e_zakhara
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
+		if = {
+			limit = {
+				independent = yes
+			}
+			change_variable = {
+				which = challenger_score
+				value = 50
+			}
+		}
 		event_target:current_caliph = {
 			export_to_variable = { which = caliph_learn value = learning }
 			export_to_variable = { which = caliph_diplo value = diplomacy }
 			export_to_variable = { which = caliph_dec value = decadence }
 			export_to_variable = { which = caliph_piety value = piety }
+			export_to_variable = { which = caliph_authority value = religion_authority }
 			change_variable = { which = global_caliph_score which = caliph_learn }
 			change_variable = { which = global_caliph_score which = caliph_diplo }
 			change_variable = { which = global_caliph_score which = caliph_piety }
 			subtract_variable = { which = global_caliph_score which = caliph_dec }
+			change_variable = { which = global_caliph_score which = caliph_authority }
+			if = {
+				limit = {
+					has_landed_title = c_huzuz
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
+			if = {
+				limit = {
+					has_landed_title = e_zakhara
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
+			if = {
+				limit = {
+					independent = yes
+				}
+				change_variable = {
+					which = global_caliph_score
+					value = 50
+				}
+			}
 		}
 		if = {
 			limit = {
@@ -75,7 +162,7 @@ character_event = {
 character_event = {
 	id = frzakh.4
 	desc = EVTDESC_FRZAKH_4
-	picture = GFX_evt_bishop
+	picture = GFX_evt_emissary_arabic
 	
 	is_triggered_only = yes
 	
@@ -83,12 +170,43 @@ character_event = {
 		name = EVTOPTA_FRZAKH_4
 		prestige = -250
 	}
+	option = {
+		trigger = {
+			NOR = {
+				trait = proud
+				trait = ambitious
+				trait = humble
+			}
+		}
+		name = EVTOPTA_FRZAKH_4 # A dignified retraction
+		prestige = -250
+	}
+	option = {
+		trigger = {
+			OR = {
+				trait = proud
+				trait = ambitious
+			}
+		}
+		name = EVTOPTB_FRZAKH_4 # An undignified concession
+		prestige = -250
+	}
+	option = {
+		trigger = {
+			trait = humble
+		}
+		name = EVTOPTC_FRZAKH_4 # A humble retraction
+		prestige = -250
+	}
+	after = {
+		narrative_event = { id = frzakh.9 }
+	}
 }
 
 character_event = {
 	id = frzakh.5
 	desc = EVTDESC_FRZAKH_5
-	picture = GFX_evt_bishop
+	picture = GFX_evt_imam
 	
 	is_triggered_only = yes
 	
@@ -101,7 +219,7 @@ character_event = {
 character_event = {
 	id = frzakh.6
 	desc = EVTDESC_FRZAKH_6
-	picture = GFX_evt_bishop
+	picture = GFX_evt_desert_rider
 	
 	is_triggered_only = yes
 	
@@ -115,21 +233,25 @@ character_event = {
 				qisma = { # this is a trigger, like an if
 					qisma = { # this is a scope
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_qisma
 					}
 				}
 				ten_thousand_gods = {
 					ten_thousand_gods = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_myriadic
 					}
 				}
 				pantheist_league = {
 					pantheist_league = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_pantheist
 					}
 				}
 				muhjari = {
 					muhjari = {
 						set_religion_head = k_grand_caliphate
+						destroy_landed_title = d_muhjari
 					}
 				}
 			}
@@ -173,17 +295,145 @@ character_event = {
 			grant_title = e_zakhara
 		}
 	}
+	after = {
+		narrative_event = { id = frzakh.10 }
+	}
 }
 
 character_event = {
 	id = frzakh.7
 	desc = EVTDESC_FRZAKH_7
-	picture = GFX_evt_bishop
+	picture = GFX_evt_stressed_ruler
 	
 	is_triggered_only = yes
 	
 	option = {
 		name = EVTOPTA_FRZAKH_7
 		prestige = -250
+	}
+}
+narrative_event = {
+	id = frzakh.8
+	title = frzakh_8.title
+	desc = EVTDESC_FRZAKH_8
+	picture = GFX_evt_imam
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			any_liege = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+			religion_head = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_8
+	}
+}
+narrative_event = {
+	id = frzakh.9
+	title = frzakh_9.title
+	desc = EVTDESC_FRZAKH_9
+	picture = GFX_evt_imam
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			any_liege = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+			religion_head = {
+				OR = {
+					character = event_target:current_caliph
+					character = event_target:caliph_challenger
+				}
+			}
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_9
+	}
+}
+narrative_event = {
+	id = frzakh.10
+	title = frzakh_10.title
+	desc = EVTDESC_FRZAKH_10
+	picture = GFX_evt_desert_rider
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			is_within_diplo_range = event_target:current_caliph
+			is_within_diplo_range = event_target:caliph_challenger
+			religion_group = qismaite_group
+		}
+		NOR = { 
+			event_target:current_caliph = { character = ROOT }
+			event_target:caliph_challenger = { character = ROOT }
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_10
+	}
+}
+narrative_event = {
+	id = frzakh.11
+	title = frzakh_11.title
+	desc = EVTDESC_FRZAKH_11
+	picture = GFX_evt_huzuz_1
+	
+	is_triggered_only = yes
+	
+	major_trigger = {
+		ai = no
+		OR = {
+			any_liege = {
+				has_landed_title = k_grand_caliphate
+			}
+			religion_group = qismaite_group
+		}
+	}
+	option = {
+		name = EVTOPTA_FRZAKH_11
+	}
+	after = {
+		if = {
+			limit = {
+				NOT = { has_global_flag = grand_caliphate_first_established }
+			}
+			event_target:new_grand_caliph = {
+				give_nickname = nick_the_first_caliph
+				create_bloodline = {
+					type = first_caliph_new_bloodline
+				}
+			}
+			set_global_flag = grand_caliphate_first_established
+		}
 	}
 }
