@@ -274,338 +274,472 @@ obj_land_for_son = {
 
 obj_land_for_daughter = {
 	type = character
-	
+
 	potential = {
+		has_dlc = "Conclave"
+		prisoner = no
+		is_adult = yes
 		independent = no
-		# is_nomadic = no
-		NOR = { 
-			has_religion_feature = religion_patriarchal
-			religion = orc_pantheon
-		}
+		is_nomadic = no
+		is_incapable = no
+		NOT = { has_character_flag = land_for_daughter_successful }
+		NOT = { religion = orc_pantheon }
 		liege = {
-			# is_nomadic = no
-			NOR = { 
-				has_religion_feature = religion_patriarchal
-				religion = orc_pantheon
+			NOT = { religion = orc_pantheon }
+		}
+
+		OR = {
+			has_law = true_cognatic_succession
+			has_law = enatic_succession
+			has_law = enatic_cognatic_succession
+		}
+
+		liege = {
+			is_nomadic = no
+
+			OR = {
+				has_law = true_cognatic_succession
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+			}
+		}
+
+		any_child = {
+			is_female = yes
+			vassal_of = ROOT
+			is_ruler = no
+			is_adult = yes
+			is_heir = no
+			prisoner = no
+			is_incapable = no
+			has_inheritance_blocker = no
+			NOT = { trait = bastard }
+		}
+	}
+
+	success = {
+		custom_tooltip = {
+			text = obj_land_for_daughter_success_tooltip
+
+			has_character_flag = land_for_daughter_successful
+		}
+	}
+
+	abort = {
+		OR = {
+			is_nomadic = yes
+			independent = yes
+			is_incapable = yes
+			prisoner = yes
+			has_law = agnatic_succession
+			has_law = cognatic_succession
+
+			liege = {
+				OR = {
+					is_nomadic = yes
+					has_law = agnatic_succession
+					has_law = cognatic_succession
+				}
+			}
+
+			NOT = {
+				any_child = {
+					is_female = yes
+					vassal_of = ROOT
+					is_ruler = no
+					is_adult = yes
+					is_heir = no
+					prisoner = no
+					is_incapable = no
+					has_inheritance_blocker = no
+					NOT = { trait = bastard }
+				}
 			}
 		}
 	}
 
-	allow = {
-		#liege = { independent = yes }
-		has_dlc = "Zeus"
-		prisoner = no
-		is_adult = yes
-		NOR = { 
-			trait = incapable 
-			has_character_flag = land_for_daughter_successful
-		}
-		any_child = {
-			is_female = yes
-			is_landed = no
-			is_adult = yes
-			is_heir = no
-			prisoner = no
-			NOR = {
-				trait = incapable
-				is_ascetic_trigger = yes
-			}
-			liege = {
-				character = ROOT
-			}
-		}
-	}
-	
 	chance = {
 		factor = 100
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = content
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			trait = ambitious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = shy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = gregarious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			trait = proud
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = humble
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.25
-			from_ruler_dynasty = yes
+			liege = { dynasty = PREV }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-			diplomacy = 16
+			diplomacy >= 16
 		}
-		modifier = { 
+
+		mult_modifier = {
 			factor = 10
 			is_councillor = yes
 		}
-		modifier = { 
+
+		mult_modifier = {
 			factor = 5
-			relative_income_to_liege = 0.5
+			relative_income_to_liege >= 0.50
 		}
-	}
-	success = {
-		custom_tooltip = {
-			text = obj_land_for_daughter_success_tooltip
-			hidden_tooltip = {
-				has_character_flag = land_for_daughter_successful
-			}
-		}
-	}
-	abort = {
-		is_nomadic = yes
-		liege = {
-			is_nomadic = yes
-		}
-		OR = {
-			NOT = {
-				any_child = {
-					is_female = yes
-					is_adult = yes
-					is_landed = no
-					is_heir = no
-				}
-			}
-			independent = yes
-			trait = incapable
-		}
-	}
-	abort_effect = {
-	}
-	effect = {
 	}
 }
 
 obj_build_a_war_chest = {
 	type = character
-	
+
 	potential = {
-		has_dlc = "Zeus"
-		NOT = { has_character_modifier = war_chest_timer }
-		is_nomadic = no
-		higher_tier_than = BARON
+		has_dlc = "Conclave"
 		is_landed = yes
-	}
-	
-	allow = {
+		higher_real_tier_than = BARON
 		is_adult = yes
-		is_ruler = yes
+		is_nomadic = no
 		war = no
-		OR = {
-			AND = {
-				tier = count
-				NOT = { wealth = 300 }
-			}
-			AND = {
-				tier = duke
-				NOT = { wealth = 500 }
-			}
-			AND = {
-				tier = king
-				NOT = { wealth = 700 }
-			}
-			AND = {
-				tier = emperor
-				NOT = { wealth = 1000 }
-			}
+		is_incapable = no
+		is_inaccessible_trigger = no
+		NOT = { has_character_modifier = war_chest_timer }
+
+		trigger_if = {
+			limit = { real_tier = COUNT }
+			wealth < 300
 		}
-		NOR = { 
-			trait = incapable
-			is_inaccessible_trigger = yes
+		trigger_else_if = {
+			limit = { real_tier = DUKE }
+			wealth < 500
 		}
-		
+		trigger_else_if = {
+			limit = { real_tier = KING }
+			wealth < 700
+		}
+		trigger_else = {
+			wealth < 1000
+		}
 	}
+
+	success = {
+		custom_tooltip = {
+			text = obj_build_a_war_chest_success_custom_tooltip
+
+			trigger_if = {
+				limit = { real_tier = COUNT }
+				wealth >= 300
+			}
+			trigger_else_if = {
+				limit = { real_tier = DUKE }
+				wealth >= 500
+			}
+			trigger_else_if = {
+				limit = { real_tier = KING }
+				wealth >= 700
+			}
+			trigger_else = {
+				wealth >= 1000
+			}
+		}
+	}
+
+	effect = {
+		add_character_modifier = {
+			name = war_taxes
+			years = 5
+		}
+
+		add_character_modifier = {
+			name = war_chest_timer
+			years = 25
+			hidden = yes
+		}
+	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			is_landed = no
+			lower_real_tier_than = COUNT
+			is_nomadic = yes
+		}
+	}
+
 	chance = {
 		factor = 100
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
-			NOT = { wealth = 0 }
+			wealth < 0
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			trait = greedy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			trait = diligent
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
-			martial = 10
+			martial >= 10
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			NOT = { martial = 10 }
+			martial < 10
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			independent = no
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = charitable
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = content
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = slothful
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			tier = count
-			wealth = 200
-		}	
-		modifier = {
-			factor = 0.5
-			tier = duke
-			wealth = 350
+
+			trigger_if = {
+				limit = { real_tier = COUNT }
+				wealth >= 200
+			}
+			trigger_else_if = {
+				limit = { real_tier = DUKE }
+				wealth >= 350
+			}
+			trigger_else_if = {
+				limit = { real_tier = KING }
+				wealth >= 550
+			}
+			trigger_else_if = {
+				limit = { real_tier = EMPEROR }
+				wealth >= 850
+			}
 		}
-		modifier = {
-			factor = 0.5
-			tier = king
-			wealth = 550
-		}
-		modifier = {
-			factor = 0.5
-			tier = emperor
-			wealth = 850
-		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			government = theocracy_government
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			tier = count
+
+			lower_real_tier_than = KING
 			independent = no
-		}
-		modifier = {
-			factor = 0.5
-			tier = duke
-			independent = no
-		}
-	}
-	success = {
-		custom_tooltip = {
-				text = obj_build_a_war_chest_success_custom_tooltip
-				hidden_tooltip = {
-					OR = {
-						AND = {
-							tier = count
-							wealth = 300
-						}
-						AND = {
-							tier = duke
-							wealth = 500
-						}
-						AND = {
-							tier = king
-							wealth = 700
-						}
-						AND = {
-							tier = emperor
-							wealth = 1000
-						}
-					}
-				}
-			}
-	}
-	abort = {
-		trait = incapable
-	}
-	abort_effect = {
-	}
-	effect = {
-		add_character_modifier = {
-			modifier = war_taxes
-			months = 60
-		}
-		add_character_modifier = {
-			modifier = war_chest_timer
-			years = 25
-			hidden = yes
 		}
 	}
 }
 
 obj_groom_an_heir = {
 	type = character
-	
+
 	fertility = 0.20
-	
+
 	potential = {
 		has_dlc = "Conclave"
-		higher_tier_than = BARON
+		higher_real_tier_than = BARON
+		is_adult = yes
+		is_incapable = no
+		is_inaccessible_trigger = no
 		holy_order = no
 		mercenary = no
-	}
-	
-	allow = {
-		is_adult = yes
-		is_ruler = yes
-		OR = {
-			NOT = { trait = eunuch }
-			any_child = {
-				is_alive = yes
-			}
+
+		trigger_if = {
+			limit = { trait = eunuch }
+			has_living_children = yes
 		}
-		NOR = {
-			trait = incapable
-			is_inaccessible_trigger = yes
+
+		AND = {
+			age = 45
+			is_female = yes
+			NOT = { BR_long_lived_races = yes }
+			NOT = { faerun_immortal_race_trigger = yes }
+		}
+		AND = {
+			age = 75
+			is_female = no
+			NOT = { BR_long_lived_races = yes }
+			NOT = { faerun_immortal_race_trigger = yes }
+		}
+		AND = {
+			age = 300
+			BR_long_lived_races = yes
+		}
+		AND = {
+			age = 750
+			faerun_immortal_race_trigger = yes
+		}
+
+		NOT = {
 			any_child = {
-				is_adult = yes 
+				dynasty = ROOT
+				is_adult = yes
+				is_incapable = no
+				has_inheritance_blocker = no
+
 				NOR = {
-					custom_tooltip = {
-						text = bastard_eunuch_celibate_or_incapable_tt
-						OR = {
-							trait = bastard
-							trait = eunuch
-							trait = celibate
-							trait = incapable
-						}
-					}
-					is_ascetic_trigger = yes
+					trait = bastard
+					trait = celibate
 				}
-				OR = {
-					custom_tooltip = { #it's a boy, and you have Agnatic
-						text = boy_agnatic_tt
-						is_female = no
+
+				trigger_if = {
+					limit = {
 						ROOT = { has_law = agnatic_succession }
 					}
-					custom_tooltip = { #it's a girl and you have Enatic
-						text = girl_enatic_tt
-						is_female = yes	
+
+					is_female = no
+				}
+				trigger_else_if = {
+					limit = {
 						ROOT = { has_law = enatic_succession }
 					}
-					custom_tooltip = {
-						text = not_enatic_or_agnatic_tt
+
+					is_female = yes
+				}
+			}
+		}
+	}
+
+	success = {
+		any_child = {
+			dynasty = ROOT
+			is_adult = yes
+			has_inheritance_blocker = no
+
+			NOT = {
+				custom_tooltip = {
+					text = bastard_eunuch_celibate_or_incapable_tt # TODO: Make negative version of the tooltip, as the not doesn't appear in the tooltip
+
+					OR = {
+						trait = bastard
+						trait = eunuch
+						trait = celibate
+						is_incapable = yes
+					}
+				}
+			}
+
+			OR = {
+				custom_tooltip = { # It's a boy, and you have Agnatic
+					text = boy_agnatic_tt
+
+					is_female = no
+					ROOT = { has_law = agnatic_succession }
+				}
+
+				custom_tooltip = { # It's a girl, and you have Enatic
+					text = girl_enatic_tt
+
+					is_female = yes
+					ROOT = { has_law = enatic_succession }
+				}
+
+				custom_tooltip = {
+					text = not_enatic_or_agnatic_tt
+
+					ROOT = {
 						NOR = {
-							ROOT = { has_law = enatic_succession }	
-							ROOT = { has_law = agnatic_succession }
+							has_law = enatic_succession
+							has_law = agnatic_succession
 						}
 					}
 				}
 			}
+		}
+	}
+
+	effect = {
+		custom_tooltip = {
+			text = opinion_boost_child
+
+			any_child = {
+				limit = {
+					dynasty = ROOT
+					is_adult = yes
+					is_incapable = no
+					has_inheritance_blocker = no
+
+					NOR = {
+						trait = bastard
+						trait = celibate
+					}
+
+					trigger_if = {
+						limit = { is_female = yes }
+
+						ROOT = {
+							NOT = { has_law = agnatic_succession }
+						}
+					}
+					trigger_else = {
+						ROOT = {
+							NOT = { has_law = enatic_succession }
+						}
+					}
+				}
+
+				opinion = {
+					name = opinion_family_love
+					who = ROOT
+					years = 20
+				}
+			}
+		}
+	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			lower_real_tier_than = COUNT
+			holy_order = yes
+			mercenary = yes
+
+			trigger_if = {
+				limit = { trait = eunuch }
+				has_living_children = no
+			}
+
 			AND = {
 				age = 45
 				is_female = yes
@@ -626,148 +760,66 @@ obj_groom_an_heir = {
 				age = 750
 				faerun_immortal_race_trigger = yes
 			}
+			AND = {
+				is_feudal = no
+				is_tribal = no
+				is_nomadic = no
+				is_patrician = no
+			}
 		}
 	}
+
 	chance = {
 		factor = 100
 
-		modifier = {
+		trigger = {
+			is_theocracy = no
+			NOT = { trait = celibate }
+		}
+
+		mult_modifier = {
+			factor = 10
+			has_focus = focus_family
+		}
+
+		mult_modifier = {
 			factor = 0
 			is_infertile_race = yes
 		}
 
-		modifier = {
-			factor = 0
-			trait = celibate
-		}
-		modifier = {
-			factor = 0
-			is_theocracy = yes
-		}
-		modifier = {
-			factor = 10
-			has_focus = focus_family
-		}
-		modifier = {
+		mult_modifier = {
 			factor = 5
 			trait = bastard
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-			age = 30
+			practical_age >= 30
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-			age = 45
+			practical_age >= 45
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
 			government = nomadic_government
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			is_smart_trigger = yes
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = shy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = chaste
-		}
-	}
-	success = {
-		any_child = {
-			is_adult = yes 
-			NOR = {
-				custom_tooltip = {
-					text = bastard_eunuch_celibate_or_incapable_tt
-					OR = {
-						trait = bastard
-						trait = eunuch
-						trait = celibate
-						trait = incapable
-					}
-				}
-				is_ascetic_trigger = yes
-			}
-			OR = {
-				custom_tooltip = { #it's a boy, and you have Agnatic
-					text = boy_agnatic_tt
-					is_female = no
-					ROOT = { has_law = agnatic_succession }
-				}
-				custom_tooltip = { #it's a girl and you have Enatic
-					text = girl_enatic_tt
-					is_female = yes	
-					ROOT = { has_law = enatic_succession }
-				}
-				custom_tooltip = {
-					text = not_enatic_or_agnatic_tt
-					NOR = {
-						ROOT = { has_law = enatic_succession }	
-						ROOT = { has_law = agnatic_succession }
-					}
-				}
-#				is_female = no
-#				AND = {
-#					is_female = yes
-#					ROOT = { has_law = true_cognatic_succession }
-#				}
-#				AND = {
-#					is_female = yes
-#					ROOT = { has_law = enatic_succession }
-#				}
-#				AND = {
-#					is_female = yes
-#					ROOT = { has_law = enatic_cognatic_succession }
-#				}
-			}
-		}
-	}
-	abort = {
-		trait = incapable
-	}
-	abort_effect = {
-	}
-	effect = {
-	custom_tooltip = {
-	text = opinion_boost_child
-		hidden_tooltip = {
-			any_child = {
-					limit = {
-						is_adult = yes 
-						NOR = {
-							trait = bastard
-							trait = eunuch
-							trait = celibate
-							trait = incapable
-							is_ascetic_trigger = yes
-						}
-						OR = {
-							is_female = no
-							AND = {
-								is_female = yes
-								ROOT = { has_law = true_cognatic_succession }
-							}
-							AND = {
-								is_female = yes
-								ROOT = { has_law = enatic_succession }
-							}
-							AND = {
-								is_female = yes
-								ROOT = { has_law = enatic_cognatic_succession }
-							}
-						}
-					}
-					opinion = {
-						who = ROOT
-						modifier = opinion_family_love
-						months = 240
-					}
-				}
-			}
 		}
 	}
 }
