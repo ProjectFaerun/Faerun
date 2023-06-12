@@ -287,27 +287,30 @@ plot_gain_vassal_title = {
 	vassal_rank_plot = yes
 
 	# Plotter scope
+	# ROOT is plotter
 	potential = {
 		is_playable = yes
+		is_adult = yes
 		prisoner = no
 		is_patrician = no
-		is_merchant_republic = no
-		is_adult = yes
+		is_incapable = no
+		in_revolt = no
+
 		primary_title = {
-			higher_tier_than = COUNT
+			higher_real_tier_than = COUNT
 			temporary = no
 		}
-		is_incapable = no
-		NOT = { has_landed_title = e_shou_lung_west_governor }
 
-		OR = {
-			ai = no
+		trigger_if = {
+			limit = { ai = yes }
 			war = no
 		}
+
+		NOT = { has_landed_title = e_shou_lung_west_governor }
 	}
 
+	# Title scope
 	target_potential = {
-		# No barony titles
 		higher_tier_than = BARON
 		is_primary_type_title = no
 		is_landless_type_title = no
@@ -316,69 +319,91 @@ plot_gain_vassal_title = {
 		mercenary = no
 	}
 
+	# Title scope
+	# FROM is plotter
 	allow = {
 		is_recent_grant = no
+
+		holder_scope = {
+			custom_tooltip = { # liege_before_war lacks localisation, among other things
+				text = TT_FROM_IS_LIEGE_BEFORE_WAR
+
+				liege_before_war = { # Plot will not invalidate during vassal-liege war
+					character = FROM
+				}
+			}
+
+			NOR = {
+				has_non_aggression_pact_with = FROM
+				reverse_has_truce = FROM
+			}
+		}
+
 		OR = {
 			# Count titles in ruler's primary duchy
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_COUNTY_IN_CAPITAL_DUCHY
-				hidden_tooltip = {
-					tier = COUNT
-					location = {
-						duchy = {
-							holder_scope = {
-								character = FROM
-								capital_scope = {
-									duchy = {
-										title = PREVPREVPREV
-									}
-								}
+
+				real_tier = COUNT
+
+				dejure_liege_title  = {
+					holder_scope = {
+						character = FROM
+
+						capital_scope = {
+							duchy = {
+								title = PREVPREVPREV
 							}
 						}
 					}
 				}
 			}
+
 			# Count's secondary county
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_COUNT_SECONDARY_COUNTY
-				hidden_tooltip = {
-					tier = COUNT
-					location = {
-						is_capital = no
-					}
-					holder_scope = {
-						lower_real_tier_than = DUKE
-						num_of_count_titles = 2
-					}
+
+				real_tier = COUNT
+
+				location = {
+					is_capital = no
+				}
+
+				holder_scope = {
+					lower_real_tier_than = DUKE
+					num_of_count_titles >= 2
 				}
 			}
+
 			# Count title outside a Duke's duchy
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_DUKE_COUNTY_OUTSIDE_DUCHY
-				hidden_tooltip = {
-					tier = COUNT
-					holder_scope = {
-						tier = DUKE
-						ROOT = {
-							NOT = { de_jure_liege = PREV }
-						}
+
+				real_tier = COUNT
+
+				holder_scope = {
+					real_tier = DUKE
+
+					ROOT = {
+						NOT = { de_jure_liege = PREV }
 					}
 				}
 			}
+
 			# Duke with no count titles
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_DUCHY_ALL_DJ_COUNTIES_NOT_DEFACTO
-				hidden_tooltip = {
-					tier = DUKE
-					holder_scope = {
-						ROOT = {
-							NOT = {
-								any_direct_de_jure_vassal_title = {
-									holder_scope = {
-										OR = {
-											character = PREVPREVPREV
-											is_liege_or_above = PREVPREVPREV
-										}
+
+				real_tier = DUKE
+
+				holder_scope = {
+					ROOT = {
+						NOT = {
+							any_direct_de_jure_vassal_title = {
+								holder_scope = {
+									OR = {
+										character = PREVPREVPREV
+										is_liege_or_above = PREVPREVPREV
 									}
 								}
 							}
@@ -386,19 +411,19 @@ plot_gain_vassal_title = {
 					}
 				}
 			}
+
 			# Belongs to Tyrannical Bloodline
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_TYRANNICAL_BLOODLINE
-				hidden_tooltip = {
-					FROM = {
-						any_owned_bloodline = {
-							has_bloodline_flag = bloodline_revocation_plot
-							bloodline_is_active_for = PREV
-						}
+
+				FROM = {
+					any_owned_bloodline = {
+						has_bloodline_flag = bloodline_revocation_plot
+						bloodline_is_active_for = PREV
 					}
 				}
 			}
-			#
+
 			custom_tooltip = {
 				text = TT_PLOT_GAIN_VASSAL_TITLE_GOOD_VS_EVIL
 				hidden_tooltip = {
@@ -412,158 +437,64 @@ plot_gain_vassal_title = {
 				}
 			}
 		}
-		holder_scope = {
-			custom_tooltip = { # liege_before_war lacks localisation, among other things
-				text = TT_FROM_IS_LIEGE_BEFORE_WAR
-				hidden_tooltip = {
-					liege_before_war = { # Plot will not invalidate during vassal-liege war
-						character = FROM
-					}
-				}
-			}
-			NOT = { has_non_aggression_pact_with = FROM }
-			NOT = { reverse_has_truce = FROM }
-		}
-		FROM = { in_revolt = no }
-	}
-
-	chance = {
-		factor = 1
-
-		modifier = {
-			factor = 0.0
-			FROM = {
-				ai = yes
-				war = yes
-			}
-		}
-		modifier = {
-			factor = 0.01
-			FROM = { trait = content }
-		}
-		modifier = {
-			factor = 0.2
-			FROM = {
-				OR = {
-					trait = dull
-					trait = slow
-				}
-			}
-		}
-		modifier = {
-			factor = 0.2
-			FROM = { trait = kind }
-		}
-		modifier = {
-			factor = 0.0
-			FROM = {
-				ai = yes
-				family = ROOT
-				opinion = { who = ROOT value = 0 }
-			}
-		}
-		modifier = {
-			factor = 0
-			FROM = {
-				ai = yes
-				opinion = { who = ROOT value = 50 }
-			}
-			OR = {
-				FROM = { trait = envious }
-				FROM = { trait = deceitful }
-				FROM = { trait = ambitious }
-			}
-		}
-		modifier = {
-			factor = 0
-			FROM = {
-				ai = yes
-				opinion = { who = ROOT value = 25 }
-			}
-			NOT = {
-				OR = {
-					FROM = { trait = envious }
-					FROM = { trait = deceitful }
-					FROM = { trait = ambitious }
-				}
-			}
-		}
-		modifier = {
-			factor = 0.25
-			FROM = {
-				ai = yes
-				opinion = { who = ROOT value = 25 }
-			}
-			OR = {
-				FROM = { trait = envious }
-				FROM = { trait = deceitful }
-				FROM = { trait = ambitious }
-			}
-		}
-		modifier = {
-			factor = 0.25
-			FROM = {
-				ai = yes
-				opinion = { who = ROOT value = 0 }
-			}
-			NOT = {
-				OR = {
-					FROM = { trait = envious }
-					FROM = { trait = deceitful }
-					FROM = { trait = ambitious }
-				}
-			}
-		}
-		modifier = {
-			factor = 1.5
-			NOT = { FROM = { opinion = { who = ROOT value = -50 } } }
-		}
-		modifier = {
-			factor = 1.5
-			NOT = { FROM = { opinion = { who = ROOT value = -75 } } }
-		}
-		modifier = {
-			factor = 1.5
-			FROM = { is_smart_trigger = yes }
-		}
-		modifier = {
-			factor = 2.0
-			FROM = { trait = envious }
-		}
-		modifier = {
-			factor = 2.0
-			FROM = { trait = deceitful }
-		}
-		modifier = {
-			factor = 4.0
-			FROM = { trait = ambitious }
-		}
 	}
 
 	success = {
 		holder = FROM
 	}
+
+	effect = {
+		FROM = {
+			any_plot_backer = {
+				reverse_opinion = {
+					name = opinion_grateful
+					who = FROM
+					years = 5
+				}
+			}
+
+			clr_character_flag = event7040
+		}
+	}
+
 	abort = {
 		OR = {
-			NOT = {
-				OR = {
-					# Count title outside a Duke's duchy
-					AND = {
-						tier = COUNT
-						holder_scope = {
-							tier = DUKE
-							ROOT = {
-								NOT = { de_jure_liege = PREV }
-							}
+			NOR = {
+				# Count title outside a Duke's duchy
+				AND = {
+					real_tier = COUNT
+
+					holder_scope = {
+						real_tier = DUKE
+
+						ROOT = {
+							NOT = { de_jure_liege = PREV }
 						}
 					}
-					# Duke with no count titles
-					AND = {
-						tier = DUKE
-						holder_scope = {
-							NOT = {
+				}
+
+				# Duke with no count titles
+				AND = {
+					real_tier = DUKE
+
+					holder_scope = {
+						NOT = {
+							any_demesne_title = {
+								real_tier = COUNT
+
+								location = {
+									duchy = {
+										title = ROOT
+									}
+								}
+							}
+						}
+
+						NOT = {
+							any_vassal = {
 								any_demesne_title = {
-									tier = COUNT
+									real_tier = COUNT
+
 									location = {
 										duchy = {
 											title = ROOT
@@ -571,74 +502,66 @@ plot_gain_vassal_title = {
 									}
 								}
 							}
-							NOT = {
-								any_vassal = {
-									any_demesne_title = {
-										tier = COUNT
-										location = {
-											duchy = {
-												title = ROOT
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					# Count titles in ruler's primary duchy
-					AND = {
-						tier = COUNT
-						location = {
-							duchy = {
-								holder_scope = {
-									character = FROM
-								}
-								FROM = {
-									capital_scope = {
-										duchy = {
-											title = PREVPREVPREV
-										}
-									}
-								}
-							}
-						}
-					}
-					# Count's secondary county
-					AND = {
-						tier = COUNT
-						location = {
-							is_capital = no
-						}
-						holder_scope = {
-							lower_tier_than = DUKE
-							num_of_count_titles = 2
-						}
-					}
-					# Bloodline
-					FROM = {
-						any_owned_bloodline = {
-							has_bloodline_flag = bloodline_revocation_plot
-							bloodline_is_active_for = PREV
-						}
-					}
-					AND = {
-						has_dlc = "Zeus"
-						holder_scope = {
-							is_evil_religion = yes
-						}
-						FROM = {
-							olrox_is_good_religion_trigger = yes
 						}
 					}
 				}
+
+				# Count titles in ruler's primary duchy
+				AND = {
+					real_tier = COUNT
+
+					dejure_liege_title  = {
+						holder = FROM
+
+						FROM = {
+							capital_scope = {
+								duchy = {
+									title = PREVPREVPREV
+								}
+							}
+						}
+					}
+				}
+
+				# Count's secondary county
+				AND = {
+					real_tier = COUNT
+
+					location = {
+						is_capital = no
+					}
+
+					holder_scope = {
+						lower_real_tier_than = DUKE
+						num_of_count_titles >= 2
+					}
+				}
+
+				FROM = {
+					any_owned_bloodline = {
+						has_bloodline_flag = bloodline_revocation_plot
+						bloodline_is_active_for = PREV
+					}
+				}
+				AND = {
+					has_dlc = "Zeus"
+					holder_scope = {
+						is_evil_religion = yes
+					}
+					FROM = {
+						olrox_is_good_religion_trigger = yes
+					}
+				}
 			}
+
 			FROM = {
 				OR = {
 					is_playable = no
-					trait = incapable
+					is_incapable = yes
 					in_revolt = yes
 				}
 			}
+
 			holder_scope = {
 				liege_before_war = {
 					NOT = { character = FROM }
@@ -646,29 +569,147 @@ plot_gain_vassal_title = {
 			}
 		}
 	}
+
 	abort_effect = {
 		FROM = {
-			# Clear flags
-			hidden_tooltip = {
-				clr_character_flag = event7040
-				clr_character_flag = plot_gain_vassal_title_decision_taken
-			}
+			clr_character_flag = event7040
 		}
 	}
-	effect = {
-		FROM = {
-			any_plot_backer = {
-				reverse_opinion = {
-					modifier = opinion_grateful
-					who = FROM
-					years = 5
+
+	chance = {
+		factor = 1
+
+		trigger = {
+			trigger_if = {
+				limit = { FROM = { ai = yes } } # Needed for some reason (maybe a bug)
+
+				holder_scope = {
+					FROM = {
+						war = no
+
+						trigger_if = {
+							limit = { dynasty = PREV }
+
+							opinion = {
+								who = PREV
+								value < 0
+							}
+						}
+
+						trigger_if = {
+							limit = {
+								OR = {
+									trait = envious
+									trait = deceitful
+									trait = ambitious
+								}
+							}
+
+							opinion = {
+								who = PREV
+								value < 50
+							}
+						}
+						trigger_else = {
+							opinion = {
+								who = PREV
+								value < 25
+							}
+						}
+					}
 				}
 			}
-			# Clear flags
-			hidden_tooltip = {
-				clr_character_flag = event7040
-				clr_character_flag = plot_gain_vassal_title_decision_taken
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			FROM = { trait = content }
+		}
+
+		mult_modifier = {
+			factor = 0.2
+			FROM = { is_dumb_trigger = yes }
+		}
+
+		mult_modifier = {
+			factor = 0.2
+			FROM = { trait = kind }
+		}
+
+		mult_modifier = {
+			factor = 0.25
+
+			FROM = {
+				opinion = {
+					who = ROOT
+					value >= 25
+				}
+
+				OR = {
+					trait = envious
+					trait = deceitful
+					trait = ambitious
+				}
 			}
+		}
+
+		mult_modifier = {
+			factor = 0.25
+
+			FROM = {
+				opinion = {
+					who = ROOT
+					value >= 0
+				}
+
+				NOR = {
+					trait = envious
+					trait = deceitful
+					trait = ambitious
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 1.5
+
+			FROM = {
+				opinion = {
+					who = ROOT
+					value < -50
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 1.5
+
+			FROM = {
+				opinion = {
+					who = ROOT
+					value < -75
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			FROM = { is_smart_trigger = yes }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = envious }
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			FROM = { trait = deceitful }
+		}
+
+		mult_modifier = {
+			factor = 4.0
+			FROM = { trait = ambitious }
 		}
 	}
 }
@@ -678,6 +719,10 @@ plot_kill_character = {
 	type = realm_characters_plus # All characters in the same realm, plus rivals and relatives of self, parents, children and spouse, and quest target
 	intrigue_plot = yes
 	murder_plot = yes
+
+	# ROOT is plotter
+	# FROM is target
+	# FROMFROM is society
 	society_plot = {
 		ROOT = {
 			OR = {
@@ -693,33 +738,22 @@ plot_kill_character = {
 	}
 
 	# Plotter scope
+	# ROOT is plotter
 	potential = {
+		is_adult = yes
 		prisoner = no
-		age = 16
 		is_incapable = no
-		NOT = {
-			AND = {
-				ai = yes
+
+		trigger_if = {
+			limit = { ai = yes }
+
+			NOR = {
 				trait = honest
-			}
-		}
-		NOT = {
-			AND = {
-				ai = yes
 				trait = kind
-			}
-		}
-		NOT = {
-			AND = {
-				ai = yes
 				trait = just
 			}
-		}
 
-		hidden_tooltip = {
 			OR = {
-				ai = no # Human
-
 				# Pretender to a title
 				any_pretender_title = {
 					always = yes
@@ -730,32 +764,38 @@ plot_kill_character = {
 					always = yes
 				}
 
-				# Character's child is heir or pretender to a title that I don't hold
+				# Child is heir or pretender to a title I don't hold or may inherit
 				any_child = {
 					OR = {
 						any_pretender_title = {
-							NOT = { holder = ROOT }
-							NOT = { current_heir = { character = ROOT } }
+							NOR = {
+								holder = ROOT
+								current_heir = { character = ROOT }
+							}
 						}
+
 						any_heir_title = {
 							NOT = { holder = ROOT }
 						}
 					}
 				}
 
-				# Spouse is pretender to a title
+				# Spouse is pretender to a title I don't hold
 				spouse = {
 					any_pretender_title = {
-						NOT = { current_heir = { character = ROOT } }
+						current_heir = { NOT = { character = ROOT } }
 					}
+
 					any_heir_title = {
 						NOT = { holder = ROOT }
 					}
 				}
 
-				# A lover of spouse...
+				# A lover of my spouse...
 				spouse = {
-					has_lover = yes
+					any_lover = {
+						NOT = { character = ROOT }
+					}
 				}
 
 				# Is nuts...
@@ -765,8 +805,14 @@ plot_kill_character = {
 		}
 	}
 
-	# Target allow trigger for when players target a specific character in the GUI
+	# FROM is plotter
+	target_potential = {
+		NOT = { is_married = FROM } # This case is covered by another plot
+	}
 
+	# Target allow trigger for when players target a specific character in the GUI
+	# ROOT is target
+	# FROM is plotter
 	player_allow = {
 		OR = {
 			NOT = { is_child_of = FROM } # Not my own children
@@ -774,14 +820,12 @@ plot_kill_character = {
 		}
 		is_within_diplo_range = FROM
 		NOT = { has_blood_oath_with = FROM }
-		assassination_interaction_trigger = yes
-	}
-
-	target_potential = {
-		NOT = { any_spouse = { character = FROM } } # This case is covered by another plot
+		assassination_interaction_trigger = yes # Game ruler
 	}
 
 	# Target character scope
+	# ROOT is target
+	# FROM is plotter
 	allow = {
 		OR = {
 			NOT = { is_child_of = FROM } # Not my own children
