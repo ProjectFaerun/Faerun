@@ -814,51 +814,47 @@ plot_kill_character = {
 	# ROOT is target
 	# FROM is plotter
 	player_allow = {
-		OR = {
-			NOT = { is_child_of = FROM } # Not my own children
-			trait = patron_bhaal
-		}
 		is_within_diplo_range = FROM
-		NOT = { has_blood_oath_with = FROM }
 		assassination_interaction_trigger = yes # Game ruler
+
+		OR = {
+			trait = patron_bhaal
+			NOR = {
+				is_child_of = FROM # Not my own children
+				has_blood_oath_with = FROM
+			}
+		}
 	}
 
 	# Target character scope
 	# ROOT is target
 	# FROM is plotter
 	allow = {
-		OR = {
-			NOT = { is_child_of = FROM } # Not my own children
-			trait = patron_bhaal
-		}
-		OR = {
-			NOT = { character = FROM }  # Not against myself! (unself I am bonkers)
-			trait = lunatic
-		}
-		NOT = { any_spouse = { character = FROM } } # This case is covered by another plot
-		NOT = { has_blood_oath_with = FROM }
-
 		is_within_diplo_range = FROM
 
-		# Don't kill my lovers, or their children
 		OR = {
-			NOT = {
+			trait = patron_bhaal
+			NOR = {
+				is_child_of = FROM # Not my own children
+				has_blood_oath_with = FROM
+				is_friend = FROM
+				is_married = FROM # This case is covered by another plot
+
+				# Don't kill my lovers, or their children
 				FROM = {
 					any_lover = {
 						OR = {
 							character = ROOT
-							is_father = ROOT
-							is_mother = ROOT
+							is_parent_of = ROOT
 						}
 					}
 				}
 			}
-			trait = patron_bhaal
 		}
 
-		OR = {
-			NOT = { is_friend = FROM }
-			trait = patron_bhaal
+		trigger_if = { # Not against myself! (unself I am bonkers)
+			limit = { character = FROM }
+			trait = lunatic
 		}
 
 		FROM = {
@@ -868,13 +864,21 @@ plot_kill_character = {
 					any_pretender_title = {
 						current_heir = { character = ROOT }
 					}
-					OR = {
-						ai = no
-						trait = deceitful
-						trait = ambitious
-						trait = arbitrary
-						trait = is_clone
-						NOT = { opinion = { who = ROOT value = 0 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						OR = {
+							trait = deceitful
+							trait = ambitious
+							trait = arbitrary
+							trait = is_clone
+
+							opinion = {
+								who = ROOT
+								value < 0
+							}
+						}
 					}
 				}
 
@@ -883,107 +887,151 @@ plot_kill_character = {
 					any_heir_title = {
 						holder = ROOT
 					}
-					OR = {
-						ai = no
-						trait = deceitful
-						trait = ambitious
-						trait = arbitrary
-						trait = is_clone
-						NOT = { opinion = { who = ROOT value = 0 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						OR = {
+							trait = deceitful
+							trait = ambitious
+							trait = arbitrary
+							trait = is_clone
+
+							opinion = {
+								who = ROOT
+								value < 0
+							}
+						}
 					}
 				}
 
 				# Gets rid of obstacles in the way of a child's succession
 				AND = {
+					NOT = { is_close_relative = ROOT }
+
 					any_child = {
 						OR = {
 							any_pretender_title = {
 								current_heir = { character = ROOT }
 							}
+
 							any_heir_title = {
 								holder = ROOT
 							}
 						}
 					}
-					NOT = { is_close_relative = ROOT }
-					OR = {
-						ai = no
-						trait = deceitful
-						trait = ambitious
-						trait = arbitrary
-						NOT = { opinion = { who = ROOT value = 0 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						OR = {
+							trait = deceitful
+							trait = ambitious
+							trait = arbitrary
+
+							opinion = {
+								who = ROOT
+								value < 0
+							}
+						}
 					}
 				}
 
 				# Get rid of the current heir to a title the character's spouse is a pretender to
 				AND = {
+					NOT = { is_close_relative = ROOT }
+
 					spouse = {
 						any_pretender_title = {
 							current_heir = { character = ROOT }
 						}
 					}
-					NOT = { is_close_relative = ROOT }
-					OR = {
-						ai = no
-						trait = deceitful
-						trait = ambitious
-						trait = arbitrary
-						NOT = { opinion = { who = ROOT value = 0 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						OR = {
+							trait = deceitful
+							trait = ambitious
+							trait = arbitrary
+
+							opinion = {
+								who = ROOT
+								value < 0
+							}
+						}
 					}
 				}
 
 				# Get rid of a ruler the spouse is heir to
 				AND = {
+					NOT = { is_close_relative = ROOT }
+
 					spouse = {
 						any_heir_title = {
 							holder = ROOT
 						}
 					}
-					NOT = { is_close_relative = ROOT }
-					OR = {
-						ai = no
-						trait = deceitful
-						trait = ambitious
-						trait = arbitrary
-						AND = {
-							is_female = no
-							NOT = { opinion = { who = ROOT value = 0 } }
-						}
-						AND = {
-							is_female = yes
-							NOT = { opinion = { who = ROOT value = -33 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						OR = {
+							trait = deceitful
+							trait = ambitious
+							trait = arbitrary
+
+							trigger_if = {
+								limit = { is_female = yes }
+
+								opinion = {
+									who = ROOT
+									value < -33
+								}
+							}
+							trigger_else = {
+								opinion = {
+									who = ROOT
+									value < 0
+								}
+							}
 						}
 					}
 				}
 
-				# A lover of spouse...
-				spouse = {
-					has_lover = yes
-					any_lover = {
-						character = ROOT
+				# A lover of my spouse...
+				AND = {
+					any_spouse = {
+						is_lover = ROOT
 					}
-					OR = {
-						ai = no
-						NOT = { opinion = { who = ROOT value = 0 } }
+
+					trigger_if = {
+						limit = { ai = yes }
+
+						opinion = {
+							who = ROOT
+							value < 0
+						}
 					}
 				}
 
 				# Go nuts...
 				AND = {
 					same_liege = ROOT
+
 					OR = {
 						trait = lunatic
 						trait = possessed
+
 						any_owned_bloodline = {
 							has_bloodline_flag = bloodline_murderous
+							bloodline_is_active_for = PREV
 						}
 					}
 				}
 
 				# Rivals
-				any_rival = {
-					character = ROOT
-				}
+				is_rival = ROOT
 
 				AND = {
 					FROM = { trait = is_clone }
@@ -995,11 +1043,34 @@ plot_kill_character = {
 		}
 	}
 
-	# ROOT = target FROM = joiner FROMFROM = plotter
+	# ROOT is target
+	# FROM is joiner
+	# FROMFROM is plotter
 	allow_join = {
 		ROOT = {
 			NOT = { is_child_of = FROM } # Not my own children
 		}
+	}
+
+	success = {
+		is_alive = no
+
+		hidden_trigger = {
+			killer = {
+				character = FROM
+				is_plot_active = yes
+			}
+		}
+	}
+
+	effect = {
+	}
+
+	abort = {
+		is_alive = no
+	}
+
+	abort_effect = {
 	}
 
 	chance = {
@@ -1204,26 +1275,6 @@ plot_kill_character = {
 		}
 	}
 
-	success = {
-		is_alive = no
-		hidden_tooltip = {
-			FROM = { has_character_flag = murder_in_motion }
-		}
-	}
-	abort = {
-		is_alive = no
-	}
-	abort_effect = {
-		FROM = { clr_character_flag = murder_in_motion }
-	}
-	effect = {
-		FROM = {
-			# Clear flags
-			hidden_tooltip = {
-				clr_character_flag = murder_in_motion
-			}
-		}
-	}
 }
 
 
