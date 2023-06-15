@@ -1076,142 +1076,190 @@ plot_kill_character = {
 	chance = {
 		factor = 2
 
-		modifier = {
-			factor = 50
-			FROM = { has_quest = quest_the_assassins_assassination }
-			is_quest_target_of = FROM
-		}
-		modifier = {
-			factor = 0.01
-			FROM = {
-				trait = content
-				NOT = { trait = is_clone }
-				NOT = { trait = lunatic }
-				NOT = { trait = possessed }
+		trigger = {
+			trigger_if = {
+				limit = { FROM = { ai = yes } } # Needed for some reason (maybe a bug)
+
+				is_pilgrim = no
+
+				FROM = {
+					trigger_if = {
+						limit = {
+							opinion = {
+								who = ROOT
+								value >= 25
+							}
+						}
+
+						OR = {
+							ROOT = { is_murder_quest_target_of_prev_trigger = yes }
+							AND = {
+								trait = is_clone
+								ROOT = { is_parent_of = FROM }
+							}
+						}
+					}
+					trigger_else_if = {
+						limit = {
+							opinion = {
+								who = ROOT
+								value >= 0
+							}
+						}
+
+						OR = {
+							trait = envious
+							trait = deceitful
+							trait = ambitious
+							ROOT = { is_murder_quest_target_of_prev_trigger = yes }
+							AND = {
+								trait = is_clone
+								ROOT = { is_parent_of = FROM }
+							}
+						}
+					}
+				}
 			}
 		}
 
-		modifier = {
+		mult_modifier = {
+			factor = 50
+
+			FROM = { has_quest = quest_the_assassins_assassination }
+			is_quest_target_of = FROM
+		}
+
+		mult_modifier = {
+			factor = 0.01
+
+			FROM = {
+				trait = content
+
+				NOR = {
+					trait = is_clone
+					trait = lunatic
+					trait = possessed
+				}
+			}
+		}
+
+		mult_modifier = {
 			factor = 0.2
 			FROM = { pacifist = yes }
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 2.0
+
 			FROM = {
 				trait = envious
+
 				OR = {
 					any_pretender_title = {
 						current_heir = { character = ROOT }
 					}
+
 					any_heir_title = {
 						holder = ROOT
 					}
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			FROM = { trait = arbitrary }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = cruel }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = deceitful }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.5
 			FROM = { is_evil_religion = yes }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			FROM = { trait = ambitious }
 		}
-		modifier = {
-			factor = 0
-			their_opinion = { who = FROM value = 25 }
-			NOT = {
-				OR = {
-					FROM = { ROOT = { is_murder_quest_target_of_prev_trigger = yes } } #MNM murder missions
-					AND = {
-						FROM = { trait = is_clone }
-						ROOT = { is_parent_of = FROM }
-					}
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			their_opinion = { who = FROM value = 0 }
-			NOT = {
-				OR = {
-					FROM = { trait = envious }
-					FROM = { trait = deceitful }
-					FROM = { trait = ambitious }
-					AND = {
-						FROM = { trait = is_clone }
-						ROOT = { is_parent_of = FROM }
-					}
-					FROM = { ROOT = { is_murder_quest_target_of_prev_trigger = yes } } #MNM murder missions
-				}
-			}
-		}
-		modifier = {
-			factor = 0
-			ROOT = {
-				is_pilgrim = yes
-			}
-		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-			NOT = { their_opinion = { who = FROM value = -25 } }
-		}
-		modifier = {
-			factor = 2.0
-			NOT = { their_opinion = { who = FROM value = -50 } }
-		}
-		modifier = {
-			factor = 2.0
-			NOT = { their_opinion = { who = FROM value = -75 } }
-		}
-		modifier = {
-			# Subtle balance against nepotism: Kill off members of powerful dynasties
-			factor = 2.0
-			top_liege = {
-				higher_tier_than = COUNT
-				dynasty = ROOT
-				dynasty_realm_power = 0.25
-			}
-		}
-		modifier = {
-			# Subtle balance against nepotism: Kill off members of powerful dynasties
-			factor = 2.0
-			top_liege = {
-				higher_tier_than = COUNT
-				dynasty = ROOT
-				dynasty_realm_power = 0.4
-			}
-		}
-		modifier = {
-			# Subtle balance against nepotism: Kill off members of powerful dynasties
-			factor = 2.0
-			top_liege = {
-				higher_tier_than = COUNT
-				dynasty = ROOT
-				dynasty_realm_power = 0.6
+
+			reverse_opinion = {
+				who = FROM
+				value < -25
 			}
 		}
 
-		modifier = {
+		mult_modifier = {
+			factor = 2.0
+
+			reverse_opinion = {
+				who = FROM
+				value < -50
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			reverse_opinion = {
+				who = FROM
+				value < -75
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			# Subtle balance against nepotism: Kill off members of powerful dynasties
+			top_liege = {
+				higher_real_tier_than = COUNT
+				dynasty = ROOT
+				dynasty_realm_power >= 0.25
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			# Subtle balance against nepotism: Kill off members of powerful dynasties
+			top_liege = {
+				higher_real_tier_than = COUNT
+				dynasty = ROOT
+				dynasty_realm_power >= 0.40
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			# Subtle balance against nepotism: Kill off members of powerful dynasties
+			top_liege = {
+				higher_real_tier_than = COUNT
+				dynasty = ROOT
+				dynasty_realm_power >= 0.60
+			}
+		}
+
+		mult_modifier = {
 			factor = 4.0
+
 			plot_target_char = {
 				sibling = FROM
 				ai = yes
-				top_liege = { is_parent_of = FROM }
+				is_child_of = top_liege
 			}
+
 			FROM = {
 				OR = {
 					is_muslim_trigger = yes
