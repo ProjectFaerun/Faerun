@@ -3,7 +3,7 @@
 # Supported types:
 # liege_titles, liege_titles_w_claimant, character
 
-# The succession law factions have hard coded elements to ensure that the correct heir is shown in Plot and 
+# The succession law factions have hard coded elements to ensure that the correct heir is shown in Plot and
 # Faction interfaces and that AI faction members vote for laws in accordance with the faction goal.
 # The valid tags correspond to the law name: faction_succ_seniority, faction_succ_primogeniture, etc.
 # (faction_succ_ultimogeniture is fully supported by the code, but not currently implemented)
@@ -15,115 +15,113 @@
 # Institute Succession by Seniority in Liege Title
 faction_succ_seniority = {
 	type = liege_titles
-	
-	warning_level = 0.7 # At this level of faction power we give player an alert. Set to 0 for no alerts.
-	
+
+	warning_level = 0.70
+
 	# Plotter scope
 	potential = {
-		prisoner = no
-		is_ruler = yes
-		independent = no
 		is_landed = yes
+		#NOT = { religion_group = muslim }
+		higher_real_tier_than = BARON
 		is_adult = yes
-		primary_title = { holy_order = no }
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			is_voter = no
-			# is_nomadic = yes
-			is_tribal = yes
-			liege = {
-				OR = {
-					is_council_content = no
-					NOT = { primary_title = { has_law = war_voting_power_1 } }
-					#has_council = no
-				}
+		independent = no
+		prisoner = no
+		is_incapable = no
+		holy_order = no
+
+		NOR = {
+			in_faction = faction_succ_primogeniture
+			in_faction = faction_succ_feudal_elective
+			in_faction = faction_succ_gavelkind
+			has_character_modifier = faction_succ_seniority_ultimatum_timer
+
+			has_opinion_modifier = {
+				name = opinion_coerced_into_leaving_faction
+				who = liege
 			}
 		}
-		NOT = { trait = incapable }
+
 		liege = {
-			is_vice_royalty = no
 			is_feudal = yes
+			is_vice_royalty = no
+
 			NOR = {
 				government = divine_feudal_government
-				#government = magocratic_feudal_government
 				has_law = succ_magic_elective
 				has_law = succ_magic_wizard
-				#has_law = succ_magic_zulkir
 				has_law = succ_magic_warlock
 			}
-			OR = {
-				year = 1350
-				primary_title = { is_tribal_type_title = no }
-				NOT = { culture = ROOT }
-				NOT = { religion = ROOT }
-			}
+
 			NOT = {
 				any_demesne_title = {
 					temporary = yes
 				}
 			}
 		}
-		#NOT = { religion_group = muslim }
-		primary_title = { higher_tier_than = BARON }
-		
-		NOT = { in_faction = faction_succ_primogeniture }
-		NOT = { in_faction = faction_succ_feudal_elective }
-		NOT = { in_faction = faction_succ_gavelkind }
-		
-		OR = {
-			# Is not affected by a Crown Law title
-			NOT = {
-				crownlaw_title = {
-					always = yes
-				}
-			}
-			
-			# The Crown Law title holder is my liege
-			crownlaw_title = {
-				holder_scope = {
-					ROOT = {
-						liege = {
-							character = PREVPREV
-						}
-					}
-				}
-			}
-			
-			# The Crown Law title allows vassal infighting
-			crownlaw_title = {
-				NOT = {
-					OR = {
-						has_law = crown_authority_2
-						has_law = crown_authority_3
-						has_law = crown_authority_4
+
+		trigger_if = {
+			limit = { has_dlc = "Conclave" }
+
+			OR = {
+				is_voter = no
+				#is_nomadic = yes
+				is_tribal = yes
+
+				liege = {
+					NAND = {
+						is_council_content = yes
+						has_law = war_voting_power_1
 					}
 				}
 			}
 		}
-		
-		NOT = { has_character_modifier = faction_succ_seniority_ultimatum_timer }
+		trigger_else_if = {
+			limit = {
+				# If affected by a Crown Law title not held by my liege
+				crownlaw_title = {
+					holder_scope = {
+						NOT = { is_liege_of = ROOT }
+					}
+				}
+			}
+
+			crownlaw_title = {
+				# The Crown Law title allows vassal infighting
+				NOR = {
+					has_law = crown_authority_2
+					has_law = crown_authority_3
+					has_law = crown_authority_4
+				}
+			}
+		}
 	}
-	
-	# Target scope
+
+	# Title scope
+	# ROOT is title
+	# FROM is faction creator
 	allow = {
 		is_law_potential = succ_seniority
 		is_law_allowed = succ_seniority
+
 		OR = {
 			is_primary_holder_title = yes
-			higher_tier_than = DUKE
+			higher_real_tier_than = DUKE
 		}
-		NOR = { 
+
+		NOR = {
 			has_law = succ_seniority
+
 			AND = {
 				has_law = succession_voting_power_1
 				has_law = succ_feudal_elective
-			}
-			AND = {
-				has_law = succession_voting_power_1
-				has_law = succ_hre_elective
+
+				#OR = {
+					#has_law = succ_feudal_elective
+					#has_law = succ_hre_elective
+				#}
 			}
 		}
-		
+
 		holder_scope = {
 			NOT = {
 				any_war = {
@@ -131,246 +129,267 @@ faction_succ_seniority = {
 					using_cb = change_seniority_succession_law
 				}
 			}
-			
-			NOT = {
-				reverse_has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_leaving_faction
-				}
-			}
 		}
 	}
-	
-	# Faction member scope (ROOT = joiner, FROM = target)
+
+	# Faction member scope
+	# ROOT is joiner
+	# FROM is target
 	allow_join = {
 		ROOT = {
-			is_ruler = yes
-			independent = no
 			is_landed = yes
+			#NOT = { religion_group = muslim }
+			independent = no
 			is_adult = yes
-			NOT = { trait = incapable }
 			prisoner = no
-			OR = {
-				NOT = { has_dlc = "Zeus"}
-				is_voter = no
-				# is_nomadic = yes
-				is_tribal = yes
-				liege = { 
-					OR = {
-						is_council_content = no
-						NOT = { primary_title = { has_law = war_voting_power_1 } }
-						#has_council = no
+			is_incapable = no
+
+			NOR = {
+				in_faction = faction_succ_primogeniture
+				in_faction = faction_succ_feudal_elective
+				in_faction = faction_succ_gavelkind
+				has_character_modifier = faction_succ_seniority_ultimatum_timer
+
+				has_opinion_modifier = {
+					name = opinion_coerced_into_leaving_faction
+					who = liege
+				}
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Conclave" }
+
+				OR = {
+					is_voter = no
+					#is_nomadic = yes
+					is_tribal = yes
+
+					liege = {
+						NAND = {
+							is_council_content = yes
+							has_law = war_voting_power_1
+						}
 					}
 				}
 			}
-			
-			#NOT = { religion_group = muslim }	
-			NOT = { in_faction = faction_succ_primogeniture }
-			NOT = { in_faction = faction_succ_feudal_elective }
-			NOT = { in_faction = faction_succ_gavelkind }			
-		}		
+		}
 	}
-	
+
 	# AI creation weight
+	# FROM is faction creator
+	# ROOT is title scope
 	chance = {
 		factor = 1
-		
-		modifier = {
-			factor = 0
+
+		trigger = {
+			would_be_heir_under_law = {
+				who = FROM
+				law = seniority
+			}
+
 			FROM = {
-				OR = {
-					prisoner = yes
-					has_character_modifier = in_seclusion
+				in_seclusion = no
+				preparing_invasion = no
+				NOT = { is_married = liege }
+
+				# To stay in the faction
+				trigger_if = {
+					limit = { leads_faction = faction_succ_seniority }
+
+					opinion = {
+						who = liege
+						value < 75
+					}
+				}
+				# To start the faction
+				trigger_else = {
+					opinion = {
+						who = liege
+						value < 50
+					}
+				}
+
+				trigger_if = {
+					limit = {
+						OR = {
+							trait = envious
+							trait = deceitful
+							trait = ambitious
+						}
+					}
+
+					opinion = {
+						who = liege
+						value < 50
+					}
+				}
+				trigger_else = {
+					opinion = {
+						who = liege
+						value < 25
+					}
 				}
 			}
-		}
-		
-		modifier = {
-			factor = 0
-			holder_scope = {
-				any_spouse = { character = FROM }
-			}
-		}
-		
-		modifier = {
-			factor = 0
+
 			current_heir = {
-				character = FROM
+				NOT = { character = FROM }
 			}
-		}
-		
-		modifier = {
-			factor = 0
-			NOT = { would_be_heir_under_law = { who = FROM law = seniority } }
 
-			#heir_under_seniority_law = {
-				#OR = {
-					#ROOT = { current_heir = { character = PREV } } 
-					#FROM = {
-						#opinion_diff = {
-							#first = LIEGE
-							#second = PREV
-							#value = -25 # I don't like the pretender enough
-							#as_if_liege = yes
-						#}
-					#}
-				#}
-			#}
+		#	heir_under_seniority_law = {
+		#		NOR = {
+		#			ROOT = { current_heir = { character = PREV } }
+		#			FROM = {
+		#				opinion_diff = {
+		#					first = liege
+		#					second = PREV
+		#					value = -25 # I don't like the pretender enough
+		#					as_if_liege = yes
+		#				}
+		#			}
+		#		}
+		#	}
+		}
 
-		}
-		
-		modifier = {
-			factor = 0
-			FROM = {
-				OR = {
-					AND = {
-						NOT = { leads_faction = faction_succ_seniority }
-						opinion = { who = LIEGE value = 50 } 
-					}
-					AND = {
-						leads_faction = faction_succ_seniority
-						opinion = { who = LIEGE value = 75 } 
-					}
-				}
-			}
-		}
-		
-		modifier = {
-			factor = 0
-			FROM = { preparing_invasion = yes }
-		}
-		
-		modifier = {
-			factor = 0
-			FROM = { 
-				opinion = { who = LIEGE value = 25 } 
-				NOT = {
-					trait = deceitful
-					trait = ambitious
-					trait = envious
-				}			
-			}
-		}		
-		
-		modifier = {
-			factor = 0
-			FROM = {
-				opinion = { who = LIEGE value = 50 } 
-				OR = {
-					trait = deceitful
-					trait = ambitious
-					trait = envious
-				}				
-			}
-		}
-		
-		modifier = {
+		mult_modifier = {
 			factor = 0.2
 			FROM = { pacifist = yes }
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
-			FROM = {
-				liege = {
-					any_owned_bloodline = { 
-						has_bloodline_flag = bloodline_less_factions 
-						bloodline_is_active_for = PREV
-					}
+
+			holder_scope = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_less_factions
+					bloodline_is_active_for = PREV
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-			NOT = { FROM = { opinion = { who = LIEGE value = 0 } } }
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < 0
+				}
+			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
-			NOT = { FROM = { opinion = { who = LIEGE value = -50 } } }
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < -50
+				}
+			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4.0
-			NOT = { FROM = { opinion = { who = LIEGE value = -75 } } }
+
+			FROM = {
+				opinion = {
+					who = liege
+					value < -75
+				}
+			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			FROM = { trait = content }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			FROM = { trait = imbecile }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
 			FROM = { trait = inbred }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
 			FROM = { trait = craven }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.2
-			FROM = { 
-				OR = {
-					trait = slow
-					trait = dull
-				}
-			}
+			FROM = { is_dumb_trigger = yes }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			FROM = { trait = kind }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			FROM = { trait = charitable }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			FROM = { trait = honest }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			FROM = { trait = humble }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			FROM = { trait = just }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			FROM = { trait = proud }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			FROM = { trait = brave }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			FROM = { trait = arbitrary }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = envious }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = greedy }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = impaler }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			FROM = { trait = deceitful }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			FROM = { is_evil_religion = yes }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4.0
 			FROM = { trait = ambitious }
 		}
