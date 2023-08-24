@@ -5797,10 +5797,10 @@ faction_claimant = {
 				}
 
 				# Will not install old women
-				trigger_if = {
-					limit = { is_female = yes }
-					age < 40
-				}
+				#trigger_if = {
+				#	limit = { is_female = yes }
+				#	age < 40
+				#}
 
 				# If I'm not the claimant, opinion of the claimant matters
 				trigger_if = {
@@ -6109,620 +6109,636 @@ faction_claimant = {
 			holder_scope = {
 				dynasty_realm_power >= 0.25
 			}
+
 			new_character = {
 				ROOT = {
-					holder_scope = { 
+					holder_scope = {
 						NOT = { dynasty = PREVPREV }
 					}
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			holder_scope = {
-				dynasty_realm_power = 0.4
+				dynasty_realm_power >= 0.4
 			}
+
 			new_character = {
 				ROOT = {
-					holder_scope = { 
+					holder_scope = {
 						NOT = { dynasty = PREVPREV }
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
+
 			FROM = { trait = content }
-			OR = {
-				is_conquered = no
+
+			trigger_if = {
+				limit = { is_conquered = yes }
 				conquest_culture = FROM
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			FROM = { trait = imbecile }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
 			FROM = { trait = inbred }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
 			FROM = { trait = craven }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.2
-			FROM = { 
-				OR = {
-					trait = slow
-					trait = dull
-				}
-			}
+			FROM = { is_dumb_trigger = yes }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			FROM = { trait = brave }
 		}
-		modifier = {
-			factor = 3.0
-			FROM = { is_evil_religion = yes }
-		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4.0
 			FROM = { trait = ambitious }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-			new_character = {
-				same_society_as = FROM
-			}
+			FROM = { same_society_as = new_character }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
+
 			FROM = {
 				OR = {
-					has_opinion_modifier = { who = LIEGE modifier = opinion_evil_tyrant }
-					has_opinion_modifier = { who = LIEGE modifier = opinion_tyrant }
+					has_opinion_modifier = {
+						name = opinion_evil_tyrant
+						who = liege
+					}
+
+					has_opinion_modifier = {
+						name = opinion_tyrant
+						who = liege
+					}
 				}
 			}
 		}
 	}
-	
-	# AI membership weight: ROOT is the prospective member. FROM is the faction leader. FROMFROM is the target title or character.
+
+	# AI membership weight
+	# ROOT is the prospective member
+	# FROM is the faction leader
+	# FROMFROM is the target title or character
 	membership = {
 		factor = 1
-		
-		modifier = {
-			factor = 0.5
-			ROOT = {  
-				liege = { 
-					any_owned_bloodline = { 
-						has_bloodline_flag = bloodline_less_factions 
-						bloodline_is_active_for = PREV
+
+		trigger = {
+			in_seclusion = no
+			preparing_invasion = no
+
+			# The following require spymaster coercion to overrule
+			trigger_if = {
+				limit = {
+					OR = {
+						opinion = {
+							who = liege
+							value >= 40
+						}
+
+						# Exclude heretics and obviously bad rulers
+						new_character = {
+							OR = {
+								NOT = { religion = ROOT }
+								# NOT = { culture_group = ROOT }
+								trait = blinded
+								trait = eunuch
+								is_incapable = yes
+								trait = imbecile
+								trait = inbred
+							}
+						}
+
+						# I'm not the claimant and I like my liege more than the claimant
+						new_character = {
+							NOT = { character = ROOT }
+
+							ROOT = {
+								# To stay in the faction
+								trigger_if = {
+									limit = { in_faction = faction_claimant }
+
+									opinion_diff = {
+										first = liege
+										second = PREV
+										value >= -25
+										as_if_liege = yes
+									}
+								}
+								# To join the faction
+								trigger_else = {
+									opinion_diff = {
+										first = liege
+										second = PREV
+										value >= 10
+										as_if_liege = yes
+									}
+								}
+							}
+						}
+
+						# I do not join factions if I am the heir, unless I am the claimant
+						trigger_if = {
+							limit = { is_heir = FROMFROM }
+							NOT = { character = new_character }
+						}
+
+						# If my liege is my dynasty, only push claimants of my dynasty
+						trigger_if = {
+							limit = {
+								liege = { dynasty = PREV }
+								religion = liege
+								culture = liege
+							}
+
+							new_character = {
+								NOT = { dynasty = FROM }
+							}
+						}
+
+						# If the title is not my De Jure liege, and my liege holds my De Jure title, don't push claimants
+						FROMFROM = {
+							NOT = { de_jure_vassal_or_below = ROOT }
+
+							holder_scope = {
+								any_demesne_title = {
+									is_primary_holder_title_tier = yes
+									de_jure_vassal_or_below = ROOT
+									NOT = { title = PREVPREV }
+								}
+							}
+						}
+
+						# If the title is conquered only push claimants of my exact culture
+						trigger_if = {
+							limit = {
+								FROMFROM = {
+									is_conquered = yes
+								}
+							}
+
+							new_character = {
+								NOT = { culture = ROOT }
+							}
+						}
+
+						# Hordes should have less problems with this type of faction until ca 1350
+						#liege = {
+						#	year < 1350
+						#	has_horde_culture = yes
+						#	culture = ROOT
+						#	religion = ROOT
+						#}
+
+						# If there is an antiking faction, prioritize that
+						#AND = {
+						#	OR = {
+						#		religion = catholic
+						#		religion = fraticelli
+						#	}
+						#
+						#	top_liege = {
+						#		is_liege_of = ROOT
+						#		religion = ROOT
+						#
+						#		# Has an antipope
+						#		rightful_religious_head_scope = {
+						#			is_antipope = yes
+						#		}
+						#
+						#		faction_exists = {
+						#			faction = faction_antiking
+						#			title = FROMFROM
+						#		}
+						#	}
+						#}
 					}
 				}
-			}
-		}
-		modifier = {
-			factor = 0.2
-			pacifist = yes
-			NOT = {	
+
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		
-		modifier = {
-			factor = 0
-			OR = {
-				prisoner = yes
-				trait = incapable
-				is_adult = no
-				is_landed = no
-				preparing_invasion = yes
-			}
-		}
-		
-		modifier = { # I do not join factions if I am the heir, unless the claimant is myself
-			factor = 0
-			FROMFROM = {
-				current_heir = {
-					character = ROOT
-				}
-			}
-			new_character = {
-				NOT = { character = ROOT }
-			}
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		modifier = { # If my liege is my dynasty, only push claimants of my dynasty
-			factor = 0
-			liege = {
-				dynasty = ROOT
-				religion = ROOT
-				culture = ROOT
-			}
-			new_character = {
-				NOT = { dynasty = ROOT }
-			}
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		modifier = { # Exclude heretics and obviously bad rulers
-			factor = 0
-			new_character = {
-				OR = {
-					NOT = { religion = ROOT }
-					#NOT = { culture_group = ROOT }
-					trait = blinded
-					trait = eunuch
-					trait = incapable
-					trait = imbecile
-					trait = inbred
-				}
-			}
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		#modifier = {
+
+		# mult_modifier = {
 		#	factor = 0
 		#	liege = {
 		#		culture_group = ROOT
 		#		religion = ROOT
+		#
 		#		any_war = {
 		#			war_title = FROMFROM
-		#			defender = { character = THIS } 
+		#			defender = { character = THIS }
+		#
 		#			attacker = {
-		#				OR = {
-		#					NOT = { culture_group = ROOT }
-		#					NOT = { religion = ROOT }
+		#				NAND = {
+		#					culture_group = ROOT
+		#					religion = ROOT
 		#				}
 		#			}
 		#		}
 		#	}
-		#	NOT = {	
+		#	NOT = {
 		#		has_opinion_modifier = {
 		#			who = FROM
 		#			modifier = opinion_coerced_into_joining_faction
 		#		}
 		#	}
-		#}
-		
-		modifier = { # If the title is not my De Jure liege, and my liege holds my De Jure title, don't push claimants
-			factor = 0
-			FROMFROM = {
-				NOT = { de_jure_vassal_or_below = ROOT }
-				holder_scope = {
-					any_demesne_title = {
-						is_primary_holder_title_tier = yes
-						de_jure_vassal_or_below = ROOT
-						NOT = { title = PREVPREV }
-					}
-				}
-			}
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
+		# }
+
+		mult_modifier = {
+			factor = 0.5
+
+			liege = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_less_factions
+					bloodline_is_active_for = PREV
 				}
 			}
 		}
-		
-		modifier = { # If the title is conquered only push claimants of my exact culture
-			factor = 0
-			FROMFROM = {
-				is_conquered = yes
-			}
-			NOT = { new_character = { culture = ROOT } }
-			NOT = {	
+
+		mult_modifier = {
+			factor = 0.2
+
+			pacifist = yes
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		
-		modifier = { # Lower chance of joining if I myself has a claim on the same title
+
+		mult_modifier = { # Lower chance of joining if I myself have a claim on the same title
 			factor = 0.1
-			FROMFROM = {
-				claimed_by = ROOT
-			}
-			NOT = { new_character = { character = ROOT } }
-			NOT = {	
+
+			has_claim = FROMFROM
+
+			NOR = {
+				character = new_character
+
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		
-		modifier = {
-			factor = 0
-			has_character_modifier = faction_claimant_timer
-		}
-		
-		modifier = {
-			factor = 0
-			liege = { 
-				NOT = { year = 1350 }
-				primary_title = { is_tribal_type_title = yes }
-				culture = ROOT
-				religion = ROOT
-			}
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		modifier = {
-			factor = 0
-			opinion = { who = LIEGE value = 40 }
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		modifier = { # If the claimant is not me, make sure I like the claimant more than my current liege
-			factor = 0
-			NOT = {
-				new_character = {
-					character = ROOT
-				}
-			}
-			
-			NOT = {
-				new_character = {
-					ROOT = {
-						OR = {
-							AND = {
-								NOT = { in_faction = faction_claimant }
-								opinion_diff = {
-									first = PREV
-									second = LIEGE
-									value = 10 # I like the Claimant more than the current ruler
-									as_if_liege = yes
-								}
-							}
-							AND = {
-								in_faction = faction_claimant
-								opinion_diff = {
-									first = PREV
-									second = LIEGE
-									value = -25
-									as_if_liege = yes
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			NOT = {	
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-		}
-		
-		modifier = {
-			factor = 0
-			has_opinion_modifier = {
-				who = LIEGE
-				modifier = opinion_coerced_into_leaving_faction
-			}
-		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 1000
+
 			has_opinion_modifier = {
+				name = opinion_coerced_into_joining_faction
 				who = FROM
-				modifier = opinion_coerced_into_joining_faction
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
-			new_character = {
-				character = ROOT
-			}
+			character = new_character
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-			new_character = {
-				dynasty = ROOT
-			}
+			dynasty = new_character
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.7
-			NAND = {
-				has_dlc = "Zeus"
-				OR = {
+
+			new_character = {
+				is_female = yes
+				NOT = { character = ROOT }
+			}
+
+			NOR = {
+				has_religion_feature = religion_equal
+				has_religion_feature = religion_feature_earthmother
+				has_religion_feature = religion_feature_yuir
+				has_religion_feature = religion_matriarchal
+			}
+
+			trigger_if = {
+				limit = { has_dlc = "Conclave" }
+
+				NOR = {
 					has_law = status_of_women_4
-					has_religion_feature = religion_equal
-					has_religion_feature = religion_feature_earthmother
-					has_religion_feature = religion_feature_yuir
-					has_religion_feature = religion_matriarchal
+
 					has_game_rule = {
 						name = gender
 						value = all
 					}
 				}
 			}
-			new_character = {
-				is_female = yes
-				NOT = { character = ROOT }
-			}
-			NOT = {	
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			new_character = {
-				NOT = { age = 13 }
-				NOT = { character = ROOT }
-			}
+			new_character = { practical_age < 13 }
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			new_character = {
-				NOT = { age = 10 }
-				NOT = { character = ROOT }
-			}
+			new_character = { practical_age < 10 }
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			new_character = {
-				NOT = { age = 5 }
-				NOT = { character = ROOT }
-			}
+			new_character = { practical_age < 5 }
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			new_character = {
 				ROOT = {
 					opinion_diff = {
 						first = PREV
-						second = LIEGE
-						value = 20
+						second = liege
+						value >= 20
 						as_if_liege = yes
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			new_character = {
 				ROOT = {
 					opinion_diff = {
 						first = PREV
-						second = LIEGE
-						value = 30
+						second = liege
+						value >= 30
 						as_if_liege = yes
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			new_character = {
 				ROOT = {
 					opinion_diff = {
 						first = PREV
-						second = LIEGE
-						value = 40
+						second = liege
+						value >= 40
 						as_if_liege = yes
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
+
 			trait = content
+
 			FROMFROM = {
-				OR = {
-					is_conquered = no
+				trigger_if = {
+					limit = { is_conquered = yes }
 					conquest_culture = ROOT
 				}
 			}
-			NOT = {	
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			liege = {
-				dynasty_realm_power = 0.25
+				dynasty_realm_power >= 0.25
 			}
+
 			new_character = {
 				ROOT = {
-					liege = { 
+					liege = {
 						NOT = { dynasty = PREVPREV }
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
+
 			liege = {
-				dynasty_realm_power = 0.4
+				dynasty_realm_power >= 0.40
 			}
+
 			new_character = {
 				ROOT = {
-					liege = { 
+					liege = {
 						NOT = { dynasty = PREVPREV }
 					}
 				}
 			}
 		}
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
+
 			trait = imbecile
-			NOT = {	
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
+
 			trait = inbred
-			NOT = {	
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
+
 			trait = craven
-			NOT = {	
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.2
-			OR = {
-				trait = slow
-				trait = dull
-			}
-			NOT = {	
+
+			is_dumb_trigger = yes
+
+			NOT = {
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = proud
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = brave
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = arbitrary
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = envious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = greedy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = impaler
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = deceitful
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			is_evil_religion = yes
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4.0
 			trait = ambitious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-			FROMFROM = {
-				new_character = {
-					same_society_as = ROOT
+			new_character = { same_society_as = PREV }
+		}
+
+		mult_modifier = {
+			factor = 1.5
+
+			opinion = {
+				who = liege
+				value < 0
+			}
+		}
+
+		mult_modifier = {
+			factor = 1.5
+
+			opinion = {
+				who = liege
+				value < -25
+			}
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			opinion = {
+				who = liege
+				value < -50
+			}
+		}
+
+		mult_modifier = {
+			factor = 4.0
+
+			opinion = {
+				who = liege
+				value < -75
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			OR = {
+				has_opinion_modifier = {
+					name = opinion_evil_tyrant
+					who = liege
+				}
+
+				has_opinion_modifier = {
+					name = opinion_tyrant
+					who = liege
 				}
 			}
 		}
-		modifier = {
-			factor = 1.5
-			NOT = { opinion = { who = LIEGE value = 0 } }
-		}
-		modifier = {
-			factor = 1.5
-			NOT = { opinion = { who = LIEGE value = -25 } }
-		}
-		modifier = {
-			factor = 2.0
-			NOT = { opinion = { who = LIEGE value = -50 } }
-		}
-		modifier = {
-			factor = 4.0
-			NOT = { opinion = { who = LIEGE value = -75 } }
-		}
-		modifier = {
-			factor = 2
-			OR = {
-				has_opinion_modifier = { who = LIEGE modifier = opinion_evil_tyrant }
-				has_opinion_modifier = { who = LIEGE modifier = opinion_tyrant }
-			}
-		}
 	}
-	
+
 	success = {
 		always = no
 	}
-	
+
 	abort = {
-		always = no		# Factions will abort if the Potential or Allow triggers are no longer valid
-	}
-	
-	abort_effect = {
-	}
-	
-	effect = {
+		always = no	# Factions will abort if the Potential or Allow trigger is no longer valid
 	}
 }
 
@@ -6730,39 +6746,53 @@ faction_claimant = {
 
 # Overthrow a weak Khan faction
 faction_overthrow = {
-
 	type = liege_titles
-	
-	warning_level = 0.7 # At this level of faction power we give player an alert. Set to 0 for no alerts.
-	
+
+	warning_level = 0.70
+
 	cancel_on_leader_death = yes # The faction will not automatically continue under a new leader
-	
+
 	# Plotter scope
 	potential = {
-		prisoner = no
-		independent = no
+		government = nomadic_tribal_government
 		is_landed = yes
 		is_adult = yes
-		government = nomadic_tribal_government
-		primary_title = { holy_order = no }
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			is_voter = no
-            government = nomadic_tribal_government
-			is_tribal = yes
-			liege = { 
-				OR = {
-					is_council_content = no
-					NOT = { primary_title = { has_law = war_voting_power_1 } }
-					government = nomadic_tribal_government 
-					#has_council = no
-				}
+		independent = no
+		prisoner = no
+		is_incapable = no
+		holy_order = no
+
+		NOT = {
+			#has_blood_oath_with = liege
+
+			has_opinion_modifier = {
+				name = opinion_coerced_into_leaving_faction
+				who = liege
 			}
 		}
-		NOT = { trait = incapable }
+
+		# Not necessary, since only nomads can join this faction
+		# trigger_if = {
+		# 	limit = { has_dlc = "Conclave" }
+		#
+		# 	OR = {
+		# 		is_voter = no
+		# 		is_nomadic = yes
+		# 		is_tribal = yes
+		#
+		# 		liege = {
+		# 			NAND = {
+		# 				is_council_content = yes
+		# 				has_law = war_voting_power_1
+		# 			}
+		# 		}
+		# 	}
+		# }
 	}
-	
+
 	# Target scope
+	# ROOT is title
+	# FROM is faction creator
 	allow = {
 		is_primary_holder_title = yes
 
