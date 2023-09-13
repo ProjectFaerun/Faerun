@@ -618,7 +618,7 @@ obj_become_spiritual = {
 
 		mult_modifier = {
 			factor = 2.0
-			trait = dutiful_cleric
+			trait = martial_cleric
 		}
 
 		mult_modifier = {
@@ -932,547 +932,687 @@ obj_get_married = {
 	type = character
 
 	potential = {
-		is_married = no
-		is_consort = no
-		can_marry = yes
-	}
-	
-	allow = {
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			ai = yes
+		trigger_if = {
+			limit = { ai = no }
+			NOT = { has_dlc = "Conclave" }
 		}
-		prisoner = no
+
+		trigger_if = {
+			limit = { is_female = yes }
+			practical_age < 40
+		}
+
+		trigger_if = {
+			limit = { is_ruler = yes }
+			is_theocracy = no
+		}
+
 		is_marriage_adult = yes
+		can_marry = yes
+		is_consort = no
+		prisoner = no
+		is_incapable = no
 		NOT = { trait = celibate }
-		NOT = { trait = incapable }
-		NOT = { trait = eunuch }
-		NOT = { trait = asexual }
-		NOT = { is_ascetic_trigger = yes }
-		OR = {
-			is_female = no
-			NOT = { age = 40 }
-		}
-		OR = {
-			is_ruler = no
-			is_feudal = yes
-			is_tribal = yes
-			is_nomadic = yes
-			is_patrician = yes
+	}
+
+	creation_effect = {
+		if = {
+			limit = {
+				religion_group = good_human_pantheon_group
+				is_ruler = no
+				NOT = { has_dlc = "Conclave" }
+			}
+
+			character_event = {
+				id = 37050
+				months = 21
+				random = 180
+			}
 		}
 	}
-	
-	chance = {
-		factor = 100
 
-		modifier = {
-			factor = 0
-			is_infertile_race = yes
-		}
-
-		modifier = {
-			factor = 0.2
-			trait = homosexual
-		}
-		modifier = {
-			factor = 0.2
-			is_female = yes
-			has_religion_feature = religion_matriarchal
-		}
-		modifier = {
-			factor = 0.2
-			is_female = no
-			has_religion_feature = religion_patriarchal
-		}
-		modifier = {
-			factor = 0.5
-			trait = shy
-		}
-		modifier = {
-			factor = 2.0
-			trait = lustful
-		}
-		modifier = {
-			factor = 2.0
-			trait = ambitious
-		}
-		modifier = {
-			factor = 2.0 
-			age = 25
-		}
-		modifier = {
-			factor = 5.0
-			age = 35
-		}
-		modifier = {
-			factor = 10.0
-			age = 40
-		}
-	}
 	success = {
 		is_married = yes
 	}
-	abort = {
-		OR = {
-			AND = {
-				is_priest = yes
-				can_marry = no
+
+	effect = {
+		piety = 10
+
+		if = {
+			limit = { is_ruler = no }
+
+			opinion = {
+				name = opinion_fulfilled_marriage_wish
+				who = liege
+				years = 5
 			}
-			AND = {
-				is_female = yes
-				is_ruler = no
-				age = 40
-			}
-			trait = celibate
-			trait = incapable
-			trait = eunuch
-			is_ascetic_trigger = yes
+		}
+
+		clr_character_flag = flag_promised_marriage
+		clr_character_flag = flag_denied_marriage
+
+		hidden_effect = {
+			remove_character_modifier = promised_a_marriage
 		}
 	}
+
+	abort = {
+		OR = {
+			trigger_if = {
+				limit = { is_female = yes }
+				practical_age >= 40
+			}
+
+			trigger_if = {
+				limit = { is_ruler = yes }
+				is_theocracy = yes
+			}
+
+			can_marry = no
+			is_consort = yes
+			is_incapable = yes
+			prisoner = yes
+			trait = celibate
+		}
+	}
+
 	abort_effect = {
 		clr_character_flag = flag_promised_marriage
 		clr_character_flag = flag_denied_marriage
 		remove_character_modifier = promised_a_marriage
 	}
-	effect = {
-		piety = 10
-		if = {
-			limit = { is_ruler = no }
-			opinion = {
-				who = liege
-				modifier = opinion_fulfilled_marriage_wish
-				years = 5
-			}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 0
+			is_infertile_race = yes
 		}
-		hidden_tooltip = {
-			clr_character_flag = flag_promised_marriage
-			clr_character_flag = flag_denied_marriage
-			remove_character_modifier = promised_a_marriage
+
+		mult_modifier = {
+			factor = 0.2
+			trait = homosexual
+		}
+
+		mult_modifier = {
+			factor = 0.2
+
+			is_female = yes
+			has_religion_feature = religion_matriarchal
+		}
+
+		mult_modifier = {
+			factor = 0.2
+
+			is_female = no
+			has_religion_feature = religion_patriarchal
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			trait = shy
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = lustful
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			practical_age >= 25
+		}
+
+		mult_modifier = {
+			factor = 5.0
+			practical_age >= 35
+		}
+
+		mult_modifier = {
+			factor = 10.0
+			practical_age >= 40
 		}
 	}
 }
 
 obj_marry_ruler = {
 	type = character
-	
+
 	potential = {
-		is_married = no
-		is_consort = no
-		can_marry = yes
-		OR = {
-			AND = { 
-				is_female = no 
-				NOT = { age = 45 }
-				has_religion_feature = religion_matriarchal
-			}
-			AND = { 
-				is_female = yes 
-				NOT = { age = 45 }
-				NOT = { has_religion_feature = religion_matriarchal }
-			}
+		trigger_if = {
+			limit = { ai = no }
+			NOT = { has_dlc = "Conclave" }
 		}
-	}
-	
-	allow = {
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			ai = yes
+
+		trigger_if = {
+			limit = { is_female = yes }
+			NOT = { has_religion_feature = religion_matriarchal }
 		}
-		prisoner = no
+		trigger_else = {
+			has_religion_feature = religion_matriarchal
+		}
+
+		practical_age < 45
 		is_marriage_adult = yes
+		can_marry = yes
+		is_consort = no
+		prisoner = no
+		is_incapable = no
 		NOT = { trait = celibate }
-		NOT = { trait = incapable }
-		NOT = { trait = asexual }
-		OR = {
-			AND = { 
-				is_female = no 
-				NOT = { age = 45 }
-				has_religion_feature = religion_matriarchal
-			}
-			AND = { 
-				is_female = yes 
-				NOT = { age = 45 }
-				NOT = { has_religion_feature = religion_matriarchal }
-			}
+
+		trigger_if = {
+			limit = { has_religion_feature = religion_matriarchal }
+			mother = { higher_real_tier_than = COUNT }
 		}
-		father = {
-			primary_title = {
-				higher_tier_than = COUNT
-			}
+		trigger_else = {
+			father = { higher_real_tier_than = COUNT }
 		}
 	}
-	
-	chance = {
-		factor = 100
 
-		modifier = {
-			factor = 0
-			is_infertile_race = yes
-		}
-
-		modifier = {
-			factor = 1.5
-			trait = midas_touched
-		}
-		modifier = {
-			factor = 1.5
-			trait = elusive_shadow
-		}
-		modifier = {
-			factor = 2.0
-			trait = greedy
-		}
-		modifier = {
-			factor = 5.0
-			trait = ambitious
-		}
-	}
 	success = {
 		is_married = yes
+
 		spouse = {
 			is_ruler = yes
 		}
 	}
-	abort = {
-		OR = {
-			AND = {
-				is_married = yes
-				is_ruler = yes
-			}
-			AND = {
-				is_priest = yes
-				can_marry = no
-			}
-			AND = {
-				is_ruler = no
-				age = 45
-			}
-			trait = celibate
-			trait = incapable
-		}
-	}
-	abort_effect = {
-	}
+
 	effect = {
 		prestige = 20
 	}
-}
 
+	abort = {
+		OR = {
+			trigger_if = {
+				limit = { is_ruler = yes }
+				is_married = yes
+			}
+			trigger_else = {
+				practical_age >= 45
+			}
+
+			trigger_if = {
+				limit = { is_female = yes }
+				has_religion_feature = religion_matriarchal
+			}
+			trigger_else = {
+				NOT = { has_religion_feature = religion_matriarchal }
+			}
+
+			can_marry = no
+			trait = celibate
+			is_incapable = yes
+			is_consort = yes
+		}
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 0
+			is_infertile_race = yes
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = midas_touched
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = elusive_shadow
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = greedy
+		}
+
+		mult_modifier = {
+			factor = 5.0
+			trait = ambitious
+		}
+	}
+}
 
 obj_have_a_daughter = {
 	type = character
-	
+
 	fertility = 0.25
-	
-	allow = {
-		NOT = { has_dlc = "Zeus" }
-		prisoner = no
+
+	potential = {
 		is_marriage_adult = yes
+
 		OR = {
 			is_married = yes
 			is_consort = yes
 		}
-		NOT = {
+
+		trigger_if = {
+			limit = { is_female = yes }
+			practical_age < 45
+		}
+		trigger_else = {
+			practical_age < 75
+		}
+
+		trigger_if = {
+			limit = { ai = yes }
+
+			OR = {
+				is_female = yes
+				num_of_children >= 2
+				has_religion_feature = religion_matriarchal
+			}
+		}
+
+		is_incapable = no
+		prisoner = no
+
+		NOR = {
+			has_dlc = "Conclave"
+			trait = celibate
+
 			any_child = {
 				is_female = yes
 			}
 		}
-		OR = {
-			ai = no
-			is_female = yes
-			num_of_children = 2
-			has_religion_feature = religion_matriarchal
-		}
-		NOT = {
-			AND = {
-				age = 45
-				is_female = yes
-			}
-		}
-		NOT = { age = 75 }
-		NOT = { trait = celibate }
-		NOT = { trait = incapable }
 	}
-	
-	chance = {
-		factor = 50
 
-		modifier = {
-			factor = 0
-			is_infertile_race = yes
-		}
-		modifier = {
-			factor = 0.1
-			has_religion_feature = religion_patriarchal
-		}
-		modifier = {
-			factor = 10.0
-			has_religion_feature = religion_matriarchal
-		}
-		modifier = {
-			factor = 1.5
-			num_of_children = 3
-		}
-		modifier = {
-			factor = 3.0
-			num_of_children = 4
-		}
-		modifier = {
-			factor = 10.0
-			num_of_children = 5
-		}
-	}
 	success = {
 		any_child = {
 			is_female = yes
 		}
 	}
-	abort = {
-		OR = {
-			AND = {
-				age = 45
-				is_female = yes
-			}
-			age = 75
-			trait = celibate
-			trait = incapable
-		}
-	}
-	abort_effect = {
-	}
+
 	effect = {
 		piety = 10
 	}
-}
 
+	abort = {
+		OR = {
+			trigger_if = {
+				limit = { is_female = yes }
+				practical_age >= 45
+			}
+			trigger_else = {
+				practical_age >= 75
+			}
+
+			trait = celibate
+			is_incapable = yes
+			prisoner = yes
+
+			AND = {
+				is_married = no
+				is_consort = no
+			}
+		}
+	}
+
+	chance = {
+		factor = 50
+
+		mult_modifier = {
+			factor = 0
+			is_infertile_race = yes
+		}
+
+		mult_modifier = {
+			factor = 0.1
+			has_religion_feature = religion_patriarchal
+		}
+
+		mult_modifier = {
+			factor = 10.0
+			has_religion_feature = religion_matriarchal
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			num_of_children >= 3
+		}
+
+		mult_modifier = {
+			factor = 3.0
+			num_of_children >= 4
+		}
+
+		mult_modifier = {
+			factor = 10.0
+			num_of_children >= 5
+		}
+	}
+}
 
 obj_have_a_son = {
 	type = character
-	
+
 	fertility = 0.25
-	
-	allow = {
-		NOT = { has_dlc = "Zeus" }
-		prisoner = no
-		is_marriage_adult = yes
+
+	potential = {
 		OR = {
 			is_married = yes
 			is_consort = yes
 		}
-		NOT = {
+
+		is_marriage_adult = yes
+		is_incapable = no
+		prisoner = no
+
+		NOR = {
+			trait = celibate
+			has_dlc = "Conclave"
+
 			any_child = {
 				is_female = no
 			}
 		}
-		OR = {
-			ai = no
-			is_female = no
-			has_religion_feature = religion_patriarchal
-			# Have at least two daughters
-			any_child = {
-				is_female = yes
-				ROOT = {
-					any_child = {
-						is_female = yes
-						NOT = { character = PREVPREV }
-					}
+
+		trigger_if = {
+			limit = { is_female = yes }
+			practical_age < 45
+		}
+		trigger_else = {
+			practical_age < 75
+		}
+
+		trigger_if = {
+			limit = { ai = yes }
+
+			OR = {
+				is_female = no
+				has_religion_feature = religion_patriarchal
+
+				# Have at least two daughters
+				any_child = {
+					count >= 2
+					is_female = yes
 				}
 			}
 		}
-		NOT = {
-			AND = {
-				age = 45
-				is_female = yes
-			}
-		}
-		NOT = { age = 75 }
-		NOT = { trait = celibate }
-		NOT = { trait = incapable }
 	}
-	chance = {
-		factor = 50
 
-		modifier = {
-			factor = 0
-			is_infertile_race = yes
-		}
-		modifier = {
-			factor = 0.1
-			has_religion_feature = religion_matriarchal
-		}
-		modifier = {
-			factor = 10.0
-			has_religion_feature = religion_patriarchal
-		}
-		modifier = {
-			factor = 1.5
-			num_of_children = 3
-		}
-		modifier = {
-			factor = 3.0
-			num_of_children = 4
-		}
-		modifier = {
-			factor = 10.0
-			num_of_children = 5
-		}
-	}
 	success = {
 		any_child = {
 			is_female = no
 		}
 	}
-	abort = {
-		OR = {
-			AND = {
-				age = 45
-				is_female = yes
-			}
-			age = 75
-			trait = celibate
-			trait = incapable
-		}
-	}
-	abort_effect = {
-	}
+
 	effect = {
 		piety = 10
 	}
-}
 
+	abort = {
+		OR = {
+			trigger_if = {
+				limit = { is_female = yes }
+				practical_age >= 45
+			}
+
+			practical_age >= 75
+			trait = celibate
+			is_incapable = yes
+		}
+	}
+
+	chance = {
+		factor = 50
+
+		mult_modifier = {
+			factor = 0
+			is_infertile_race = yes
+		}
+
+		mult_modifier = {
+			factor = 0.1
+			has_religion_feature = religion_matriarchal
+		}
+
+		mult_modifier = {
+			factor = 10.0
+			has_religion_feature = religion_patriarchal
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			num_of_children >= 3
+		}
+
+		mult_modifier = {
+			factor = 3.0
+			num_of_children >= 4
+		}
+
+		mult_modifier = {
+			factor = 10.0
+			num_of_children >= 5
+		}
+	}
+}
 
 obj_wants_landed_title = {
 	type = character
-	
+
 	potential = {
 		is_ruler = no
-	}
-	
-	allow = {
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			ai = yes
-		}
-		prisoner = no
+		#is_close_relative = liege # leaving this below in the liege
 		is_adult = yes
-		OR = {
-			AND = { 
-				is_female = yes 
-				NOT = { age = 45 }
-				has_religion_feature = religion_matriarchal
-			}
-			AND = { 
-				is_female = no
-				NOT = { has_religion_feature = religion_matriarchal }
+
+		trigger_if = {
+			limit = { is_female = yes }
+
+			practical_age < 45
+
+			OR = {
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+				has_law = true_cognatic_succession
 			}
 		}
-		NOT = { trait = incapable }
-		NOT = { trait = eunuch }
-		NOT = { is_ascetic_trigger = yes }
-		NOT = { has_minor_title = title_guru }
+		trigger_else = {
+			OR = {
+				has_law = agnatic_succession
+				has_law = cognatic_succession
+				has_law = true_cognatic_succession
+			}
+		}
+
 		liege = {
 			OR = {
 				is_feudal = yes
 				is_tribal = yes
 			}
 			is_close_relative = ROOT
-			num_of_extra_landed_titles = 1
-			OR = {
-				AND = {
-					NOT = { is_father = ROOT }
-					NOT = { is_mother = ROOT }
-				}
-				NOT = {
-					current_heir = {
-						character = ROOT
-					}
-				}
-				NOT = {
-					primary_title = {
-						has_law = succ_gavelkind
-					}
+			num_of_extra_landed_titles >= 1
+
+			NAND = {
+				is_parent_of = ROOT
+				has_law = succ_gavelkind
+
+				current_heir = {
+					character = ROOT
 				}
 			}
 		}
+
+		prisoner = no
+		is_incapable = no
+		has_inheritance_blocker = no
+		NOT = { has_minor_title = title_guru }
 	}
-	
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 0.01
-			trait = content
+
+	creation_effect = {
+		if = {
+			limit = {
+				trait = content
+				trait = slothful
+			}
+
+			character_event = {
+				id = 37000
+				years = 15
+				random = 2738 # 7.5 years
+			}
 		}
-		modifier = {
-			factor = 0.25
-			trait = patient
+		else_if = {
+			limit = {
+				OR = {
+					trait = ambitious
+					trait = diligent
+				}
+
+				NOR = {
+					trait = content
+					trait = slothful
+				}
+			}
+
+			character_event = {
+				id = 37000
+				months = 3
+			}
 		}
-		modifier = {
-			factor = 0.5
-			trait = humble
+		else_if = {
+			limit = {
+				OR = {
+					trait = content
+					trait = slothful
+				}
+
+				NOR = {
+					trait = ambitious
+					trait = diligent
+				}
+			}
+
+			character_event = {
+				id = 37000
+				years = 3
+				random = 360
+			}
 		}
-		modifier = {
-			factor = 1.25
-			trait = proud
-		}
-		modifier = {
-			factor = 1.5
-			trait = greedy
-		}
-		modifier = {
-			factor = 2.0
-			trait = envious
-		}
-		modifier = {
-			factor = 3.0
-			trait = ambitious
-		}
-		modifier = {
-			factor = 2.0
-			religion_group = qismaite_group
-			liege = {
-				dynasty = ROOT
+		else = {
+			character_event = {
+				id = 37000
+				months = 6
+				random = 180
 			}
 		}
 	}
+
 	success = {
 		is_ruler = yes
 	}
-	abort = {
-		liege = { 
-			OR = {
-				NOT = { is_close_relative = ROOT }
-				NOT = { num_of_extra_landed_titles = 1 }
+
+	effect = {
+		prestige = 50
+
+		opinion = {
+			name = opinion_generous_relative
+			who = liege
+			years = 10
+		}
+
+		clr_character_flag = flag_denied_title
+		clr_character_flag = flag_promised_title
+		clr_character_flag = flag_later_title
+
+		hidden_effect = {
+			remove_character_modifier = promised_a_title
+
+			remove_opinion = {
+				name = opinion_promised_title
+				who = liege
 			}
 		}
+	}
+
+	abort = {
 		OR = {
-			trait = eunuch
-			is_ascetic_trigger = yes
+			is_ruler = yes
+			#NOT = { is_close_relative = liege }
+			is_married = liege
+			is_incapable = yes
+			prisoner = yes
+			has_inheritance_blocker = yes
+			has_minor_title = title_guru
+
+			AND = {
+				is_child_of = liege
+				has_law = succ_gavelkind
+				is_primary_heir = liege
+			}
+
+			liege = {
+				OR = {
+					NOT = { is_close_relative = ROOT }
+					num_of_extra_landed_titles < 1
+				}
+			}
 		}
-	}	
+	}
+
 	abort_effect = {
 		clr_character_flag = flag_denied_title
 		clr_character_flag = flag_promised_title
-		remove_character_modifier = promised_a_title
 		clr_character_flag = flag_later_title
+		remove_character_modifier = promised_a_title
 	}
-	effect = {
-		prestige = 50
-		opinion = {
-			who = liege
-			modifier = opinion_generous_relative
-			years = 10
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
 		}
-		hidden_tooltip = {
-			clr_character_flag = flag_denied_title
-			clr_character_flag = flag_promised_title
-			remove_character_modifier = promised_a_title
-			clr_character_flag = flag_later_title
-			remove_opinion = { who = liege modifier = opinion_promised_title }
+
+		mult_modifier = {
+			factor = 0.25
+			trait = patient
+		}
+
+		mult_modifier = {
+			factor = 0.5
+			trait = humble
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = proud
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = greedy
+		}
+
+		mult_modifier = {
+			factor = 2.0
+			trait = envious
+		}
+
+		mult_modifier = {
+			factor = 3.0
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 2.0
+
+			religion_group = qismaite_group
+			liege = { dynasty = PREV }
 		}
 	}
 }
-
 
 obj_become_heir = {
 	type = character
