@@ -1403,7 +1403,7 @@ obj_wants_landed_title = {
 
 	potential = {
 		is_ruler = no
-		#is_close_relative = liege # leaving this below in the liege
+		is_close_relative = liege
 		is_adult = yes
 
 		trigger_if = {
@@ -1430,7 +1430,7 @@ obj_wants_landed_title = {
 				is_feudal = yes
 				is_tribal = yes
 			}
-			is_close_relative = ROOT
+
 			num_of_extra_landed_titles >= 1
 
 			NAND = {
@@ -1538,7 +1538,7 @@ obj_wants_landed_title = {
 	abort = {
 		OR = {
 			is_ruler = yes
-			#NOT = { is_close_relative = liege }
+			NOT = { is_close_relative = liege }
 			is_married = liege
 			is_incapable = yes
 			prisoner = yes
@@ -1552,10 +1552,7 @@ obj_wants_landed_title = {
 			}
 
 			liege = {
-				OR = {
-					NOT = { is_close_relative = ROOT }
-					num_of_extra_landed_titles < 1
-				}
+				num_of_extra_landed_titles < 1
 			}
 		}
 	}
@@ -1616,85 +1613,112 @@ obj_wants_landed_title = {
 
 obj_become_heir = {
 	type = character
-	
+
 	potential = {
-		liege = { any_child = { character = ROOT } }
-		NOT = { 
-			liege = { primary_title = { has_law = agnatic_succession } }
-			is_female = yes
-		}
-		NOT = { 
-			liege = { primary_title = { has_law = enatic_succession } }
-			is_female = no
-		}
+		is_child_of = liege
+		is_adult = yes
+		prisoner = no
+		is_primary_heir = no
+		is_incapable = no
 		NOT = { trait = bastard }
+
+		trigger_if = {
+			limit = { ai = no }
+			NOT = { has_dlc = "Conclave" }
+		}
+
+		trigger_if = {
+			limit = { is_female = yes }
+
+			liege = {
+				NOT = { has_law = agnatic_succession }
+			}
+		}
+		trigger_else = {
+			liege = {
+				NOT = { has_law = enatic_succession }
+			}
+		}
+
 		liege = {
-			any_child = {
-				is_primary_heir = yes
+			current_heir = {
+				is_child_of = PREV
+
 				OR = {
 					has_epidemic = yes
+					is_incapable = yes
 					is_ill = yes
 					trait = lunatic
 					trait = possessed
-					trait = incapable
 					trait = infirm
 				}
 			}
 		}
 	}
-	
-	allow = {
-		OR = {
-			NOT = { has_dlc = "Zeus" }
-			ai = yes
-		}
-		prisoner = no
-		is_adult = yes
-		is_primary_heir = no
-		NOT = { trait = incapable }
+
+	success = {
+		is_primary_heir = liege
 	}
-	
+
+	effect = {
+		change_intrigue = 1
+	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			independent = yes
+			prisoner = yes
+			NOT = { is_child_of = liege }
+			trait = bastard
+
+			trigger_if = {
+				limit = { is_female = yes }
+
+				liege = {
+					has_law = agnatic_succession
+				}
+			}
+			trigger_else = {
+				liege = {
+					has_law = enatic_succession
+				}
+			}
+		}
+	}
+
 	chance = {
 		factor = 50
-		
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = ambitious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = greedy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = envious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			trait = proud
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = patient
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			trait = content
 		}
-	}
-	success = {
-		is_primary_heir = yes
-	}
-	abort = {
-		OR = {
-			trait = incapable
-			independent = yes
-		}
-	}
-	abort_effect = {
-	}
-	effect = {
-		change_intrigue = 1
 	}
 }
 
@@ -1703,58 +1727,24 @@ obj_become_heir = {
 # Martial
 obj_improve_martial = {
 	type = character
-	
+
 	potential = {
-		age = 16
 		is_playable = yes
-		NOT = { has_dlc = "Way of Life" }
-	}
-	
-	allow = {
-		NOT = { martial = 8 }
-		NOT = { trait = incapable }
-		NOT = { trait = infirm }
+		is_adult = yes
+		martial < 8
 		prisoner = no
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = misguided_warrior
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
-	success = {
-		martial = 8
-	}
-	abort = {
-		OR = {
-			trait = incapable
+		is_incapable = no
+
+		NOR = {
+			has_dlc = "Way of Life"
 			trait = infirm
 		}
 	}
-	abort_effect = {
-		clr_character_flag = improve_martial_success
-		clr_character_flag = toy_army_prepare
-		clr_character_flag = toy_army
-		clr_character_flag = street_ruffians
+
+	success = {
+		martial >= 8
 	}
+
 	effect = {
 		prestige = 100
 		clr_character_flag = improve_martial_success
@@ -1762,57 +1752,91 @@ obj_improve_martial = {
 		clr_character_flag = toy_army
 		clr_character_flag = street_ruffians
 	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			prisoner = yes
+			is_playable = no
+			trait = infirm
+		}
+	}
+
+	abort_effect = {
+		clr_character_flag = improve_martial_success
+		clr_character_flag = toy_army_prepare
+		clr_character_flag = toy_army
+		clr_character_flag = street_ruffians
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = misguided_warrior
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
+	}
 }
 
 # Stewardship
 obj_improve_stewardship = {
 	type = character
-	
+
 	potential = {
-		age = 16
 		is_playable = yes
-		NOT = { has_dlc = "Way of Life" }
-	}
-	
-	allow = {
-		NOT = { stewardship = 8 }
-		NOT = { trait = incapable }
-		NOT = { trait = infirm }
+		is_adult = yes
+		stewardship < 8
 		prisoner = no
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = indulgent_wastrel
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
-	success = {
-		stewardship = 8
-	}
-	abort = {
-		OR = {
-			trait = incapable
+		is_incapable = no
+
+		NOR = {
+			has_dlc = "Way of Life"
 			trait = infirm
 		}
 	}
+
+	success = {
+		stewardship >= 8
+	}
+
+	effect = {
+		prestige = 100
+		clr_character_flag = improve_stewardship_success
+		clr_character_flag = the_inn
+		clr_character_flag = the_garden
+		clr_character_flag = the_survey
+	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			prisoner = yes
+			is_playable = no
+			trait = infirm
+		}
+	}
+
 	abort_effect = {
 		clr_character_flag = 10_salt
 		clr_character_flag = 20_salt
@@ -1822,69 +1846,58 @@ obj_improve_stewardship = {
 		clr_character_flag = the_garden
 		clr_character_flag = the_survey
 	}
-	effect = {
-		prestige = 100
-		clr_character_flag = improve_stewardship_success
-		clr_character_flag = the_inn
-		clr_character_flag = the_garden
-		clr_character_flag = the_survey
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = indulgent_wastrel
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
 # Learning
 obj_improve_learning = {
 	type = character
-	
+
 	potential = {
-		age = 16
 		is_playable = yes
-		NOT = { has_dlc = "Way of Life" }
-	}
-	
-	allow = {
-		NOT = { learning = 8 }
-		NOT = { trait = incapable }
-		NOT = { trait = infirm }
+		is_adult = yes
+		learning < 8
 		prisoner = no
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = detached_priest
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
-	success = {
-		learning = 8
-	}
-	abort = {
-		OR = {
-			trait = incapable
+		is_incapable = no
+
+		NOR = {
+			has_dlc = "Way of Life"
 			trait = infirm
 		}
 	}
-	abort_effect = {
-		clr_character_flag = flying_machine
-		clr_character_flag = ancient_tome
-		clr_character_flag = hermit_visit
+
+	success = {
+		learning >= 8
 	}
+
 	effect = {
 		prestige = 100
 		clr_character_flag = improve_learning_success
@@ -1892,62 +1905,73 @@ obj_improve_learning = {
 		clr_character_flag = ancient_tome
 		clr_character_flag = hermit_visit
 	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			prisoner = yes
+			is_playable = no
+			trait = infirm
+		}
+	}
+
+	abort_effect = {
+		clr_character_flag = flying_machine
+		clr_character_flag = ancient_tome
+		clr_character_flag = hermit_visit
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = detached_priest
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
+	}
 }
 
 # Diplomacy
 obj_improve_diplomacy = {
 	type = character
-	
+
 	potential = {
-		age = 16
 		is_playable = yes
-		NOT = { has_dlc = "Way of Life" }
-	}
-	
-	allow = {
-		NOT = { diplomacy = 8 }
-		NOT = { trait = incapable }
-		NOT = { trait = infirm }
+		is_adult = yes
+		diplomacy < 8
 		prisoner = no
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = naive_appeaser
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
-	success = {
-		diplomacy = 8
-	}
-	abort = {
-		OR = {
-			trait = incapable
+		is_incapable = no
+
+		NOR = {
+			has_dlc = "Way of Life"
 			trait = infirm
 		}
 	}
-	abort_effect = {
-		clr_character_flag = the_feud
-		clr_character_flag = the_mirror
-		clr_character_flag = the_suicide
+
+	success = {
+		diplomacy >= 8
 	}
+
 	effect = {
 		prestige = 100
 		clr_character_flag = improve_diplomacy_success
@@ -1955,62 +1979,73 @@ obj_improve_diplomacy = {
 		clr_character_flag = the_mirror
 		clr_character_flag = the_suicide
 	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			prisoner = yes
+			is_playable = no
+			trait = infirm
+		}
+	}
+
+	abort_effect = {
+		clr_character_flag = the_feud
+		clr_character_flag = the_mirror
+		clr_character_flag = the_suicide
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = naive_appeaser
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
+	}
 }
 
 # Intrigue
 obj_improve_intrigue = {
 	type = character
-	
+
 	potential = {
-		age = 16
 		is_playable = yes
-		NOT = { has_dlc = "Way of Life" }
-	}
-	
-	allow = {
-		NOT = { intrigue = 8 }
-		NOT = { trait = incapable }
-		NOT = { trait = infirm }
+		is_adult = yes
+		intrigue < 8
 		prisoner = no
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = naive_appeaser
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
-	success = {
-		intrigue = 8
-	}
-	abort = {
-		OR = {
-			trait = incapable
+		is_incapable = no
+
+		NOR = {
+			has_dlc = "Way of Life"
 			trait = infirm
 		}
 	}
-	abort_effect = {
-		clr_character_flag = the_necklace
-		clr_character_flag = gossip
-		clr_character_flag = old_spymaster
+
+	success = {
+		intrigue >= 8
 	}
+
 	effect = {
 		prestige = 100
 		clr_character_flag = improve_intrigue_success
@@ -2018,57 +2053,68 @@ obj_improve_intrigue = {
 		clr_character_flag = gossip
 		clr_character_flag = old_spymaster
 	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			prisoner = yes
+			is_playable = no
+			trait = infirm
+		}
+	}
+
+	abort_effect = {
+		clr_character_flag = the_necklace
+		clr_character_flag = gossip
+		clr_character_flag = old_spymaster
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = naive_appeaser
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
+	}
 }
 
 # Decadence
 obj_lower_decadence = {
 	type = character
-	
+
 	potential = {
-		is_adult = yes
 		is_ruler = yes
 		uses_decadence = yes
+		decadence >= 60
+		is_adult = yes
+		is_incapable = no
 	}
-	
-	allow = {
-		decadence = 60
-		NOT = { trait = incapable }
-	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 1.25
-			trait = diligent
-		}
-		modifier = {
-			factor = 1.25
-			trait = naive_appeaser
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = content
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
+
 	success = {
-		NOT = { decadence = 60 }
+		decadence < 60
 	}
-	abort = {
-		trait = incapable
-	}
-	abort_effect = {
-		clr_character_flag = berber_life
-		clr_character_flag = bandit_camp
-		clr_character_flag = dromedary_hunt
-	}
+
 	effect = {
 		prestige = 100
 		clr_character_flag = lower_decadence_success
@@ -2076,290 +2122,351 @@ obj_lower_decadence = {
 		clr_character_flag = bandit_camp
 		clr_character_flag = dromedary_hunt
 	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			uses_decadence = no
+		}
+	}
+
+	abort_effect = {
+		clr_character_flag = berber_life
+		clr_character_flag = bandit_camp
+		clr_character_flag = dromedary_hunt
+	}
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 1.25
+			trait = diligent
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			trait = naive_appeaser
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = content
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
+	}
 }
 
 # Become King
 obj_become_king = {
 	type = character
-	
-	can_cancel = no
-	
+
 	ai_capital_kingdom_focus = yes # AI characters with this ambition will actually focus on taking the kingdom
-	
+	can_cancel = no
+
 	potential = {
-		is_adult = yes
 		is_playable = yes
 		is_landed = yes
-		lower_tier_than = KING
+		is_adult = yes
+		lower_real_tier_than = KING
+		is_incapable = no
+
 		OR = {
 			independent = yes
 			liege = { independent = yes }
 		}
+
 		NOT = {
 			any_heir_title = {
-				higher_tier_than = DUKE
+				higher_real_tier_than = DUKE
 			}
 		}
+
 		capital_scope = {
 			kingdom = {
 				always = yes
 			}
 		}
+
 	}
-	
-	allow = {
-		NOT = { trait = incapable }
+
+	success = {
+		custom_tooltip = {
+			text = obj_become_king_tip
+
+			capital_scope = {
+				kingdom = {
+					holder = ROOT
+				}
+			}
+		}
 	}
-	
+
+	effect = {
+		prestige = 500
+		clr_character_flag = kingdom_claimed_with_ambition
+	}
+
+	abort = {
+		OR = {
+			is_incapable = yes
+			is_playable = no
+			is_landed = no
+			higher_real_tier_than = DUKE
+
+			any_heir_title = {
+				higher_real_tier_than = DUKE
+			}
+		}
+	}
+
 	chance = {
 		factor = 100
-		
-		modifier = {
-			factor = 0
-			NOT = { religion_group = humanoid_group }
-			NOT = { trait = ambitious }
+
+		trigger = {
+			OR = {
+				religion_group = humanoid_group
+				trait = ambitious
+			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
+
 			capital_scope = {
 				kingdom = {
 					has_holder = no
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
 			trait = ambitious
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 2.0
 			trait = brave
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3.0
+
 			OR = {
 				independent = yes
-				religion_group = humanoid_group
+				is_unreformed_pagan_trigger = yes
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
 			trait = craven
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			trait = content
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.01
 			trait = slothful
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.1
-			tier = COUNT
+			real_tier = COUNT
 		}
 	}
-	
-	success = {
-		custom_tooltip = {
-			text = obj_become_king_tip
-			hidden_tooltip = {
-				capital_scope = {
-					kingdom = {
-						holder_scope = {
-							character = ROOT
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	abort = {
-		OR = {
-			trait = incapable
-			is_playable = no
-			is_landed = no
-			AND = {
-				higher_tier_than = DUKE
-				primary_title = {
-					temporary = no
-				}
-			}
-			any_heir_title = {
-				higher_tier_than = DUKE
-				temporary = no
-			}
-		}
-	}
-	
-	abort_effect = {
-	}
-	
-	effect = {
-		prestige = 500
-		hidden_tooltip = {
-			clr_character_flag = kingdom_claimed_with_ambition
-		}
-	}
-	
 }
 
 ### Buddhist ambitions ###
 
 obj_buddhist_stop_drinking = {
 	type = character
-	
+
 	potential = {
 		OR = {
 			religion = adama
 			religion = padhran
 		}
 		trait = drunkard
-	}
-	
-	allow = {
 		is_adult = yes
-		NOT = { trait = incapable }
+		is_incapable = no
 		NOT = { trait = infirm }
 	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 2
-			trait = zealous
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
+
 	success = {
 		NOT = { trait = drunkard }
 	}
+
+	effect = {
+		piety = 100
+		clr_character_flag = guru_helped_ambition
+	}
+
 	abort = {
 		NOR = { 
 			religion = adama
 			religion = padhran
 		}
 	}
+
 	abort_effect = {
 		clr_character_flag = guru_helped_ambition
 	}
-	effect = {
-		piety = 100
-		clr_character_flag = guru_helped_ambition
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 2
+			trait = zealous
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
 obj_buddhist_reject_empty_pleasures = {
 	type = character
-	
+
 	potential = {
 		OR = {
 			religion = adama
 			religion = padhran
 		}
 		trait = hedonist
-	}
-	
-	allow = {
 		is_adult = yes
-		NOT = { trait = incapable }
+		is_incapable = no
 		NOT = { trait = infirm }
 	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 2
-			trait = zealous
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
+
 	success = {
 		NOT = { trait = hedonist }
 	}
+
+	effect = {
+		piety = 100
+		clr_character_flag = guru_helped_ambition
+	}
+
 	abort = {
 		NOR = { 
 			religion = adama
 			religion = padhran
 		}
 	}
+
 	abort_effect = {
 		clr_character_flag = guru_helped_ambition
 	}
-	effect = {
-		piety = 100
-		clr_character_flag = guru_helped_ambition
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 2
+			trait = zealous
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
 obj_buddhist_abstain_sexual_excess = {
 	type = character
-	
+
 	potential = {
 		OR = {
 			religion = adama
 			religion = padhran
 		}
 		trait = lustful
-	}
-	
-	allow = {
 		is_adult = yes
-		NOT = { trait = incapable }
+		is_incapable = no
 		NOT = { trait = infirm }
 	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 2
-			trait = zealous
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
+
+	creation_effect = {
+		character_event = {
+			id = 5064
+			months = 6
+			random = 8030 # 22 years
 		}
 	}
+
 	success = {
 		NOT = { trait = lustful }
 	}
+
+	effect = {
+		piety = 100
+		clear_delayed_event = { id = 5064 }
+		clr_character_flag = guru_helped_ambition
+	}
+
 	abort = {
 		NOR = { 
 			religion = adama
 			religion = padhran
 		}
 	}
+
 	abort_effect = {
+		clear_delayed_event = { id = 5064 }
 		clr_character_flag = guru_helped_ambition
 	}
-	effect = {
-		piety = 100
-		clr_character_flag = guru_helped_ambition
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 2
+			trait = zealous
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
 obj_buddhist_reject_cruelty = {
 	type = character
-	
+
 	potential = {
 		OR = {
 			religion = adama
@@ -2369,95 +2476,106 @@ obj_buddhist_reject_cruelty = {
 			trait = impaler
 			trait = cruel
 		}
-	}
-	
-	allow = {
+
 		is_adult = yes
-		NOT = { trait = incapable }
+		is_incapable = no
 		NOT = { trait = infirm }
 	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 2
-			trait = zealous
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
+
 	success = {
-		NOT = { trait = impaler }
-		NOT = { trait = cruel }
+		NOR = {
+			trait = impaler
+			trait = cruel
+		}
 	}
+
+	effect = {
+		piety = 100
+		clr_character_flag = guru_helped_ambition
+	}
+
 	abort = {
 		NOR = { 
 			religion = adama
 			religion = padhran
 		}
 	}
+
 	abort_effect = {
 		clr_character_flag = guru_helped_ambition
 	}
-	effect = {
-		piety = 100
-		clr_character_flag = guru_helped_ambition
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 2
+			trait = zealous
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
 obj_buddhist_temperance_food = {
 	type = character
-	
+
 	potential = {
 		OR = {
 			religion = adama
 			religion = padhran
 		}
 		trait = gluttonous
-	}
-	
-	allow = {
 		is_adult = yes
-		NOT = { trait = incapable }
+		is_incapable = no
 		NOT = { trait = infirm }
 	}
-	chance = {
-		factor = 100
-		
-		modifier = {
-			factor = 2
-			trait = zealous
-		}
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 0.01
-			trait = slothful
-		}
-	}
+
 	success = {
 		NOT = { trait = gluttonous }
 	}
+
+	effect = {
+		piety = 100
+		clr_character_flag = guru_helped_ambition
+	}
+
 	abort = {
 		NOR = { 
 			religion = adama
 			religion = padhran
 		}
 	}
+
 	abort_effect = {
 		clr_character_flag = guru_helped_ambition
 	}
-	effect = {
-		piety = 100
-		clr_character_flag = guru_helped_ambition
+
+	chance = {
+		factor = 100
+
+		mult_modifier = {
+			factor = 2
+			trait = zealous
+		}
+
+		mult_modifier = {
+			factor = 1.5
+			trait = ambitious
+		}
+
+		mult_modifier = {
+			factor = 0.01
+			trait = slothful
+		}
 	}
 }
 
