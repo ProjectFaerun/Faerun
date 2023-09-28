@@ -1975,114 +1975,128 @@ title_councilmember_king = {
 
 title_councilmember_emperor = {
 	is_high_prio = yes
+	message = yes
+	is_voter = yes
+
 	dignity = 0.060
 	grant_limit = 1
+
 	opinion_effect = 10
 	monthly_salary = 0.00
 	monthly_prestige = 1.00
-	is_voter = yes
 
 	allowed_to_grant = {
-		higher_tier_than = KING
-		has_dlc = "Zeus"
-		primary_title = { has_law = law_voting_power_1 }
+		real_tier = EMPEROR
+		has_law = law_voting_power_1
+		has_dlc = "Conclave"
 	}
 
 	allowed_to_hold = {
-		NOT = {
-			primary_title = { temporary = yes }
-		}
 		can_be_councilmember_emperor_trigger = yes
+
+		custom_tooltip = {
+			text = court_physician_tooltip_1
+
+			trigger_if = {
+				limit = { is_ruler = yes }
+
+				primary_title = {
+					temporary = no
+				}
+			}
+		}
 	}
 
 	revoke_trigger = {
-		FROM = {
-			primary_title = {
-				NOT = {
-					AND = {
-						has_law = succession_voting_power_1
-						ROOT = { is_powerful_vassal = yes }
-					}
-				}
-			}
+		trigger_if = {
+			limit = { FROM = { has_law = succession_voting_power_1 } }
+			is_powerful_vassal = no
 		}
 	}
 
 	gain_effect = {
 	}
+
 	lose_effect = {
 		if = {
 			limit = {
 				FROM = {
-					NOT = {
-						has_character_flag = swapping_councillors
-					}
+					NOT = { has_character_flag = swapping_councillors }
 				}
 			}
-			opinion = { who = FROM modifier = opinion_fired_from_council }
-			opinion = { who = FROM modifier = opinion_recently_fired }
+
+			opinion = {
+				name = opinion_fired_from_council
+				who = FROM
+			}
+
+			opinion = {
+				name = opinion_recently_fired
+				who = FROM
+			}
 		}
 	}
 
 	retire_effect = {
 		if = {
 			limit = {
-				NOT = {
-					age = 65
-				}
-				health = 3
-				NOT = {
-					is_sick_or_injured_trigger = yes
-				}
-				can_be_councilmember_king_trigger = yes
+				#practical_age < 65
+				health >= 3
+				is_sick_or_injured_trigger = no
+				can_be_councilmember_emperor_trigger = yes
 			}
 
 			FROM = {
-				opinion = { who = ROOT modifier = opinion_resigned_from_council }
+				opinion = {
+					name = opinion_resigned_from_council
+					who = ROOT
+				}
 			}
 		}
 	}
 
-	message = yes
+	death_effect = {
+	}
 }
 
 ## Court Physician
 title_court_physician = {
 	is_high_prio = yes
+	message = yes
+	realm_in_name = yes
+
 	attribute = learning
 	dignity = 5
-	realm_in_name = yes
 	grant_limit = 1
+
 	opinion_effect = 10
 	monthly_salary = 0.2
 	monthly_prestige = 0.5
 
 	allowed_to_grant = {
-		OR = {
-			higher_tier_than = BARON
-			is_patrician = yes
-		}
+		is_playable = yes
 		has_dlc = "Reapers"
 	}
 
 	allowed_to_hold = {
-		custom_tooltip = {
-			text = court_physician_tooltip_1
-			NOT = {
-				primary_title = { temporary = yes }
-			}
-		}
+		is_adult = yes
+		prisoner = no
+
 		custom_tooltip = {
 			text = court_physician_tooltip_2
+
 			OR = {
 				male_can_hold_minor_title_trigger = yes
 				female_can_hold_minor_title_trigger = yes
 			}
 		}
+
 		OR = {
-			learning = 15
+			learning >= 15
+
 			AND = {
-				learning = 10
+				learning >= 10
+
 				OR = {
 					trait = physician
 					trait = scholar
@@ -2090,36 +2104,51 @@ title_court_physician = {
 					trait = mutazilite
 				}
 			}
+
 			custom_tooltip = {
 				text = educated_court_physician
-				hidden_tooltip = {
-					has_character_flag = is_court_physician
+
+				has_character_flag = is_court_physician
+			}
+		}
+
+		is_incapable = no
+		NOT = { trait = in_hiding }
+
+		custom_tooltip = {
+			text = court_physician_tooltip_1
+
+			trigger_if = {
+				limit = { is_ruler = yes }
+
+				primary_title = {
+					temporary = no
 				}
 			}
 		}
-		is_adult = yes
-
-		prisoner = no
-		NOT = { trait = in_hiding }
-		is_incapable = no
-
 	}
 
 	revoke_trigger = {
 		custom_tooltip = {
 			text = revoke_court_physician_being_treated_tt
-			NOT = { FROM = { has_character_flag = being_treated } }
+
+			FROM = {
+				NOT = { has_character_flag = being_treated }
+			}
 		}
 	}
 
 	gain_effect = {
 	}
+
 	lose_effect = {
 	}
+
 	retire_effect = {
 	}
 
-	message = yes
+	death_effect = {
+	}
 }
 
 
