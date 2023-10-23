@@ -721,209 +721,180 @@ obj_amass_wealth = {
 
 obj_become_paragon_of_virtue = {
 	type = character
-
+	
 	potential = {
 		NOT = { religion_group = karaturan_group }
-		is_playable = yes
-		is_landed = yes
+	}
+	
+	allow = {
 		is_adult = yes
-
+		NOT = { piety = 1000 }
 		OR = {
 			has_education_learning_trigger = yes
 			has_pious_trait_trigger = yes
 		}
-
-		is_incapable = no
-		piety < 1000
 		has_impious_trait_trigger = no
+		is_playable = yes
+		is_landed = yes
+		NOT = { trait = incapable }
 	}
-
-	success = {
-		piety >= 2000
-	}
-
-	effect = {
-		change_learning = 1
-		piety = 100
-
-		if = {
-			limit = { has_nickname = no }
-			give_nickname = nick_the_holy
-		}
-
-		religion_authority = {
-			name = paragon_of_virtue
-			years = 20
-		}
-
-		religion_head = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_paragon
-				who = ROOT
-				years = 100
-			}
-		}
-
-		any_vassal = {
-			show_scope_change = no
-
-			limit = {
-				is_theocracy = yes
-				religion = ROOT
-			}
-
-			opinion = {
-				name = opinion_paragon
-				who = ROOT
-				years = 100
-			}
-		}
-
-		# Achievement
-		if = {
-			limit = {
-				ai = no
-				is_ironman = yes
-			}
-
-			set_character_flag = achievement_become_paragon_of_virtue
-		}
-	}
-
-	abort = {
-		OR = {
-			is_playable = no
-			is_landed = no
-			religion_group = karaturan_group
-			is_incapable = yes
-			has_impious_trait_trigger = yes
-			has_pious_trait_trigger = no
-		}
-	}
-
+	
 	chance = {
 		factor = 50
-
-		mult_modifier = {
+		
+		modifier = {
 			factor = 1.25
 			trait = patient
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 0.01
-			lower_real_tier_than = KING
-			is_theocracy = no
+			NOR = {
+				tier = king 
+				tier = emperor
+				is_theocracy = yes
+			}
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 10.0
 			has_education_learning_trigger = yes
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 10.0
 			trait = zealous
 		}
 	}
+	success = {
+		piety = 2000
+	}
+	abort = {
+		OR = {
+			has_impious_trait_trigger = yes
+			trait = incapable
+		}
+	}
+	abort_effect = {
+	}
+	effect = {
+		change_learning = 1
+		piety = 100
+		if = {
+			limit = {
+				has_nickname = no
+			}
+			give_nickname = nick_the_holy
+		}
+		religion_authority = {
+			modifier = paragon_of_virtue
+			years = 20
+		}
+		religion_head = {
+			opinion = {
+				who = ROOT
+				modifier = opinion_paragon
+				years = 100
+			}
+		}
+		any_vassal = {
+			limit = {
+				is_theocracy = yes
+				religion = ROOT
+			}
+			opinion = {
+				who = ROOT
+				modifier = opinion_paragon
+				years = 100
+			}
+		}
+		# Achievement
+		hidden_tooltip = {
+			if = {
+				limit = { ai = no }
+				set_character_flag = achievement_become_paragon_of_virtue
+			}
+		}
+	}
 }
+
 
 obj_become_exalted = {
 	type = character
-
+	
 	potential = {
+		NOT = { has_character_flag = became_exalted }
+	}
+	
+	allow = {
+		is_adult = yes
+		NOT = { prestige = 1000 }
 		is_playable = yes
 		is_landed = yes
-		is_incapable = no
-		is_adult = yes
-		prestige < 1000
-
-		OR = {
-			higher_real_tier_than = DUKE
+		OR = { 
+			tier = king
+			tier = emperor
 			trait = ambitious
 			trait = envious
 			trait = proud
 		}
-
 		NOR = {
-			has_character_flag = became_exalted
 			trait = content
 			trait = humble
 			trait = shy
 		}
+		NOT = { trait = incapable }
 	}
-
-	success = {
-		prestige >= 5000
-	}
-
-	effect = {
-		change_diplomacy = 1
-		prestige = 100
-
-		any_vassal = {
-			show_scope_change = no
-
-			opinion = {
-				name = opinion_exalted
-				who = ROOT
-				years = 100
-			}
-		}
-
-		# Achievement
-		if = {
-			limit = {
-				ai = no
-				is_ironman = yes
-			}
-
-			set_character_flag = achievement_become_exalted
-		}
-
-		set_character_flag = became_exalted
-	}
-
-	abort = {
-		OR = {
-			is_incapable = yes
-			is_playable = no
-			is_landed = no
-			trait = content
-			trait = humble
-			trait = shy
-
-			NOR = {
-				lower_real_tier_than = KING
-				trait = ambitious
-				trait = envious
-				trait = proud
-			}
-		}
-	}
-
 	chance = {
 		factor = 50
-
-		mult_modifier = {
+		
+		modifier = {
 			factor = 1.25
 			trait = patient
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 0.01
-			lower_real_tier_than = KING
+			NOR = { 
+				tier = king
+				tier = emperor
+			}
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 5.0
 			trait = ambitious
 		}
-
-		mult_modifier = {
+		modifier = {
 			factor = 10.0
 			trait = proud
+		}
+	}
+	success = {
+		prestige = 5000
+	}
+	abort = {
+		OR = {
+			trait = content
+			trait = humble
+			trait = shy
+			trait = incapable
+		}
+	}
+	abort_effect = {
+	}
+	effect = {
+		change_diplomacy = 1
+		prestige = 100
+		any_vassal = {
+			opinion = {
+				who = ROOT
+				modifier = opinion_exalted
+				years = 100
+			}
+		}
+		# Achievement
+		hidden_tooltip = {
+			if = {
+				limit = { ai = no }
+				set_character_flag = achievement_become_exalted
+			}
+			set_character_flag = became_exalted
 		}
 	}
 }
