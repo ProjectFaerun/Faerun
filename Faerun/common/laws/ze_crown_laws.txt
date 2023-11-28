@@ -3,6 +3,7 @@ law_groups = {
 		law_type = realm
 		allowed_for_councillors = yes
 	}
+
 	vassal_wars_law = {
 		law_type = realm
 		allowed_for_councillors = yes
@@ -10,19 +11,21 @@ law_groups = {
 }
 
 de_jure_laws = {
+	# Out of Realm Inheritance
 	out_of_realm_inheritance_law_0 = {
 		group = out_of_realm_inheritance_law
 		default = yes
 
 		potential = {
-			has_dlc = "Zeus"
+			has_dlc = "Conclave"
+
 			holder_scope = {
 				is_tribal = no
 				# is_nomadic = no
 				is_republic = no
-				NOT = { government = democratic_feudal_government }
-				NOT = {
-					government = order_government
+				NOR = { 
+					government = democratic_feudal_government
+					government = order_government 
 				}
 			}
 		}
@@ -31,67 +34,44 @@ de_jure_laws = {
 			has_law = out_of_realm_inheritance_law_1
 		}
 
-		revoke_allowed = {
-			always = no
+		pass_effect = {
+			# log = "out_of_realm_inheritance_law_0 pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			# log = "out_of_realm_inheritance_law_0 ([This.GetFullBaseName])"
+			set_protected_inheritance = no
+			revoke_law = out_of_realm_inheritance_law_1
 		}
 
 		ai_will_do = {
 			factor = 0
 		}
-
-		ai_will_revoke = {
-			factor = 0
-		}
-
-		effect = {
-			hidden_tooltip = {
-				revoke_law = out_of_realm_inheritance_law_1
-			}
-			set_protected_inheritance = no
-		}
 	}
+
 	out_of_realm_inheritance_law_1 = {
 		group = out_of_realm_inheritance_law
-		default = yes
 
 		potential = {
-			has_dlc = "Zeus"
-			holder_scope = {
-				is_tribal = no
-				# is_nomadic = no
-				is_republic = no
-				NOT = { government = democratic_feudal_government }
-				NOT = {
-					government = order_government
-				}
-			}
+			is_law_potential = out_of_realm_inheritance_law_0
 		}
 
 		allow = {
 			has_law = out_of_realm_inheritance_law_0
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
-				always = yes
-			}
-		}
-
-		ai_will_revoke = {
-			factor = 0
+		pass_effect = {
+			# log = "out_of_realm_inheritance_law_1 pass ([This.GetFullBaseName])"
 		}
 
 		effect = {
-			hidden_tooltip = {
-				revoke_law = out_of_realm_inheritance_law_0
-			}
+			# log = "out_of_realm_inheritance_law_1 ([This.GetFullBaseName])"
 			set_protected_inheritance = yes
+			revoke_law = out_of_realm_inheritance_law_0
+		}
+
+		ai_will_do = {
+			factor = 0.05
 		}
 	}
 
@@ -101,73 +81,61 @@ de_jure_laws = {
 		default = yes
 
 		potential = {
-			has_dlc = "Zeus"
+			has_dlc = "Conclave"
+
 			holder_scope = {
-				is_tribal = no
-				# is_nomadic = no
-				is_republic = no
-				is_theocracy = no
-				NOT = { government = democratic_feudal_government }
-				NOT = {
-					government = order_government
+				is_feudal = yes
+				NOR = { 
+					government = democratic_feudal_government
+					government = order_government 
 				}
 			}
 		}
 
 		allow = {
-			OR = {
-				has_law = vassal_wars_law_1
-				AND = {
-					NOT = {	has_law = vassal_wars_law_0 }
-					NOT = {	has_law = vassal_wars_law_1 }
-					NOT = {	has_law = vassal_wars_law_2 }
+			trigger_if = {
+				limit = {
+					OR = {
+						has_law = vassal_wars_law_0
+						has_law = vassal_wars_law_1
+						has_law = vassal_wars_law_2
+					}
 				}
+
+				has_law = vassal_wars_law_1
 			}
 		}
 
-		revoke_allowed = {
-			always = no
+		pass_effect = {
+			# log = "vassal_wars_law_0 pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			# log = "vassal_wars_law_0 ([This.GetFullBaseName])"
+			set_the_kings_peace = no
+			set_the_kings_full_peace = no
+			revoke_law = vassal_wars_law_1
+			revoke_law = vassal_wars_law_2
 		}
 
 		ai_will_do = {
 			factor = 0
 		}
-
-		ai_will_revoke = {
-			factor = 0
-		}
-
-		effect = {
-			hidden_tooltip = {
-				revoke_law = vassal_wars_law_1
-				revoke_law = vassal_wars_law_2
-			}
-			set_the_kings_peace = no
-			set_the_kings_full_peace = no
-		}
 	}
+
 	vassal_wars_law_1 = {
 		group = vassal_wars_law
 
-		potential = {
-			has_dlc = "Zeus"
-			holder_scope = {
-				is_tribal = no
-				# is_nomadic = no
-				is_republic = no
-				is_theocracy = no
-				NOR = {
-					government = order_government
-					government = democratic_feudal_government
-				}
-			}
-		}
+		feudal_opinion = -5
+
+		potential = { is_law_potential = vassal_wars_law_0 }
 
 		allow = {
 			OR = {
 				has_law = vassal_wars_law_0
 				has_law = vassal_wars_law_2
 			}
+
 			holder_scope = {
 				OR = {
 					primary_title = {
@@ -179,51 +147,33 @@ de_jure_laws = {
 			}
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
-				always = yes
-			}
-		}
-
-		ai_will_revoke = {
-			factor = 0
+		pass_effect = {
+			# log = "vassal_wars_law_1 pass ([This.GetFullBaseName])"
 		}
 
 		effect = {
-			hidden_tooltip = {
-				revoke_law = vassal_wars_law_0
-				revoke_law = vassal_wars_law_2
-			}
+			# log = "vassal_wars_law_1 ([This.GetFullBaseName])"
 			set_the_kings_peace = yes
 			set_the_kings_full_peace = no
+			revoke_law = vassal_wars_law_0
+			revoke_law = vassal_wars_law_2
 		}
-		feudal_opinion = -5
+
+		ai_will_do = {
+			factor = 0.05
+		}
 	}
+
 	vassal_wars_law_2 = {
 		group = vassal_wars_law
 
-		potential = {
-			has_dlc = "Zeus"
-			holder_scope = {
-				is_tribal = no
-				# is_nomadic = no
-				is_republic = no
-				is_theocracy = no
-				NOR = {
-					government = order_government
-					government = democratic_feudal_government
-				}
-			}
-		}
+		feudal_opinion = -10
+
+		potential = { is_law_potential = vassal_wars_law_0 }
 
 		allow = {
 			has_law = vassal_wars_law_1
+
 			holder_scope = {
 				OR = {
 					primary_title = {
@@ -235,30 +185,20 @@ de_jure_laws = {
 			}
 		}
 
-		revoke_allowed = {
-			always = no
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
-				always = yes
-			}
-		}
-
-		ai_will_revoke = {
-			factor = 0
+		pass_effect = {
+			# log = "vassal_wars_law_2 pass ([This.GetFullBaseName])"
 		}
 
 		effect = {
-			hidden_tooltip = {
-				revoke_law = vassal_wars_law_0
-				revoke_law = vassal_wars_law_1
-			}
+			# log = "vassal_wars_law_2 ([This.GetFullBaseName])"
 			set_the_kings_peace = yes
 			set_the_kings_full_peace = yes
+			revoke_law = vassal_wars_law_0
+			revoke_law = vassal_wars_law_1
 		}
-		feudal_opinion = -10
+
+		ai_will_do = {
+			factor = 0.05
+		}
 	}
 }
