@@ -63,84 +63,59 @@ laws = {
 		}
 
 		allow = {
-			has_law = law_voting_power_1
-			has_law = banish_voting_power_0
-			has_law = revoke_title_voting_power_0
-			has_law = grant_title_voting_power_0
-			has_law = imprison_voting_power_0
-			has_law = execution_voting_power_0
-			has_law = war_voting_power_0
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law = tribal_organization_4
-			}
-			NOT = { is_nomadic = yes }
-			NOT = { holder_scope = { government = nomadic_tribal_government } }
-			#holder_scope = { #we'll see about this one
-			#	NOR = {
-			#		religion = ten_thousand_gods
-			#		olrox_is_good_religion_trigger = yes
-			#	}
-			#}
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
-			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			disable_council_voting_on_issue = laws
-			custom_tooltip = {
-				text = council_off_custom
-			}
-			custom_tooltip = {
-				text = tooltip_disables_advisors
-			}
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = law_voting_power_1 
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { is_nomadic = yes }
+					is_nomadic = no
+				}
+				trigger_else = {
+					has_law = law_voting_power_1
+					has_law = banish_voting_power_0
+					has_law = revoke_title_voting_power_0
+					has_law = grant_title_voting_power_0
+					has_law = imprison_voting_power_0
+					has_law = execution_voting_power_0
+					has_law = war_voting_power_0
+
+					trigger_if = {
+						limit = { is_tribal = yes }
+						has_law = tribal_organization_4
 					}
 				}
-				revoke_law = law_voting_power_1
+				NOT = { government = nomadic_tribal_government }
+			}
+		}
+
+		pass_effect = {
+			# log = "law_voting_power_0 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = law_voting_power_1
+					is_primary_holder_title = yes
+				}
+
+				decreased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "law_voting_power_0 ([This.GetFullBaseName])"
+			disable_council_voting_on_issue = laws
+
+			custom_tooltip = {
+				text = council_off_custom
 				disable_council_voting_on_issue = enforce_peace
 			}
+
+			custom_tooltip = { text = tooltip_disables_advisors }
+			revoke_law = law_voting_power_1
+		}
+
+		ai_will_do = {
+			factor = 0.05
 		}
 	}
 
