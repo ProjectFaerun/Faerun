@@ -60,6 +60,7 @@ laws = {
 					has_law = tribal_organization_4
 				}
 			}
+			NOT = { holder_scope = { government = nomadic_tribal_government } }
 		}
 
 		allow = {
@@ -121,120 +122,99 @@ laws = {
 
 	law_voting_power_1 = {
 		group = law_voting_power
-		
+
+		potential = {
+			OR = {
+				is_law_potential = law_voting_power_0
+				holder_scope = { government = nomadic_tribal_government }
+			}
+		}
+
+		allow = {
+			has_law = law_voting_power_0
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_1
+					has_law = tribal_organization_2
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+				}
+			}
+
+			holder_scope = { government = nomadic_tribal_government }
+		}
+
+		pass_effect = {
+			# log = "law_voting_power_1 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = law_voting_power_0
+					is_primary_holder_title = yes
+				}
+
+				increased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "law_voting_power_1 ([This.GetFullBaseName])"
+			enable_council_voting_on_issue = laws
+
+			custom_tooltip = {
+				text = council_on_custom
+				enable_council_voting_on_issue = enforce_peace
+			}
+
+			custom_tooltip = { text = tooltip_enables_advisors }
+			revoke_law = law_voting_power_0
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+
 		default_selection = {
 			factor = 0
-			
-			additive_modifier = { 
-				value = 10			
-				year = 850
+
+			additive_modifier = {
+				value = 10
+
 				holder_scope = {
 					religion_group = good_human_pantheon_group
 					is_feudal = yes
-				}	
+				}
+
+				year >= 850
 			}
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_hre	
-			# }
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_byzantium	
-			# }
-			additive_modifier = { 
-				value = 10			
-				holder_scope = { 
+
+			#additive_modifier = {
+			#	value = 10
+			#
+			#	OR = {
+			#		title = e_hre
+			#		title = e_byzantium
+			#	}
+			#}
+
+			additive_modifier = {
+				value = 10
+
+				holder_scope = {
 					OR = {
-						is_nomadic = yes	
-						is_tribal = yes	
+						is_nomadic = yes
+						is_tribal = yes
 						is_republic = yes
 					}
 				}
 			}
 		}
-		
-		allow = {
-            OR = {
-                holder_scope = { government = nomadic_tribal_government }
-                AND = {
-                    has_law = law_voting_power_0
-                    OR = {
-                        NOT = { holder_scope = { is_tribal = yes } }
-                        has_law = tribal_organization_1
-                    }
-                }
-            }
-		}
-		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law = tribal_organization_1
-				has_law	= tribal_organization_2
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
-			}
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 0
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			enable_council_voting_on_issue = laws
-			custom_tooltip = {
-				text = council_on_custom
-			}
-			custom_tooltip = {
-				text = tooltip_enables_advisors
-			}
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = law_voting_power_0
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-					}
-				}
-				revoke_law = law_voting_power_0
-				enable_council_voting_on_issue = enforce_peace
-			}
-		}
 	}
 
-	#VOTE ON WAR
+	# VOTE ON WAR
 	war_voting_power_0 = {
 		group = war_voting_power
 		default = yes
