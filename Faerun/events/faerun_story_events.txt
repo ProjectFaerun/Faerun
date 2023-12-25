@@ -73,22 +73,7 @@ namespace = frstory
 		picture = GFX_evt_bhaalspawn
 
 		is_triggered_only = yes
-
-		trigger = { #All Bhaalspawn dead except one
-			trait = bhaalspawn
-			NOT = { trait = avatar }
-			NOT = { has_global_flag = avatar_bhaal }
-			NOT = { has_global_flag = refused_bhaal }
-			has_global_flag = bhaal_dead
-			NOT = {
-				bhaalspawn = {
-					#AND = {
-						is_alive = yes
-						NOT = { character = ROOT }
-					#}
-				}
-			}
-		}
+		has_global_flag = bhaal_dead
 
 		option = {
 			name = EVTOPTA_BHAALSPAWN2
@@ -96,7 +81,7 @@ namespace = frstory
 				factor = 1
 				modifier = {
 					factor = 0
-					character = 3
+					character = c_3 # Abdel Adrian
 				}
 			}
 			add_trait = avatar
@@ -216,8 +201,8 @@ namespace = frstory
 
 		picture = GFX_evt_bhaalspawn
 
-		ai = no
 		is_triggered_only = yes
+		has_global_flag = bhaal_dead
 
 		desc = {
 			trigger = { NOT = { has_global_flag = refused_bhaal } }
@@ -230,16 +215,10 @@ namespace = frstory
 
 		trigger = { #All Bhaalspawn dead
 			NOT = { has_global_flag = return_of_bhaal }
-			has_global_flag = bhaal_dead
 			NOT = { has_global_flag = CHARNAME_ascends }
 			OR = {
 				has_global_flag = avatar_bhaal
 				has_global_flag = refused_bhaal
-			}
-			NOT = {
-				bhaalspawn = {
-					is_alive = yes
-				}
 			}
 		}
 
@@ -255,6 +234,46 @@ namespace = frstory
 		}
 		after = {
 			set_global_flag = return_of_bhaal
+			clr_global_flag = bhaal_dead
+		}
+	}
+
+	character_event = { #Bhaalspawn dying
+		id = frstory.5
+		hide_window = yes
+
+		is_triggered_only = yes
+		has_global_flag = bhaal_dead
+
+		trigger = {
+			trait = bhaalspawn
+		}
+
+		immediate = {
+			subtract_variable = { 
+				which = global_bhaalspawn_count 
+				value = 1
+			}
+			log = "[Root.GetFullName] dies [global_bhaalspawn_count.GetValue] Bhaalspawn to go."
+			if = {
+				limit = {
+					is_variable_equal = { which = global_bhaalspawn_count value = 1 }
+				}
+				any_character = {
+					limit = {
+						trait = bhaalspawn
+						is_alive = yes
+						is_dying = no
+					}
+					character_event = { id = frstory.2 }
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { which = global_bhaalspawn_count value <= 0 }
+				}
+				narrative_event = { id = frstory.4 }
+			}
 		}
 	}
 
