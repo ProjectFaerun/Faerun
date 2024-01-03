@@ -184,7 +184,7 @@ laws = {
 				value = 10
 
 				holder_scope = {
-					religion = good_human_pantheon_group
+					religion_group = good_human_pantheon_group
 					is_feudal = yes
 				}
 
@@ -347,7 +347,7 @@ laws = {
 				value = 10
 
 				holder_scope = {
-					religion = good_human_pantheon_group
+					religion_group = good_human_pantheon_group
 					is_feudal = yes
 				}
 
@@ -490,7 +490,7 @@ laws = {
 				value = 10
 
 				holder_scope = {
-					religion = good_human_pantheon_group
+					religion_group = good_human_pantheon_group
 					is_feudal = yes
 				}
 
@@ -513,539 +513,427 @@ laws = {
 	revoke_title_voting_power_0 = {
 		group = revoke_title_voting_power
 		default = yes
-		
-		allow = {
-			has_law = revoke_title_voting_power_1
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law = tribal_organization_4
-			}
-			NOT = { is_nomadic = yes }
-			NOT = { holder_scope = { government = nomadic_tribal_government } }
-		}
+
 		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law = tribal_organization_2
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
+			has_dlc = "Conclave"
+			higher_real_tier_than = BARON
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_2
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = { government = nomadic_tribal_government }
+				}
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
+
+		allow = {
+			trigger_if = {
+				limit = { is_nomadic = yes }
+				is_nomadic = no
 			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = revoke_title_voting_power_1
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
+
+			trigger_else = {
+				has_law = revoke_title_voting_power_1
+
+				trigger_if = {
+					limit = { holder_scope = { is_tribal = yes } }
+					has_law = tribal_organization_4
 					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
+						show_scope_change = no
+						NOT = { government = nomadic_tribal_government }
 					}
 				}
-				revoke_law = revoke_title_voting_power_1
 			}
+		}
+
+		pass_effect = {
+			# log = "revoke_title_voting_power_0 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = revoke_title_voting_power_1
+					is_primary_holder_title = yes
+				}
+
+				decreased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "revoke_title_voting_power_0 ([This.GetFullBaseName])"
 			disable_council_voting_on_issue = revoke_title_interaction
+			revoke_law = revoke_title_voting_power_1
+		}
+
+		ai_will_do = {
+			factor = 0.05
 		}
 	}
 
 	revoke_title_voting_power_1 = {
 		group = revoke_title_voting_power
-		
+
+		vassal_limit = 2
+
+		potential = {
+			is_law_potential = revoke_title_voting_power_0
+		}
+
+		allow = {
+			has_law = law_voting_power_1
+			has_law = war_voting_power_1
+			has_law = revoke_title_voting_power_0
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_2
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = {
+						show_scope_change = no
+						government = nomadic_tribal_government
+					}
+				}
+			}
+		}
+
+		pass_effect = {
+			# log = "revoke_title_voting_power_1 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = revoke_title_voting_power_0
+					is_primary_holder_title = yes
+				}
+
+				increased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "revoke_title_voting_power_1 ([This.GetFullBaseName])"
+			enable_council_voting_on_issue = revoke_title_interaction
+			revoke_law = revoke_title_voting_power_0
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+
 		default_selection = {
 			factor = 0
-			
-			additive_modifier = { 
-				value = 10			
-				year = 1100
+
+			additive_modifier = {
+				value = 10
+
 				holder_scope = {
 					religion_group = good_human_pantheon_group
 					is_feudal = yes
-				}	
-			}
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_hre	
-			# }
-			additive_modifier = { 
-				value = 10			
-				OR = {
-					# holder_scope = { is_nomadic = yes }
-					holder_scope = { government = nomadic_tribal_government }	
 				}
+
+				year >= 1100
+			}
+
+			#additive_modifier = {
+			#	value = 10
+			#	title = e_hre
+			#}
+
+			additive_modifier = {
+				value = 10
+				holder_scope = { government = nomadic_tribal_government }	
 			}
 		}
-		
-		allow = {
-            OR = {
-                holder_scope = { government = nomadic_tribal_government }
-                AND = {
-                    has_law = law_voting_power_1
-                    has_law = war_voting_power_1
-                    has_law = revoke_title_voting_power_0
-                    OR = {
-                        NOT = { holder_scope = { is_tribal = yes } }
-                        has_law = tribal_organization_2
-                    }
-                }
-            }
-		}
-		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law	= tribal_organization_2
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
-			}
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 0
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = revoke_title_voting_power_0
-						#is_landed_title_being_created = no
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = { 
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-					}
-				}
-				revoke_law = revoke_title_voting_power_0
-			}
-			enable_council_voting_on_issue = revoke_title_interaction
-		}
-		vassal_limit = 2
 	}
 
-	#VOTE ON IMPRISON
+	# VOTE ON IMPRISON
 	imprison_voting_power_0 = {
 		group = imprison_voting_power
 		default = yes
-		
-		allow = {
-			has_law = imprison_voting_power_1
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law = tribal_organization_4
-			}
-			NOT = { is_nomadic = yes }
-			NOT = { holder_scope = { government = nomadic_tribal_government } }
-		}
+
 		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
+			has_dlc = "Conclave"
+			higher_real_tier_than = BARON
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = { government = nomadic_tribal_government }
+				}
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
+
+		allow = {
+			trigger_if = {
+				limit = { is_nomadic = yes }
+				is_nomadic = no
 			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = imprison_voting_power_1
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
+
+			trigger_else = {
+				has_law = imprison_voting_power_1
+
+				trigger_if = {
+					limit = { holder_scope = { is_tribal = yes } }
+					has_law = tribal_organization_4
 					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
+						show_scope_change = no
+						NOT = { government = nomadic_tribal_government }
 					}
 				}
-				revoke_law = imprison_voting_power_1
 			}
+		}
+
+		pass_effect = {
+			# log = "imprison_voting_power_0 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = imprison_voting_power_1
+					is_primary_holder_title = yes
+				}
+
+				decreased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "imprison_voting_power_0 ([This.GetFullBaseName])"
 			disable_council_voting_on_issue = imprison_character_interaction
+			revoke_law = imprison_voting_power_1
+		}
+
+		ai_will_do = {
+			factor = 0.05
 		}
 	}
 
 	imprison_voting_power_1 = {
 		group = imprison_voting_power
-		
+
+		vassal_limit = 2
+
+		potential = {
+			is_law_potential = imprison_voting_power_0
+		}
+
+		allow = {
+			has_law = law_voting_power_1
+			has_law = war_voting_power_1
+			has_law = imprison_voting_power_0
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = {
+						show_scope_change = no
+						government = nomadic_tribal_government
+					}
+				}
+			}
+		}
+
+		pass_effect = {
+			# log = "imprison_voting_power_1 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = imprison_voting_power_0
+					is_primary_holder_title = yes
+				}
+
+				increased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "imprison_voting_power_1 ([This.GetFullBaseName])"
+			enable_council_voting_on_issue = imprison_character_interaction
+			revoke_law = imprison_voting_power_0
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+
 		default_selection = {
 			factor = 0
-			
-			additive_modifier = { 
-				value = 10			
-				year = 1000
+
+			additive_modifier = {
+				value = 10
+
+
 				holder_scope = {
 					religion_group = good_human_pantheon_group
 					is_feudal = yes
-				}	
-			}
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_hre	
-			# }
-			additive_modifier = { 
-				value = 10			
-				OR = {
-					# holder_scope = { is_nomadic = yes }
-					holder_scope = { government = nomadic_tribal_government }	
 				}
+
+				year >= 1000
+			}
+
+			#additive_modifier = {
+			#	value = 10
+			#	title = e_hre
+			#}
+
+			additive_modifier = {
+				value = 10
+				holder_scope = { government = nomadic_tribal_government }	
 			}
 		}
-		
-		allow = {
-            OR = {
-                holder_scope = { government = nomadic_tribal_government }
-                AND = {
-                    has_law = law_voting_power_1
-                    has_law = war_voting_power_1
-                    has_law = imprison_voting_power_0
-                    OR = {
-                        NOT = { holder_scope = { is_tribal = yes } }
-                        has_law = tribal_organization_3
-                    }
-                }
-            }
-		}
-		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
-			}
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 0
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = imprison_voting_power_0
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-					}
-				}
-				revoke_law = imprison_voting_power_0
-			}
-			enable_council_voting_on_issue = imprison_character_interaction
-		}
-		vassal_limit = 2
 	}
 
-
-	#VOTE ON BANISH
+	# VOTE ON BANISH
 	banish_voting_power_0 = {
 		group = banish_voting_power
 		default = yes
-		
-		allow = {
-			has_law = banish_voting_power_1
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law = tribal_organization_4
-			}
-			NOT = { is_nomadic = yes }
-			NOT = { holder_scope = { government = nomadic_tribal_government } }
-		}
+
 		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
+			has_dlc = "Conclave"
+			higher_real_tier_than = BARON
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = { government = nomadic_tribal_government }
+				}
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
+
+		allow = {
+			trigger_if = {
+				limit = { is_nomadic = yes }
+				is_nomadic = no
 			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = banish_voting_power_1
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
+
+			trigger_else = {
+				has_law = banish_voting_power_1
+
+				trigger_if = {
+					limit = { holder_scope = { is_tribal = yes } }
+					has_law = tribal_organization_4
 					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
+						show_scope_change = no
+						NOT = { government = nomadic_tribal_government }
 					}
 				}
-				revoke_law = banish_voting_power_1
 			}
+		}
+
+		pass_effect = {
+			# log = "banish_voting_power_0 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = banish_voting_power_1
+					is_primary_holder_title = yes
+				}
+
+				decreased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "banish_voting_power_0 ([This.GetFullBaseName])"
 			disable_council_voting_on_issue = exile_imprisoned_interaction
+			revoke_law = banish_voting_power_1
+		}
+
+		ai_will_do = {
+			factor = 0.05
 		}
 	}
 
 	banish_voting_power_1 = {
 		group = banish_voting_power
 		default = yes
-		
-		default_selection = {
-			factor = 0
-			
-			additive_modifier = { 
-				value = 10			
-				year = 1300
-				holder_scope = {
-					religion_group = good_human_pantheon_group
-					is_feudal = yes
-				}	
-			}
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_hre	
-			# }
-			additive_modifier = { 
-				value = 10			
+
+		vassal_limit = 2
+
+		potential = {
+			is_law_potential = banish_voting_power_0
+		}
+
+		allow = {
+			has_law = law_voting_power_1
+			has_law = war_voting_power_1
+			has_law = banish_voting_power_0
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
 				OR = {
-					# holder_scope = { is_nomadic = yes }
-					holder_scope = { government = nomadic_tribal_government }	
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = {
+						show_scope_change = no
+						government = nomadic_tribal_government
+					}
 				}
 			}
 		}
-		
-		allow = {
-            OR = {
-                holder_scope = { government = nomadic_tribal_government }
-                AND = {
-                    has_law = law_voting_power_1
-                    has_law = war_voting_power_1
-                    has_law = banish_voting_power_0
-                    OR = {
-                        NOT = { holder_scope = { is_tribal = yes } }
-                        has_law = tribal_organization_3
-                    }
-                }
-            }
-		}
-		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
+
+		pass_effect = {
+			# log = "banish_voting_power_1 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = banish_voting_power_0
+					is_primary_holder_title = yes
+				}
+
+				increased_council_power_effect = yes
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}			
+
+		effect = {
+			# log = "banish_voting_power_1 ([This.GetFullBaseName])"
+			enable_council_voting_on_issue = exile_imprisoned_interaction
+			revoke_law = banish_voting_power_0
+		}
+
 		ai_will_do = {
 			factor = 0
 		}
-		ai_will_revoke = {
+
+		default_selection = {
 			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = banish_voting_power_0
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-					}
+
+			additive_modifier = {
+				value = 10
+
+				holder_scope = {
+					religion_group = good_human_pantheon_group
+					is_feudal = yes
 				}
-				revoke_law = banish_voting_power_0
+
+				year >= 1300
 			}
-			enable_council_voting_on_issue = exile_imprisoned_interaction
+
+			#additive_modifier = {
+			#	value = 10
+			#	title = e_hre
+			#}
+
+			additive_modifier = {
+				value = 10
+				holder_scope = { government = nomadic_tribal_government }	
+			}
 		}
-		vassal_limit = 2
 	}
 
 	# VOTE ON EXECUTE
@@ -1056,176 +944,137 @@ laws = {
 		potential = {
 			has_dlc = "Conclave"
 			higher_real_tier_than = BARON
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
-			}
-		}
-		allow = {
-			has_law = execution_voting_power_1
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				has_law = tribal_organization_4
-			}
-			NOT = { is_nomadic = yes }
-			NOT = { holder_scope = { government = nomadic_tribal_government } }
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05
-			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = execution_voting_power_1
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_decreased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_decreased_council_power
-								years = 5
-							}
-						}
-					}
-				}
-				revoke_law = execution_voting_power_1
-			}
-			disable_council_voting_on_issue = execute_imprisoned_interaction
-		}
-	}
-	
-	execution_voting_power_1 = {
-		group = execution_voting_power
 
-		default = yes
-		
-		default_selection = {
-			factor = 0
-			
-			additive_modifier = { 
-				value = 10			
-				year = 1200
-				holder_scope = {
-					religion_group = good_human_pantheon_group
-					is_feudal = yes
-				}	
-			}
-			# additive_modifier = { 
-				# value = 10			
-				# title = e_hre	
-			# }
-			additive_modifier = { 
-				value = 10			
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
 				OR = {
-					# holder_scope = { is_nomadic = yes }	
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
 					holder_scope = { government = nomadic_tribal_government }
 				}
 			}
 		}
-		
+
 		allow = {
-            OR = {
-                holder_scope = { government = nomadic_tribal_government }
-                AND = {
-                    has_law = law_voting_power_1
-                    has_law = war_voting_power_1
-                    has_law = execution_voting_power_0
-                    OR = {
-                        NOT = { holder_scope = { is_tribal = yes } }
-                        has_law = tribal_organization_3
-                    }
-                }
+			trigger_if = {
+				limit = { is_nomadic = yes }
+				is_nomadic = no
+			}
+
+			trigger_else = {
+				has_law = execution_voting_power_1
+
+				trigger_if = {
+					limit = { holder_scope = { is_tribal = yes } }
+					has_law = tribal_organization_4
+					holder_scope = {
+						show_scope_change = no
+						NOT = { government = nomadic_tribal_government }
+					}
+				}
 			}
 		}
+
+		pass_effect = {
+			# log = "execution_voting_power_0 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = execution_voting_power_1
+					is_primary_holder_title = yes
+				}
+
+				decreased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "execution_voting_power_0 ([This.GetFullBaseName])"
+			disable_council_voting_on_issue = execute_imprisoned_interaction
+			revoke_law = execution_voting_power_1
+		}
+
+		ai_will_do = {
+			factor = 0.05
+		}
+	}
+
+	execution_voting_power_1 = {
+		group = execution_voting_power
+
+		vassal_limit = 2
+
 		potential = {
-			has_dlc = "Zeus"
-			higher_tier_than = baron
-			OR = {
-				NOT = { holder_scope = { is_tribal = yes } }
-				holder_scope = { government = nomadic_tribal_government }
-				has_law	= tribal_organization_3
-				has_law = tribal_organization_4
+			is_law_potential = execution_voting_power_0
+		}
+
+		allow = {
+			has_law = law_voting_power_1
+			has_law = war_voting_power_1
+			has_law = execution_voting_power_0
+
+			trigger_if = {
+				limit = { holder_scope = { is_tribal = yes } }
+
+				OR = {
+					has_law = tribal_organization_3
+					has_law = tribal_organization_4
+					holder_scope = {
+						show_scope_change = no
+						government = nomadic_tribal_government
+					}
+				}
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}			
+
+		pass_effect = {
+			# log = "execution_voting_power_1 pass ([This.GetFullBaseName])"
+
+			if = {
+				limit = {
+					has_law = execution_voting_power_0
+					is_primary_holder_title = yes
+				}
+
+				increased_council_power_effect = yes
+			}
+		}
+
+		effect = {
+			# log = "execution_voting_power_1 ([This.GetFullBaseName])"
+			enable_council_voting_on_issue = execute_imprisoned_interaction
+			revoke_law = execution_voting_power_0
+		}
+
 		ai_will_do = {
 			factor = 0
 		}
-		ai_will_revoke = {
+
+		default_selection = {
 			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				if = {
-					limit = { 
-						has_law = execution_voting_power_0
-						holder_scope = {
-							primary_title = {
-								title = PREVPREV
-							}
-							NOT = { government = nomadic_tribal_government }
-						}
-					}
-					holder_scope = {
-						any_vassal = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-						any_courtier = {
-							limit = {
-								NOT = { has_opinion_modifier = { who = ROOT modifier = opinion_increased_council_power } }
-							}
-							opinion = {
-								who = ROOT
-								modifier = opinion_increased_council_power
-								years = 5
-							}
-						}
-					}
+
+			additive_modifier = {
+				value = 10
+
+				holder_scope = {
+					religion_group = good_human_pantheon_group
+					is_feudal = yes
 				}
-				revoke_law = execution_voting_power_0
+
+				year >= 1200
 			}
-			enable_council_voting_on_issue = execute_imprisoned_interaction
+
+			#additive_modifier = {
+			#	value = 10
+			#	title = e_hre
+			#}
+
+			additive_modifier = {
+				value = 10
+				holder_scope = { government = nomadic_tribal_government }	
+			}
 		}
-		vassal_limit = 2
 	}
 
 	# VOTE ON SUCCESSION
