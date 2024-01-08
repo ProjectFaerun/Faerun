@@ -18,7 +18,6 @@ character_event = {
 
 	immediate = {
 		# Fix noculture generated characters.
-
 		if = {
 			limit= {
 				NOT = { gfx_culture_scope = { always = yes } }
@@ -27,6 +26,7 @@ character_event = {
 			set_graphical_culture = ROOT
 		}
 
+		# Local courts.
 		if = {
 			limit = {
 				OR = {
@@ -34,11 +34,15 @@ character_event = {
 					lower_tier_than = count
 				}
 				liege = {
+					is_landed = yes
 					OR = {
 						has_character_flag = local_court
 						trait = creature_dragon
 						trait = creature_sarrukh
 						trait = creature_elder_brain
+						trait = creature_angel
+						trait = creature_fiend
+						trait = creature_genie
 						AND = {
 							trait = creature_construct
 							NOT = {
@@ -56,14 +60,27 @@ character_event = {
 					has_character_flag = shou_lung_generated
 				}
 			}
-			capital_scope = {
-				ROOT = {
-					log = "[Root.GetFullName] becomes local court."
-					culture = PREV
-					set_graphical_culture = PREV
-					if = {
-						limit = { is_ruler = no }
-						religion = PREV
+			random = {
+				chance = 40
+				mult_modifier = {
+					factor = 3
+					liege = {
+						NOR = {
+							trait = creature_angel
+							trait = creature_fiend
+							trait = creature_genie
+						}
+					}
+				}
+
+				capital_scope = {
+					ROOT = {
+						culture = PREV
+						set_graphical_culture = PREV
+						if = {
+							limit = { is_ruler = no }
+							religion = PREV
+						}
 					}
 				}
 			}
@@ -1024,29 +1041,88 @@ character_event = {
 			# celestial group
 			
 			angelgfx 		= { # Angels (solars, devas)
-				add_trait = creature_angel
+				random_list = {
+					1 = {
+						add_trait = creature_angel
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_aasimar = yes
+					}
+				}
 			}
 			houndgfx 		= { # Archons (hound archons)
-				add_trait = creature_angel
-				if = {
-					limit = { allow_changing_race = yes }
-					random_list = {
-						75 = {}
-						20 = { set_graphical_culture = angel } # Trumpet and Sword archons
-						5 = { set_graphical_culture = warden_archon } #Warden archons
+				random_list = {
+					1 = {
+						add_trait = creature_angel
+						if = {
+							limit = { allow_changing_race = yes }
+							random_list = {
+								75 = {}
+								20 = { set_graphical_culture = angel } # Trumpet and Sword archons
+								5 = { set_graphical_culture = warden_archon } #Warden archons
+							}
+						}
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_aasimar = yes
 					}
 				}
 			}
 			asuragfx 		= { # Asuras
-				add_trait = creature_angel
+				random_list = {
+					1 = {
+						add_trait = creature_angel
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_aasimar = yes
+					}
+				}
 			}
 			celestialeladringfx = { # Celestial Eladrin
-				add_trait = creature_angel
+				random_list = {
+					1 = {
+						add_trait = creature_angel
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_aasimar = yes
+					}
+				}
 			}
 			einheriargfx 	= { # Einheriar
 				if = {
 					limit = { culture_group = celestial_group }
-					add_trait = creature_angel
+					random_list = {
+						1 = {
+							add_trait = creature_angel
+						}
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							add_trait = creature_aasimar
+							add_character_modifier = {
+								name = einheriar_aasimar
+								duration = -1
+							}
+						}
+					}
 				}
 				else = {
 					add_trait = creature_aasimar
@@ -1059,7 +1135,22 @@ character_event = {
 			moonmaidengfx 	= { # Moonmaidens
 				if = {
 					limit = { culture_group = celestial_group }
-					add_trait = creature_angel
+					random_list = {
+						1 = {
+							add_trait = creature_angel
+						}
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							add_trait = creature_aasimar
+							add_character_modifier = {
+								name = moonmaiden_aasimar
+								duration = -1
+							}
+						}
+					}
 				}
 				else = {
 					add_trait = creature_aasimar
@@ -1118,10 +1209,21 @@ character_event = {
 			beargfx = { # Ursinals (guardinals) - this is the default guardinal
 				if = {
 					limit = { culture_group = celestial_group }
-					add_trait = creature_angel
-					if = {
-						limit = { allow_changing_race = yes }
-						spawn_random_guardinal = yes
+					random_list = {
+						1 = {
+							add_trait = creature_angel
+							if = {
+								limit = { allow_changing_race = yes }
+								spawn_random_guardinal = yes
+							}
+						}
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							spawn_random_aasimar = yes
+						}
 					}
 				}
 				else_if = {
@@ -1140,6 +1242,10 @@ character_event = {
 				if = {
 					limit = { culture_group = celestial_group }
 					add_trait = creature_angel
+				}
+				else_if = {
+					limit = { culture_group = fey_group }
+					add_trait = creature_hengeyokai
 				}
 				else = {
 					add_trait = creature_aasimar
@@ -1160,13 +1266,24 @@ character_event = {
 			# fiendish group
 
 			khorneprincegfx = { # Pit fiends (baatezu) - this is the default baatezu
-				add_trait = creature_fiend
-				if = {
-					limit = { allow_changing_race = yes }
-					spawn_random_baatezu = yes
-				}
-				else = {
-					add_trait = greater_fiend
+				random_list = {
+					1 = {
+						add_trait = creature_fiend
+						if = {
+							limit = { allow_changing_race = yes }
+							spawn_random_baatezu = yes
+						}
+						else = {
+							add_trait = greater_fiend
+						}
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_tiefling = yes
+					}
 				}
 			}
 			bloodlettergfx 	= { # Cornugons (baatezu)
@@ -1192,10 +1309,21 @@ character_event = {
 				add_trait = creature_fiend
 			}
 			tzeentchprincegfx = { # Vrocks (tanar'ri)- this is the default tanar'ri 
-				add_trait = creature_fiend
-				if = {
-					limit = { allow_changing_race = yes }
-					spawn_random_tanarri = yes
+				random_list = {
+					1 = {
+						add_trait = creature_fiend
+						if = {
+							limit = { allow_changing_race = yes }
+							spawn_random_tanarri = yes
+						}
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_tiefling = yes
+					}
 				}
 			}
 			daemonettegfx 	= { # Succubi and incubi (tanar'ri)
@@ -1220,10 +1348,21 @@ character_event = {
 				}
 			}
 			nycalothgfx		= { # Nycaloths (yugoloths) - this is the default yugoloth
-				add_trait = creature_fiend
-				if = {
-					limit = { allow_changing_race = yes }
-					spawn_random_yugoloth = yes
+				random_list = {
+					1 = {
+						add_trait = creature_fiend
+						if = {
+							limit = { allow_changing_race = yes }
+							spawn_random_yugoloth = yes
+						}
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_tiefling = yes
+					}
 				}
 			}
 			ultrolothgfx	= { # Ultroloths (yugoloths)
@@ -1233,10 +1372,32 @@ character_event = {
 				add_trait = creature_fiend
 			}
 			rakshasagfx		= { # Rakshasas
-				add_trait = creature_fiend
+				random_list = {
+					1 = {
+						add_trait = creature_fiend
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_tiefling = yes
+					}
+				}
 			}
 			marrashgfx	 	= { # Marrashi
-				add_trait = creature_fiend
+				random_list = {
+					1 = {
+						add_trait = creature_fiend
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_tiefling = yes
+					}
+				}
 			}
 			
 			# gith group
@@ -1395,19 +1556,74 @@ character_event = {
 			# genie group
 
 			nomadgfx 		= { # Jann
-				add_trait = creature_genie
+				random_list = {
+					1 = {
+						add_trait = creature_genie
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_genasi = yes
+					}
+				}
 			}
 			earthgeniegfx	= { # Dao
-				add_trait = creature_genie
+				random_list = {
+					1 = {
+						add_trait = creature_genie
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_genasi = yes
+					}
+				}
 			}
 			airgeniegfx		= { # Djinn
-				add_trait = creature_genie
+				random_list = {
+					1 = {
+						add_trait = creature_genie
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_genasi = yes
+					}
+				}
 			}
 			firegeniegfx	= { # Efreet
-				add_trait = creature_genie
+				random_list = {
+					1 = {
+						add_trait = creature_genie
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_genasi = yes
+					}
+				}
 			}
 			watergeniegfx	= { # Marid
-				add_trait = creature_genie
+				random_list = {
+					1 = {
+						add_trait = creature_genie
+					}
+					1 = {
+						trigger = {
+							allow_changing_race = yes
+							liege = { is_landed = yes }
+						}
+						spawn_random_genasi = yes
+					}
+				}
 			}
 
 			# outworlder group all use vanilla human portraits
@@ -1610,7 +1826,6 @@ character_event = {
 											}
 										}
 										40 = {
-											set_graphical_culture = tiefling
 											spawn_random_tiefling = yes
 										}
 										5 = {
@@ -2084,7 +2299,6 @@ character_event = {
 											}
 										}
 										20 = {
-											set_graphical_culture = tiefling
 											spawn_random_tiefling = yes
 										}
 										14 = {
@@ -2207,7 +2421,6 @@ character_event = {
 									}
 									random_list = {
 										20 = {
-											set_graphical_culture = tiefling
 											spawn_random_tiefling = yes
 										}
 										20 = {
@@ -3448,7 +3661,6 @@ character_event = {
 											}
 										}
 										44 = {
-											set_graphical_culture = tiefling
 											spawn_random_tiefling = yes
 										}
 										1 = {
@@ -3965,7 +4177,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 								1 = {
@@ -4796,7 +5007,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 								1 = {
@@ -4835,7 +5045,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 							}
@@ -5109,7 +5318,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 							}
@@ -5129,7 +5337,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 							}
@@ -6764,7 +6971,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 								1 = {
@@ -7020,7 +7226,6 @@ character_event = {
 									trigger = {
 										is_patrician = no
 									}
-									set_graphical_culture = tiefling
 									spawn_random_tiefling = yes
 								}
 								2 = {
@@ -7066,7 +7271,6 @@ character_event = {
 										trigger = {
 											is_patrician = no
 										}
-										set_graphical_culture = tiefling
 										spawn_random_tiefling = yes
 									}
 								}
