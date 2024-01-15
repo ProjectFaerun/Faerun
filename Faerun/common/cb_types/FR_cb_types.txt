@@ -6552,7 +6552,12 @@ barbarian_adventure = {
 	}
 
 	can_use_title = {
-#		higher_tier_than = COUNT
+		FROM = {
+			OR = {
+				higher_tier_than = ROOT
+				tier = ROOT
+			}
+		}
 		# ROOT = {
 			# any_landed_title = {
 				# any_de_jure_liege_title = {
@@ -6562,7 +6567,6 @@ barbarian_adventure = {
 				# }
 			# }
 		# }
-		always = yes # Temporary, while we work out a more efficient replacement
 	}
 
 	is_valid_title = {
@@ -6681,15 +6685,36 @@ barbarian_adventure = {
 					ROOT = { # and the titles under those duchies
 						random_courtier = {
 							limit = {
-								NOT = { dynasty = ROOT }
+								NOR = {
+									dynasty = ROOT
+									character = FROM
+								}
 							}
+							preferred_limit = {
+								PREV = {
+									capital_scope = {
+										culture = PREVPREV
+									}
+								}
+							}
+							save_event_target_as = new_duke
 							grant_title_no_opinion = PREVPREV
 							PREVPREV = { # the title
+								capital_scope = {
+									if = {
+										limit = {
+											holder = ROOT
+										}
+										event_target:new_duke = {
+											grant_title_no_opinion = PREV
+										}
+									}
+								}
 								any_de_jure_vassal_title = {
 									limit = {
 										holder = ROOT
 									}
-									PREVPREV = { # back to the random courtier
+									event_target:new_duke = { # back to the random courtier
 										grant_title_no_opinion = PREV
 									}
 								}
@@ -6698,7 +6723,7 @@ barbarian_adventure = {
 										NOT = { holder = ROOT }
 										owner = { vassal_of = ROOT }
 									}
-									set_defacto_liege = PREVPREV # the random courtier
+									set_defacto_liege = event_target:new_duke # the random courtier
 								}
 							}
 						}
@@ -6708,8 +6733,14 @@ barbarian_adventure = {
 					ROOT = {
 						random_realm_character = {
 							limit = {
-								NOT = { dynasty = ROOT }
+								NOR = {
+									dynasty = ROOT 
+									character = FROM
+								}
 								is_landed = no
+							}
+							preferred_limit = {
+								culture = PREVPREV
 							}
 							grant_title_no_opinion = PREVPREV
 						}
