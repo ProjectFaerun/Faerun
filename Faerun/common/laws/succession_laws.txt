@@ -9,16 +9,13 @@ succession_laws = {
 
 		potential = {
 			OR = {
-				holder_scope = { is_feudal = yes }
-				holder_scope = { is_tribal = yes }
-			}
-			OR = {
 				is_landless_type_title = no
 				is_tribal_type_title = yes
 				temporary = yes
 			}
 
 			rebel = no
+			NOT = { has_law = succ_byzantine_elective }
 
 			NOR = {
 				holder_scope = { government = muslim_government }
@@ -27,6 +24,13 @@ succession_laws = {
 				holder_scope = { government = nomadic_tribal_government }
 			}
 			holder_scope = {
+				OR = {
+					is_feudal = yes
+					is_tribal = yes
+				}
+
+				is_vice_royalty = no
+
 				NAND = {
 					tier = BARON
 					government = democratic_feudal_government
@@ -2261,22 +2265,20 @@ succession_laws = {
 	succ_appointment = {
 		potential = {
 			holder_scope = {
-				is_feudal = yes
-				independent = no
-				any_liege = {
-					holy_order = yes
-				}
-				is_merchant_republic = no
+				government = order_government
+				holy_order = no
 			}
-			NOT = { holder_scope = { government = confucian_bureaucracy } }
-			NOT = { holder_scope = { government = chinese_imperial_government } }
-			NOT = { holder_scope = { government = magocratic_feudal_government } }
 		}
+
+		allow = {}
+
+		pass_effect = {
+			# log = "succ_appointment pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			# log = "succ_appointment ([This.GetFullBaseName])"
 			succession = appointment
-		}
-		revoke_allowed = {
-			always = no
 		}
 	}
 
@@ -2285,93 +2287,68 @@ succession_laws = {
 			temporary = no
 			NOT = { has_law = succ_byzantine_elective }
 
-			holder_scope = {
-				NOT = {
-					AND = {
-						OR = {
-							religion = ubtao_worship
-							religion = giant_pantheon
-							religion = mulhorandi_faith
-							religion = padhran
-						}
-						controls_religion = yes
-					}
-				}
-			}
 			OR = {
 				is_primary_type_title = yes
 				holy_order = yes
-				holder_scope = {
-					AND = {
-						tier = BARON
-						OR = {
-							is_republic = yes
-							holder_scope = { government = democratic_feudal_government }
-							holder_scope = { government = theocracy_government }
-							holder_scope = { government = baron_theocracy_government }
-							holder_scope = { government = republic_government }
-							AND = {
-								is_theocracy = yes
-								NOT = { holder_scope = { religion = muhjari } }
-								NOT = { holder_scope = { religion = pantheist_league } }
-								NOT = { holder_scope = { religion = qisma } }
-								NOT = { holder_scope = { religion = ten_thousand_gods } }
-							}
-						}
-					}
-				}
+
 				holder_scope = {
 					OR = {
 						is_republic = yes
-						AND = {
-							is_theocracy = yes
-							NOT = { religion = muhjari }
-							NOT = { religion = pantheist_league }
-							NOT = { religion = qisma }
-							NOT = { religion = ten_thousand_gods }
-						}
+						is_theocracy = yes
 					}
 				}
 			}
+
 			holder_scope = {
-				is_patrician = no
-				is_merchant_republic = no
-				OR = {
-					independent = yes
-					is_feudal = no
-					AND = {
-						controls_religion = yes
-						OR= {
-							has_religion_feature = religion_autocephaly
-							has_religion_feature = religion_theocratic_head
-						}
-					}
-					NOT = {
-						any_liege = {
-							holy_order = yes
-						}
+				trigger_if = {
+					limit = { is_offmap_governor = yes }
+
+					# Use Offmap succession instead
+					ROOT = {
+						NOT = { is_law_potential = succ_offmap_succession }
 					}
 				}
-			}
-			NAND = {
-				has_law = succession_voting_power_1
-				OR = {
-					has_law = succ_feudal_elective
-					has_law = succ_hre_elective
+
+				#trigger_if = {
+				#	limit = { is_theocracy = yes }
+				#
+				#	# Use Investiture and Papal succession instead
+				#	ROOT = {
+				#		NOR = {
+				#			is_law_potential = succ_papal_succession
+				#			is_law_potential = succ_catholic_bishopric
+				#		}
+				#	}
+				#}
+				trigger_else_if = {
+					limit = { is_republic = yes }
+					is_patrician = no
 				}
 			}
-			NOT = { holder_scope = { government = confucian_bureaucracy } }
-			NOT = { holder_scope = { government = chinese_imperial_government } }
-			NOT = { holder_scope = { government = magocratic_feudal_government } }
+
+			trigger_if = {
+				limit = { controls_religion = yes }
+
+				OR = {
+					religion_group = qismaite_group
+					religion = mulhorandi_faith
+					has_religion_feature = religion_temporal_head
+				}
+			}
+		}
+
+		allow = {}
+
+		pass_effect = {
+			# log = "succ_open_elective pass ([This.GetFullBaseName])"
 		}
 
 		effect = {
+			# log = "succ_open_elective ([This.GetFullBaseName])"
 			succession = open_elective
 		}
-		revoke_allowed = {
-			always = no
-		}
 	}
+
 	succ_catholic_bishopric = {
 		potential = {
 			is_landless_type_title = no
