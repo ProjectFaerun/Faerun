@@ -8,21 +8,23 @@ succession_laws = {
 		vassal_opinion = 5
 
 		potential = {
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-
 			rebel = no
 			NOT = { has_law = succ_byzantine_elective }
 
-			NOR = {
-				holder_scope = { government = muslim_government }
-				holder_scope = { government = magocratic_feudal_government }
-				holder_scope = { government = confucian_bureaucracy }
-				holder_scope = { government = nomadic_tribal_government }
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				OR = {
 					is_feudal = yes
@@ -36,7 +38,11 @@ succession_laws = {
 					government = democratic_feudal_government
 				}
 				NOR = {
-					#government = magocratic_feudal_government
+					government = muslim_government
+					government = magocratic_feudal_government
+					government = confucian_bureaucracy
+					government = order_government
+					government = nomadic_tribal_government
 					#trying to preserve some successions somewhat
 					AND = {
 						has_law = succ_magic_elective
@@ -95,7 +101,30 @@ succession_laws = {
 				}
 			}
 		}
+
 		allow = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
+
+					OR = {
+						has_law = succ_feudal_elective
+						has_law = succ_hre_elective
+					}
+				}
+
+				has_law = succession_voting_power_0
+			}
+			trigger_else_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = crown_authority_4
+			}
+			trigger_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = centralization_4
+			}
+
 			holder_scope = {
 				show_scope_change = no
 
@@ -146,40 +175,60 @@ succession_laws = {
 			succession = gavelkind
 		}
 	}
+
 	succ_nomadic_elective = {
 		oldest_child_opinion = -15
 		child_opinion = -5
 		dynasty_opinion = -5
+
 		potential = {
+			rebel = no
+			NOT = { is_law_potential = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				government = nomadic_tribal_government
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
 		}
+
 		allow = {
-			custom_tooltip = {
-				text = not_forced_tt
-				hidden_tooltip = {
-					holder_scope = { NOT = { has_character_flag = liege_forced_succ_law } }
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
 				}
 			}
-			holder_scope = {
-				in_revolt = no
-			}
-
 		}
+
 		effect = {
 			succession = {
 				base_type = feudal_elective
 				voting_rules = nomadic_elective
 			}
-		}
-		revoke_allowed = {
-			always = no
 		}
 	}
 
@@ -221,6 +270,32 @@ succession_laws = {
 				temporary = yes
 			}
 		}
+		# allow = {
+			# holder_scope = {
+				# OR = {
+					# z_wizard = yes
+					# z_sorcerer = yes
+					# z_warlock = yes
+					# z_bard = yes
+				# }
+
+				# show_scope_change = no
+
+				# trigger_if = {
+					# limit = { in_revolt = yes }
+					# in_revolt = no
+				# }
+
+				# trigger_if = {
+					# limit = { independent = no }
+
+					# custom_tooltip = {
+						# text = not_forced_tt
+						# NOT = { has_character_flag = liege_forced_succ_law }
+					# }
+				# }
+			# }
+		# }
 		allow = {
 			custom_tooltip = {
 				text = not_forced_tt
@@ -243,9 +318,6 @@ succession_laws = {
 				base_type = feudal_elective
 				voting_rules = magic_elective #Defined in common/01_succession_voting_specials.txt
 			}
-		}
-		revoke_allowed = {
-			always = no
 		}
 	}
 
