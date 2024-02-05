@@ -175,7 +175,7 @@ succession_laws = {
 			succession = gavelkind
 		}
 	}
-	
+
 	succ_elective_gavelkind = {
 		child_opinion = 15
 		dynasty_opinion = 5
@@ -330,141 +330,135 @@ succession_laws = {
 			}
 		}
 	}
-	
+
 	succ_eldership = {
 		dynasty_opinion = 5
 
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			has_dlc = "Holy Fury"
+			rebel = no
+			NOT = { has_law = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
+				OR = {
+					is_feudal = yes
+					is_tribal = yes
+				}
+
+				OR = {
+					trigger_if = {
+						limit = { is_tribal = yes }
+
+						OR = {
+							culture = bedine
+							culture = pazruki
+							culture = wuhaltai
+							culture = uthgardt
+							culture = angulutiun
+							culture = iulutiun
+							culture = saurial
+							culture = nar
+							culture = korpokkur
+							culture = tabaxi
+							culture = rakasta
+							culture = aslanlar
+							religion = ubtao_worship
+							is_ancestor_worship_religion = yes
+						}
+					}
+
+					has_religion_feature = religion_beatification
+					has_religion_feature = religion_feature_yuir
+					has_religion_feature = religion_feature_nogari
+				}
+
+				is_vice_royalty = no
+
 				NOR = {
+					is_muslim_trigger = yes
 					government = magocratic_feudal_government
 					government = democratic_feudal_government
 					government = theocracy_government
 					government = baron_theocracy_government
 					government = nomadic_tribal_government
-				}
-				OR = {
-					culture = bedine
-					culture = pazruki
-					culture = wuhaltai
-					culture = uthgardt
-					culture = angulutiun
-					culture = iulutiun
-					culture = saurial
-					culture = nar
-					culture = korpokkur
-					culture = tabaxi
-					AND = {
-						culture = arnadar
-						government = tribal_government
-					}
-					religion = ubtao_worship
-					is_ancestor_worship_religion = yes
-					has_religion_feature = religion_beatification
-					has_religion_feature = religion_feature_yuir
-					has_religion_feature = religion_feature_nogari
-				}
-			}
-			holder_scope = {
-				has_dlc = "Holy Fury"
-				# is_nomadic = no
-				OR = {
-					independent = yes
-					NOT = {
-						any_liege = {
-							holy_order = yes
-						}
-					}
-				}
-				NOR = {
-					is_muslim_trigger = yes
+					government = chinese_imperial_government
+					government = confucian_bureaucracy
+					government = order_government
 					has_religion_feature = religion_matriarchal
 					has_religion_feature = religion_patriarchal
 				}
-				is_merchant_republic = no
-				is_patrician = no
-				OR = {
-					independent = yes
-					NOT = {
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
-					}
-				}
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-
-			rebel = no
-
-			OR = {
-				holder_scope = { is_feudal = yes }
-				holder_scope = { is_tribal = yes }
-			}
-			#is_primary_type_title = no #this broke succession for some reason
-			NOT = { holder_scope = { government = confucian_bureaucracy } }
-			NOT = { holder_scope = { government = chinese_imperial_government } }
 		}
+
 		allow = {
-			conditional_tooltip = {
-				trigger = {
-					has_dlc = "Holy Fury"
-				}
-				holder_scope = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
 					OR = {
-						culture = bedine
-						culture = pazruki
-						culture = wuhaltai
-						culture = uthgardt
-						culture = angulutiun
-						culture = iulutiun
-						culture = saurial
-						culture = nar
-						culture = korpokkur
-						culture = tabaxi
-						AND = {
-							culture = arnadar
-							government = tribal_government
-						}
-						religion = ubtao_worship
-						is_ancestor_worship_religion = yes
-						has_religion_feature = religion_beatification
-						has_religion_feature = religion_feature_yuir
-						has_religion_feature = religion_feature_nogari
+						has_law = succ_feudal_elective
+						has_law = succ_hre_elective
 					}
 				}
-				custom_tooltip = {
-					text = forced_elective_tt
-					hidden_tooltip = {
-						NAND = {
-							has_law = succession_voting_power_1
-							OR = {
-								has_law = succ_feudal_elective
-								has_law = succ_hre_elective
-							}
-						}
-					}
-				}
+
+				has_law = succession_voting_power_0
 			}
+			trigger_else_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = crown_authority_4
+			}
+			trigger_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = centralization_4
+			}
+
 			holder_scope = {
 				show_scope_change = no
-				in_revolt = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
 			}
 		}
+
+		pass_effect = {
+			# log = "succ_eldership pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			# log = "succ_eldership ([This.GetFullBaseName])"
+
 			succession = {
 				base_type = tanistry
 				voting_rules = eldership_rules
 			}
 		}
 	}
-	
+
 	succ_seniority = {
 		vassal_opinion = -5
 		oldest_child_opinion = -15
@@ -472,9 +466,22 @@ succession_laws = {
 		dynasty_opinion = 5
 
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			NOT = { has_law = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				NAND = {
 					tier = BARON
@@ -539,166 +546,110 @@ succession_laws = {
 					government = baron_theocracy_government
 					government = nomadic_tribal_government
 				}
-				OR = {
-					independent = yes
-					NOT = {
-						any_liege = {
-							holy_order = yes
-						}
-					}
-				}
-				OR = {
-					is_merchant_republic = no
-					primary_title = {
-						NOT = { title = PREVPREV }
-					}
-				}
 
-				OR = {
+				trigger_if = {
+					limit = { is_merchant_republic = yes }
+					PREV = { is_primary_holder_title = no }
+				}
+				trigger_else_if = {
+					limit = { is_patrician = no }
+
+					is_feudal = yes
+
 					NOR = {
 						is_muslim_trigger = yes
-						NOR = {
-							has_religion_feature = religion_matriarchal
-							has_religion_feature = religion_patriarchal
-						}
 						religion_group = karaturan_group
 					}
-					is_patrician = yes
 				}
 
-				OR = {
-					NOT = { religion_group = humanoid_group }
-					is_reformed_religion = yes
-					is_patrician = yes
-				}
+				trigger_if = {
+					limit = { religion_group = humanoid_group }
 
-				OR = {
-					is_republic = no
-					is_patrician = yes
-				}
-				OR = {
-					independent = yes
-					NOT = {
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
+					OR = {
+						is_reformed_religion = yes
+						is_patrician = yes
 					}
 				}
+
+				is_vice_royalty = no
+
 				NOR = {
-					religion = pantheist_league
-					religion = ten_thousand_gods
+					government = confucian_bureaucracy
+					government = order_government
 				}
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-			OR = {
-				AND = {
-					tier = baron
-					is_feudal = yes
-				}
-				holder_scope = { is_feudal = yes }
-				holder_scope = { is_patrician = yes }
-			}
-
-			#is_primary_type_title = no #this broke succession for some reason
-
-			OR = {
-				NOT = { tier = baron }
-				holder_scope = { is_patrician = yes }
-			}
-
-			NOT = { holder_scope = { government = confucian_bureaucracy } }
 		}
 
 		allow = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
+					OR = {
+						has_law = succ_feudal_elective
+						has_law = succ_hre_elective
+					}
+				}
 
-			conditional_tooltip = {
-				trigger = {
-					NOT = { has_dlc = "Conclave" }
-					NOT = { has_law = succ_hre_elective }
-				}
-				OR = {
-					hidden_tooltip = {
-						has_crown_law_title = no
-					}
-					holder_scope = {
-						show_scope_change = no
-						is_patrician = yes
-						OR = {
-							is_merchant_republic = no
-							PREV = {
-								is_primary_holder_title = no
-							}
-							NOT = {
-								in_revolt = yes
-								succ_law_title = {
-									title = PREVPREV
-								}
-							}
-						}
-					}
-					crownlaw_title = {
-						OR = {
-							has_law = crown_authority_2
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
+				has_law = succession_voting_power_0
 			}
-			custom_tooltip = {
-				text = not_forced_tt
-				hidden_tooltip = {
-					holder_scope = { NOT = { has_character_flag = liege_forced_succ_law } }
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_dlc = "Conclave"
-				}
-				custom_tooltip = {
-					text = forced_elective_tt
-					hidden_tooltip = {
-						NAND = {
-							has_law = succession_voting_power_1
-							OR = {
-								has_law = succ_feudal_elective
-								has_law = succ_hre_elective
-							}
-						}
-					}
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-					has_dlc = "Conclave"
-				}
-				has_law = law_voting_power_0
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-					NOT = { has_dlc = "Conclave" }
-				}
+			trigger_else_if = {
+				limit = { has_law = succ_hre_elective }
 				has_law = crown_authority_4
 			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-				}
+			trigger_if = {
+				limit = { has_law = succ_hre_elective }
 				has_law = centralization_4
 			}
+
+			trigger_if = {
+				limit = {
+					NOR = {
+						has_dlc = "Conclave"
+						has_law = succ_hre_elective
+						holder_scope = {
+							is_patrician = yes
+						}
+					}
+
+					has_crown_law_title = yes
+				}
+
+				crownlaw_title = {
+					OR = {
+						has_law = crown_authority_2
+						has_law = crown_authority_3
+						has_law = crown_authority_4
+					}
+				}
+			}
+
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+			}
+		}
+
+		pass_effect = {
+			# log = "succ_seniority pass ([This.GetFullBaseName])"
 		}
 
 		effect = {
+			# log = "succ_seniority ([This.GetFullBaseName])"
 			succession = seniority
-		}
-		revoke_allowed = {
-			always = no
 		}
 	}
 
@@ -707,10 +658,24 @@ succession_laws = {
 		youngest_child_opinion = -15
 		child_opinion = -10
 		dynasty_opinion = -5
+
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			NOT = { has_law = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				NAND = {
 					government = democratic_feudal_government
@@ -775,167 +740,131 @@ succession_laws = {
 					government = baron_theocracy_government
 					government = nomadic_tribal_government
 				}
-				NOT = { is_muslim_trigger = yes }
+
+				is_feudal = yes
+
 				NOR = {
-					has_religion_feature = religion_matriarchal
-					has_religion_feature = religion_patriarchal
+					is_muslim_trigger = yes
+					government = confucian_bureaucracy
+					government = order_government
 				}
-				is_merchant_republic = no
-				is_patrician = no
-			}
-			OR = {
-				holder_scope = { # Viceroyalties can always have primogeniture if not muslim
-					any_demesne_title = {
-						is_vice_royalty = yes
-					}
+
+				trigger_if = {
+					limit = { religion_group = humanoid_group }
+
+					is_reformed_religion = yes
 				}
-				AND = {
-					holder_scope = {
-						OR = {
-							independent = yes
-							NOT = {
-								any_liege = {
-									holy_order = yes
-								}
-							}
-						}
-						OR = {
-							NOT = { religion_group = humanoid_group }
-							is_reformed_religion = yes
-						}
-					}
-					OR = {
-						is_landless_type_title = no
-						is_tribal_type_title = yes
-						temporary = yes
-					}
-					#is_primary_type_title = no #this broke succession for some reason
-					OR = {
-						AND = {
-							tier = baron
-							is_feudal = yes
-						}
-						holder_scope = { is_feudal = yes }
-					}
-				}
-				has_title_flag = alternate_byz
-			}
-			NOT = { holder_scope = { government = confucian_bureaucracy } }
-		}
-		allow = {
-			conditional_tooltip = {
-				trigger = {
-					has_dlc = "Conclave"
-				}
-				OR = {
-					holder_scope = { # Viceroyalties can always have primogeniture if not muslim
-						show_scope_change = no
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
-					}
-					AND = { #late feudal or imperial
-						holder_scope = {
-							show_scope_change = no
-							primary_title = {
-								show_scope_change = no
-								OR = {
-									has_law = ze_administration_laws_1
-									has_law = ze_administration_laws_2
-								}
-							}
-						}
-					}
-					AND = { #despotic commonwealth
-						holder_scope = {
-							show_scope_change = no
-							government = democratic_feudal_government
-							primary_title = {
-								show_scope_change = no
-								has_law = law_voting_power_0
-								OR = {
-									has_law = centralization_2
-									has_law = centralization_3
-									has_law = centralization_4
-								}
-							}
-						}
-					}
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					NOT = { has_dlc = "Conclave" }
-					NOT = { has_law = succ_hre_elective }
-				}
-				OR = {
-					holder_scope = { # Viceroyalties can always have primogeniture if not muslim
-						show_scope_change = no
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
-					}
-					hidden_tooltip = {
-						has_crown_law_title = no
-					}
-					crownlaw_title = {
-						OR = {
-							has_law = crown_authority_3
-							has_law = crown_authority_4
-						}
-					}
-				}
-			}
-			custom_tooltip = {
-				text = not_forced_tt
-				hidden_tooltip = {
-					holder_scope = { NOT = { has_character_flag = liege_forced_succ_law } }
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_dlc = "Conclave"
-				}
-				custom_tooltip = {
-					text = forced_elective_tt
-					hidden_tooltip = {
-						NAND = {
-							has_law = succession_voting_power_1
-							OR = {
-								has_law = succ_feudal_elective
-								has_law = succ_hre_elective
-							}
-						}
-					}
-				}
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-					has_dlc = "Conclave"
-				}
-				has_law = law_voting_power_0
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-					NOT = { has_dlc = "Conclave" }
-				}
-				has_law = crown_authority_4
-			}
-			conditional_tooltip = {
-				trigger = {
-					has_law = succ_hre_elective
-				}
-				has_law = centralization_4
 			}
 		}
 
-		effect = {
-			succession = primogeniture
+		allow = {
+			# NOTE: Do not combine these three. They are separate for the tooltip
+			trigger_if = {
+				limit = {
+					has_dlc = "Conclave"
+					is_vice_royalty = no
+
+					OR = {
+						has_law = succ_feudal_elective
+						has_law = succ_hre_elective
+					}
+				}
+
+				has_law = succession_voting_power_0
+			}
+			trigger_else_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = crown_authority_4
+			}
+			trigger_if = {
+				limit = { has_law = succ_hre_elective }
+				has_law = centralization_4
+			}
+
+			# Viceroyalties can always have primogeniture if not muslim
+			trigger_if = {
+				limit = {
+					has_dlc = "Charlemagne"
+
+					holder_scope = {
+						independent = no
+
+						top_liege = {
+							OR = {
+								has_law = vice_royalty_1
+								has_law = vice_royalty_2
+							}
+						}
+					}
+				}
+
+				holder_scope = {
+					show_scope_change = no
+
+					is_vice_royalty = yes
+				}
+			}
+			trigger_else_if = {
+				limit = { has_dlc = "Conclave" }
+
+				OR = {
+					has_law = ze_administration_laws_1
+					has_law = ze_administration_laws_2
+				}
+			}
+			trigger_else_if = {
+				limit = { government = democratic_feudal_government }
+				
+				holder_scope = {
+					primary_title = {
+						has_law = law_voting_power_0
+						OR = {
+							has_law = centralization_2
+							has_law = centralization_3
+							has_law = centralization_4
+						}
+					}
+				}
+			}
+			trigger_else_if = {
+				limit = {
+					NOT = { has_law = succ_hre_elective }
+				}
+
+				crownlaw_title = {
+					OR = {
+						has_law = crown_authority_3
+						has_law = crown_authority_4
+					}
+				}
+			}
+
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+			}
 		}
-		revoke_allowed = {
-			always = no
+
+		pass_effect = {
+			# log = "succ_primogeniture pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			# log = "succ_primogeniture ([This.GetFullBaseName])"
+			succession = primogeniture
 		}
 	}
 
