@@ -873,10 +873,29 @@ succession_laws = {
 		child_opinion = -5
 		dynasty_opinion = -5
 		vassal_opinion = 10
+
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			higher_real_tier_than = BARON
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
+			NOR = { # Has special elective law instead
+				is_law_potential = succ_hre_elective
+				is_law_potential = succ_byzantine_elective
+			}
+
 			holder_scope = {
 				NOR = {
 					#government = magocratic_feudal_government
@@ -939,100 +958,84 @@ succession_laws = {
 					government = baron_theocracy_government
 					government = nomadic_tribal_government
 				}
-				OR = {
-					independent = yes
-					NOT = {
-						any_liege = {
-							holy_order = yes
-						}
-					}
-				}
-				OR = {
-					NOR = {
-						is_muslim_trigger = yes
-						has_religion_feature = religion_matriarchal
-						has_religion_feature = religion_patriarchal
-						religion_group = karaturan_group
-					}
-					has_law = succession_voting_power_1
-					OR = {
-						has_law = succ_feudal_elective # Keep it even if you revoke Full Council Authority
-						has_law = succ_hre_elective
-					}
-					ROOT = {
-						has_title_flag = alternate_hre
-					}
-				}
-				is_merchant_republic = no
-				is_patrician = no
 
-				OR = {
-					NOT = { religion_group = humanoid_group }
-					is_reformed_religion = yes
-					has_law = succession_voting_power_1
-					OR = {
-						has_law = succ_feudal_elective # Keep it even if you revoke Full Council Authority
-						has_law = succ_hre_elective
-					}
-					ROOT = {
-						has_title_flag = alternate_hre
-					}
-				}
-				OR = {
-					independent = yes
-					NOT = {
-						any_demesne_title = {
-							is_vice_royalty = yes
+				is_feudal = yes
+
+				trigger_if = {
+					limit = {
+						OR = {
+							is_muslim_trigger = yes
+							religion_group = karaturan_group
+
+							trigger_if = {
+								limit = { religion_group = humanoid_group }
+
+								is_reformed_religion = no
+							}
 						}
 					}
+
+					has_dlc = "Conclave"
+					higher_real_tier_than = DUKE
 				}
-			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-			#is_primary_type_title = no #this broke succession for some reason
-			NOT = { tier = baron }
-			holder_scope = {
-				OR = {
-					is_feudal = yes
-					has_law = succession_voting_power_1
-					OR = {
-						has_law = succ_feudal_elective # Keep it even if you revoke Full Council Authority
-						has_law = succ_hre_elective
-					}
-					ROOT = {
-						has_title_flag = alternate_hre
-					}
+
+				is_vice_royalty = no
+
+				NOR = {
+					government = celestial_bureaucracy
+					government = celestial_government
+					government = order_government
 				}
-			}
-			NOT = { holder_scope = { government = celestial_bureaucracy } }
-			NOT = { holder_scope = { government = celestial_government } }
-			#NOT = { holder_scope = { government = magocratic_feudal_government } }
-			NOT = {  #Special Elective.
-				has_title_flag = alternate_hre
 			}
 		}
+
 		allow = {
-			custom_tooltip = {
-				text = not_forced_tt
-				hidden_tooltip = {
-					holder_scope = { NOT = { has_character_flag = liege_forced_succ_law } }
+			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+
+				trigger_if = {
+					limit = {
+						has_dlc = "Conclave"
+
+						OR = {
+							is_muslim_trigger = yes
+							religion_group = karaturan_group
+
+							AND = {
+								religion_group = humanoid_group
+								is_reformed_religion = no
+							}
+						}
+					}
+
+					has_law = succession_voting_power_1
 				}
 			}
 		}
+
+		pass_effect = {
+			# log = "succ_feudal_elective pass ([This.GetFullBaseName])"
+		}
+
 		effect = {
+			# log = "succ_feudal_elective ([This.GetFullBaseName])"
+
 			succession = {
 				base_type = feudal_elective
 				voting_rules = feudal_elective
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}
 	}
-	
+
 	succ_hre_elective = {
 		oldest_child_opinion = -15
 		child_opinion = -5
