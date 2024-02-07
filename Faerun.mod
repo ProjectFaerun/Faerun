@@ -15,3 +15,5 @@ replace_path = "history/titles"
 replace_path = "history/wars"
 replace_path = "gfx/loadingscreens"
 
+tags = { "Faerun" "Forgotten Realms" "Total Conversion" "Dungeons and Dragons" "D&D" "DnD" "Baldurs Gate" }
+picture="Faerun.jpg"
