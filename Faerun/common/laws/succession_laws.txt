@@ -1838,7 +1838,7 @@ succession_laws = {
 
 		potential = {
 			rebel = no
-			NOT = { is_law_potential = succ_byzantine_elective }
+			NOT = { has_law = succ_byzantine_elective }
 
 			trigger_if = {
 				limit = { is_primary_type_title = yes }
@@ -2514,6 +2514,7 @@ succession_laws = {
 		child_opinion = -5
 		dynasty_opinion = -5
 		vassal_opinion = 10
+
 		potential = {
 			is_merchant_republic = no
 			NOT = { tier = BARON }
@@ -2525,31 +2526,44 @@ succession_laws = {
 				}
 				holder_scope = {
 					government = theocracy_government
-					z_monk = yes
+					#z_monk = yes
 				}
 			}
-			holder_scope = {
-				NOR = {
-					has_religion_feature = religion_matriarchal
-					has_religion_feature = religion_patriarchal
-				}
+			rebel = no
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
 			}
 		}
 		allow = {
-			custom_tooltip = {
-				text = not_forced_tt
-				hidden_tooltip = {
-					holder_scope = { NOT = { has_character_flag = liege_forced_succ_law } }
-				}
-			}
 			holder_scope = {
+				show_scope_change = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+
 				z_monk = yes
-				in_revolt = no
 			}
 		}
 		effect = {
@@ -2557,9 +2571,6 @@ succession_laws = {
 				base_type = feudal_elective
 				voting_rules = monk_elective
 			}
-		}
-		revoke_allowed = {
-			always = no
 		}
 	}
 
@@ -2578,101 +2589,77 @@ succession_laws = {
 				voting_rules = yikaria_vote
 			}
 		}
-		revoke_allowed = {
-			always = no
-		}
 	}
 
 	succ_wychlaran = {
 		dynasty_opinion = 5
 
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			rebel = no
+			NOT = { has_law = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				culture = rashemi
-			}
-			OR = {
-				real_tier = KING
-				real_tier = EMPEROR
-			}
-			holder_scope = {
+				OR = {
+					real_tier = KING
+					real_tier = EMPEROR
+				}
+				OR = {
+					is_feudal = yes
+					is_tribal = yes
+				}
+
+				is_vice_royalty = no
+
 				NOR = {
 					#government = magocratic_feudal_government
 					government = divine_feudal_government
 					government = theocracy_government
-				}
-				# is_nomadic = no
-				NOT = { government = nomadic_tribal_government }
-				OR = {
-					independent = yes
-					NOT = {
-						any_liege = {
-							holy_order = yes
-						}
-					}
-				}
-				NOR = {
+					government = nomadic_tribal_government
+					government = celestial_government
+					government = celestial_bureaucracy
+					government = order_government
 					is_muslim_trigger = yes
-					has_religion_feature = religion_matriarchal
-					has_religion_feature = religion_patriarchal
-				}
-				is_merchant_republic = no
-				is_patrician = no
-				OR = {
-					independent = yes
-					NOT = {
-						any_demesne_title = {
-							is_vice_royalty = yes
-						}
-					}
 				}
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-
-			rebel = no
-
-			OR = {
-				holder_scope = { is_feudal = yes }
-				holder_scope = { is_tribal = yes }
-			}
-			#is_primary_type_title = no #this broke succession for some reason
-			NOT = { holder_scope = { government = celestial_bureaucracy } }
-			NOT = { holder_scope = { government = celestial_government } }
-			#NOT = { holder_scope = { government = magocratic_feudal_government } }
 		}
 		allow = {
-			conditional_tooltip = {
-				trigger = {
-					holder_scope = {
-						culture = rashemi
-					}
-					OR = {
-						real_tier = KING
-						real_tier = EMPEROR
-					}
-				}
-				custom_tooltip = {
-					text = forced_elective_tt
-					hidden_tooltip = {
-						NAND = {
-							has_law = succession_voting_power_1
-							OR = {
-								has_law = succ_feudal_elective
-								has_law = succ_hre_elective
-							}
-						}
-					}
-				}
-			}
 			holder_scope = {
+				culture = rashemi
+				OR = {
+					real_tier = KING
+					real_tier = EMPEROR
+				}
 				show_scope_change = no
-				in_revolt = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+
 			}
 		}
 		effect = {
@@ -2685,69 +2672,65 @@ succession_laws = {
 	
 	succ_ordning = {
 		giant_pantheon_opinion = 5
+
 		potential = {
-			NOT = {
-				has_law = succ_byzantine_elective
+			rebel = no
+			NOT = { has_law = succ_byzantine_elective }
+
+			trigger_if = {
+				limit = { is_primary_type_title = yes }
+				NOT = { is_law_potential = succ_open_elective }
 			}
+
+			trigger_if = {
+				limit = {
+					is_landless_type_title = yes
+					temporary = no
+				}
+
+				NOT = { is_law_potential = succ_open_elective }
+			}
+
 			holder_scope = {
 				religion = giant_pantheon
-			}
-			holder_scope = {
+				OR = {
+					is_feudal = yes
+					is_tribal = yes
+				}
+
+				is_vice_royalty = no
+
 				NOR = {
 					#government = magocratic_feudal_government
 					government = divine_feudal_government
 					government = theocracy_government
-				}
-				# is_nomadic = no
-				NOT = { government = nomadic_tribal_government }
-				NOR = {
+					government = nomadic_tribal_government
+					government = celestial_government
+					government = celestial_bureaucracy
+					government = order_government
 					is_muslim_trigger = yes
-					has_religion_feature = religion_matriarchal
-					has_religion_feature = religion_patriarchal
 				}
-				is_merchant_republic = no
-				is_patrician = no
 			}
-			OR = {
-				is_landless_type_title = no
-				is_tribal_type_title = yes
-				temporary = yes
-			}
-
-			rebel = no
-
-			OR = {
-				holder_scope = { is_feudal = yes }
-				holder_scope = { is_tribal = yes }
-			}
-			#is_primary_type_title = no #this broke succession for some reason
-			NOT = { holder_scope = { government = celestial_bureaucracy } }
-			NOT = { holder_scope = { government = celestial_government } }
-			#NOT = { holder_scope = { government = magocratic_feudal_government } }
 		}
 		allow = {
-			conditional_tooltip = {
-				trigger = {
-					holder_scope = {
-						religion = giant_pantheon
-					}
-				}
-				custom_tooltip = {
-					text = forced_elective_tt
-					hidden_tooltip = {
-						NAND = {
-							has_law = succession_voting_power_1
-							OR = {
-								has_law = succ_feudal_elective
-								has_law = succ_hre_elective
-							}
-						}
-					}
-				}
-			}
 			holder_scope = {
+				religion = giant_pantheon
 				show_scope_change = no
-				in_revolt = no
+
+				trigger_if = {
+					limit = { in_revolt = yes }
+					in_revolt = no
+				}
+
+				trigger_if = {
+					limit = { independent = no }
+
+					custom_tooltip = {
+						text = not_forced_tt
+						NOT = { has_character_flag = liege_forced_succ_law }
+					}
+				}
+
 			}
 		}
 		effect = {
