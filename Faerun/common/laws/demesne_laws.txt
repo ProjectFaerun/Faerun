@@ -46,380 +46,304 @@ law_groups = {
 }
 
 laws = {
-
 	# CENTRALIZATION LAWS
 	##############################
-	
+
 	centralization_0 = {
 		group = centralization
 		default = yes
-		
-		allow = {
-			OR = {
-				has_law = centralization_1
-				AND = {
-					NOT = {	has_law = centralization_0 }
-					NOT = {	has_law = centralization_1 }
-					NOT = {	has_law = centralization_2 }
-					NOT = {	has_law = centralization_3 }
-					NOT = {	has_law = centralization_4 }
-				}
-			}
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
-		}
+
+		demesne_size = 0
+		vassal_limit = 10
+
 		potential = {
-			higher_tier_than = count
-			# is_nomadic = no
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.8
+			holder_scope = {
+				is_nomadic = no
+				higher_real_tier_than = COUNT
+				NOT = { government = nomadic_tribal_government }
 			}
-			modifier = {
-				factor = 0
-				NOT = {
+		}
+
+		allow = {
+			trigger_if = {
+				limit = {
 					OR = {
-						AND = {
-							has_law = centralization_1
-							over_vassal_limit = -1
-							over_max_demesne_size = -1
-						}
-						AND = {
-							has_law = centralization_2
-							over_vassal_limit = -6
-							over_max_demesne_size = -2
-						}
-						AND = {
-							has_law = centralization_3
-							over_vassal_limit = -11
-							over_max_demesne_size = -3
-						}
-						AND = {
-							has_law = centralization_4
-							over_vassal_limit = -16
-							over_max_demesne_size = -4
-						}					
+						has_law = centralization_1
+						has_law = centralization_2
+						has_law = centralization_3
+						has_law = centralization_4
+					}
+				}
+
+				has_law = centralization_1
+			}
+		}
+
+		pass_effect = {
+			# log = "centralization_0 pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			# log = "centralization_0 ([This.GetFullBaseName])"
+			revoke_law = centralization_1
+			revoke_law = centralization_2
+			revoke_law = centralization_3
+			revoke_law = centralization_4
+		}
+
+		ai_will_do = {
+			factor = 0.8
+
+			trigger = {
+				trigger_if = { # Need to increase vassal limit
+					limit = { has_law = centralization_1 }
+
+					over_vassal_limit > 0
+					over_max_demesne_size <= 0
+				}
+				trigger_else = {
+					NOR = {
+						has_law = centralization_0
+						has_law = centralization_1
+						has_law = centralization_2
+						has_law = centralization_3
+						has_law = centralization_4
 					}
 				}
 			}
 		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
-				revoke_law = centralization_4
-			}
-		}
-		
-		vassal_limit = 10
 	}
-	
+
 	centralization_1 = {
 		group = centralization
-		
+
+		vassal_limit = 5
+		demesne_size = 1
+
+		potential = {
+			is_law_potential = centralization_0
+		}
+
 		allow = {
-			OR = { 
+			OR = {
 				has_law = centralization_0
 				has_law = centralization_2
 			}
-			OR = {
+
+			trigger_if = {
+				limit = {
+					holder_scope = {
+						is_tribal = yes
+					}
+				}
+
 				OR = {
 					has_law = tribal_organization_1
 					has_law = tribal_organization_2
 					has_law = tribal_organization_3
 					has_law = tribal_organization_4
 				}
-				holder_scope = {
-					is_tribal = no
-				}
 			}
 		}
-		potential = {
-			higher_tier_than = count
-			# is_nomadic = no
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
+
+		pass_effect = {
+			# log = "centralization_1 pass ([This.GetFullBaseName])"
 		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.9
-			}
-			modifier = {
-				factor = 0
-				NOT = {
-					OR = {
-						AND = {
-							has_law = centralization_0
-							over_vassal_limit = -1
-							over_max_demesne_size = 1
-						}
-						AND = {
-							has_law = centralization_2
-							over_vassal_limit = 1
-							over_max_demesne_size = -1
-						}
-						AND = {
-							has_law = centralization_3
-							over_vassal_limit = 6
-							over_max_demesne_size = -2
-						}
-						AND = {
-							has_law = centralization_4
-							over_vassal_limit = 11
-							over_max_demesne_size = -3
-						}					
-					}
-				}
-			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
+
 		effect = {
-			hidden_tooltip = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
-				revoke_law = centralization_4
+			# log = "centralization_1 ([This.GetFullBaseName])"
+			revoke_law = centralization_0
+			revoke_law = centralization_2
+			revoke_law = centralization_3
+			revoke_law = centralization_4
+		}
+
+		ai_will_do = {
+			factor = 0.9
+
+			trigger = {
+				trigger_if = { # Need to increase vassal limit
+					limit = { has_law = centralization_2 }
+
+					over_vassal_limit > 0
+					over_max_demesne_size <= 0
+				}
+				trigger_else = { # Vassal limit left over
+					over_vassal_limit <= 5
+					over_max_demesne_size > 0
+				}
 			}
 		}
-		
-		vassal_limit = 5
-		demesne_size = 1
 	}
-	
+
 	centralization_2 = {
 		group = centralization
-		
+
+		vassal_limit = 0
+		demesne_size = 2
+
+		potential = {
+			is_law_potential = centralization_0
+		}
+
 		allow = {
-			OR = { 
+			OR = {
 				has_law = centralization_1
 				has_law = centralization_3
 			}
-			OR = {
+
+			trigger_if = {
+				limit = {
+					holder_scope = {
+						is_tribal = yes
+					}
+				}
+
 				OR = {
 					has_law = tribal_organization_2
 					has_law = tribal_organization_3
 					has_law = tribal_organization_4
 				}
-				holder_scope = {
-					is_tribal = no
-				}
 			}
 		}
-		potential = {
-			higher_tier_than = count
-			# is_nomadic = no
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
+
+		pass_effect = {
+			# log = "centralization_2 pass ([This.GetFullBaseName])"
 		}
-		revoke_allowed = {
-			always = no
-		}			
+
+		effect = {
+			# log = "centralization_2 ([This.GetFullBaseName])"
+			revoke_law = centralization_0
+			revoke_law = centralization_1
+			revoke_law = centralization_3
+			revoke_law = centralization_4
+		}
+
 		ai_will_do = {
 			factor = 1
-			modifier = {
-				factor = 0
-				NOT = {
-					OR = {
-						AND = {
-							has_law = centralization_0
-							over_vassal_limit = -6
-							over_max_demesne_size = 2
-						}
-						AND = {
-							has_law = centralization_1
-							over_vassal_limit = -1
-							over_max_demesne_size = 1
-						}
-						AND = {
-							has_law = centralization_3
-							over_vassal_limit = 1
-							over_max_demesne_size = -1
-						}
-						AND = {
-							has_law = centralization_4
-							over_vassal_limit = 6
-							over_max_demesne_size = -2
-						}					
-					}
+
+			trigger = {
+				trigger_if = { # Need to increase vassal limit
+					limit = { has_law = centralization_3 }
+
+					over_vassal_limit > 0
+					over_max_demesne_size <= 0
+				}
+				trigger_else = { # Vassal limit left over
+					over_vassal_limit <= 5
+					over_max_demesne_size > 0
 				}
 			}
 		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
-				revoke_law = centralization_4
-			}
-		}
-		
-		vassal_limit = 0
-		demesne_size = 2
 	}
-	
+
 	centralization_3 = {
 		group = centralization
-		
+
+		vassal_limit = -5
+		demesne_size = 3
+
+		potential = {
+			is_law_potential = centralization_0
+		}
+
 		allow = {
-			OR = { 
+			OR = {
 				has_law = centralization_2
 				has_law = centralization_4
 			}
-			OR = {
+
+			trigger_if = {
+				limit = {
+					holder_scope = {
+						is_tribal = yes
+					}
+				}
 				OR = {
 					has_law = tribal_organization_3
 					has_law = tribal_organization_4
 				}
-				holder_scope = {
-					is_tribal = no
-				}
 			}
 		}
-		potential = {
-			higher_tier_than = count
-			# is_nomadic = no
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
+
+		pass_effect = {
+			# log = "centralization_3 pass ([This.GetFullBaseName])"
 		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.9
-			}
-			modifier = {
-				factor = 0
-				NOT = {
-					OR = {
-						AND = {
-							has_law = centralization_0
-							over_vassal_limit = -11
-							over_max_demesne_size = 3
-						}
-						AND = {
-							has_law = centralization_1
-							over_vassal_limit = -6
-							over_max_demesne_size = 2
-						}
-						AND = {
-							has_law = centralization_2
-							over_vassal_limit = -1
-							over_max_demesne_size = 1
-						}
-						AND = {
-							has_law = centralization_4
-							over_vassal_limit = 1
-							over_max_demesne_size = -1
-						}					
-					}
-				}
-			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
+
 		effect = {
-			hidden_tooltip = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
-				revoke_law = centralization_4
+			# log = "centralization_3 ([This.GetFullBaseName])"
+			revoke_law = centralization_0
+			revoke_law = centralization_1
+			revoke_law = centralization_2
+			revoke_law = centralization_4
+		}
+
+		ai_will_do = {
+			factor = 0.9
+
+			trigger = {
+				trigger_if = { # Need to increase vassal limit
+					limit = { has_law = centralization_4 }
+
+					over_vassal_limit > 0
+					over_max_demesne_size <= 0
+				}
+				trigger_else = { # Vassal limit left over
+					over_vassal_limit <= 5
+					over_max_demesne_size > 0
+				}
 			}
 		}
-		
-		vassal_limit = -5
-		demesne_size = 3
 	}
-	
+
 	centralization_4 = {
 		group = centralization
-		
-		allow = {
-			has_law = centralization_3
-			OR = {
-				has_law = tribal_organization_4
-				holder_scope = {
-					is_tribal = no
-				}
-			}
-		}
-		potential = {
-			higher_tier_than = count
-			# is_nomadic = no
-			holder_scope = { NOT = { government = nomadic_tribal_government } }
-		}
-		revoke_allowed = {
-			always = no
-		}			
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.8
-			}
-			modifier = {
-				factor = 0
-				NOT = {
-					OR = {
-						AND = {
-							has_law = centralization_0
-							over_vassal_limit = -16
-							over_max_demesne_size = 4
-						}
-						AND = {
-							has_law = centralization_1
-							over_vassal_limit = -11
-							over_max_demesne_size = 3
-						}
-						AND = {
-							has_law = centralization_2
-							over_vassal_limit = -6
-							over_max_demesne_size = 2
-						}
-						AND = {
-							has_law = centralization_3
-							over_vassal_limit = -1
-							over_max_demesne_size = 1
-						}					
-					}
-				}
-			}
-		}
-		ai_will_revoke = {
-			factor = 0
-		}
-		effect = {
-			hidden_tooltip = {
-				revoke_law = centralization_0
-				revoke_law = centralization_1
-				revoke_law = centralization_2
-				revoke_law = centralization_3
-				revoke_law = centralization_4
-			}
-		}
-		
+
 		vassal_limit = -10
 		demesne_size = 4
+
+		potential = {
+			is_law_potential = centralization_0
+		}
+
+		allow = {
+			has_law = centralization_3
+
+			trigger_if = {
+				limit = {
+					holder_scope = {
+						is_tribal = yes
+					}
+				}
+
+				has_law = tribal_organization_4
+			}
+		}
+
+		pass_effect = {
+			# log = "centralization_4 pass ([This.GetFullBaseName])"
+		}
+
+		effect = {
+			# log = "centralization_4 ([This.GetFullBaseName])"
+			revoke_law = centralization_0
+			revoke_law = centralization_1
+			revoke_law = centralization_2
+			revoke_law = centralization_3
+		}
+
+		ai_will_do = {
+			factor = 0.8
+
+			trigger = {
+				trigger_if = { # Vassal limit left over
+					limit = { has_law = centralization_3 }
+
+					over_vassal_limit <= 5
+					over_max_demesne_size > 0
+				}
+			}
+		}
 	}
 
 

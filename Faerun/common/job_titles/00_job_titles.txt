@@ -9,96 +9,102 @@
 #	lose_effect: fires when a title is lost through most causes
 #	retire_effect: fires when a title is lost due to the character stepping down, or getting a different liege
 #	death_effect: fires when a title is lost due to the character dying
-#	The other fields are all character modifiers.
- 
+#	The other fields are all character modifiers
+
+#	ROOT is councillor
+#	FROM is liege
+
 job_chancellor = {
 	is_chancellor = yes
 	is_voter = yes
+	lift_fow = yes
+
 	attribute = diplomacy
 	dignity = 0.33
 	opinion_effect = 10
-	
+
 	monthly_salary = 0.1
 	monthly_prestige = 0.75
-	
+
+	action = action_statecraft			# Offmap, Monks and Mystics
+	action = action_improve_relations
+	action = action_fabricate_claims
+	#action = action_clan_sentiment		# Replaces Fabricate Claims for Nomads
+	action = action_sow_dissent
+
 	allow = {
 		can_be_chancellor_trigger = yes
 	}
+
 	dismiss_trigger = {
+		show_only_failed_conditions = yes
+
 		FROM = {
-			NOT = { 
-				AND = {
-					has_law = succession_voting_power_1
-					ROOT = { is_powerful_vassal = yes }
+			show_scope_change = no
+
+			# Powerful vassals can't be fired from the council under Full Council Authority
+			OR = {
+				NOT = { has_law = succession_voting_power_1 }
+
+				ROOT = {
+					show_scope_change = no
+
+					is_powerful_vassal = no
 				}
 			}
-			conditional_tooltip = {
-				trigger = {
-					has_character_flag = swapping_councillors
-				}
-				custom_tooltip = {
-					text = not_swapping_tt
-					hidden_tooltip = {
-						NOT = {
-							has_character_flag = swapping_councillors
-						}
-					}
-				}
+
+			custom_tooltip = {
+				text = not_swapping_tt
+				NOT = { has_character_flag = swapping_councillors }
 			}
 		}
 	}
+
 	gain_effect = {
 	}
+
 	lose_effect = {
 		if = {
 			limit = {
 				FROM = {
-					NOT = {
-						has_character_flag = swapping_councillors
-					}
+					NOT = { has_character_flag = swapping_councillors }
 				}
 
-				NOT = { trait = incapable }
-				NOT = { trait = sick_incapable }
+				is_incapable = no
 			}
-			opinion = { who = FROM modifier = opinion_fired_from_council }
-			opinion = { who = FROM modifier = opinion_recently_fired }
+
+			opinion = { who = FROM name = opinion_fired_from_council }
+			opinion = { who = FROM name = opinion_recently_fired }
 		}
+
 		if = {
 			limit = { has_character_flag = relic_hunter }
-			character_event = { id = MNM.9034 }
+			character_event = { id = MNM.9034 } # Artifact hunter councllior fired/retires ping
 		}
 	}
+
 	retire_effect = {
 		if = {
 			limit = { has_character_flag = relic_hunter }
-			character_event = { id = MNM.9034 }
+			character_event = { id = MNM.9034 } # Artifact hunter councllior fired/retires ping
 		}
+
 		if = {
 			limit = {
-				NOT = {
-					age = 65
-				}
-				health = 3
-				NOT = {
-					is_sick_or_injured_trigger = yes
-				}
-				can_be_councilmember_king_trigger = yes
+				practical_age < 65
+				health >= 3
+				is_sick_or_injured_trigger = no
+				can_be_chancellor_trigger = yes
 			}
-			
-			FROM = { 
-				opinion = { who = ROOT modifier = opinion_resigned_from_council }
+
+			FROM = {
+				opinion = {
+					name = opinion_resigned_from_council
+					who = ROOT
+				}
 			}
 		}
 	}
-	
-	action = action_statecraft
-	action = action_improve_relations
-	action = action_fabricate_claims
-	#action = action_clan_sentiment # Replaces Fabricate Claims for Nomads
-	action = action_sow_dissent
-
-	lift_fow = yes
 }
 
 job_marshal = {
