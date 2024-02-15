@@ -2,41 +2,47 @@
 # COUNCILLOR ACTIONS
 ##########################################
 # attribute = [diplomacy/stewardship/intrigue/martial/learning] - Character attribute is multiplied with the modifiers
-# trigger = Province scope trigger to determine if the action is meaningful in a province (the player character is FROM, the councillor is in 'new_character')
+# trigger = Province scope trigger to determine if the action is meaningful in a province
 # Events that can trigger off this action. This info is only used by the GUI.
 # All modifiers (like 'local_build_time_modifier') are multiplied by the attribute
 
+# ROOT is province
+# FROM is liege
+
 # display_on_map = {
 #	tooltip = JOB_PROSELYTIZE_DIFFERENT_RELIGION  # Key of the loc to add to the tooltip
-#	trigger = {									# Trigger for when this should happen. Same scopes as the allow/potential for the job action itself
+#	trigger = {                                   # Trigger for when this should happen. Same scopes as the allow/potential for the job action itself
 #		NOT = { religion = FROM }
 #	}
-#	color = { 255 0 0 }							# What color to use on the map
+#	color = { 255 0 0 }                           # What color to use on the map
 # }
 
- 
 # Chancellor
 action_improve_relations = {
 	attribute = diplomacy
-	
+
 	potential = {
 	}
-	
+
 	trigger = {
+		is_within_diplo_range = FROM
+
 		any_province_lord = {
-			NOT = { character = FROM }
 			is_theocracy = no
+			NOT = { character = FROM }
+
 			FROM = {
 				job_chancellor = {
 					NOT = { character = PREVPREV } # Can't be sent to improve relations with himself...
 				}
 			}
 		}
-		is_within_diplo_range = FROM
 	}
-	
-	
-	events = { 910 911 }
+
+	events = {
+		910 # The Chancellor attempts to improve relation with lord
+		911 # The Chancellor's attempts to improve relations with lord is sabotaged
+	}
 }
 
 # action_clan_sentiment = {
@@ -72,60 +78,74 @@ action_improve_relations = {
 
 action_fabricate_claims = {
 	attribute = diplomacy
-	
+
 	potential = {
 		FROM = { is_nomadic = no }
 	}
-	
+
 	trigger = {
-		any_province_lord = {
+		has_owner = yes
+		is_within_diplo_range = FROM
+
+		owner = {
 			NOT = { character = FROM }
+
 			FROM = {
 				job_chancellor = {
-					NOT = { character = PREVPREV } # Can't be sent to improve relations with himself...
+					NOT = { character = PREVPREV } # Not the chancellor's own titles
 				}
 			}
 		}
-		is_within_diplo_range = FROM
 	}
-	
-	events = { 913 914 }
+
+	events = {
+		913 # The Chancellor fabricates a claim for his liege on a landed noble's title
+		914 # A Noble finds out that the Chancellor is trying to fabricate claims
+	}
 }
 
 action_sow_dissent = {
 	attribute = diplomacy
-	
+
 	potential = {
 	}
-	
+
 	trigger = {
-		any_province_lord = {
-			NOT = { character = FROM }
-			NOT = { is_liege_or_above = FROM }
-		}
 		is_within_diplo_range = FROM
+
+		any_province_lord = {
+			NOR = {
+				character = FROM
+				is_vassal_or_below_of = FROM
+			}
+		}
 	}
-	
-	events = { 916 917 }
+
+	events = {
+		916 # The Chancellor sows dissent between a local noble and his liege
+		917 # Chancellor Discovered
+	}
 }
 
 action_statecraft = {
 	attribute = diplomacy
+	liege_modifier = statecraft_liege_mod
+	offmap = yes
 
 	potential = {
-		has_dlc = Mystics
+		has_dlc = "Mystics"
 	}
 
-	liege_modifier = statecraft_liege_mod
-
-	offmap = yes
-	
-	events = { MNM.78000 MNM.78003 } 
+	events = {
+		MNM.78000 # Relations improved
+		MNM.78003 # Sabotaged relations with lord
+	}
 }
 
 # Steward
 action_squeeze_peasants = {
 	attribute = stewardship
+	local_tax_modifier = 0.025
 
 	potential = {
 		FROM = {
@@ -139,10 +159,11 @@ action_squeeze_peasants = {
 			character = FROM
 		}
 	}
-	
-	local_tax_modifier = 0.025
-	
-	events = { 920 921 }
+
+	events = {
+		920 # The Steward collects a tithe and sends it to his liege
+		921 # The peasents attempt to kill the Steward (Gets away, is wounded, is killed)
+	}
 }
 
 action_collect_tribute = {
@@ -154,44 +175,48 @@ action_collect_tribute = {
 				is_nomadic = yes
 				AND = {
 					olrox_is_good_religion_trigger = no
-		      is_tribal = yes
+					is_tribal = yes
 				}
 			}
 		}
 	}
 
 	trigger = {
-		num_of_settlements = 1
+		num_of_settlements >= 1
+
 		any_province_lord = {
+			capital_scope = {
+				province = ROOT
+			}
+
+			OR = {
+				vassal_of = FROM
+				pays_tribute_to = FROM
+			}
+
 			NOT = { character = FROM }
-			
+
 			FROM = {
 				job_treasurer = {
 					NOT = { character = PREVPREV } # Can't be sent to himself...
 				}
 			}
-			
-			OR = {
-				vassal_of = FROM
-				pays_tribute_to = FROM
-			}
-			capital_scope = {
-				province = ROOT
-			}
 		}
 	}
-	
-	events = { 20225 }
+
+	events = {
+		20225 # The Steward demands extra funds from the ruler
+	}
 }
 
 action_settle_tribe = {
 	attribute = stewardship
 
 	potential = {
-    OR = {
-  		liege = { olrox_is_good_religion_trigger = no }
-		is_tribal = yes
-    }
+		OR = {
+			liege = { olrox_is_good_religion_trigger = no }
+			is_tribal = yes
+		}
 		OR = {
 			liege = { ai = no }
 			liege = { culture = PREV } # Disabled proselytize if religion mismatch with liege to prevent AI from shooting itself in the foot
@@ -271,15 +296,20 @@ action_settle_tribe = {
 				}
 			}
 		}
-		OR = {
-			NOT = { 
-				has_game_rule = {
-					name = culture_conversion
-					value = restricted
+		any_neighbor_province = {
+			trigger_if = {
+				limit = {
+					has_game_rule = {
+						name = culture_conversion
+						value = restricted
+					}
+				}
+
+				OR = {
+					is_coastal = yes
+					culture = FROM
 				}
 			}
-			any_neighbor_province = { culture = FROM } 
-			any_neighbor_province = { port = yes } 
 		}
 	}
 	
