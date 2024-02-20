@@ -213,9 +213,11 @@ action_settle_tribe = {
 	attribute = stewardship
 
 	potential = {
-		OR = {
-			liege = { olrox_is_good_religion_trigger = no }
-			is_tribal = yes
+		FROM = {
+			OR = {
+				liege = { olrox_is_good_religion_trigger = no }
+				is_tribal = yes
+			}
 		}
 		OR = {
 			liege = { ai = no }
@@ -282,12 +284,16 @@ action_settle_tribe = {
 			}
 		}
 	}
-	
-	events = { 925 20206 }
+
+	events = {
+		925 # The Steward has settled the tribe
+		20206 # The Steward is attacked and wounded
+	}
 }
 
 action_oversee_construction = {
 	attribute = stewardship
+	local_build_time_modifier = -0.025
 
 	potential = {
 		OR = {
@@ -309,24 +315,23 @@ action_oversee_construction = {
   			culture_group = outworlder_group
   			culture_group = construct_group
   		}
-    }
+	}
 
 	trigger = {
-		#FROM = {
-			#is_tribal = yes
-		#}
 		any_province_lord = {
 			character = FROM
 		}
 	}
-	
-	local_build_time_modifier = -0.025
-	
-	events = { 923 924 }
+
+	events = {
+		923 # Good Master Builder
+		924 # Sabotage
+	}
 }
 
 action_advance_eco_tech = {
 	attribute = stewardship
+	tech_growth_modifier_economy = 0.05
 
 	potential = {
 		FROM = {
@@ -338,16 +343,16 @@ action_advance_eco_tech = {
 		any_province_lord = {
 			character = FROM
 		}
+
 		technology_can_spread = yes
 	}
-	
-	tech_growth_modifier_economy = 0.05
-	
+
 	events = { }
 }
 
 action_build_legend = {
 	attribute = stewardship
+	monthly_character_prestige = 0.10
 
 	potential = {
 		FROM = {
@@ -360,159 +365,186 @@ action_build_legend = {
 			is_capital = PREV
 		}
 	}
-	
-	monthly_character_prestige = 0.1
-	
-	events = { 20208 }
+
+	events = {
+		20208 # The Steward has managed to raise an eager force of warriors
+	}
 }
 
 action_administer_realm = {
 	attribute = stewardship
+	offmap = yes
 
 	potential = {
-		has_dlc = Mystics
+		has_dlc = "Mystics"
 	}
 
-	offmap = yes
-	
-	events = { MNM.70005 MNM.78007 }
+	events = {
+		MNM.70005 # Demesne improved
+		MNM.78007 # Smugglers enter demesne
+	}
 }
 
 # Spymaster
 action_uncover_plots = {
 	attribute = intrigue
-	
+	plot_discovery_chance = 0.01
+
 	potential = {
-		NOT = { has_dlc = Mystics }
+		NOT = { has_dlc = "Mystics" }
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			OR = {
-				is_liege_or_above = FROM
 				same_liege = FROM
+				is_vassal_or_below_of = FROM
 			}
 		}
 	}
 
-	plot_discovery_chance = 0.01
-	
-	events = { 929 931 9000 9020 }
+	events = {
+		929 # Plot Uncovered
+		931 # The Spymaster is attacked by a Noble's thugs (Gets away, Is wounded, Is maimed, Is killed)
+		9000 # Faction Prevention - Spymaster finds Faction Member
+		9020 # Faction Recruitment - Spymaster finds Faction Member
+	}
 }
 
 action_uncover_plots_offmap = {
 	attribute = intrigue
-	
-	potential = {
-		has_dlc = Mystics
-	}
-	
+	plot_discovery_chance = 0.01
 	offmap = yes
 
-	plot_discovery_chance = 0.01
-	
-	events = { MNM.70022 MNM.70024 MNM.70023 }
+	potential = {
+		has_dlc = "Mystics"
+	}
+
+	events = {
+		MNM.70022 # Plot uncovered
+		MNM.70024 # Vassal discouraged from joining faction
+		MNM.70023 # Thugs attack the spymaster
+	}
 }
 
 action_study_technology = {
 	attribute = intrigue
-	
+
 	potential = {
 	}
-	
+
 	trigger = {
 		has_higher_tech_than = FROM
-		any_province_lord = {
-			NOT = { is_liege_or_above = FROM }
-			NOT = { character = FROM }
-		}
 		is_within_diplo_range = FROM
+
+		any_province_lord = {
+			NOR = {
+				character = FROM
+				is_vassal_or_below_of = FROM
+			}
+		}
 	}
-	
-	events = { 932 933 }
+
+	events = {
+		932 # The Spymaster studies foreign technology
+		933 # The Spymaster is discovered by the local count - chance of imprisonment
+	}
 }
 
 action_organize_spies = {
 	attribute = intrigue
-	
+	plot_power_modifier = 0.005
+
 	potential = {
-		NOT = {
-			has_dlc = "Mystics"
-		}
+		NOT = { has_dlc = "Mystics" }
 	}
-	
+
 	trigger = {
+		is_within_diplo_range = FROM
+
 		any_province_lord = {
 			NOT = { character = FROM }
 		}
-		is_within_diplo_range = FROM
 	}
-	
-	plot_power_modifier = 0.005
-	
-	events = { 935 936 }
+
+	events = {
+		935 # Vicious Rumors Spread
+		936 # Corruption Uncovered
+	}
 }
 
 action_organize_spies_mystics = {
 	attribute = intrigue
-	
+	plot_power_modifier = 0.005
+
 	potential = {
 		has_dlc = "Mystics"
 	}
-	
+
 	trigger = {
+		is_within_diplo_range = FROM
+
 		any_province_lord = {
 			NOT = { character = FROM }
 		}
-		is_within_diplo_range = FROM
 	}
-	
-	plot_power_modifier = 0.005
-	
-	events = { 935 936 931 9000 9020 }
+
+	events = {
+		935 # Vicious Rumors Spread
+		936 # Corruption Uncovered
+		931 # The Spymaster is attacked by a Noble's thugs (Gets away, Is wounded, Is maimed, Is killed)
+		9000 # Faction Prevention - Spymaster finds Faction Member
+		9020 # Faction Recruitment - Spymaster finds Faction Member
+	}
 }
 
 action_sabotage_province = {
 	attribute = intrigue
 
 	potential = {
-		has_dlc = Mystics
+		has_dlc = "Mystics"
 	}
 
 	trigger = {
+		is_within_diplo_range = FROM
+
 		any_province_lord = {
-			NOT = {
-				tier = BARON
-			}
+			higher_real_tier_than = BARON
 			NOT = { character = FROM }
 		}
+
 		can_be_sabotaged_trigger = yes
-		is_within_diplo_range = FROM
 	}
-	
-	events = { MNM.70020 933 }
+
+	events = {
+		MNM.70020	  # Sabotaged province
+		933 # The Spymaster is discovered by the local count - chance of imprisonment
+	}
 }
 
 # Marshal
 action_advance_mil_tech = {
 	attribute = martial
+	tech_growth_modifier_military = 0.05
 
 	potential = {
 		FROM = {
 			is_tribal = no
 		}
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			character = FROM
 		}
+
 		technology_can_spread = yes
 	}
-	
-	tech_growth_modifier_military = 0.05
-	
-	events = { 938 939 }
+
+	events = {
+		938 # Military Accident
+		939 # Military Secrets Revealed!
+	}
 }
 
 action_organize_raid = {
@@ -529,13 +561,17 @@ action_organize_raid = {
 			is_capital = PREV
 		}
 	}
-	
-	events = { 20221 }
+
+	events = {
+		20221 # The Marshal has managed to raise an eager force of raiders
+	}
 }
 
 action_train_troops = {
 	attribute = martial
-	
+	levy_size = 0.025
+	levy_reinforce_rate = 0.05
+
 	potential = {
 		FROM = {
 			is_nomadic = no
@@ -547,16 +583,17 @@ action_train_troops = {
 			character = FROM
 		}
 	}
-	
-	levy_size = 0.025
-	levy_reinforce_rate = 0.05
-	
-	events = { 941 942 }
+
+	events = {
+		941 # Reinforcements arrive
+		942 # Marshal tries to train troops, noble interferes
+	}
 }
 
 action_train_troops_nomadic = {
 	attribute = martial
-	
+	manpower_growth = 0.015
+
 	potential = {
 		FROM = {
 			is_nomadic = yes
@@ -568,18 +605,18 @@ action_train_troops_nomadic = {
 			is_capital = ROOT
 		}
 	}
-	
-	manpower_growth = 0.015
-	
+
 	events = { }
 }
 
 action_assist_arrest = {
 	attribute = martial
-	
+	arrest_chance_modifier = 0.01
+	local_revolt_risk = -0.01
+
 	potential = {
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			OR = {
@@ -588,46 +625,37 @@ action_assist_arrest = {
 			}
 		}
 	}
-	
-	arrest_chance_modifier = 0.01
-	local_revolt_risk = -0.01
-	
-	events = {  }
+
+	events = { }
 }
 
 action_organize_army = {
 	attribute = martial
+	liege_modifier = organize_army_liege_mod
+	attribute_cap = 25
+	offmap = yes
 
 	potential = {
-		has_dlc = Mystics
+		has_dlc = "Mystics"
 	}
 
-	offmap = yes
-	
-	liege_modifier = organize_army_liege_mod
-	
-	attribute_cap = 25
-	
-	events = { MNM.70010 MNM.70012 MNM.70015 } 
+	events = {
+		MNM.70010 # Commander improved
+		MNM.70012 # Commander found
+		MNM.70015 # Commander brawl
+	}
 }
 
 # Court Chaplain
 action_inquisition = {
 	attribute = learning
-	
+
 	potential = {
-		#NOR = {
-		#	FROM = { government = magocratic_feudal_government }
-		#	FROM = { government = democratic_feudal_government }
-		#	FROM = { government = celestial_government }
-		#	FROM = { government = chinese_imperial_government }
-		#	FROM = { government = celestial_bureaucracy }
-		#	}
-        liege = { religion = PREV } # Disabled proselytize if religion mismatch with liege to prevent AI from shooting itself in the foot
+		liege = { religion = PREV } # Disabled proselytize if religion mismatch with liege to prevent AI from shooting itself in the foot
 	}
-	
+
 	trigger = {
-		num_of_settlements = 1
+		num_of_settlements >= 1
 		# NAND = {
 			# FROM = { job_spiritual = { has_character_modifier = spiritual_refused_pagans } }  # See Event ZE.5040
 			# owner = { AND = { religion_group = pagan_group NOT = { religion = FROM } } }
@@ -635,39 +663,43 @@ action_inquisition = {
 		any_province_lord = {
 			OR = {
 				character = FROM
-				is_liege_or_above = FROM
+				is_vassal_or_below_of = FROM
 			}
 		}
 	}
-	
+
 	display_on_map = {
 		tooltip = JOB_PROSELYTIZE_SAME_RELIGION
+		color = { 0 0 255 }
+
 		trigger = {
 			religion = FROM
+
 			any_province_lord = {
 				OR = {
 					character = FROM
-					is_liege_or_above = FROM
+					is_vassal_or_below_of = FROM
 				}
 			}
 		}
-		color = { 0 0 255 }
 	}
-	
+
 	display_on_map = {
 		tooltip = JOB_PROSELYTIZE_DIFFERENT_RELIGION
+		color = { 0 255 0 }
+
 		trigger = {
 			NOT = { religion = FROM }
+
 			any_province_lord = {
 				OR = {
 					character = FROM
-					is_liege_or_above = FROM
+					is_vassal_or_below_of = FROM
 				}
 			}
 		}
-		color = { 0 255 0 }
 	}
-	
+
 	# display_on_map = {
 		# tooltip = JOB_PROSELYTIZE_CONVERT_INDEPENDENT
 		# trigger = {
@@ -676,66 +708,79 @@ action_inquisition = {
 		# color = { 255 35 35 }
 	# }
 
-	events = { 900 901 902 }
+	events = {
+		900 # The Lord Spiritual converts a province!
+		901 # The Lord Spiritual converts a subject character
+		902 # The Lord Spiritual is attacked by heathens (Gets away, is wounded, Is killed)
+		# 903 # The Lord Spiritual suspects a subject character of heresy
+	}
 }
 
 action_improve_rel_relations = {
 	attribute = learning
-	
+
 	potential = {
 		FROM = {
 			NOR = {
 				religion_group = qismaite_group
 				government = democratic_feudal_government
-				#government = magocratic_feudal_government
 				government = celestial_government
 				government = celestial_bureaucracy
 			}
 		}
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			religion = FROM
 			is_theocracy = yes
+
 			FROM = {
 				job_spiritual = {
 					NOT = { character = PREVPREV } # Can't be sent to improve relations with himself...
 				}
 			}
 		}
+
 		is_within_diplo_range = FROM
 	}
-	
-	events = { 906 907 }
+
+	events = {
+		906 # The Lord Spiritual improves relations between the liege and a bishop
+		907 # The Lord Spiritual attempts to sabotage the relations of a subject priest towards the head of the religion
+	}
 }
 
 action_advance_cul_tech = {
 	attribute = learning
-	
+	tech_growth_modifier_culture = 0.05
+
 	potential = {
 		FROM = {
 			is_tribal = no
 		}
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			OR = {
 				character = FROM
-				is_liege_or_above = FROM
+				is_vassal_or_below_of = FROM
 			}
 		}
+
 		technology_can_spread = yes
 	}
-	
-	tech_growth_modifier_culture = 0.05
-	
-	events = { 926 } # removed 927: Lord Spiritual = heretic 
+
+	events = {
+		926 # A Great Inventor offers his help: Random Culture Tech increases
+		# 927 # Lord Spiritual is heretic
+	}
 }
 
 action_build_zeal = {
 	attribute = learning
+	monthly_character_piety = 0.05
 
 	potential = {
 		FROM = {
@@ -748,32 +793,33 @@ action_build_zeal = {
 			is_capital = PREV
 		}
 	}
-	
-	monthly_character_piety = 0.05
-	
-	events = { 20218 }
+
+	events = {
+		20218 # The Court Priest has managed to raise an eager force of holy warriors
+	}
 }
 
 action_hunt_heretics = {
 	attribute = learning
+	liege_modifier = apostate_liege_mod
+	offmap = yes
 
 	potential = {
-		has_dlc = Mystics
+		has_dlc = "Mystics"
 	}
-	
-	liege_modifier = apostate_liege_mod
 
-	offmap = yes
-	
-	events = { MNM.70100 }
+	events = {
+		MNM.70100 # Hunt Apostates
+	}
 }
 
 # Lord Spiritual (Muslim only)
 action_charity = {
 	attribute = learning
-	
+	local_revolt_risk = -0.01
+
 	potential = {
-		FROM = { 
+		FROM = {
 			OR = {
 				religion_group = qismaite_group
 				government = celestial_government
@@ -781,19 +827,22 @@ action_charity = {
 			}
 		}
 	}
-	
+
 	trigger = {
 		any_province_lord = {
 			character = FROM
 		}
 	}
-	
-	local_revolt_risk = -0.01
-	
-	events = { 20040 20043 20048 20050 }
+
+	events = {
+		20040 # The Mufti improves relations between the liege and a vassal
+		20043 # The Mufti is trampled by a peasant mob (Gets away, Is wounded, Is killed)
+		20048 # Court Imam pockets charity money
+		20050 # Piety gained
+	}
 }
 
-# Magocratic and Commonwealth Only
+# Commonwealth Only
 action_local_leaders = {
 	attribute = learning
 
