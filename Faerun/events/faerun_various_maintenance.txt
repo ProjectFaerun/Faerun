@@ -1,23 +1,5 @@
 namespace = frmaint
 
-character_event = { # Is a placeholder workaround
-	id = frmaint.1
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		government = baron_theocracy_government
-		NOT = { has_law = succ_open_elective }
-	}
-
-	immediate = {
-		primary_title = {
-			add_law = succ_open_elective
-		}
-	}
-}
-
 character_event = { # Sets various story flags
 	id = frmaint.2
 	hide_window = yes
@@ -31,6 +13,8 @@ character_event = { # Sets various story flags
 	}
 
 	immediate = {
+		set_global_flag = faerun_started
+
 		#Can't be trigger switch because it's not a case of only one possible option
 		if = {
 			limit = {
@@ -78,6 +62,14 @@ character_event = { # Sets various story flags
 			}
 			set_global_flag = peacock_throne_shattered # canopy goes missing
 		}
+		if = {
+			limit = {
+				date >= 1159.1.1
+			}
+			c_53001 = { #Szass Tam
+				add_character_modifier = { name = true_villain_modifier years = 10 }
+			}
+		}
 		if = { # initiates the plot driving variables
 			limit = {
 				date = 1281.1.1
@@ -87,6 +79,14 @@ character_event = { # Sets various story flags
 			set_variable = { which = global_counter_divine value = 1000 }
 			set_variable = { which = global_counter_trivir value = 1000 }
 			set_variable = { which = global_counter_shadow value = 1000 }
+		}
+		if = {
+			limit = {
+				date >= 1300.1.1
+			}
+			c_56001 = { #Manshoon
+				add_character_modifier = { name = true_villain_modifier years = 10 }
+			}
 		}
 		if = {
 			limit = {
@@ -176,6 +176,14 @@ character_event = { # Sets various story flags
 				date = 1361.7.1
 			}
 			set_global_flag = maztica_opened
+		}
+		if = {
+			limit = {
+				date >= 1362.1.1
+			}
+			c_120 = { #Acerak
+				add_character_modifier = { name = true_villain_modifier years = 10 }
+			}
 		}
 		if = {
 			limit = {
@@ -851,82 +859,46 @@ character_event = {
 			}
 			FROM = { add_law = succ_turkish_succession }
 		}
+
 		if = {
+			limit = {
+				is_matriarchal_religion_or_culture = yes
+			}
+			FROM = { add_law = enatic_succession }
+		}
+		else_if = {
 			limit = {
 				culture_group = goblinoid_group
 			}
 			FROM = { add_law = enatic_cognatic_succession }
 		}
-		if = {
+		else_if = {
+			limit = {
+				NOR = {
+					is_patriarchal_religion_or_culture = yes
+					has_law = status_of_women_3
+					has_law = status_of_women_2
+					has_law = status_of_women_1
+					has_law = status_of_women_0
+				}
+			}
+			FROM = { add_law = true_cognatic_succession }
+		}
+		else_if = {
 			limit = {
 				OR = {
 					culture = calishite
-					NOR = {
-						religion = lolth_cult
-						has_religion_feature = religion_matriarchal
-					}
 					AND = {
-						NOR = {
-							culture_group = orc_group
-							culture_group = goblinoid_group
-							culture = troll
-						}
 						is_female = yes
-						OR = {
-							has_religion_feature = religion_patriarchal
-							has_law = status_of_women_3
-							has_law = status_of_women_2
+						is_tribal = no
+						NOR = {
 							has_law = status_of_women_1
+							has_law = status_of_women_0
 						}
 					}
 				}
 			}
 			FROM = { add_law = cognatic_succession }
-		}
-		if = {
-			limit = {
-				OR = {
-					culture = troll
-					religion = lolth_cult
-					has_religion_feature = religion_matriarchal
-				}
-			}
-			FROM = { add_law = enatic_succession }
-		}
-		if = {
-			limit = {
-				is_government_potential = democratic_feudal_government
-				FROM = { NOT = { tier = baron } }
-			}
-			FROM = { add_law = succ_popular_elective }
-		}
-		if = {
-			limit = {
-				NOR = {
-					culture_group = orc_group
-					culture_group = goblinoid_group
-					culture = calishite
-					culture = troll
-					has_law = status_of_women_3
-					has_law = status_of_women_2
-					has_law = status_of_women_1
-				}
-			}
-			FROM = { add_law = true_cognatic_succession }
-		}
-		if = {
-			limit = {
-				is_government_potential = divine_feudal_government
-				FROM = { NOT = { tier = baron } }
-			}
-			FROM = { add_law = succ_divine_dynastic }
-		}
-		if = {
-			limit = {
-				is_government_potential = theocracy_government
-				FROM = { NOT = { tier = baron } }
-			}
-			FROM = { add_law = succ_divine_elective }
 		}
 	}
 }
@@ -1088,20 +1060,6 @@ character_event = {
 				grant_title = PREV
 			}
 		}
-	}
-}
-
-# Sets startup flag, for submod compatibility
-character_event = {
-	id = frmaint.22
-	hide_window = yes
-	is_triggered_only = yes
-	trigger = {
-		is_save_game = no
-		NOT = { has_global_flag = faerun_started }
-	}
-	immediate = {
-		set_global_flag = faerun_started
 	}
 }
 
@@ -2076,25 +2034,20 @@ character_event = { # preserve some government types on succession
 				FROMFROM = { government = democratic_feudal_government }
 			}
 			set_character_flag = democratic_feudal_government_preserve
-			character_event = { id = frmaint.35 days = 1 }
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				FROMFROM = { government = theocracy_government }
 			}
 			set_character_flag = theocracy_government_preserve
-			character_event = { id = frmaint.35 days = 1 }
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				FROMFROM = { government = divine_feudal_government }
 			}
 			set_character_flag = divine_feudal_government_preserve
-			character_event = { id = frmaint.35 days = 1 }
-			break = yes
 		}
+		character_event = { id = frmaint.35 days = 1 }
 	}
 }
 
@@ -2127,6 +2080,7 @@ character_event = { # preserve elective succession for promoted barons and landl
 	}
 
 	immediate = {
+		character_event = { id = womenstatusmaint.1 days = 1 }
 		character_event = { id = frmaint.37 days = 1 }
 	}
 }
@@ -2157,9 +2111,8 @@ character_event = {
 					opinion_effect = no
 				}
 			}
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = { government = theocracy_government }
 			any_demesne_title = {
 				limit = {
@@ -2171,7 +2124,6 @@ character_event = {
 					opinion_effect = no
 				}
 			}
-			break = yes
 		}
 	}
 }
@@ -2185,40 +2137,29 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		OR = {
-			government = republic_government
-			government = baron_theocracy_government
-			is_landed = no
-		}
+		lower_tier_than = COUNT
 	}
 
 	immediate = {
 		set_character_flag = promoted_received_title
 		if = {
 			limit = {
-				is_landed = no
-			}
-			character_event = { id = frmaint.35 days = 1 }
-			break = yes
-		}
-		if = {
-			limit = {
 				government = republic_government
 			}
 			set_character_flag = democratic_feudal_government_preserve
 			character_event = { id = frmaint.35 days = 1 }
-			break = yes
 		}
-		if = {
+		else_if = {
 			limit = {
 				government = baron_theocracy_government
 			}
 			set_character_flag = theocracy_government_preserve
 			character_event = { id = frmaint.35 days = 1 }
-			break = yes
 		}
+		character_event = { id = frmaint.35 days = 1 }
 	}
 }
+
 # maintain popular_elective and divine_elective for rulers that have them
 # Fired from GRANT_LANDED_TITLE_INTERACTION_ACCEPT_EVENT and on_new_holder_usurpation on_actions
 character_event = {
@@ -2291,40 +2232,6 @@ character_event = {
 					name = ruined_dwarfhold
 					duration = -1
 				}
-			}
-		}
-	}
-}
-
-character_event = { #10 years villain modifier applied on startup, to avoid unlimited duration
-	id = frmaint.42
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		c_53001 = { #Szass Tam
-			if = {
-				limit  = {
-					date >= 1159.1.1
-				}
-				add_character_modifier = { name = true_villain_modifier years = 10 }
-			}
-		}
-		c_56001 = { #Manshoon
-			if = {
-				limit  = {
-					date >= 1300.1.1
-				}
-				add_character_modifier = { name = true_villain_modifier years = 10 }
-			}
-		}
-		c_120 = { #Acerak
-			if = {
-				limit  = {
-					date >= 1362.1.1
-				}
-				add_character_modifier = { name = true_villain_modifier years = 10 }
 			}
 		}
 	}
@@ -3003,7 +2910,7 @@ character_event = {
 character_event = {
 	id = frmaint.55
 	hide_window = yes
-	only_playable = yes
+	only_rulers = yes
 
 	is_triggered_only = yes # on_new_holder
 
@@ -3012,15 +2919,20 @@ character_event = {
 			NOT = { government = FROMFROM }
 			OR = {
 				government = democratic_feudal_government
+				government = divine_feudal_government
 				government = nomadic_tribal_government
 				government = ordning_government
 				government = theocracy_government
+				government = baron_theocracy_government
 			}
 		}
 	}
 
 	immediate = {
-		ROOT = { character_event = { id = frmaint.56 days = 1 } }
+		ROOT = {
+			character_event = { id = frmaint.56 }
+			character_event = { id = frmaint.56 days = 1 }
+		}
 	}
 }
 
@@ -3028,7 +2940,6 @@ character_event = {
 character_event = {
 	id = frmaint.56
 	hide_window = yes
-	only_playable = yes
 
 	is_triggered_only = yes # frmaint.55
 
@@ -3042,6 +2953,17 @@ character_event = {
 				log = "frmaint.56: Changed succession for [This.GetFullName] to popular elective"
 				add_law = {
 					law = succ_popular_elective
+					opinion_effect = no
+				}
+			}
+			else_if = {
+				limit = {
+					holder_scope = { government = divine_feudal_government }
+					NOT = { has_law = succ_divine_dynastic }
+				}
+				log = "frmaint.56: Changed succession for [This.GetFullName] to divine dynastic"
+				add_law = {
+					law = succ_divine_dynastic
 					opinion_effect = no
 				}
 			}
@@ -3102,6 +3024,58 @@ character_event = {
 				add_law = {
 					law = succ_divine_elective
 					opinion_effect = no
+				}
+			}
+			else_if = {
+				limit = {
+					holder_scope = { government = baron_theocracy_government }
+					NOT = { has_law = succ_open_elective }
+				}
+				add_law = {
+					law = succ_open_elective
+					opinion_effect = no
+				}
+			}
+
+			# Extra setup for theocratic gender succession.
+			if = {
+				limit = {
+					holder_scope = {
+						OR = {
+							is_theocracy = yes
+							government = theocracy_government
+						}
+					}
+				}
+				if = {
+					limit = {
+						holder_scope = {
+							religion_allows_male_temple_holders = yes
+							religion_allows_female_temple_holders = yes
+						}
+					}
+					add_law = {
+						law = true_cognatic_succession
+						opinion_effect = no
+					}
+				}
+				else_if = {
+					limit = {
+						holder_scope = {
+							religion_allows_male_temple_holders = yes
+							religion_allows_female_temple_holders = no
+						}
+					}
+					add_law = {
+						law = agnatic_succession
+						opinion_effect = no
+					}
+				}
+				else = {
+					add_law = {
+						law = enatic_succession
+						opinion_effect = no
+					}
 				}
 			}
 		}
