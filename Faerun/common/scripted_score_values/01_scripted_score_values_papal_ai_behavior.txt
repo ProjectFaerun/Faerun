@@ -8,1722 +8,1475 @@
 # nominate_bishop_chance
 # AI logic for how the Pope should respond to the hardcoded Ask for Excommunication action
 # ROOT is the asker, FROM is the Pope, FROMFROM is the target
-# ask_for_excommunication_chance = {
-	# additive_modifier = {
-		# value = -50
-		# localisation_key = AIREASON_BASE_RELUCTANCE
-		# always = yes
-	# }
-	# additive_modifier = { #Slow down the AI
-		# value = -25
-		# localisation_key = AIREASON_BASE_RELUCTANCE
-		# ai = yes
-	# }
-	# additive_modifier = { #And Landless Mercenaries overall...
-		# value = -150
-		# localisation_key = AIREASON_BASE_RELUCTANCE
-		# ai = yes
-		# is_landed = no
-	# }
-	# additive_modifier = {
-		# value = -1000
-		# localisation_key = AIREASON_EXCOM_TARGET_HAS_REPENTED_SINS
-		# FROM = {
-			# has_opinion_modifier = { who = ROOT_FROMFROM modifier = opinion_repented_sins }
-		# }
-	# }
-	# additive_modifier = {
-		# value = -50
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_REQUESTED_EXCOM_ALREADY
-		# FROM = {
-			# has_opinion_modifier = {
-				# modifier = opinion_requested_excommunication
-				# who = ROOT
-			# }
-		# }
-	# }
-	# #The Papacy will not excommunicate other priests on demand.
-	# additive_modifier = { 
-		# value = -100
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_NO_PRIEST_EXCOMMUNICATION_DEMANDED
-		# NOT = { 
-			# character = FROM # The Pope will excommunicate priests by his own accord, but not on request from other rulers.
-		# }
-		# FROMFROM = { is_theocracy = yes } 
-	# }
-	# #The Papacy will tend to excommunicate bad priests.
-	# additive_modifier = { 
-		# value = 15
-		# #No loc needed, it's just for the Pope.
-		# character = FROM 
-		# FROMFROM = { 
-			# higher_real_tier_than = BARON
-			# is_theocracy = yes 
-			
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# }
-		# } 
-	# }
-	#Saintly Bloodline boost.
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE
-		# NOT = { character = FROM }
-		# any_owned_bloodline = {
-			# has_bloodline_flag = saintly_bloodline
-			# NOT = { has_bloodline_flag = wicked_saint }
-		# } 
-	# }
-	# additive_modifier = {
-		# value = -25
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_IS_KINSLAYER
-		# OR = {
-			# trait = kinslayer
-			# trait = familial_kinslayer
-			# trait = dynastic_kinslayer
-		# }
-	# }
-	# additive_modifier = {
-		# value = -40
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_IS_SINNER
-		# OR = {
-			# has_character_modifier = rampant_sinner_christian
-			# has_character_modifier = rampant_sinner_dharmic
-			# has_character_modifier = known_satanist
-			# has_character_modifier = known_witch
-		# }
-	# }
+ask_for_excommunication_chance = {
+	additive_modifier = {
+		value = -50
+		localisation_key = AIREASON_BASE_RELUCTANCE
+	}
+
+	additive_modifier = { # Slow down the AI
+		value = -25
+		localisation_key = AIREASON_BASE_RELUCTANCE
+		ai = yes
+	}
+
+	additive_modifier = { # And Landless Mercenaries overall...
+		value = -150
+		localisation_key = AIREASON_BASE_RELUCTANCE
+
+		ai = yes
+		is_landed = no
+	}
+
+	additive_modifier = {
+		value = -1000
+		localisation_key = AIREASON_EXCOM_TARGET_HAS_REPENTED_SINS
+
+		FROM = {
+			has_opinion_modifier = {
+				name = opinion_repented_sins
+				who = ROOT_FROMFROM
+			}
+		}
+	}
+	additive_modifier = {
+		value = -50
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_REQUESTED_EXCOM_ALREADY
+
+		reverse_has_opinion_modifier = {
+			name = opinion_requested_excommunication
+			who = FROM
+		}
+	}
+
+	# The Papacy will not excommunicate other priests on demand
+	additive_modifier = {
+		value = -100
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_NO_PRIEST_EXCOMMUNICATION_DEMANDED
+
+		FROMFROM = {
+			OR = {
+				is_theocracy = yes
+				government = theocracy_government
+			}
+		}
+		NOT = { character = FROM } # The Pope will excommunicate priests by his own accord, but not on request from other rulers.
+	}
+
+	# The Papacy will tend to excommunicate bad priests
+	additive_modifier = {
+		value = 15
+
+		# No loc needed, it's just for the Pope
+		character = FROM
+
+		FROMFROM = {
+			higher_real_tier_than = BARON
+			is_theocracy = yes
+			has_bad_priest_trait_trigger = yes
+		}
+	}
+
+	# Saintly Bloodline boost
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE
+
+		any_owned_bloodline = {
+			has_bloodline_flag = saintly_bloodline
+			bloodline_is_active_for = PREV
+			NOT = { has_bloodline_flag = wicked_saint }
+		}
+
+		NOT = { character = FROM }
+	}
+
+	additive_modifier = {
+		value = -25
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_IS_KINSLAYER
+
+		OR = {
+			trait = kinslayer
+			trait = familial_kinslayer
+			trait = dynastic_kinslayer
+		}
+	}
+
+	additive_modifier = {
+		value = -40
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_IS_SINNER
+
+		OR = {
+			has_character_modifier = true_villain_modifier
+			has_character_modifier = rampant_sinner_dharmic
+			has_character_modifier = known_satanist
+			has_character_modifier = known_witch
+		}
+	}
 
 	## Universal modifiers ##
-	#Always valid for all Papal actions.
+	# Always valid for all Papal actions
+	additive_modifier = {
+		value = -1000
+		localisation_key = POPE_AIREASON_MODIFIER_IS_EXCOMMUNICATED
+
+		excommunicated_for = FROM
+	}
+
 	# additive_modifier = {
-		# value = -1000
-		# localisation_key = POPE_AIREASON_MODIFIER_IS_EXCOMMUNICATED
-		# excommunicated_for = FROM
-	# }
-	# additive_modifier = {
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_CHILD
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# OR = { 
-			# trait = baptized_by_pope 
-			# trait = baptized_by_patriarch
-		# }
-		# NOT = { persistent_event_target:baptizing_pope_per = { character = FROM } }
-	# }
-	# additive_modifier = {
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_BY_ME
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# OR = { 
-			# trait = baptized_by_pope 
-			# trait = baptized_by_patriarch
-		# }
-		# persistent_event_target:baptizing_pope_per = { character = FROM } #Ruler asking was baptized by this very same Pope.
-	# }
-	# additive_modifier = {
-		# value = -100
-		# localisation_key = POPE_AIREASON_MODIFIER_NAPOLEON_RULER
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# trait = crowned_by_myself
-	# }
-	# additive_modifier = {
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_UNCROWNED_RULER
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# has_dlc = "Holy Fury"
-		# higher_tier_than = DUKE
-		# age = 16
-		# religion = FROM
-		# is_feudal = yes
-		# OR = { 
-			# religion = catholic
-			# religion = fraticelli
-		# }
-		# NOR = { 
-			# trait = crowned_by_pope 
-			# trait = crowned_by_bishop
-			# trait = crowned_by_priest
-			# trait = crowned_by_myself
-		# }
-	# }
-	# additive_modifier = {
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_POPE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# trait = crowned_by_pope
-		# NOT = { persistent_event_target:coronation_priest_per = { character = FROM } } #Ruler asking was crowned by this very same Pope.
-	# }
-	# additive_modifier = {
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_ME
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# trait = crowned_by_pope
-		# persistent_event_target:coronation_priest_per = { character = FROM } #Ruler asking was crowned by this very same Pope.
-	# }
-	# additive_modifier = { 
-		# value = 50 
-		# localisation_key = POPE_AIREASON_MODIFIER_PET_POPE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = { vassal_of = ROOT } #Overrides base acceptance.
-	# }
-	# additive_modifier = { 
-		# value = 5 
-		# localisation_key = POPE_AIREASON_MODIFIER_SAME_DYNASTY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# dynasty = FROM
-		# NOT = { is_close_relative = FROM }
-	# }
-	# additive_modifier = { 
-		# value = 10 
-		# localisation_key = POPE_AIREASON_MODIFIER_CLOSE_RELATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# is_close_relative = FROM
-		# NOT = { FROM = { is_child_of = ROOT } }
-	# }
-	# additive_modifier = { 
-		# value = 15 
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_PARENT
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = { is_child_of = ROOT }
-	# }
-	# additive_modifier = { 
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_FRIEND
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# is_friend = FROM
-	# }
-	# additive_modifier = { 
-		# value = 20
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_LOVER
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# is_lover = FROM
-	# }
-	# additive_modifier = { 
-		# value = -100
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_RIVAL
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# is_rival = FROM
-	# }
-	# additive_modifier = { 
-		# value = 5 
-		# localisation_key = POPE_AIREASON_MODIFIER_SAME_CULTURE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# culture = FROM
-	# }
-	# additive_modifier = { 
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_CARDINAL
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = {  
-			# has_opinion_modifier = { 
-				# who = ROOT 
-				# modifier = opinion_supported_cardinal
-			# }
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = 30
-		# localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_POPE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = {  
-			# has_opinion_modifier = { 
-				# who = ROOT 
-				# modifier = opinion_supported_pope
-			# }
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = -30
-		# localisation_key = POPE_AIREASON_MODIFIER_FREE_INVESTITURE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# primary_title = {  
-			# has_law = investiture_law_1
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_PLEDGED_TO_CRUSADE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
- 		# is_preparing_crusade = yes 
-		# has_pledged_crusade_participation = yes
-	# }
-	# additive_modifier = { 
-		# value = 30
-		# localisation_key = POPE_AIREASON_MODIFIER_WAGING_CRUSADE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# OR = {
- 			# any_war = { using_cb = new_crusade }
- 			# any_war = { using_cb = crusade }
-		# }
-	# }
-	#Influence over Cardinals.
-	# additive_exported_value_modifier = {
-		# localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS
-		# factor = 2
-		# max = 45
-		# value = num_vassals_with_minor_title
-		# who = ROOT
-		# key = title_cardinal
-	# }
-	# additive_exported_value_modifier = {
-		# localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS
-		# factor = 2
-		# max = 45
-		# value = num_vassals_with_minor_title
-		# who = ROOT
-		# key = title_fraticelli_cardinal
-	# }
-	
-	# #Asker's Piety.
-	# additive_modifier = { 
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# NOT = { piety = -250 }
-	# }
-	# additive_modifier = { 
-		# value = -10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = -250
-		# NOT = { piety = -100 }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = -100
-		# NOT = { piety = -50 }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = 150
-		# NOT = { piety = 350 }
-	# }
-	# additive_modifier = { 
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = 350
-		# NOT = { piety = 750 }
-	# }
-	# additive_modifier = { 
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = 750
-		# NOT = { piety = 1500 }
-	# }
-	# additive_modifier = { 
-		# value = 20
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-			# piety = 1500
-			# NOT = { piety = 2000 }
-	# }
-	# additive_modifier = { 
-		# value = 25
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# piety = 2000
-	# }
-	# additive_opinion_modifier = { 
-		# localisation_key = POPE_AIREASON_MODIFIER_OPINION_RULER
-		# factor = 0.25 # +100 Opinion = +25 points
-		# who = ROOT	 
-		# this = FROM #The Pope's opinion of ROOT.
-	# }
-	# # Modifiers vs Virtuous Pope
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# trait = zealous
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# # religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# NOT = { has_polygamy = yes }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# trait = chaste
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# trait = temperate
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# trait = charitable
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# trait = diligent
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# trait = patient
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# trait = kind
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# trait = humble
-	# }
-	# additive_modifier = { 
-		# value = -10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CYNICAL
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# trait = cynical
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_LUSTFUL
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# trait = lustful
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_GLUTTONOUS
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# trait = gluttonous
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_GREEDY
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# Or = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# trait = greedy
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_SLOTHFUL
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = giant_pantheon
-		# religion = faceless_god
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# trait = slothful
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_WROTH
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# trait = wroth
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ENVIOUS
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# trait = envious
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PROUD
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# trait = proud
-	# }
-	#Modifiers vs Wicked Pope
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# trait = humble
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# trait = kind
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# trait = patient
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# trait = diligent
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# trait = charitable
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# trait = temperate
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# religion_group = christian #Reformed Pagans shouldn't use these.
-		# OR = {
-		# religion = muhjari
-		# religion = padhran
-		# religion = faceless_god
-		# religion = giant_pantheon
-		# }
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# trait = chaste
-	# }
-	# additive_modifier = { 
-		# value = -10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_NEGATIVE
-		# NOT = { character = FROM } #Not on yourself, dirty Pope.
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# trait = zealous
+	# 	value = 5
+	# 	localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_CHILD
+
+	# 	OR = {
+	# 		trait = baptized_by_pope
+	# 		trait = baptized_by_patriarch
+	# 	}
+
+	# 	NOR = {
+	# 		persistent_event_target:baptizing_pope_per = { character = FROM }
+	# 		character = FROM # Not on yourself, dirty Pope
+	# 	}
 	# }
 
+	# additive_modifier = {
+	# 	value = 10
+	# 	localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_BY_ME
+
+	# 	OR = {
+	# 		trait = baptized_by_pope
+	# 		trait = baptized_by_patriarch
+	# 	}
+
+	# 	persistent_event_target:baptizing_pope_per = { character = FROM } # Ruler asking was baptized by this very same Pope
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+
+	# additive_modifier = {
+	# 	value = -100
+	# 	localisation_key = POPE_AIREASON_MODIFIER_NAPOLEON_RULER
+ # 
+	# 	trait = crowned_by_myself
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+
+	additive_modifier = {
+		value = -15
+		localisation_key = POPE_AIREASON_MODIFIER_UNCROWNED_RULER
+
+		is_decision_potential = prepare_coronation_ceremony
+		religion = FROM
+		is_adult = yes
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	# additive_modifier = {
+	# 	value = 10
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_POPE
+ # 
+	# 	trait = crowned_by_pope
+ # 
+	# 	NOR = {
+	# 		persistent_event_target:coronation_priest_per = { character = FROM } # Ruler asking was crowned by this very same Pope
+	# 		character = FROM # Not on yourself, dirty Pope
+	# 	}
+	# }
+
+	# additive_modifier = {
+	# 	value = 15
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_ME
+ # 
+	# 	trait = crowned_by_pope
+	# 	persistent_event_target:coronation_priest_per = { character = FROM } # Ruler asking was crowned by this very same Pope
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+
+	additive_modifier = {
+		value = 50
+		localisation_key = POPE_AIREASON_MODIFIER_PET_POPE
+
+		is_liege_of = FROM # Overrides base acceptance
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_SAME_DYNASTY
+
+		dynasty = FROM
+
+		NOR = {
+			is_close_relative = FROM
+			character = FROM # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = 10
+		localisation_key = POPE_AIREASON_MODIFIER_CLOSE_RELATIVE
+
+		is_close_relative = FROM
+
+		NOR = {
+			is_parent_of = FROM
+			character = FROM # Not on yourself, dirty Pope
+		}
+
+	}
+	additive_modifier = {
+		value = 15
+		localisation_key = POPE_AIREASON_MODIFIER_MY_PARENT
+
+		is_parent_of = FROM
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 15
+		localisation_key = POPE_AIREASON_MODIFIER_MY_FRIEND
+
+		is_friend = FROM
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 20
+		localisation_key = POPE_AIREASON_MODIFIER_MY_LOVER
+
+		is_lover = FROM
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = -100
+		localisation_key = POPE_AIREASON_MODIFIER_MY_RIVAL
+
+		is_rival = FROM
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_SAME_CULTURE
+
+		culture = FROM
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	# additive_modifier = {
+	# 	value = 15
+	# 	localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_CARDINAL
+ # 
+	# 	FROM = {
+	# 		has_opinion_modifier = {
+	# 			name = opinion_supported_cardinal
+	# 			who = ROOT
+	# 		}
+ # 
+	# 		NOT = { character = ROOT } # Not on yourself, dirty Pope
+	# 	}
+	# }
+
+	# additive_modifier = {
+	# 	value = 30
+	# 	localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_POPE
+ # 
+	# 	FROM = {
+	# 		has_opinion_modifier = {
+	# 			name = opinion_supported_pope
+	# 			who = ROOT
+	# 		}
+ # 
+	# 		NOT = { character = ROOT } # Not on yourself, dirty Pope
+	# 	}
+	# }
+
+	# additive_modifier = {
+	# 	value = -30
+	# 	localisation_key = POPE_AIREASON_MODIFIER_FREE_INVESTITURE
+ # 
+	# 	has_law = investiture_law_1
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+ # 
+	# additive_modifier = {
+	# 	value = 15
+	# 	localisation_key = POPE_AIREASON_MODIFIER_PLEDGED_TO_CRUSADE
+ # 
+ # 		is_preparing_crusade = yes
+	# 	has_pledged_crusade_participation = yes
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+ # 
+	# additive_modifier = {
+	# 	value = 30
+	# 	localisation_key = POPE_AIREASON_MODIFIER_WAGING_CRUSADE
+ # 
+	# 	any_war = {
+	# 		OR = {
+	# 			using_cb = new_crusade
+	# 			using_cb = crusade
+	# 		}
+	# 	}
+ # 
+	# 	NOT = { character = FROM } # Not on yourself, dirty Pope
+	# }
+
+	# Influence over Cardinals
+	# additive_exported_value_modifier = {
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS
+	# 	factor = 2
+	# 	max = 45
+	# 	value = num_vassals_with_minor_title
+	# 	who = ROOT
+	# 	key = title_cardinal
+	# }
+ # 
+	# additive_exported_value_modifier = {
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS
+	# 	factor = 2
+	# 	max = 45
+	# 	value = num_vassals_with_minor_title
+	# 	who = ROOT
+	# 	key = title_fraticelli_cardinal
+	# }
+
+	# Asker's Piety
+	additive_modifier = {
+		value = -15
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety < -250
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = -10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= -250
+		piety < -100
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= -100
+		piety < -50
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= 150
+		piety < 350
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= 350
+		piety < 750
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 15
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= 750
+		piety < 1500
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 20
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= 1500
+		piety < 2000
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_modifier = {
+		value = 25
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY
+
+		piety >= 2000
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+	}
+
+	additive_opinion_modifier = {
+		localisation_key = POPE_AIREASON_MODIFIER_OPINION_RULER
+		factor = 0.25 # +100 Opinion = +25 points
+		who = ROOT
+		this = FROM # The Pope's opinion of ROOT
+	}
+
+	# Modifiers vs Virtuous Pope
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS
+
+		trait = zealous
+
+		FROM = {
+			NOR = {
+				has_bad_priest_trait_trigger = yes
+				trait = cynical
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE
+
+		trait = chaste
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = lustful
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE
+
+		trait = temperate
+
+		FROM = {
+			olrox_is_environmental_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = gluttonous
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE
+
+		trait = charitable
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = greedy
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT
+
+		trait = diligent
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = slothful
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT
+
+		trait = patient
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = wroth
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND
+
+		trait = kind
+
+		FROM = {
+			is_evil_religion = no
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = envious
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE
+
+		trait = humble
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = proud
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CYNICAL
+
+		trait = cynical
+
+		FROM = {
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = cynical
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_LUSTFUL
+
+		trait = lustful
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = lustful
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_GLUTTONOUS
+
+		trait = gluttonous
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = gluttonous
+				character = ROOT  # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_GREEDY
+
+		trait = greedy
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = greedy
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_SLOTHFUL
+
+		trait = slothful
+
+		FROM = {
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = slothful
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_WROTH
+
+		trait = wroth
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = wroth
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ENVIOUS
+
+		trait = envious
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = envious
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PROUD
+
+		trait = proud
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+
+			NOR = {
+				trait = proud
+				character = ROOT # Not on yourself, dirty Pope
+			}
+		}
+	}
+
+	# Modifiers vs Wicked Pope
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_NEGATIVE
+
+		trait = humble
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = proud
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_NEGATIVE
+
+		trait = kind
+
+		FROM = {
+			OR = {
+				is_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = envious
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_NEGATIVE
+
+		trait = patient
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = wroth
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_NEGATIVE
+
+		trait = diligent
+
+		FROM = {
+			OR = {
+				has_bad_priest_trait_trigger = yes
+				trait = slothful
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_NEGATIVE
+
+		trait = charitable
+
+		FROM = {
+			OR = {
+				is_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = greedy
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_NEGATIVE
+
+		trait = temperate
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = gluttonous
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_NEGATIVE
+
+		trait = chaste
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = lustful
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
+
+	additive_modifier = {
+		value = -10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_NEGATIVE
+
+		trait = zealous
+
+		FROM = {
+			OR = {
+				has_bad_priest_trait_trigger = yes
+				trait = cynical
+			}
+
+			NOT = { character = ROOT } # Not on yourself, dirty Pope
+		}
+	}
 
 	## Modifiers evaluating the Excommunication Target ##
-	#Always valid for all Papal actions.
-	# additive_modifier = { #Saintly Bloodline boost.
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE_TARGET
-		# NOT = { character = FROM }
-		# FROMFROM = {
-			# any_owned_bloodline = {
-				# has_bloodline_flag = saintly_bloodline
-				# NOT = { has_bloodline_flag = wicked_saint }
-			# } 
-		# } 
-	# }
+	# Always valid for all Papal actions
+	additive_modifier = { # Saintly Bloodline boost
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE_TARGET
+
+		FROMFROM = {
+			any_owned_bloodline = {
+				has_bloodline_flag = saintly_bloodline
+				bloodline_is_active_for = PREV
+				NOT = { has_bloodline_flag = wicked_saint }
+			}
+		}
+
+		NOT = { character = FROM }
+	}
+
+	additive_modifier = {
+		value = 25
+		localisation_key = POPE_AIREASON_MODIFIER_TARGET_IS_KINSLAYER
+
+		FROMFROM = {
+			OR = {
+				trait = kinslayer
+				trait = familial_kinslayer
+				trait = dynastic_kinslayer
+			}
+		}
+		FROM = { religion_tolerates_kinslaying = no }
+	}
+
+	additive_modifier = {
+		value = 40
+		localisation_key = POPE_AIREASON_MODIFIER_TARGET_IS_SINNER
+
+		FROMFROM = {
+			OR = {
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = rampant_sinner_dharmic
+				has_character_modifier = known_satanist
+				has_character_modifier = known_witch
+			}
+		}
+	}
+
 	# additive_modifier = {
-		# value = 25
-		# localisation_key = POPE_AIREASON_MODIFIER_TARGET_IS_KINSLAYER
-		# FROMFROM = {
-			# OR = {
-				# trait = kinslayer
-				# trait = familial_kinslayer
-				# trait = dynastic_kinslayer
-			# }
-		# }
+	# 	value = -5
+	# 	localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_CHILD_TARGET
+ # 
+	# 	FROMFROM = {
+	# 		OR = {
+	# 			trait = baptized_by_pope
+	# 			trait = baptized_by_patriarch
+	# 		}
+ # 
+	# 		NOT = { persistent_event_target:baptizing_pope_per = { character = ROOT_FROM } }
+	# 	}
 	# }
+ # 
 	# additive_modifier = {
-		# value = 40
-		# localisation_key = POPE_AIREASON_MODIFIER_TARGET_IS_SINNER
-		# FROMFROM = {
-			# OR = {
-				# has_character_modifier = rampant_sinner_christian
-				# has_character_modifier = rampant_sinner_dharmic
-				# has_character_modifier = known_satanist
-				# has_character_modifier = known_witch
-			# }
-		# }
+	# 	value = -10
+	# 	localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_BY_ME_TARGET
+ # 
+	# 	FROMFROM = {
+	# 		OR = {
+	# 			trait = baptized_by_pope
+	# 			trait = baptized_by_patriarch
+	# 		}
+ # 
+	# 		persistent_event_target:baptizing_pope_per = { character = ROOT_FROM } # Ruler asking was baptized by this very same Pope
+	# 	}
 	# }
+ # 
 	# additive_modifier = {
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_CHILD_TARGET
-		# FROMFROM = { 
-			# OR = { 
-				# trait = baptized_by_pope 
-				# trait = baptized_by_patriarch
-			# }
-			# NOT = { persistent_event_target:baptizing_pope_per = { character = ROOT_FROM } }
-		# }
+	# 	value = 100
+	# 	localisation_key = POPE_AIREASON_MODIFIER_NAPOLEON_RULER_TARGET
+ # 
+	# 	FROMFROM = { trait = crowned_by_myself }
 	# }
+
+	additive_modifier = {
+		value = 15
+		localisation_key = POPE_AIREASON_MODIFIER_UNCROWNED_RULER_TARGET
+
+		FROMFROM = {
+			is_decision_potential = prepare_coronation_ceremony
+			is_adult = yes
+			religion = ROOT_FROM
+		}
+	}
+
 	# additive_modifier = {
-		# value = -10
-		# localisation_key = POPE_AIREASON_MODIFIER_BAPTIZED_BY_ME_TARGET
-		# FROMFROM = { 
-			# OR = { 
-				# trait = baptized_by_pope 
-				# trait = baptized_by_patriarch
-			# }
-			# persistent_event_target:baptizing_pope_per = { character = ROOT_FROM } #Ruler asking was baptized by this very same Pope.
-		# }
+	# 	value = -15
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_POPE_TARGET
+ # 
+	# 	FROMFROM = {
+	# 		trait = crowned_by_pope
+	# 		NOT = { persistent_event_target:coronation_priest_per = { character = ROOT_FROM } } # Ruler asking was crowned by this very same Pope
+	# 	}
 	# }
+ # 
 	# additive_modifier = {
-		# value = 100
-		# localisation_key = POPE_AIREASON_MODIFIER_NAPOLEON_RULER_TARGET
-		# FROMFROM = { 
-			# trait = crowned_by_myself
-		# }
+	# 	value = -25
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_ME_TARGET
+ # 
+	# 	FROMFROM = {
+	# 		trait = crowned_by_pope
+	# 		persistent_event_target:coronation_priest_per = { character = ROOT_FROM } # Ruler asking was crowned by this very same Pope
+	# 	}
 	# }
+
+	additive_modifier = {
+		value = -50
+		localisation_key = POPE_AIREASON_MODIFIER_PET_POPE_TARGET
+		FROM = { vassal_of = ROOT_FROMFROM } # Overrides base acceptance
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_SAME_DYNASTY_TARGET
+
+		FROM = {
+			dynasty = ROOT_FROMFROM
+			NOT = { is_close_relative = ROOT_FROMFROM }
+		}
+	}
+
+	additive_modifier = {
+		value = -10
+		localisation_key = POPE_AIREASON_MODIFIER_CLOSE_RELATIVE_TARGET
+
+		FROM = {
+			is_close_relative = ROOT_FROMFROM
+			NOT = { is_child_of = ROOT_FROMFROM }
+		}
+	}
+
+	additive_modifier = {
+		value = -15
+		localisation_key = POPE_AIREASON_MODIFIER_MY_PARENT_TARGET
+
+		FROMFROM = { is_parent_of = ROOT_FROM }
+	}
+
+	additive_modifier = {
+		value = -15
+		localisation_key = POPE_AIREASON_MODIFIER_MY_FRIEND_TARGET
+
+		FROMFROM = { is_friend = ROOT_FROM }
+	}
+
+	additive_modifier = {
+		value = -20
+		localisation_key = POPE_AIREASON_MODIFIER_MY_LOVER_TARGET
+
+		FROMFROM = { is_lover = ROOT_FROM }
+	}
+
+	additive_modifier = {
+		value = 100
+		localisation_key = POPE_AIREASON_MODIFIER_MY_RIVAL_TARGET
+
+		FROMFROM = { is_rival = ROOT_FROM }
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_SAME_CULTURE_TARGET
+
+		FROMFROM = { culture = ROOT_FROM }
+	}
+
 	# additive_modifier = {
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_UNCROWNED_RULER_TARGET
-		# FROMFROM = { 
-			# has_dlc = "Holy Fury"
-			# higher_tier_than = DUKE
-			# age = 16
-			# religion = ROOT_FROM
-			# is_feudal = yes
-			# primary_title = { holy_order = no }
-			# OR = { 
-				# religion = catholic
-				# religion = fraticelli
-			# }
-			# NOR = { 
-				# trait = crowned_by_pope 
-				# trait = crowned_by_bishop
-				# trait = crowned_by_priest
-				# trait = crowned_by_myself
-			# }
-		# }
+	# 	value = -15
+	# 	localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_CARDINAL_TARGET
+ # 
+	# 	FROM = {
+	# 		has_opinion_modifier = {
+	# 			name = opinion_supported_cardinal
+	# 			who = ROOT_FROMFROM
+	# 		}
+	# 	}
 	# }
+ # 
 	# additive_modifier = {
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_POPE_TARGET
-		# FROMFROM = { 
-			# trait = crowned_by_pope
-			# NOT = { persistent_event_target:coronation_priest_per = { character = ROOT_FROM } } #Ruler asking was crowned by this very same Pope.
-		# }
+	# 	value = -30
+	# 	localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_POPE_TARGET
+ # 
+	# 	FROM = {
+	# 		has_opinion_modifier = {
+	# 			name = opinion_supported_pope
+	# 			who = ROOT_FROMFROM
+	# 		}
+	# 	}
 	# }
+ # 
 	# additive_modifier = {
-		# value = -25
-		# localisation_key = POPE_AIREASON_MODIFIER_CROWNED_BY_ME_TARGET
-		# FROMFROM = { 
-			# trait = crowned_by_pope
-			# persistent_event_target:coronation_priest_per = { character = ROOT_FROM } #Ruler asking was crowned by this very same Pope.
-		# }
+	# 	value = 30
+	# 	localisation_key = POPE_AIREASON_MODIFIER_FREE_INVESTITURE_TARGET
+ # 
+	# 	FROMFROM = { has_law = investiture_law_1 }
 	# }
-	# additive_modifier = { 
-		# value = -50 
-		# localisation_key = POPE_AIREASON_MODIFIER_PET_POPE_TARGET
-		# FROM = { vassal_of = ROOT_FROMFROM } #Overrides base acceptance.
+ # 
+	# additive_modifier = {
+	# 	value = -1000
+	# 	localisation_key = POPE_AIREASON_MODIFIER_PLEDGED_TO_CRUSADE_TARGET
+ # 
+	# 	FROMFROM = {
+	#  		is_preparing_crusade = yes
+	# 		has_pledged_crusade_participation = yes
+	# 	}
 	# }
-	# additive_modifier = { 
-		# value = -5 
-		# localisation_key = POPE_AIREASON_MODIFIER_SAME_DYNASTY_TARGET
-		# FROM = { 
-			# dynasty = ROOT_FROMFROM 
-			# NOT = { is_close_relative = ROOT_FROMFROM }
-		# }
+ # 
+	# additive_modifier = {
+	# 	value = -1000
+	# 	localisation_key = POPE_AIREASON_MODIFIER_WAGING_CRUSADE_TARGET
+ # 
+	# 	FROMFROM = {
+	# 		any_war = {
+	# 			OR = {
+	# 				using_cb = new_crusade
+	# 				using_cb = crusade
+	# 			}
+	# 		}
+	# 	}
 	# }
-	# additive_modifier = { 
-		# value = -10 
-		# localisation_key = POPE_AIREASON_MODIFIER_CLOSE_RELATIVE_TARGET
-		# FROM = { 
-			# is_close_relative = ROOT_FROMFROM
-			# NOT = { is_child_of = ROOT_FROMFROM }
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -15 
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_PARENT_TARGET
-		# FROM = { is_child_of = ROOT_FROMFROM }
-	# }
-	# additive_modifier = { 
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_FRIEND_TARGET
-		# FROMFROM = { is_friend = ROOT_FROM }
-	# }
-	# additive_modifier = { 
-		# value = -20
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_LOVER_TARGET
-		# FROMFROM = { is_lover = ROOT_FROM }
-	# }
-	# additive_modifier = { 
-		# value = 100
-		# localisation_key = POPE_AIREASON_MODIFIER_MY_RIVAL_TARGET
-		# FROMFROM = { is_rival = ROOT_FROM }
-	# }
-	# additive_modifier = { 
-		# value = -5 
-		# localisation_key = POPE_AIREASON_MODIFIER_SAME_CULTURE_TARGET
-		# FROMFROM = { culture = ROOT_FROM }
-	# }
-	# additive_modifier = { 
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_CARDINAL_TARGET
-		# FROM = {  
-			# has_opinion_modifier = { 
-				# who = ROOT_FROMFROM 
-				# modifier = opinion_supported_cardinal
-			# }
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = -30
-		# localisation_key = POPE_AIREASON_MODIFIER_MADE_ME_POPE_TARGET
-		# FROM = {  
-			# has_opinion_modifier = { 
-				# who = ROOT_FROMFROM 
-				# modifier = opinion_supported_pope
-			# }
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = 30
-		# localisation_key = POPE_AIREASON_MODIFIER_FREE_INVESTITURE_TARGET
-		# FROMFROM = {  
-			# primary_title = {  
-				# has_law = investiture_law_1
-			# } 
-		# } 
-	# }
-	# additive_modifier = { 
-		# value = -1000
-		# localisation_key = POPE_AIREASON_MODIFIER_PLEDGED_TO_CRUSADE_TARGET
-		# FROMFROM = {  
-	 		# is_preparing_crusade = yes 
-			# has_pledged_crusade_participation = yes
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -1000
-		# localisation_key = POPE_AIREASON_MODIFIER_WAGING_CRUSADE_TARGET
-		# FROMFROM = {  
-			# OR = {
-	 			# any_war = { using_cb = new_crusade }
-	 			# any_war = { using_cb = crusade }
-			# }
-		# }
-	# }
+ # 
 	# additive_exported_value_modifier = {
-		# localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS_TARGET
-		# factor = -2
-		# min = -45
-		# value = num_vassals_with_minor_title
-		# who = FROMFROM
-		# key = title_cardinal
-		# FROM = { NOT = { religion = orthodox } } #Cardinals doesn't matter if you're orthodox
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS_TARGET
+	# 	factor = -2
+	# 	min = -45
+	# 	value = num_vassals_with_minor_title
+	# 	who = FROMFROM
+	# 	key = title_cardinal
+ # 
+	# 	FROM = { religion = catholic } # Only your Pope cares
 	# }
+ # 
 	# additive_exported_value_modifier = {
-		# localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS_TARGET
-		# factor = -2
-		# min = -45
-		# value = num_vassals_with_minor_title
-		# who = FROMFROM
-		# key = title_fraticelli_cardinal
-		# FROM = { NOT = { religion = orthodox } } #Cardinals doesn't matter if you're orthodox
+	# 	localisation_key = POPE_AIREASON_MODIFIER_CONTROLLED_CARDINALS_TARGET
+	# 	factor = -2
+	# 	min = -45
+	# 	value = num_vassals_with_minor_title
+	# 	who = FROMFROM
+	# 	key = title_fraticelli_cardinal
+ # 
+	# 	FROM = { religion = fraticelli } # Only your Pope cares
 	# }
-	#Asker's Piety.
-	# additive_modifier = { 
-		# value = 15
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { NOT = { piety = -250 } }
-	# }
-	# additive_modifier = { 
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = -250
-			# NOT = { piety = -100 } 
-		# }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = -100
-			# NOT = { piety = -50 } 
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = 150
-			# NOT = { piety = 350 } 
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = 350
-			# NOT = { piety = 750 } 
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -15
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = 750
-			# NOT = { piety = 1500 } 
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -20
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { 
-			# piety = 1500
-			# NOT = { piety = 2000 }
-		# }
-	# }
-	# additive_modifier = { 
-		# value = -25
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
-		# FROMFROM = { piety = 2000 }
-	# }
-	# additive_opinion_modifier = { 
-		# localisation_key = POPE_AIREASON_MODIFIER_OPINION_RULER_TARGET
-		# factor = -0.5 # +100 Opinion = +50 points
-		# who = FROMFROM	 
-		# this = FROM #The Pope's opinion of ROOT.
-	# }
-	# # Modifiers vs Virtuous Pope
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# FROMFROM = { trait = zealous }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# FROMFROM = { trait = chaste }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# FROMFROM = { trait = temperate }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# FROMFROM = { trait = charitable }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# FROMFROM = { trait = diligent }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# FROMFROM = { trait = patient }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# FROMFROM = { trait = kind }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = -5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# FROMFROM = { trait = humble }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }		
-	# }
-	# additive_modifier = { 
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CYNICAL_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# FROMFROM = { trait = cynical }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_LUSTFUL_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# FROMFROM = { trait = lustful }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.	
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_GLUTTONOUS_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# FROMFROM = { trait = gluttonous }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_GREEDY_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# FROMFROM = { trait = greedy }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_SLOTHFUL_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# FROMFROM = { trait = slothful }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_WROTH_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# FROMFROM = { trait = wroth }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ENVIOUS_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# FROMFROM = { trait = envious }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PROUD_TARGET
-		# FROM = { 
-			# NOR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# FROMFROM = { trait = proud }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# #Modifiers vs Wicked Pope
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = proud
-			# } 
-		# }
-		# FROMFROM = { trait = humble }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.	
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = envious
-			# } 
-		# }
-		# FROMFROM = { trait = kind }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = wroth
-			# } 
-		# }
-		# FROMFROM = { trait = patient }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = slothful
-			# } 
-		# }
-		# FROMFROM = { trait = diligent }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these. 
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = greedy
-			# } 
-		# }
-		# FROMFROM = { trait = charitable }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = gluttonous
-			# } 
-		# }
-		# FROMFROM = { trait = temperate }
-	# }
-	# additive_modifier = { 
-		# value = 5
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = lustful
-			# } 
-		# }
-		# FROMFROM = { trait = chaste }
-		# FROMFROM = { religion_group = christian }  #Reformed Pagans shouldn't use these.
-		# FROMFROM = { NOT = { religion_group = humanoid_group } }
-	# }
-	# additive_modifier = { 
-		# value = 10
-		# localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_NEGATIVE_TARGET
-		# FROM = { 
-			# OR = { 
-				
-	# OR = {
-		# trait = bad_priest_christian
-		# trait = bad_priest_muslim
-		# trait = bad_priest_norse
-		# trait = bad_priest_tengri
-		# trait = bad_priest_zoroastrian
-		# trait = bad_priest_aztec
-	# } 
-				# trait = cynical
-			# } 
-		# }
-		# FROMFROM = { trait = zealous }
-	# }
-# }
+
+	# Asker's Piety
+	additive_modifier = {
+		value = 15
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = { piety < -250 }
+	}
+
+	additive_modifier = {
+		value = 10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= -250
+			piety < -100
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= -100
+			piety < -50
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= 150
+			piety < 350
+		}
+	}
+
+	additive_modifier = {
+		value = -10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= 350
+			piety < 750
+		}
+	}
+
+	additive_modifier = {
+		value = -15
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= 750
+			piety < 1500
+		}
+	}
+
+	additive_modifier = {
+		value = -20
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = {
+			piety >= 1500
+			piety < 2000
+		}
+	}
+
+	additive_modifier = {
+		value = -25
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PIETY_TARGET
+
+		FROMFROM = { piety >= 2000 }
+	}
+
+	additive_opinion_modifier = {
+		localisation_key = POPE_AIREASON_MODIFIER_OPINION_RULER_TARGET
+		factor = -0.5 # +100 Opinion = -50 points
+		who = FROMFROM
+		this = FROM # The Pope's opinion of the target
+	}
+
+	# Modifiers vs Virtuous Pope
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_TARGET
+
+		FROMFROM = { trait = zealous }
+
+		FROM = {
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = cynical }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_TARGET
+
+		FROMFROM = { trait = chaste }
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = lustful }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_TARGET
+
+		FROMFROM = { trait = temperate }
+
+		FROM = {
+			olrox_is_environmental_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = gluttonous }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_TARGET
+
+		FROMFROM = { trait = charitable }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = greedy }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_TARGET
+
+		FROMFROM = { trait = diligent }
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = slothful }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_TARGET
+
+		FROMFROM = { trait = patient }
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = wroth }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_TARGET
+
+		FROMFROM = { trait = kind }
+
+		FROM = {
+			is_evil_religion = no
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = envious }
+		}
+	}
+
+	additive_modifier = {
+		value = -5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_TARGET
+
+		FROMFROM = { trait = humble }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = proud }
+		}
+	}
+
+	additive_modifier = {
+		value = 10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CYNICAL_TARGET
+
+		FROMFROM = { trait = cynical }
+
+		FROM = {
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = cynical }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_LUSTFUL_TARGET
+
+		FROMFROM = { trait = lustful }
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = lustful }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_GLUTTONOUS_TARGET
+
+		FROMFROM = { trait = gluttonous }
+
+		FROM = {
+			is_lawful_religion = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = gluttonous }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_GREEDY_TARGET
+
+		FROMFROM = { trait = greedy }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = greedy }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_SLOTHFUL_TARGET
+
+		FROMFROM = { trait = slothful }
+
+		FROM = {
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = slothful }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_WROTH_TARGET
+
+		FROMFROM = { trait = wroth }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = wroth }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ENVIOUS_TARGET
+
+		FROMFROM = { trait = envious }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = envious }
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PROUD_TARGET
+
+		FROMFROM = { trait = proud }
+
+		FROM = {
+			olrox_is_good_religion_trigger = yes
+			has_bad_priest_trait_trigger = no
+			NOT = { trait = proud }
+		}
+	}
+
+	# Modifiers vs Wicked Pope
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HUMBLE_NEGATIVE_TARGET
+
+		FROMFROM = { trait = humble }
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = proud
+			}
+		}
+	}
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_KIND_NEGATIVE_TARGET
+
+		FROMFROM = { trait = kind }
+
+		FROM = {
+			OR = {
+				is_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = envious
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_PATIENT_NEGATIVE_TARGET
+
+		FROMFROM = { trait = patient }
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = wroth
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_DILIGENT_NEGATIVE_TARGET
+
+		FROMFROM = { trait = diligent }
+
+		FROM = {
+			OR = {
+				has_bad_priest_trait_trigger = yes
+				trait = slothful
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHARITABLE_NEGATIVE_TARGET
+
+		FROMFROM = { trait = charitable }
+
+		FROM = {
+			OR = {
+				is_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = greedy
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_TEMPERATE_NEGATIVE_TARGET
+
+		FROMFROM = { trait = temperate }
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = gluttonous
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_CHASTE_NEGATIVE_TARGET
+
+		FROMFROM = { trait = chaste }
+
+		FROM = {
+			OR = {
+				is_chaotic_evil_religion = yes
+				has_bad_priest_trait_trigger = yes
+				trait = lustful
+			}
+		}
+	}
+
+	additive_modifier = {
+		value = 10
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_ZEALOUS_NEGATIVE_TARGET
+
+		FROMFROM = { trait = zealous }
+
+		FROM = {
+			OR = {
+				has_bad_priest_trait_trigger = yes
+				trait = cynical
+			}
+		}
+	}
+}
 
 # AI logic for how the Pope should respond to the hardcoded Ask for Invasion action
 # ROOT is the asker, FROM is the Pope, FROMFROM is the target title
@@ -1741,6 +1494,7 @@ ask_for_invasion_chance = {
 			trait = familial_kinslayer
 			trait = dynastic_kinslayer
 		}
+		religion_tolerates_kinslaying = no
 	}
 	additive_modifier = {
 		value = -40
