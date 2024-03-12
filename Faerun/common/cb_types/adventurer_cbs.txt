@@ -1,0 +1,510 @@
+# duchy_adventure
+# kingdom_adventure
+# manifest_destiny_invasion
+
+duchy_adventure = {
+	name = CB_NAME_DUCHY_ADVENTURE
+	war_name = WAR_DUCHY_ADVENTURE
+	sprite = 9
+	truce_days = 3650
+	hostile_against_others = yes
+	check_de_jure_tier = DUKE # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character
+
+	can_use = {
+		# Attacker
+		ROOT = {
+			has_character_flag = duchy_adventurer
+			NOT = { culture = monster }
+		}
+		FROM = {
+			NOT = { culture = monster }
+		}
+	}
+
+	on_add = {
+		fire_haruspicy_event_effect = yes
+		anger_china_effect = yes
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = 250
+			attacker_victory_effect = yes
+
+			hidden_effect = {
+				clr_character_flag = duchy_adventurer
+				give_nickname = nick_the_conqueror
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = -250
+		}
+	}
+
+	on_success_title = {
+		custom_tooltip = {
+			text = other_invasion_succ_tip
+
+			attacker = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = defender
+					type = host
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+			clear_wealth = yes
+			imprison = defender
+
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 100
+
+			hidden_effect = {
+				opinion = {
+					name = opinion_rebel_traitor
+					who = attacker
+					years = 100
+				}
+			}
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+
+			clear_wealth = yes
+			imprison = defender
+
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			defender_victory_effect = yes
+		}
+	}
+
+	on_attacker_leader_death = {
+		attacker = {
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+			}
+		}
+
+		end_war = invalid
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+}
+
+#  Used mainly for Muslims adventuring into India
+kingdom_adventure = {
+	name = CB_NAME_DUCHY_ADVENTURE
+	war_name = WAR_DUCHY_ADVENTURE
+	sprite = 9
+	truce_days = 3650
+
+	hostile_against_others = yes
+	check_de_jure_tier = KING # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character
+
+	can_use = {
+		# Attacker
+		ROOT = {
+			has_character_flag = duchy_adventurer
+			NOT = { culture = monster }
+		}
+		FROM = {
+			NOT = { culture = monster }
+		}
+	}
+
+	on_add = {
+		fire_haruspicy_event_effect = yes
+		anger_china_effect = yes
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = 500
+			piety = 250
+			attacker_victory_effect = yes
+
+			hidden_effect = {
+				clr_character_flag = duchy_adventurer
+				clr_character_flag = do_not_disturb
+
+				if = {
+					limit = {
+						has_nickname = no
+						NOT = { has_character_flag = is_child_of_destiny }
+					}
+
+					# Set event targets for dynamic nicknames
+					save_event_target_as = nickname_receiver
+					defender = { save_event_target_as = nickname_target }
+
+					random_list = {
+						 5 = { give_nickname = nick_the_victorious }
+						 5 = { give_nickname = nick_the_conqueror }
+						 5 = { give_nickname = nick_the_dragon }
+						10 = { give_nickname = nick_the_rel_group }
+						10 = { give_nickname = nick_the_tiger }
+						10 = { give_nickname = nick_the_world_burner }
+					}
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = -500
+			piety = -250
+		}
+	}
+
+	on_success_title = {
+		custom_tooltip = {
+			text = other_invasion_succ_tip
+
+			attacker = {
+				if = { # Special stuff for player Child of Destiny (AI Children do not have this flag)
+					limit = { has_character_flag = child_of_destiny_outwards_focus }
+
+					defender = { # Ensure that the Child of Destiny always gets one County in the targeted Kingdom (mainly useful when testing with yesmen, but can also happen in rare occurences where the target is imprisoned)
+						random_realm_title = {
+							limit = {
+								real_tier = COUNT
+								de_jure_liege_or_above = PREVPREV
+							}
+
+							usurp_title = {
+								target = attacker
+								type = host
+							}
+						}
+					}
+
+					liege = { save_event_target_as = old_liege_target }
+
+					if = { # Abandon all old titles if you were a vassal
+						limit = { independent = no }
+
+						any_demesne_title = {
+							limit = {
+								NOR = {
+									title = PREVPREV
+									de_jure_liege_or_above = PREVPREV
+								}
+							}
+
+							grant_title = event_target:old_liege_target
+						}
+
+						any_vassal = {
+							limit = {
+								capital_scope = {
+									NOR = {
+										province = PREVPREVPREV
+										de_jure_liege_or_above = PREVPREVPREV
+									}
+								}
+							}
+
+							set_defacto_liege = event_target:old_liege_target
+						}
+					}
+				}
+			}
+
+			defender = { # The adventurer takes ANY demesne title, including the targeted Kingdom, within the area of the targeted kingdom
+				any_demesne_title = {
+					limit = {
+						OR = {
+							title = PREVPREV
+							de_jure_liege_or_above = PREVPREV
+						}
+					}
+
+					usurp_title = {
+						target = attacker
+						type = host
+					}
+				}
+			}
+
+			if = { # Claim the targeted Kingdom if it isn't held by anyone
+				limit = { has_holder = no }
+
+				usurp_title = {
+					target = attacker
+					type = host
+				}
+			}
+
+			attacker = {
+				if = { # Create a Kingdom if the adventurer does not have one by this point
+					limit = { lower_real_tier_than = KING }
+
+					if = {
+						limit = { has_character_flag = is_child_of_destiny }
+
+						save_event_target_as = target_name
+
+						create_title = {
+							tier = KING
+							landless = no
+							temporary = no
+							custom_created = yes
+							culture = attacker
+							holder = attacker
+							name = DESTINY_KINGDOM
+							base_title = PREV
+							copy_title_laws = yes
+						}
+
+						capital_scope = {
+							county = {
+								save_event_target_as = coa_target
+							}
+						}
+
+						primary_title = {
+							set_coa = event_target:coa_target
+						}
+
+						any_demesne_title = {
+							limit = { higher_real_tier_than = COUNT }
+							add_law = succ_primogeniture
+						}
+
+						character_event = {
+							id = HF.303 # Child of Destiny can choose to adopt culture/religion of newly conquered land.
+							days = 3
+						}
+
+						if = { # Give bloodline to Child of Destiny
+							limit = {
+								higher_real_tier_than = DUKE
+
+								NOT = {
+									any_owned_bloodline = {
+										has_bloodline_flag = created_bloodline
+										bloodline_is_active_for = PREV
+									}
+								}
+							}
+
+							character_event = {
+								id = HF.304 # Bloodline event
+								days = 14
+							}
+						}
+					}
+
+					else = {
+						create_title = {
+							tier = KING
+							landless = no
+							temporary = no
+							custom_created = yes
+							culture = attacker
+							holder = attacker
+							name = KINGDOM
+							base_title = PREV
+							copy_title_laws = yes
+						}
+
+						capital_scope = {
+							reverse_culture = ROOT
+						}
+
+						any_child = {
+							limit = {
+								is_ruler = no
+								ai = yes
+							}
+
+							culture = ROOT
+						}
+
+						any_courtier = {
+							limit = {
+								is_ruler = no
+								ai = yes
+							}
+
+							culture = ROOT
+						}
+					}
+				}
+
+				# Preserve Vassals under the targeted kingdom
+				vassalize_or_take_under_title = { # Take all vassals held by the target under the title
+					title = PREV
+					enemy = defender
+					type = host
+				}
+
+				set_defacto_liege = ROOT # Always go Independent
+			}
+		}
+	}
+
+	on_invalidation = {
+		attacker = {
+			clr_character_flag = child_of_destiny_made_player_choice
+			clr_character_flag = child_of_destiny_adventure
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+			clear_wealth = yes
+			imprison = defender
+
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+
+				if = {
+					limit = { has_character_flag = is_child_of_destiny }
+
+					remove_trait = disinherited
+					set_global_flag = child_of_destiny_invasion_fail@attacker
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 100
+
+			hidden_effect = {
+				opinion = {
+					name = opinion_rebel_traitor
+					who = attacker
+					years = 100
+				}
+			}
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+
+			clear_wealth = yes
+			imprison = defender
+
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+
+				if = {
+					limit = { has_character_flag = is_child_of_destiny }
+					remove_trait = disinherited
+					set_global_flag = child_of_destiny_invasion_reverse_demand@attacker
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			defender_victory_effect = yes
+		}
+	}
+
+	on_attacker_leader_death = {
+		attacker = {
+			hidden_effect = {
+				disband_event_forces = yes
+				clr_character_flag = duchy_adventurer
+			}
+		}
+
+		end_war = invalid
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+}
+
+# This can be used for various special cases; the great conquerors
+#manifest_destiny_invasion
