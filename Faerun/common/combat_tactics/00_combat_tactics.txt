@@ -14,8 +14,8 @@ no_tactic = {
 }
 
 generic_skirmish_tactic = {
-	days = 6
-	sprite = 4
+	days = 18 # tactic lasts one day
+	sprite = 4 # index of icon
 	group = skirmish
 
 	trigger = {
@@ -25,88 +25,65 @@ generic_skirmish_tactic = {
 	mean_time_to_happen = {
 		days = 3
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 2 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 2 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 4 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 4 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 6 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 6 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 8 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 8 } } }
 		}
 	}
 }
 
 harass_tactic = {	# exclusive for light cavalry
-	days = 6
+	days = 18
 	sprite = 4
 	group = harass
 
 	trigger = {
 		phase = skirmish
+		#NOT = { horse_archers = 0.5 } #not sure what this does - tsf4
+
 		OR = {
-			troops = {
-				who = light_cavalry
-				value = 0.01
-			}
-			troops = {
-				who = camel_cavalry
-				value = 0.01
-			}
-			troops = {
-				who = beast_troops
-				value = 0.01
-			}
+			light_cavalry = 0.01
+			camel_cavalry = 0.01
+			beast_troops = 0.01
 		}
-		OR = {
-			NOT = {
+
+		trigger_if = {
+			limit = {
 				OR = {
-					troops = {
-						who = light_cavalry
-						value = 0.45
-					}
-					troops = {
-						who = camel_cavalry
-						value = 0.45
-					}
-					troops = {
-						who = beast_troops
-						value = 0.45
-					}
+					light_cavalry = 0.45
+					camel_cavalry = 0.45
+					beast_troops = 0.45
 				}
 			}
-			AND = {
-				flank_has_leader = yes
-				leader = { martial = 12 }
-				NOT = {
-					OR = {
-						troops = {
-							who = light_cavalry
-							value = 0.75
-						}
-						troops = {
-							who = camel_cavalry
-							value = 0.75
-						}
-						troops = {
-							who = beast_troops
-							value = 0.75
-						}
-					}
-				}
+
+			flank_has_leader = yes
+			leader = { martial >= 12 }
+			NOR = {
+				light_cavalry = 0.75
+				camel_cavalry = 0.75
+				beast_troops = 0.75
 			}
 		}
+
 		#high level fighter exclusion
 		leader = {
 			NOR = {
@@ -117,67 +94,70 @@ harass_tactic = {	# exclusive for light cavalry
 	}
 
 	mean_time_to_happen = {
-		days = 3
-		modifier = {
-			factor = 1.5
+		days = 2
+
+		mult_modifier = {
+			factor = 2
+
 			flank_has_leader = yes
-			leader = {
-				martial = 8
-			}
+			leader = { martial >= 8 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.7
+					value >= 0.7
 				}
 			}
 		}
-		modifier = {
-			factor = 1.5
+
+		mult_modifier = {
+			factor = 2
+
 			flank_has_leader = yes
-			leader = {
-				martial = 12
-			}
+			leader = { martial >= 12 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.6
+					value >= 0.6
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.6
+					value >= 0.6
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.6
+					value >= 0.6
 				}
 			}
 		}
-		modifier = {
-			factor = 1.5
+
+		mult_modifier = {
+			factor = 2
+
 			flank_has_leader = yes
-			leader = {
-				martial = 16
-			}
+			leader = { martial >= 16 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.5
+					value >= 0.5
 				}
 			}
 		}
@@ -194,150 +174,119 @@ harass_tactic = {	# exclusive for light cavalry
 	light_cavalry_defensive = -0.25
 	camel_cavalry_defensive = -0.25
 	beast_troops_defensive = -0.25
+	
 	enemy = {
 		group = swarm
 		factor = 1
 	}
 }
+
 improved_harass_tactic = {	# fighter class light cavalry tactic
-	days = 6
+	days = 18
 	sprite = 4
 	group = harass
 
 	trigger = {
 		phase = skirmish
 		flank_has_leader = yes
-		leader = {
-			OR = {
-				trait = trained_fighter
-				trait = journeyman_fighter
-				trait =	expert_fighter
-				trait =	master_fighter
-				trait =	renowned_fighter
-				trait = legendary_fighter
-			}
-		}
+		leader = { z_fighter = yes }
+
 		OR = {
-			troops = {
-				who = light_cavalry
-				value = 0.01
-			}
-			troops = {
-				who = camel_cavalry
-				value = 0.01
-			}
-			troops = {
-				who = beast_troops
-				value = 0.01
-			}
+			light_cavalry = 0.01
+			camel_cavalry = 0.01
+			beast_troops = 0.01
 		}
-		OR = {
-			NOT = {
+
+		trigger_if = {
+			limit = {
 				OR = {
-					troops = {
-						who = light_cavalry
-						value = 0.45
-					}
-					troops = {
-						who = camel_cavalry
-						value = 0.45
-					}
-					troops = {
-						who = beast_troops
-						value = 0.45
-					}
+					light_cavalry = 0.45
+					camel_cavalry = 0.45
+					beast_troops = 0.45
 				}
 			}
-			AND = {
-				flank_has_leader = yes
-				leader = { martial = 12 }
-				NOT = {
-					OR = {
-						troops = {
-							who = light_cavalry
-							value = 0.75
-						}
-						troops = {
-							who = camel_cavalry
-							value = 0.75
-						}
-						troops = {
-							who = beast_troops
-							value = 0.75
-						}
-					}
-				}
+
+			flank_has_leader = yes
+			leader = { martial >= 12 }
+			NOR = {
+				light_cavalry = 0.75
+				camel_cavalry = 0.75
+				beast_troops = 0.75
 			}
 		}
 	}
 
 	mean_time_to_happen = {
 		days = 3
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			flank_has_leader = yes
-			leader = {
-				martial = 8
-			}
+			leader = { martial >= 8 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.7
+					value >= 0.7
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			flank_has_leader = yes
-			leader = {
-				martial = 12
-			}
+			leader = { martial >= 12 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.6
+					value >= 0.6
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.6
+					value >= 0.6
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.6
+					value >= 0.6
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			flank_has_leader = yes
-			leader = {
-				martial = 16
-			}
+			leader = { martial >= 16 }
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.5
+					value >= 0.5
 				}
 			}
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
+
 			flank_has_leader = yes
 			leader = {
 				OR = {
@@ -359,124 +308,123 @@ improved_harass_tactic = {	# fighter class light cavalry tactic
 	light_cavalry_defensive = -0.12
 	camel_cavalry_defensive = -0.12
 	beast_troops_defensive = -0.12
+
 	enemy = {
 		group = swarm
 		factor = 1
 	}
 }
+
 disorganised_harass_tactic = {
-	days = 6
+	days = 18
 	sprite = 4
 	group = harass
 
 	trigger = {
 		phase = skirmish
+		#NOT = { horse_archers = 0.5 } #not sure what this does - tsf4
+
 		OR = {
-			troops = {
-				who = light_cavalry
-				value = 0.4
-			}
-			troops = {
-				who = camel_cavalry
-				value = 0.4
-			}
-			troops = {
-				who = beast_troops
-				value = 0.4
-			}
+			light_cavalry = 0.4
+			camel_cavalry = 0.4
+			beast_troops = 0.4
 		}
+
 		OR = {
 			flank_has_leader = no
-			NOT = { leader = { martial = 12 } }
+			leader = { martial < 12 }
+
 			OR = {
-				troops = {
-					who = light_cavalry
-					value = 0.75
-				}
-				troops = {
-					who = camel_cavalry
-					value = 0.75
-				}
-				troops = {
-					who = beast_troops
-					value = 0.75
-				}
+				light_cavalry = 0.75
+				camel_cavalry = 0.75
+				beast_troops = 0.75
 			}
 		}
+
 	}
 
 	mean_time_to_happen = {
 		days = 2
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.5
+					value >= 0.5
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.5
+					value >= 0.5
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.7
+					value >= 0.7
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.7
+					value >= 0.7
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
+
 			OR = {
 				light_troops = {
 					who = light_cavalry
-					value = 0.9
+					value >= 0.9
 				}
 				light_troops = {
 					who = camel_cavalry
-					value = 0.9
+					value >= 0.9
 				}
 				light_troops = {
 					who = beast_troops
-					value = 0.9
+					value >= 0.9
 				}
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 2 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 2 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 4 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 4 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 6 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 6 } } }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.80
 			flank_has_leader = yes
-			leader = { liege = { capital_scope = { TECH_SKIRMISH = 8 } } }
+			leader = { liege = { capital_scope = { TECH_SKIRMISH >= 8 } } }
 		}
 	}
 
@@ -491,6 +439,7 @@ disorganised_harass_tactic = {
 	light_cavalry_defensive = -0.5
 	camel_cavalry_defensive = -0.5
 	beast_troops_defensive = -0.5
+
 	enemy = {
 		group = swarm
 		factor = 0.5
@@ -498,7 +447,7 @@ disorganised_harass_tactic = {
 }
 
 volly_harass_tactic = {	# cooperative between light cavalry and archers
-	days = 6
+	days = 18
 	sprite = 4
 	group = harass
 
