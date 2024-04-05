@@ -1,0 +1,912 @@
+# crusade
+# new_crusade
+# religious - Regular Holy War CB
+# liberate_religion
+
+# Regular Holy War CB
+religious = {
+	name = CB_NAME_RELIGIOUS
+	war_name = WAR_NAME_RELIGIOUS
+	sprite = 34
+	truce_days = 3650
+	sort_priority = 800
+
+	is_permanent = yes
+	is_holy_war = yes
+	check_de_jure_tier = DUKE # this scans all dejure duchies for the counties which are held by or vassals(or below) of selected character. Only valid if is_permanent = yes
+	allowed_to_target_tributaries = no
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+
+			trigger_if = {
+				limit = { z_paladin = yes }
+				piety >= 150
+			}
+			trigger_else = {
+				piety >= 250
+			}
+			war_cost = yes
+			NOT = { has_character_modifier = recent_holy_war }
+		}
+	}
+
+	can_use = {
+		# Attacker
+		ROOT = {
+			# General requirements
+			is_nomadic = no
+			is_pacifist_religion = no
+			mercenary = no
+
+			NOR = {
+				same_realm = FROM
+				government = nomadic_tribal_government
+				trait = creature_monster
+			}
+
+			OR = {
+				religious_enemy = yes
+				is_heresy_of = FROM
+				is_parent_religion = FROM
+
+				# Can holy war known devil worshippers
+				trigger_if = {
+					limit = { FROM = { has_character_modifier = known_satanist } }
+					NOR = {
+						religion = infernal
+						secret_religion = infernal
+						has_character_modifier = known_satanist
+					}
+				}
+			}
+
+			top_liege = {
+				religion_group = ROOT
+
+				# Can holy war known devil worshippers of top liege's religion
+				trigger_if = {
+					limit = { religion = FROM }
+
+					FROM = { has_character_modifier = known_satanist }
+					NOR = {
+						religion = infernal
+						secret_religion = infernal
+						has_character_modifier = known_satanist
+					}
+					ROOT = {
+						NOR = {
+							religion = infernal
+							secret_religion = infernal
+							has_character_modifier = known_satanist
+						}
+					}
+				}
+
+				# Religion must match, or neither is a heretic
+				OR = {
+					religion = ROOT
+
+					AND = {
+						is_heretic = no
+						ROOT = { is_heretic = no }
+					}
+				}
+			}
+		}
+		FROM = {
+			NOT = { trait = creature_monster }
+		}
+	}
+
+	can_use_title = {
+		# The attacker needs at least one county in the target duchy, or a border, or be only two sea zones away from one of your counties
+		any_direct_de_jure_vassal_title = {
+			OR = {
+				holder_scope = { # attacker owns a county in target duchy
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+
+				location = {
+					any_neighbor_province = {
+						trigger_if = {
+							limit = { has_owner = yes } # not wasteland or sea zone
+
+							owner = {
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
+								}
+							}
+						}
+
+						trigger_else = {
+							is_land = no # first sea zone
+
+							any_neighbor_province = { # county one sea zone away
+								trigger_if = {
+									limit = { has_owner = yes } # not wasteland or sea zone
+
+									owner = {
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
+										}
+									}
+								}
+
+								trigger_else = {
+									is_land = no # second seazone
+
+									any_neighbor_province = { # county two sea zones away
+										owner = {
+											OR = {
+												character = ROOT
+												is_vassal_or_below_of = ROOT
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid = {
+		# Attacker
+		ROOT = {
+			NOT = { same_realm = FROM }
+			is_pacifist_religion = no
+
+			OR = {
+				religious_enemy = yes
+				is_heresy_of = FROM
+				is_parent_religion = FROM
+
+				# Can holy war known devil worshippers
+				trigger_if = {
+					limit = { FROM = { has_character_modifier = known_satanist } }
+					NOR = {
+						religion = infernal
+						secret_religion = infernal
+						has_character_modifier = known_satanist
+					}
+				}
+			}
+
+			top_liege = {
+				# Can holy war known devil worshippers of top liege's religion
+				trigger_if = {
+					limit = { religion = FROM }
+
+					FROM = { has_character_modifier = known_satanist }
+					NOR = {
+						religion = infernal
+						secret_religion = infernal
+						has_character_modifier = known_satanist
+					}
+					ROOT = {
+						NOR = {
+							religion = infernal
+							secret_religion = infernal
+							has_character_modifier = known_satanist
+						}
+					}
+				}
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+
+			if = {
+				limit = {
+					z_paladin = yes
+				}
+				piety = -150
+			}
+			else = {
+				piety = -250
+			}
+			declare_war_effect = yes
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 50
+			attacker_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+				add_character_modifier = { name = recent_holy_war years = 5 }
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+
+			hidden_effect = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			piety = -100
+			prestige = -50
+
+			religion_authority = {
+				name = lost_holy_war
+				years = 20
+			}
+		}
+	}
+
+	on_success_title = {
+		attacker = {
+			show_scope_change = no
+
+			custom_tooltip = {
+				text = religious_cb_succ_tip
+
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = defender
+					same_religion = yes # Only vassalize rulers of my religion
+					is_religious = yes
+					type = holy_war
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			piety = -50
+			prestige = -100
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+
+			piety = -75
+			prestige = -150
+
+			religion_authority = {
+				name = lost_holy_war
+				years = 20
+			}
+		}
+
+		any_attacker = {
+			limit = {
+				uses_decadence = yes
+
+				NOT = {
+					any_liege = {
+						dynasty = PREV
+					}
+				}
+			}
+
+			hidden_effect = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_piety = 200
+			participation_scaled_prestige = 100
+			defender_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+
+			hidden_effect = {
+				participation_scaled_piety = 200
+				participation_scaled_prestige = 100
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+}
+
+liberate_religion = {
+	name = CB_NAME_LIBERATE_RELIGION
+	war_name = WAR_NAME_LIBERATE_RELIGION
+	sprite = 35
+	truce_days = 3650
+	sort_priority = 4000
+
+	is_permanent = yes
+	is_holy_war = yes
+	check_de_jure_tier = KING
+	apply_short_occ_mod = no # Do not apply the 'recently_conquered' modifier to Holdings
+	allowed_to_target_tributaries = no
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		OR = {
+			has_dlc = "Holy Fury"
+			has_dlc = "Jade Dragon"
+		}
+
+		# Attacker
+		ROOT = {
+			independent = yes
+
+			OR = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_religious_liberation
+					bloodline_is_active_for = PREV
+				}
+
+				trigger_if = {
+					limit = { has_character_flag = had_liberate_opportunity }
+
+					NOT = {
+						has_game_rule = {
+							name = jade_dragon_cbs
+							value = off
+						}
+					}
+				}
+			}
+
+			is_nomadic = no
+			is_pacifist_religion = no
+			mercenary = no
+
+			NOR = {
+				same_realm = FROM
+				religion = FROM
+				has_character_flag = used_liberate_opportunity
+				trait = creature_monster
+			}
+		}
+		FROM = {
+			NOT = { trait = creature_monster }
+		}
+	}
+
+	can_use_title = {
+		any_de_jure_vassal_title = {
+			real_tier = COUNT
+
+			holder_scope = {
+				OR = {
+					character = FROM
+					is_vassal_or_below_of = FROM
+				}
+			}
+
+			location = {
+				religion = ROOT
+			}
+		}
+
+		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
+		any_de_jure_vassal_title = {
+			OR = {
+				holder_scope = { # own a county
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+
+				location = {
+					any_neighbor_province = { # have a border
+						trigger_if = {
+							limit = { has_owner = yes }
+
+							owner = {
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
+								}
+							}
+						}
+						trigger_else = {
+							is_land = no # first sea zone
+
+							any_neighbor_province = {
+								trigger_if = {
+									limit = { has_owner = yes }
+
+									owner = {
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
+										}
+									}
+								}
+								trigger_else = {
+									is_land = no # second sea zone
+
+									any_neighbor_province = {
+										owner = {
+											OR = {
+												character = ROOT
+												is_vassal_or_below_of = ROOT
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid = {
+		# Attacker
+		ROOT = {
+			is_pacifist_religion = no
+
+			NOR = {
+				same_realm = FROM
+				religion = FROM
+			}
+
+			top_liege = {
+				NOT = { religion = FROM }
+			}
+		}
+	}
+
+	is_valid_title = {
+		# Defender
+		FROM = {
+			num_of_realm_counties = {
+				value >= 1
+				title = PREV
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			hidden_effect = {
+				if = {
+					limit = {
+						NOT = {
+							any_owned_bloodline = {
+								has_bloodline_flag = bloodline_religious_liberation
+								bloodline_is_active_for = PREV
+							}
+						}
+					}
+
+					set_character_flag = used_liberate_opportunity
+				}
+			}
+			declare_war_effect = yes 
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_piety = 500
+			participation_scaled_prestige = 250
+			attacker_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+
+			hidden_effect = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			piety = -100
+			prestige = -50
+		}
+	}
+
+	on_success_title = {
+		custom_tooltip = {
+			text = religious_liberation_cb_succ_tip
+
+			defender = {
+				random_realm_title = {
+					limit = {
+						real_tier = COUNT
+
+						kingdom = { title = PREVPREVPREV }
+					}
+
+					preferred_limit = {
+						location = {
+							religion = ROOT
+						}
+					}
+
+					location = {
+						create_character = {
+							religion = attacker
+							culture = THIS
+							dynasty = random
+							random_traits = yes
+							female = 50
+							age = 20
+							health = 7
+							fertility = 0.7
+							flag = is_religious_liberation_ruler
+
+							attributes = {
+								martial = 10
+								diplomacy = 10
+								stewardship = 10
+							}
+						}
+
+						new_character = {
+							remove_trait = cynical
+							add_trait = zealous
+							wealth = 500
+							prestige = 500
+							piety = 500
+							save_event_target_as = new_ruler
+
+							usurp_title = {
+								target = PREVPREV
+								type = invasion
+							}
+						}
+					}
+				}
+			}
+
+			if = {
+				limit = { has_holder = no }
+
+				usurp_title = {
+					target = event_target:new_ruler
+					type = invasion
+				}
+			}
+			else = {
+				event_target:new_ruler = {
+					create_title = {
+						tier = KING
+						landless = no
+						temporary = no
+						custom_created = yes
+						culture = event_target:new_ruler
+						holder = event_target:new_ruler
+						name = LIBERATED_KINGDOM
+						base_title = PREV
+					}
+				}
+			}
+
+			event_target:new_ruler = {
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = defender
+					same_religion = yes # Only vassalize rulers of my religion
+					is_religious = yes
+					type = holy_war
+					as_if_allied_to = attacker
+				}
+
+				set_defacto_liege = THIS
+			}
+
+			if = {
+				limit = {
+					has_holder = yes
+
+					holder_scope = {
+						OR = {
+							character = defender
+							is_vassal_or_below_of = defender
+						}
+					}
+				}
+
+				destroy_landed_title = THIS
+
+				usurp_title_only = {
+					target = event_target:new_ruler
+					type = invasion
+				}
+
+				make_primary_title = yes
+
+				event_target:new_ruler = {
+					any_demesne_title = {
+						limit = {
+							tier = KING
+							is_primary_holder_title = no
+						}
+
+						destroy_landed_title = THIS
+					}
+				}
+			}
+
+			attacker = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+
+				make_tributary = {
+					who = event_target:new_ruler
+					tributary_type = permanent
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			piety = -125
+			prestige = -250
+		}
+	}
+
+	on_invalidation = {
+		attacker = {
+			clr_character_flag = used_liberate_opportunity
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+
+			piety = -250
+			prestige = -500
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = 20
+			}
+
+			religion_authority = {
+				name = lost_holy_war
+				years = 20
+			}
+		}
+
+		any_attacker = {
+			limit = {
+				NOT = { character = attacker }
+				uses_decadence = yes
+			}
+
+			hidden_effect = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_piety = 200
+			participation_scaled_prestige = 100
+			defender_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+		any_defender = {
+			limit = { NOT = { character = defender } }
+
+			hidden_effect = {
+				participation_scaled_piety = 200
+				participation_scaled_prestige = 100
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+}
