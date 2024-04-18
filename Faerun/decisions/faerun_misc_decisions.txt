@@ -396,6 +396,107 @@ decisions = {
 		}
 	}
 
+	sacrifice_everyone_decision = {
+		ai = no
+		is_high_prio = yes
+		potential = {
+			is_generic_sacrifice_religion = yes
+			num_of_prisoners >= 2
+		}
+
+		allow = {
+			custom_tooltip = {
+				text = SACRIFICE_EVERYONE_DECISION_COND
+				any_courtier = {
+					prisoner = yes
+					host = { character = ROOT }
+					NOT = { religion = ROOT }
+					NOT = { diplomatic_immunity = yes }
+				}
+			}
+		}
+
+		effect = {
+			custom_tooltip = {
+				text = SACRIFICE_EVERYONE_DECISION_EFFECT
+				any_courtier = {
+					limit = { 
+						prisoner = yes
+						is_alive = yes
+						host = { character = ROOT }
+						NOT = { religion = ROOT }
+						NOT = { diplomatic_immunity = yes }
+					}
+
+					trigger_switch = {
+						on_trigger = tier
+						EMPEROR = { ROOT = { piety = 250 } }
+						KING = { ROOT = { piety = 150 } }
+						DUKE = { ROOT = { piety = 75 } }
+						COUNT = { ROOT = { piety = 30 } }
+						BARON = { ROOT = { piety = 15 } }
+						fallback = { ROOT = { piety = 5 } }
+					}
+					if = {
+						limit = {
+							ROOT = { 
+								any_owned_bloodline = {
+									has_bloodline_flag = bloodline_prestige_sacrifice
+									bloodline_is_active_for = PREV
+								}
+							}
+						}
+						trigger_switch = {
+							on_trigger = tier
+							EMPEROR = { ROOT = { prestige = 500 } }
+							KING = { ROOT = { prestige = 300 } }
+							DUKE = { ROOT = { prestige = 150 } }
+							COUNT = { ROOT = { prestige = 60 } }
+							BARON = { ROOT = { prestige = 30 } }
+							fallback = { ROOT = { prestige = 10 } }
+						}
+					}
+					
+					ROOT = {
+						if = {
+							limit = {
+								any_realm_wonder_upgrade = {
+									has_wonder_upgrade = upgrade_sacrificial_altar
+									is_active = yes
+								}
+							}
+							hidden_tooltip = {
+								if = { limit = { has_character_modifier = ate_beating_heart } remove_character_modifier = ate_beating_heart }
+							}
+							add_character_modifier = {
+								name = ate_beating_heart
+								months = 6
+							}
+							prestige = 10
+						}
+						
+						trigger_switch = {
+							on_trigger = religion
+							abyssal_cult = { PREV = { death = { death_reason = death_execution_abyss_sacrifice killer = ROOT } } }
+							lolth_cult = { PREV = { death = { death_reason = death_execution_lolth_sacrifice killer = ROOT } } }
+							infernal = { PREV = { death = { death_reason = death_execution_infernal_sacrifice killer = ROOT } } }
+							church_of_cyric = { PREV = { death = { death_reason = death_execution_cyric_sacrifice killer = ROOT } } }
+							loviatar = { PREV = { death = { death_reason = death_execution_loviatar_sacrifice killer = ROOT } } }
+							#illithid_pantheon = { PREV = { death = { death_reason = death_execution_ilsensine_sacrifice killer = ROOT } } }
+							deities_of_fury = { PREV = { death = { death_reason = death_execution_dof_sacrifice killer = ROOT } } }
+							dead_three = { PREV = { death = { death_reason = death_execution_dead_three_sacrifice killer = ROOT } } }
+							geomancy = { PREV = { death = { death_reason = death_execution_geomancy_sacrifice killer = ROOT } } }
+							fallback = { PREV = { death = { death_reason = death_execution_aztec_sacrifice killer = ROOT } } }
+						}
+					}
+				}
+			}
+		}
+
+		ai_will_do = {
+			factor = 0
+		}
+	}
 }
 
 targeted_decisions = {
