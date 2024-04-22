@@ -1,0 +1,697 @@
+conquest_of_evil = {
+	name = CB_NAME_CONQUEST_OF_EVIL
+	war_name = WAR_CONQUEST_OF_EVIL
+	sprite = 34
+	truce_days = 3800
+	infamy_modifier = 4
+	sort_priority = 600
+
+	is_permanent = yes
+	is_holy_war = yes
+	check_de_jure_tier = DUKE
+	can_ask_to_join_war = no
+	allowed_to_target_tributaries = no
+	hostile_against_others = yes
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+
+			prestige >= 500
+			war_cost = yes
+
+			OR = {
+				trait = ambitious
+				trait = cruel
+				trait = zealous
+				trait = arbitrary
+			}
+			NOR = {
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = fr_nomad_conquerer_modifier
+				has_character_flag = declaring_conquest
+			}
+		}
+	}
+
+	can_use = {
+		# Attacker
+		ROOT = {
+			OR = {
+				religion_group = evil_human_pantheon_group
+				religion_group = drow_pantheon
+			}
+
+			# General requirements
+			is_pacifist_religion = no
+			mercenary = no
+
+			NOR = {
+				same_realm = FROM
+				government = nomadic_tribal_government
+				trait = creature_monster
+			}
+		}
+		FROM = {
+			NOT = { trait = creature_monster }
+		}
+	}
+
+	can_use_title = {
+		# The attacker needs at least one county in the target duchy, or a border, or be only two sea zones away from one of your counties
+		any_direct_de_jure_vassal_title = {
+			OR = {
+				holder_scope = { # attacker owns a county in target duchy
+					OR = {
+						character = ROOT
+						is_vassal_or_below_of = ROOT
+					}
+				}
+
+				location = {
+					any_neighbor_province = {
+						trigger_if = {
+							limit = { has_owner = yes } # not wasteland or sea zone
+
+							owner = {
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
+								}
+							}
+						}
+
+						trigger_else = {
+							is_land = no # first sea zone
+
+							any_neighbor_province = { # county one sea zone away
+								trigger_if = {
+									limit = { has_owner = yes } # not wasteland or sea zone
+
+									owner = {
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
+										}
+									}
+								}
+
+								trigger_else = {
+									is_land = no # second seazone
+
+									any_neighbor_province = { # county two sea zones away
+										owner = {
+											OR = {
+												character = ROOT
+												is_vassal_or_below_of = ROOT
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid = {
+		# Attacker
+		ROOT = {
+			NOT = { same_realm = FROM }
+			is_pacifist_religion = no
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -500
+			set_character_flag = declaring_conquest
+			declare_war_effect = yes
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 50
+			attacker_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			add_trait_fully_cruel_effect = yes
+
+			hidden_effect = {
+				add_character_modifier = { name = true_villain_modifier years = 10 }
+				clr_character_flag = declaring_conquest
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+
+			hidden_effect = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 50
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			piety = -100
+			prestige = -50
+
+			religion_authority = {
+				name = lost_holy_war
+				years = 20
+			}
+		}
+	}
+
+	on_success_title = {
+		attacker = {
+			show_scope_change = no
+
+			custom_tooltip = {
+				text = religious_cb_succ_tip
+
+				vassalize_or_take_under_title = {
+					title = PREV
+					enemy = defender
+					same_religion = yes # Only vassalize rulers of my religion
+					is_religious = yes
+					type = holy_war
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			piety = -50
+			prestige = -100
+			clr_character_flag = declaring_conquest
+		}
+	}
+
+	on_invalidation = {
+		ROOT = {
+			clr_character_flag = declaring_conquest
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+
+			piety = -75
+			prestige = -150
+
+			religion_authority = {
+				name = lost_holy_war
+				years = 20
+			}
+			clr_character_flag = declaring_conquest
+		}
+
+		any_attacker = {
+			limit = {
+				uses_decadence = yes
+
+				NOT = {
+					any_liege = {
+						dynasty = PREV
+					}
+				}
+			}
+
+			hidden_effect = {
+				participation_scaled_decadence = 20
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_piety = 200
+			participation_scaled_prestige = 100
+			defender_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+
+			hidden_effect = {
+				participation_scaled_piety = 200
+				participation_scaled_prestige = 100
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.5 # Low prio CB
+
+		mult_modifier = {
+			factor = 0.2
+			ROOT = {
+				trait = slothful
+			}
+		}
+		mult_modifier = {
+			factor = 0.5
+			ROOT = {
+				trait = shy
+			}
+		}
+		mult_modifier = {
+			factor = 3
+			ROOT = {
+				trait = impaler
+			}
+		}
+		mult_modifier = {
+			factor = 3
+			ROOT = {
+				trait = cruel
+			}
+		}
+		mult_modifier = {
+			factor = 0.8
+			ROOT = {
+				trait = deceitful
+			}
+		}
+		mult_modifier = {
+			factor = 0.2
+			ROOT = {
+				trait = kind
+			}
+		}
+		mult_modifier = {
+			factor = 3
+			ROOT = {
+				trait = brave
+			}
+		}
+		mult_modifier = {
+			factor = 4
+			ROOT = {
+				trait = ambitious
+			}
+		}
+		mult_modifier = {
+			factor = 4
+			ROOT = {
+				trait = zealous
+			}
+		}
+	}
+}
+
+triumvir_subjugation = {
+	name = CB_NAME_PAGAN_SUBJUGATION
+	war_name = WAR_NAME_PAGAN_SUBJUGATION
+	sprite = 32
+	truce_days = 365
+	sort_priority = 1000
+
+	hostile_against_others = yes
+	is_permanent = yes
+	can_ask_to_join_war = yes
+	check_de_jure_tier = KING # this scans all de jure kingdoms for the counties which are held by or vassals(or below) of selected character. Only valid if is_permanent = yes
+	allowed_to_target_tributaries = no
+
+	can_use_gui = {
+		# Attacker
+		ROOT = {
+			show_scope_change = no
+			piety >= 500
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		# Attacker
+		ROOT = {
+			religion = dead_three
+
+			NOT = { same_realm = FROM }
+			#has_horde_culture = no # Should use tribal invasion instead
+			#is_nomadic = no
+			mercenary = no
+			NOT = { trait = creature_monster }
+		}
+
+		# Defender
+		FROM = {
+			religion = dead_three
+
+			NOR = {
+				is_offmap_governor = yes
+
+				any_war = {
+					defender = { character = PREVPREV }
+					using_cb = triumvir_subjugation
+				}
+				trait = creature_monster
+			}
+		}
+	}
+
+	can_use_title = {
+		# Attacker
+		ROOT = {
+			trigger_if = { # can only do it once, except in de jure kingdom of current capital with the right ambition
+				limit = { has_character_modifier = launched_subjugation }
+
+				has_ambition = obj_become_king
+
+				capital_scope = {
+					kingdom = {
+						title = PREVPREVPREV
+					}
+				}
+			}
+		}
+
+		# Defender
+		FROM = {
+			num_of_realm_counties = {
+				value >= 1
+				title = PREV
+			}
+		}
+	}
+
+	is_valid_title = {
+		# Defender
+		FROM = {
+			num_of_realm_counties = {
+				value >= 1
+				title = PREV
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+
+			piety = -500
+			declare_war_effect = yes
+		}
+	}
+
+	on_add_title = {
+		attacker = {
+			show_scope_change = no
+
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { has_ambition = obj_become_king }
+
+						capital_scope = {
+							kingdom = {
+								NOT = { title = PREVPREVPREV }
+							}
+						}
+					}
+				}
+
+				add_character_modifier = {
+					name = launched_subjugation
+					years = 30
+				}
+			}
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 200
+			attacker_victory_effect = yes
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = { participation_scaled_prestige = 200 }
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = -200
+		}
+	}
+
+	on_success_title = {
+		# Usurp the target kingdom itself, if the enemy holds it
+		if = {
+			limit = {
+				holder = defender
+
+				attacker = {
+					lower_real_tier_than = EMPEROR
+				}
+			}
+
+			attacker = {
+				show_scope_change = no
+
+				usurp_title = {
+					target = PREV
+					type = invasion
+				}
+			}
+		}
+
+		if = {
+			# Take the enemy's duchies within the target kingdom, if we are the same or lower tier
+			limit = {
+				attacker = {
+					NOT = { higher_real_tier_than = defender }
+				}
+			}
+
+			defender = {
+				show_scope_change = no
+
+				any_demesne_title = {
+					limit = {
+						real_tier = DUKE
+
+						OR = {
+							title = PREVPREV
+							de_jure_liege_or_above = PREVPREV
+						}
+					}
+
+					attacker = {
+						show_scope_change = no
+
+						usurp_title = {
+							target = PREV
+							type = invasion
+						}
+					}
+				}
+			}
+		}
+
+		# Have I become the vassal of the loser due to taking a duchy or kingdom?
+		# TODO: Ensure vassals using this CB can't become independent!
+		if = {
+			limit = {
+				attacker = {
+					is_vassal_or_below_of = defender
+				}
+			}
+
+			attacker = {
+				set_defacto_liege = THIS
+			}
+		}
+
+		# Vassalize the rest
+		custom_tooltip = {
+			text = pagan_subjugation_tip
+
+			attacker = {
+				subjugate_or_take_under_title = { # If the target only has territory within the kingdom, he is simply vassalized
+					title = PREV
+					enemy = defender
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 100
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 2.0
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 200
+			defender_victory_effect = yes
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 200 }
+		}
+	}
+
+	on_invalidation = {
+		attacker = {
+			show_scope_change = no
+
+			remove_character_modifier = launched_subjugation
+			piety = 500
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.9 # Prefer using CB's without on_add costs
+	}
+}
