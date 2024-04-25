@@ -1,0 +1,214 @@
+# loretaker_cb
+
+loretaker_cb = {
+	name = CB_NAME_LORETAKER
+	war_name = WAR_NAME_LORETAKER
+	sprite = 21
+	truce_days = 1825
+	sort_priority = 200
+
+	hostile_against_others = yes
+	can_ask_to_join_war = yes
+	is_permanent = yes
+	allowed_to_target_tributaries = no
+	allow_whitepeace = no
+	attacker_can_call_allies = no
+	max_attacker_battle_score = 100
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		ROOT = {
+			OR = {
+				religion = illithid_pantheon
+				has_character_modifier = syncretic_illithid
+			}
+			mercenary = no
+			NOT = { trait = creature_monster }
+		}
+
+		FROM = {
+			capital_scope = {
+				has_higher_tech_than = ROOT
+			}
+
+			NOR = {
+				same_realm = ROOT
+				religion = illithid_pantheon
+				mercenary = yes
+				trait = creature_monster
+			}
+
+			distance = {
+				who = ROOT
+				distance < 500
+			}
+		}
+	}
+
+	is_valid = {
+		ROOT = {
+			OR = {
+				religion = illithid_pantheon
+				has_character_modifier = syncretic_illithid
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			declare_war_effect = yes
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			custom_tooltip = {
+				text = gain_tech_loretaker_tooltip
+				random_list = {
+					1 = {
+						culture_techpoints = 400
+						random = {
+							chance = 30
+							culture_techpoints = 200
+						}
+					}
+					1 = {
+						military_techpoints = 400
+						random = {
+							chance = 30
+							military_techpoints = 200
+						}
+					}
+					1 = {
+						economy_techpoints = 400
+						random = {
+							chance = 30
+							economy_techpoints = 200
+						}
+					}
+				}
+			}
+			attacker_victory_effect = yes
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -100
+		}
+	}
+
+	on_reverse_demand = {
+		if = {
+			limit = {
+				FROM = {
+					trait = patron_hoar
+					is_rival = ROOT
+				}
+			}
+			FROM = { piety = 40 }
+		}
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			transfer_scaled_wealth = {
+				to = FROM
+				value = 8.0
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			participation_scaled_prestige = 200
+			defender_victory_effect = yes
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_tooltip = { participation_scaled_prestige = 200 }
+		}
+	}
+
+	on_attacker_leader_death = {
+		any_defender = {
+			letter_event = { id = 251 } # Our enemy has died, the war has ended
+		}
+
+		end_war = whitepeace
+	}
+
+	attacker_ai_victory_worth = {
+		factor = 150
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.8
+
+		mult_modifier = {
+			factor = 0.4
+			ROOT = { trait = content }
+		}
+		mult_modifier = {
+			factor = 2
+			ROOT = { trait = ambitious }
+		}
+		mult_modifier = {
+			factor = 2
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power >= 0.8
+				}
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power <= 1.2
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.7
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power >= 1.2
+				}
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power <= 1.9
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.3
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power > 1.9
+				}
+			}
+		}
+	}
+}
