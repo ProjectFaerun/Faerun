@@ -32,6 +32,8 @@ character_event = {
 	}
 
 	immediate = { # Up to 4 courtiers can be chosen
+		set_variable = { which = local_dungeon_level_threshold_easy value = 20 }
+		set_variable = { which = local_dungeon_level_threshold_medium value = 50 }
 		random_courtier = { # first party member can be either raider or adventurer, but the next ones must be the same as the first one.
 			limit = {
 				is_adult = yes
@@ -59,6 +61,7 @@ character_event = {
 			if = { limit = { NOT = { trait = adventurer } } add_trait = adventurer }
 			export_to_variable = { which = local_combat_rating_1 value = combat_rating }
 			set_variable = { which = local_combat_rating_party which = local_combat_rating_1 }
+			set_variable = { which = local_party_members_count value = 1 }
 			add_trait = travelling
 			if = { limit = { z_has_class = no } pick_random_class_effect = yes }
 		}
@@ -155,6 +158,7 @@ character_event = {
 			if = { limit = { NOT = { trait = adventurer } } add_trait = adventurer }
 			export_to_variable = { which = local_combat_rating_2 value = combat_rating }
 			change_variable = { which = local_combat_rating_party which = local_combat_rating_2 }
+			change_variable = { which = local_party_members_count value = 1 }
 			add_trait = travelling
 			if = { limit = { z_has_class = no } pick_random_class_effect = yes }
 		}
@@ -251,6 +255,7 @@ character_event = {
 			if = { limit = { NOT = { trait = adventurer } } add_trait = adventurer }
 			export_to_variable = { which = local_combat_rating_3 value = combat_rating }
 			change_variable = { which = local_combat_rating_party which = local_combat_rating_3 }
+			change_variable = { which = local_party_members_count value = 1 }
 			add_trait = travelling
 			if = { limit = { z_has_class = no } pick_random_class_effect = yes }
 		}
@@ -347,9 +352,13 @@ character_event = {
 			if = { limit = { NOT = { trait = adventurer } } add_trait = adventurer }
 			export_to_variable = { which = local_combat_rating_4 value = combat_rating }
 			change_variable = { which = local_combat_rating_party which = local_combat_rating_4 }
+			change_variable = { which = local_party_members_count value = 1 }
 			add_trait = travelling
 			if = { limit = { z_has_class = no } pick_random_class_effect = yes }
 		}
+
+		multiply_variable = { which = local_dungeon_level_threshold_easy which = local_party_members_count }
+		multiply_variable = { which = local_dungeon_level_threshold_medium which = local_party_members_count }
 		
 		character_event = { id = faerun_ruler_events.2 }
 		
@@ -536,39 +545,39 @@ province_event = {
 		}
 		random_list = {
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value < 80 } }
+				trigger = { check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_easy } }
 				set_variable = { which = local_combat_rating_enemy value = 5 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value < 80 } }
+				trigger = { check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_easy } }
 				set_variable = { which = local_combat_rating_enemy value = 10 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value < 80 } }
+				trigger = { check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_easy } }
 				set_variable = { which = local_combat_rating_enemy value = 15 }
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 80 } check_variable = { which = local_combat_rating_party value < 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_easy } check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 30 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 80 } check_variable = { which = local_combat_rating_party value < 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_easy } check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 40 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 80 } check_variable = { which = local_combat_rating_party value < 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_easy } check_variable = { which = local_combat_rating_party which < local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 50 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 60 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 70 } 
 			}
 			33 = {
-				trigger = { check_variable = { which = local_combat_rating_party value >= 200 } }
+				trigger = { check_variable = { which = local_combat_rating_party which >= local_dungeon_level_threshold_medium } }
 				set_variable = { which = local_combat_rating_enemy value = 80 } 
 			}
 		}
@@ -622,19 +631,17 @@ character_event = {
 	immediate = {
 		simulate_duel_effect = yes
 		set_variable = { which = local_lose_count which = local_combatant_2_win_count }
+		simulate_duel_injury_effect = yes
 		if = { 
 			limit = { # if the courtier is not the winner, he dies
 				check_variable = { which = local_lose_count which >= local_round_count }
 			}
-			simulate_duel_injury_effect = yes
 			death = { death_reason = death_adventuring }
 			break = yes
 		}
-		else = { # get some injures
-			add_blood_splatter_effect = yes
-			simulate_duel_injury_effect = yes
-			add_one_duel_experience_modifier = yes
-		}
+		add_blood_splatter_effect = yes
+		add_one_duel_experience_modifier = yes
+		
 		random_list = {
 			1 = {
 				trigger = {
