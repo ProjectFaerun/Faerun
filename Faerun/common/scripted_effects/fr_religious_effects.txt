@@ -2019,3 +2019,81 @@ select_patron_effect = {
 	character_event = { id = faithcleanup.0 days = 1 }
 	character_event = { id = faithcleanup.0 months = 1 }
 }
+
+calc_reward_for_sacrifice_effect = {
+	event_target:human_sacrifice = {
+		trigger_switch = {
+			on_trigger = tier
+			EMPEROR = { change_variable = { which = local_piety_reward value = 250 } }
+			KING = { change_variable = { which = local_piety_reward value = 150 } }
+			DUKE = { change_variable = { which = local_piety_reward value = 75 } }
+			COUNT = { change_variable = { which = local_piety_reward value = 30 } }
+			BARON = { change_variable = { which = local_piety_reward value = 15 } }
+			fallback = { change_variable = { which = local_piety_reward value = 5 } }
+		}
+	}
+	event_target:jailer = {
+		if = { # bigger rewards for some religions
+			limit = { religion = abyssal_cult }
+			change_variable = { which = local_piety_reward value = 5 }
+			if = {
+				limit = {
+					event_target:human_sacrifice = {
+						olrox_is_good_religion_trigger = yes
+					}
+				}
+				change_variable = { which = local_piety_reward value = 10 }
+			}
+			if = {
+				limit = {
+					event_target:human_sacrifice = {
+						OR = {
+							z_cleric = yes
+							z_paladin = yes
+							z_druid = yes
+						}
+					}
+				}
+				change_variable = { which = local_piety_reward value = 15 }
+			}
+			if = {
+				limit = {
+					event_target:human_sacrifice = {
+						trait = creature_angel
+					}
+				}
+				change_variable = { which = local_piety_reward value = 45 }
+			}
+		}
+		if = { # Prestige reward if the jailer has specific bloodline
+			limit = {
+				any_owned_bloodline = {
+					has_bloodline_flag = bloodline_prestige_sacrifice
+					bloodline_is_active_for = PREV
+				}
+			}
+			event_target:human_sacrifice = {
+				trigger_switch = {
+					on_trigger = tier
+					EMPEROR = { change_variable = { which = local_prestige_reward value = 500 } }
+					KING = { change_variable = { which = local_prestige_reward value = 300 } }
+					DUKE = { change_variable = { which = local_prestige_reward value = 150 } }
+					COUNT = { change_variable = { which = local_prestige_reward value = 60 } }
+					BARON = { change_variable = { which = local_prestige_reward value = 30 } }
+					fallback = { change_variable = { which = local_prestige_reward value = 10 } }
+				}
+			}
+		}
+		if = {
+			limit = { # prestige for eating heart if the jailer have specific wonder feature
+				any_realm_wonder_upgrade = {
+					has_wonder_upgrade = upgrade_sacrificial_altar
+					is_active = yes
+				}
+			}
+			change_variable = { which = local_prestige_reward value = 10 }
+		}
+	}
+
+	
+}
