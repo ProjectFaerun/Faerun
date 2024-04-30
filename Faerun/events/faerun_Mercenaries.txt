@@ -32,3 +32,104 @@ letter_event = {
 		name = EXCELLENT
 	}
 }
+
+# maintenance event where we correct mercenaries gender for special mercenary titles
+character_event = {
+	id = FaerunMercenaries.1000
+	hide_window = yes
+	is_triggered_only = yes
+	ai = yes
+	only_men = yes
+	min_age = 16
+	friends = no
+	rivals = no
+	prisoner = no
+	is_married = no
+
+	trigger = {
+		is_lowborn = yes
+		liege = {
+			mercenary = yes
+			OR = {
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+				has_law = true_cognatic_succession
+			}
+		}
+		NOR = {
+			father = { always = yes }
+			mother = { always = yes }
+			is_immune_to_pruning = yes
+			has_children = yes
+			is_ruler = yes
+			has_character_flag = mercenary_gender_checked
+		}
+		
+	}
+
+	immediate = { # If succession law is enatic, we always change gender, otherwise with 50% chance. Couldn't use "set_gender = female" because there is seemingly no way to change existing character's name to random.
+		liege = {
+			any_courtier = { # Somehow, I've had troubles with names not being correctly randomized, so I've had to use any_courtier method.
+				limit = {
+					is_female = no
+					host = { character = liege }
+					NOT = { has_character_flag = mercenary_gender_checked }
+				}
+				set_character_flag = mercenary_gender_checked
+				random_list = {
+					50 = {
+						create_random_soldier = {
+							dynasty = none
+							female = yes
+							random_traits = yes
+							culture = THIS
+							religion = THIS
+							employer = PREV
+						}
+						new_character = {
+							remove_trait = imbecile
+							remove_trait = idiot
+							remove_trait = slow
+							remove_trait = dumb
+							remove_trait = dim
+							remove_trait = weak
+							remove_trait = delicate
+							remove_trait = soft
+	
+							remove_lifestyle_trait_effect = yes
+							character_event = { id = character_trait.1 }
+					
+							random_list = { # Flavor Randomization
+								35 = { } # Nothing
+								15 = { change_martial = 2 }
+								10 = { add_trait = robust }
+								10 = { add_trait = duelist }
+								10 = { add_trait = hunter }
+									5 = { add_trait = strategist }
+									5 = { change_martial = 4 }
+					
+									5 = {
+									trigger = { has_dlc = "Reapers" }
+									add_trait = one_eyed
+								}
+					
+									5 = { add_trait = shrewd }
+									3 = { add_trait = giant }
+							}
+							set_character_flag = class_selection_includes_fighter
+							set_character_flag = class_selection_includes_ranger
+							set_character_flag = class_selection_includes_barbarian
+							pick_random_class_effect = yes
+						}
+						death = { death_reason = death_missing }
+					}
+					50 = {
+						trigger = {
+							liege = { NOT = { has_law = enatic_succession } }
+						}
+					}
+				}
+			}
+		}
+	}
+}
