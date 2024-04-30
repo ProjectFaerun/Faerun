@@ -17,12 +17,16 @@ character_event = {
 	hide_window = yes # Only fires for unplayable landless characters
 	
 	min_age = 16
-	max_age = 50
 	capable_only = yes
 	prisoner = no
 	
 	trigger = {
 		has_dlc = "The Old Gods"
+
+		OR = {
+			olrox_all_immortals_trigger = yes
+			age < 50
+		}
 		
 		NOT = {
 			has_game_rule = {
@@ -83,6 +87,18 @@ character_event = {
 						non_interference = PREV
 					}
 				}
+				capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+					ROOT = {
+						liege = {
+							any_demesne_province = {
+								OR = {
+									can_naval_path_to = PREVPREVPREV
+									can_land_path_to = PREVPREVPREV
+								}
+							}
+						}
+					}
+				}
 			}
 			OR = {
 				tier = KING
@@ -101,6 +117,7 @@ character_event = {
 		health = 4
 		NOT = { trait = content }
 		NOT = { trait = craven }
+		NOT = { trait = infirm }
 		
 		NOT = { has_character_modifier = planning_claimant_adventure }
 	}
@@ -191,6 +208,18 @@ character_event = {
 						NOT = {
 							capital_holding = {
 								de_jure_liege_or_above = PREVPREV
+							}
+						}
+					}
+					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+						ROOT = {
+							liege = {
+								any_demesne_province = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
+								}
 							}
 						}
 					}
@@ -323,6 +352,18 @@ character_event = {
 						non_interference = PREV
 					}
 				}
+				capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+					ROOT = {
+						liege = {
+							any_demesne_province = {
+								OR = {
+									can_naval_path_to = PREVPREVPREV
+									can_land_path_to = PREVPREVPREV
+								}
+							}
+						}
+					}
+				}
 			}
 			OR = {
 				tier = KING
@@ -350,6 +391,7 @@ character_event = {
 		}
 		
 		liege = {
+			save_event_target_as = old_liege
 			capital_scope = {
 				ROOT = {
 					set_defacto_liege = ROOT
@@ -382,6 +424,16 @@ character_event = {
 									NOT = {
 										capital_holding = {
 											de_jure_liege_or_above = PREVPREV
+										}
+									}
+								}
+								capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+									event_target:old_liege = {
+										any_demesne_province = {
+											OR = {
+												can_naval_path_to = PREVPREV
+												can_land_path_to = PREVPREV
+											}
 										}
 									}
 								}
@@ -771,12 +823,16 @@ character_event = {
 	hide_window = yes # Only fires for unplayable landless characters
 	
 	min_age = 16
-	max_age = 50
 	capable_only = yes
 	prisoner = no
 	
 	trigger = {
 		has_dlc = "The Old Gods"
+
+		OR = {
+			olrox_all_immortals_trigger = yes
+			age < 50
+		}
 		
 		NOT = {
 			has_game_rule = {
@@ -806,6 +862,7 @@ character_event = {
 		
 		NOT = { trait = content }
 		NOT = { trait = craven }
+		NOT = { trait = infirm }
 		
 		NOT = { culture = monster }
 		
@@ -825,6 +882,18 @@ character_event = {
 						NOT = {
 							capital_holding = {
 								de_jure_liege_or_above = PREVPREV
+							}
+						}
+					}
+					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+						ROOT = {
+							liege = {
+								any_demesne_province = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
+								}
 							}
 						}
 					}
@@ -947,34 +1016,27 @@ character_event = {
 				NOT = { is_vassal_or_below = ROOT }
 				any_realm_province = {
 					OR = {
-						AND = {
-							port = yes
-#							ROOT = {
-#								NOT = { culture_group = altaic }
-#								NOT = { culture = hungarian }
-#							}
-							NOT = {
-								distance = {
-									who = ROOT
-									value = 800
-								}
-							}
-						}
 						any_neighbor_province = {
 							owner = {
 								same_realm = ROOT
 							}
 						}
+						trigger_if = {
+							limit = { port = yes }
+							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+								liege = {
+									any_demesne_province = {
+										can_naval_path_to = {
+											target = PREVPREVPREV
+											distance <= 800
+										}
+									}
+								}
+							}
+						}
 					}
-#					NOT = {
-#						region = world_europe_north
-#					}
-#					NOT = {
-#						duchy = {
-#							title = d_bjarmia
-#						}
-#					}
 				}
+				
 				ROOT = {
 					NOR = {
 						obedient = PREV
@@ -986,33 +1048,25 @@ character_event = {
 			random_realm_province = {
 				limit = {
 					OR = {
-						AND = {
-							port = yes
-#							ROOT = {
-#								NOT = { culture_group = altaic }
-#								NOT = { culture = hungarian }
-#							}
-							NOT = {
-								distance = {
-									who = ROOT
-									value = 800
-								}
-							}
-						}
 						any_neighbor_province = {
 							owner = {
 								same_realm = ROOT
 							}
 						}
+						trigger_if = {
+							limit = { port = yes }
+							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+								liege = {
+									any_demesne_province = {
+										can_naval_path_to = {
+											target = PREVPREVPREV
+											distance <= 800
+										}
+									}
+								}
+							}
+						}
 					}
-#					NOT = {
-#						region = world_europe_north
-#					}
-#					NOT = {
-#						duchy = {
-#							title = d_bjarmia
-#						}
-#					}
 				}
 				
 				ROOT = {
@@ -1099,10 +1153,22 @@ character_event = {
 			NOT = { is_vassal_or_below = ROOT }
 			any_realm_province = {
 				OR = {
-					port = yes
 					any_neighbor_province = {
 						owner = {
 							same_realm = ROOT
+						}
+					}
+					trigger_if = {
+						limit = { port = yes }
+						ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+							liege = {
+								any_demesne_province = {
+									can_naval_path_to = {
+										target = PREVPREVPREV
+										distance <= 800
+									}
+								}
+							}
 						}
 					}
 				}
@@ -1141,10 +1207,22 @@ character_event = {
 						NOT = { is_vassal_or_below = ROOT }
 						any_realm_province = {
 							OR = {
-								port = yes
 								any_neighbor_province = {
 									owner = {
 										same_realm = ROOT
+									}
+								}
+								trigger_if = {
+									limit = { port = yes }
+									ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+										liege = {
+											any_demesne_province = {
+												can_naval_path_to = {
+													target = PREVPREVPREV
+													distance <= 800
+												}
+											}
+										}
 									}
 								}
 							}
@@ -1163,10 +1241,22 @@ character_event = {
 					random_realm_province = {
 						limit = {
 							OR = {
-								port = yes
 								any_neighbor_province = {
 									owner = {
 										same_realm = ROOT
+									}
+								}
+								trigger_if = {
+									limit = { port = yes }
+									ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+										liege = {
+											any_demesne_province = {
+												can_naval_path_to = {
+													target = PREVPREVPREV
+													distance <= 800
+												}
+											}
+										}
 									}
 								}
 							}
