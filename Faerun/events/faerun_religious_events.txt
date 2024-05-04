@@ -729,3 +729,778 @@ character_event = {
 		}
 	}
 }
+
+character_event = { # replace for hunting heretics
+	id = conv.70100
+	title = conv.70100.t
+	hide_window = yes
+
+	min_age = 16
+	capable_only = yes
+	prisoner = no
+	has_job_title = yes
+
+	trigger = {
+		has_job_action = action_hunt_heretics
+		NOT = { has_character_modifier = in_seclusion }
+		is_incapable = no
+		liege = {
+			# There is someone who is eligible for divine class
+			any_realm_character = {
+				ai = yes
+				prisoner = no
+				is_incapable = no
+				z_divine_caster = no
+				z_multiclass = no
+				NOR = {
+					has_opinion_modifier = {
+						who = PREV
+						name = opinion_disallowed_divine_class_acquirement
+					}
+					has_character_flag = paladin_candidate
+					has_character_flag = cleric_candidate
+					has_character_flag = druid_candidate
+					character = ROOT # Don't encourage yourself
+					character = PREV # Don't encourage your liege
+				}
+				OR = {
+					religion = ROOT
+					ROOT = {
+						characters_have_the_same_patron_trigger = yes
+					}
+				}
+				OR = {
+					is_cleric_class_allowed = yes
+					is_paladin_class_allowed = yes
+					is_druid_class_allowed = yes
+				}
+			}
+		}
+	}
+
+	immediate = {
+		liege = {
+			any_realm_character = {
+				limit = {
+					ai = yes
+					prisoner = no
+					is_incapable = no
+					z_multiclass = no
+					z_divine_caster = no
+					NOR = {
+						has_opinion_modifier = {
+							who = PREV
+							name = opinion_disallowed_divine_class_acquirement
+						}
+						has_character_flag = paladin_candidate
+						has_character_flag = cleric_candidate
+						has_character_flag = druid_candidate
+						character = ROOT # Don't encourage yourself
+						character = PREV # Don't encourage your liege
+					}
+					OR = {
+						religion = ROOT
+						ROOT = {
+							characters_have_the_same_patron_trigger = yes
+						}
+					}
+					OR = {
+						is_cleric_class_allowed = yes
+						is_paladin_class_allowed = yes
+						is_druid_class_allowed = yes
+					}
+				}
+				score_value = {
+					value = 1
+				
+					additive_modifier = {
+						trait = zealous
+						value = 20
+					}
+					additive_modifier = {
+						trait = theologian
+						value = 30
+					}
+					additive_modifier = {
+						trait = mystic
+						value = 10
+					}
+					additive_modifier = {
+						trait = diligent
+						value = 10
+					}
+					additive_modifier = {
+						has_education_learning_trigger = yes
+						value = 20
+					}
+					additive_modifier = {
+						OR = {
+							is_member_of_any_knight_order_trigger = yes
+							is_member_of_any_monastic_order_trigger = yes
+						}
+						value = 10
+					}
+					additive_modifier = {
+						z_has_class = yes
+						value = -30
+					}
+					additive_modifier = {
+						trait = slothful
+						value = -10
+					}
+					additive_modifier = {
+						trait = drunkard
+						value = -10
+					}
+
+					
+				}
+				count = 1
+
+				save_event_target_as = divine_class_candidate
+			}
+		}
+
+		if = {
+			limit = {
+				event_target:divine_class_candidate = {
+					always = yes
+					is_alive = yes
+				}
+			}
+			event_target:divine_class_candidate = {
+				random_list = {
+					50 = {
+						trigger = {
+							is_paladin_class_allowed = yes
+							z_paladin = no
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = wroth
+						}
+						mult_modifier = {
+							factor = 3.0
+							trait = duelist
+						}
+						mult_modifier = {
+							factor = 3.0
+							OR = {
+								trait = sturdy
+								is_strong_trigger = yes
+							}
+						}
+						mult_modifier = {
+							factor = 10.0
+							has_education_martial_trigger = yes
+						}
+						mult_modifier = {
+							factor = 2.0
+							is_member_of_any_knight_order_trigger = yes
+						}
+						mult_modifier = {
+							factor = 0.01
+							OR = {
+								trait = one_handed
+								trait = one_legged
+								trait = mangled
+								trait = maimed
+							}
+						}
+						mult_modifier = {
+							factor = 1.5
+							OR = {
+								trait = creature_angel
+								trait = creature_aasimar
+							}
+						}
+
+						set_character_flag = paladin_candidate
+					}
+					50 = {
+						trigger = {
+							is_cleric_class_allowed = yes
+							z_cleric = no
+						}
+						mult_modifier = {
+							factor = 5.0
+							trait = theologian
+						}
+						mult_modifier = {
+							factor = 2.5
+							trait = mystic
+						}
+						mult_modifier = {
+							factor = 5.0
+							has_education_learning_trigger = yes
+						}
+						mult_modifier = {
+							factor = 2.0
+							is_member_of_any_monastic_order_trigger = yes
+						}
+
+						set_character_flag = cleric_candidate
+					}
+					50 = {
+						trigger = {
+							is_druid_class_allowed = yes
+							z_druid = no
+						}
+						mult_modifier = {
+							factor = 3.0
+							trait = gardener
+						}
+						mult_modifier = {
+							factor = 3.0
+							trait = mystic
+						}
+						mult_modifier = {
+							factor = 5.0
+							realm = {
+								has_law = succ_divine_druid
+							}
+						}
+						mult_modifier = {
+							factor = 2.5
+							has_education_learning_trigger = yes
+						}
+						mult_modifier = {
+							factor = 3.0
+							is_member_of_any_druid_society_trigger = yes
+						}
+						mult_modifier = {
+							factor = 1.5
+							OR = {
+								culture_group = gnome_group
+								culture_group = sylvan_elf_group
+							}
+						}
+						mult_modifier = {
+							factor = 3.0
+							is_woodland_religion = yes
+						}
+
+						set_character_flag = druid_candidate
+					}
+				}
+			}
+			character_event = { id = conv.70110 }
+		}
+	}
+
+	mean_time_to_happen = {
+		months = 100
+
+		job_event_mtth_modifier_learning_score = yes
+		job_event_mtth_modifier_intrigue_score = yes
+
+		modifier = {
+			factor = 0.75
+			z_legendary_class = yes
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					z_paladin = yes
+					z_cleric = yes
+					z_druid = yes
+				}
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					trait = trained_paladin
+					trait = journeyman_paladin
+					trait = expert_paladin
+					trait = master_paladin
+					trait = renowned_paladin
+					trait = legendary_paladin
+					trait = trained_cleric
+					trait = journeyman_cleric
+					trait =	expert_cleric
+					trait =	master_cleric
+					trait =	renowned_cleric
+					trait = legendary_cleric
+					trait = trained_druid
+					trait = journeyman_druid
+					trait =	expert_druid
+					trait =	master_druid
+					trait =	renowned_druid
+					trait = legendary_druid
+				}
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					trait = journeyman_paladin
+					trait = expert_paladin
+					trait = master_paladin
+					trait = renowned_paladin
+					trait = legendary_paladin
+					trait = journeyman_cleric
+					trait =	expert_cleric
+					trait =	master_cleric
+					trait =	renowned_cleric
+					trait = legendary_cleric
+					trait = journeyman_druid
+					trait =	expert_druid
+					trait =	master_druid
+					trait =	renowned_druid
+					trait = legendary_druid
+				}
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					trait = expert_paladin
+					trait = master_paladin
+					trait = renowned_paladin
+					trait = legendary_paladin
+					trait =	expert_cleric
+					trait =	master_cleric
+					trait =	renowned_cleric
+					trait = legendary_cleric
+					trait =	expert_druid
+					trait =	master_druid
+					trait =	renowned_druid
+					trait = legendary_druid
+				}
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					trait = master_paladin
+					trait = renowned_paladin
+					trait = legendary_paladin
+					trait =	master_cleric
+					trait =	renowned_cleric
+					trait = legendary_cleric
+					trait =	master_druid
+					trait =	renowned_druid
+					trait = legendary_druid
+				}
+		}
+		modifier = {
+			factor = 0.9
+				OR = {
+					trait = renowned_paladin
+					trait = legendary_paladin
+					trait =	renowned_cleric
+					trait = legendary_cleric
+					trait =	renowned_druid
+					trait = legendary_druid
+				}
+		}
+		modifier = {
+			factor = 2
+			NOT = { religion_authority = 0.1 }
+		}
+		modifier = {
+			factor = 1.5
+			NOT = { religion_authority = 0.2 }
+		}
+		modifier = {
+			factor = 1.25
+			NOT = { religion_authority = 0.3 }
+		}
+		modifier = {
+			factor = 1.25
+			NOT = { religion_authority = 0.4 }
+		}
+		modifier = {
+			factor = 1.25
+			NOT = { religion_authority = 0.5 }
+		}
+		modifier = {
+			factor = 0.9
+			religion_authority = 0.6
+		}
+		modifier = {
+			factor = 0.9
+			religion_authority = 0.7
+		}
+		modifier = {
+			factor = 0.9
+			religion_authority = 0.8
+		}
+		modifier = {
+			factor = 0.9
+			religion_authority = 0.9
+		}
+	}
+}
+
+character_event = { # Outcome event
+	id = conv.70110
+	title = conv.70100.t
+	picture = GFX_evt_bishop
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	min_age = 16
+	capable_only = yes
+	prisoner = no
+
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = paladin_candidate }
+		}
+		text = conv.70110.d.paladin
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = cleric_candidate }
+		}
+		text = conv.70110.d.cleric
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = druid_candidate }
+		}
+		text = conv.70110.d.druid
+	}
+
+	
+
+	option = {
+		name = conv.70110.a
+
+		liege = {
+			character_event = { id = conv.70200 }
+		}
+	}
+}
+
+character_event = { # Does the liege wish to allow divine class acquirement?
+	id = conv.70200
+	picture = GFX_evt_bishop
+	border = GFX_event_normal_frame_religion
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:divine_class_candidate = {
+			always = yes
+			is_alive = yes
+		}
+	}
+
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = paladin_candidate }
+		}
+		text = conv.70200.d.paladin
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = cleric_candidate }
+		}
+		text = conv.70200.d.cleric
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = druid_candidate }
+		}
+		text = conv.70200.d.druid
+	}
+
+	
+
+	option = { # Allow
+		name = conv.70200.a
+
+		ai_chance = {
+			factor = 80
+
+			modifier = {
+				factor = 2
+				trait = zealous
+			}
+			modifier = {
+				factor = 0.25
+				trait = cynical
+			}
+		}
+
+		event_target:divine_class_candidate = { 
+			if = {
+				limit = { has_character_flag = paladin_candidate }
+				become_paladin_effect = yes
+			}
+			else_if = {
+				limit = { has_character_flag = cleric_candidate }
+				become_cleric_effect = yes
+			}
+			else = {
+				become_druid_effect = yes
+			}
+		}
+		character_event = {
+			id = conv.70201
+			days = 1
+			#days = 120
+			#random = 80
+		}
+		character_event = {
+			id = conv.70202
+			days = 201
+		}
+	}
+
+	option = { # Disallow
+		name = conv.70200.b
+
+		ai_chance = {
+			factor = 20
+
+			modifier = {
+				factor = 0.5
+				trait = zealous
+			}
+			modifier = {
+				factor = 4
+				trait = cynical
+			}
+		}
+
+		event_target:divine_class_candidate = { 
+			character_event = { id = conv.70202 }
+			opinion = {
+				modifier = opinion_disallowed_divine_class_acquirement
+				who = ROOT
+			}
+		}
+	}
+}
+character_event = { # gain trained or journeyman trait
+	id = conv.70201
+	picture = GFX_evt_bishop
+	border = GFX_event_normal_frame_religion
+
+	trigger = {
+		event_target:divine_class_candidate = {
+			always = yes
+			is_alive = yes
+			prisoner = no
+			is_incapable = no
+		}
+	}
+
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = paladin_candidate }
+		}
+		text = conv.70201.d.paladin
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = cleric_candidate }
+		}
+		text = conv.70201.d.cleric
+	}
+	desc = {
+		trigger = {
+			event_target:divine_class_candidate = { has_character_flag = druid_candidate }
+		}
+		text = conv.70201.d.druid
+	}
+
+	option = {
+		name = conv.70201.a
+
+		event_target:divine_class_candidate = { 
+			if = {
+				limit = { has_character_flag = paladin_candidate }
+				random_list = {
+					20 = {
+						mult_modifier = {
+							factor = 2.0
+							trait = duelist
+						}
+						mult_modifier = {
+							factor = 2.0
+							OR = {
+								trait = sturdy
+								is_strong_trigger = yes
+							}
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = diligent
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = ambitious
+						}
+						mult_modifier = {
+							factor = 1.25
+							trait = misguided_warrior
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = tough_soldier
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = skilled_tactician
+						}
+						mult_modifier = {
+							factor = 2.5
+							trait = brilliant_strategist
+						}
+						mult_modifier = {
+							factor = 2.0
+							is_member_of_any_knight_order_trigger = yes
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = slothful
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = content
+						}
+						add_trait = journeyman_paladin
+					}
+					80 = {
+						add_trait = trained_paladin
+					}
+				}
+			}
+			else_if = {
+				limit = { has_character_flag = cleric_candidate }
+				random_list = {
+					20 = {
+						mult_modifier = {
+							factor = 3.0
+							trait = theologian
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = zealous
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = mystic
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = diligent
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = ambitious
+						}
+						mult_modifier = {
+							factor = 1.25
+							trait = detached_priest
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = martial_cleric
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = scholarly_theologian
+						}
+						mult_modifier = {
+							factor = 2.5
+							trait = mastermind_theologian
+						}
+						mult_modifier = {
+							factor = 2.0
+							is_member_of_any_monastic_order_trigger = yes
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = slothful
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = content
+						}
+						add_trait = journeyman_cleric
+					}
+					80 = {
+						add_trait = trained_cleric
+					}
+				}
+			}
+			else = {
+				random_list = {
+					20 = {
+						mult_modifier = {
+							factor = 3.0
+							trait = mystic
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = zealous
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = theologian
+						}
+						mult_modifier = {
+							factor = 2
+							trait = gardener
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = diligent
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = ambitious
+						}
+						mult_modifier = {
+							factor = 1.25
+							trait = detached_priest
+						}
+						mult_modifier = {
+							factor = 1.5
+							trait = martial_cleric
+						}
+						mult_modifier = {
+							factor = 2.0
+							trait = scholarly_theologian
+						}
+						mult_modifier = {
+							factor = 2.5
+							trait = mastermind_theologian
+						}
+						mult_modifier = {
+							factor = 2.0
+							is_member_of_any_druid_society_trigger = yes
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = slothful
+						}
+						mult_modifier = {
+							factor = 0.5
+							trait = content
+						}
+						add_trait = journeyman_druid
+					}
+					80 = {
+						add_trait = trained_druid
+					}
+				}
+			}
+			character_event = { id = conv.70202 }
+		}
+		
+	}
+}
+
+character_event = {
+	id = conv.70202
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		clr_character_flag = paladin_candidate
+		clr_character_flag = cleric_candidate
+		clr_character_flag = druid_candidate
+	}
+}
