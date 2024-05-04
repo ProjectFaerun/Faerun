@@ -1391,57 +1391,66 @@ decisions = {
 	convert_to_republic_ai = {
 		only_playable = yes
 		ai = yes
-		ai_check_interval = 36
+		ai_check_interval = 72
 
 		potential = {
 			government = democratic_feudal_government
 			ai = yes
-			OR = {
-				AND = {
-					higher_tier_than = count
-					independent = no # as a vassal MR
-				}
-				tier = DUKE # excluding major Commonwealths
-			}
+			tier = DUKE # excluding major Commonwealths
 			has_dlc = "The Republic"
 		}
 		allow = {
 			war = no
 			capital_scope = {
-				port = yes
+				is_coastal = yes
 			}
 			capital_holding = {
 				holding_type = city
 			}
-			OR = {
-				controls_religion = no
-				religion_group = qismaite_group
-				religion_group = karaturan_group
-				religion = mulhorandi_faith
-				has_religion_feature = religion_temporal_head
-			}
-			liege = { # preventing some weird bugs
-				NOT = { government = merchant_republic_government }
-			}
-			top_liege = {
-				OR = {
-					character = ROOT # decision taker is independent
-					AND = { # try to stay withing realm republic % limits
-						tier = KING
-						NOT = {
-							num_of_government_vassals = {
-								government = merchant_republic_government
-								value = 1
-							}
+			NOR = {
+				trait = avatar
+				trait = greater_fiend
+				trait = archfiend
+				evilcat_is_chosen = yes
+				is_true_outsider = yes
+				is_dragon = yes
+				controls_religion = yes
+				is_heir = yes
+				num_of_claims >= 1
+				any_close_relative = {
+					higher_real_tier_than = COUNT
+				}
+				any_spouse = {
+					OR = {
+						higher_real_tier_than = BARON
+						is_heir = yes
+						num_of_claims >= 1
+						any_close_relative = {
+							higher_real_tier_than = COUNT
 						}
 					}
-					AND = {
-						tier = EMPEROR
-						NOT = {
-							num_of_government_vassals = {
-								government = merchant_republic_government
-								value = 2
-							}
+				}
+				any_dynasty_member = {
+					is_patrician = yes
+				}
+			}
+			trigger_if = {
+				limit = { independent = no }
+				NOR = {
+					leads_faction = yes
+					is_powerful_vassal = yes
+					liege = {
+						government = merchant_republic_government
+						num_of_government_vassals = {
+							government = merchant_republic_government
+							value >= 1
+						}
+					}
+					top_liege = { # if there is a top emperor
+						government = merchant_republic_government
+						num_of_government_vassals = {
+							government = merchant_republic_government
+							value >= 1
 						}
 					}
 				}
@@ -1453,54 +1462,7 @@ decisions = {
 				create_family_palace = yes
 
 				set_government_type = merchant_republic_government
-
-				if = {
-					limit = {
-						NOT = {
-							num_of_government_vassals = {
-								government = merchant_republic_government
-								value = 1
-							}
-						}
-					}
-
-					any_unique_dynasty_vassal = { # gives random vassals a family palace
-						count = 4
-						limit = {
-							OR = {
-								government = democratic_feudal_government
-								is_republic = yes
-								is_tribal = yes
-							}
-							is_patrician = no
-							prisoner = no
-							is_incapable = no
-							is_adult = yes
-							NOT = {
-								dynasty = none
-							}
-						}
-
-						if = {
-							limit = { is_tribal = yes }
-
-							hidden_tooltip = {
-								any_demesne_title = {
-									limit = {
-										tier = baron
-										holding_type = tribal
-									}
-									convert_to = city
-									refill_holding_levy = yes
-								}
-							}
-						}
-						create_family_palace = yes
-					}
-				}
 			}
-
-			set_government_type = merchant_republic_government
 		}
 
 		ai_will_do = {
@@ -1521,7 +1483,7 @@ decisions = {
 				factor = 0
 				independent = yes
 				NAND = {
-					ruled_years = 10
+					ruled_years = 15
 					total_years_played = 25
 				}
 			}
