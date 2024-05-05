@@ -1520,19 +1520,30 @@ character_event = {
     is_triggered_only = yes
 
     trigger = {
-    	FROM = { NOT = { has_artifact_flag = ingredient } } #the artifact inherited is NOT an ingredient (those have their own event)...
+    	trigger_if = {
+    		limit = { FROM = { always = yes } } # artifact scope actually exists
+    		FROM = { NOT = { has_artifact_flag = ingredient } } #the artifact inherited is NOT an ingredient (those have their own event)...
+    	}
+    	trigger_else = {
+    		always = no
+    	}
+    	
     	NOR = { #not already dealing with other inheritances... 
     		#has_character_flag = dealing_with_inherited_ingredients
     		has_character_flag = dealing_with_inherited_artifacts
     	}
     }
     fail_trigger_effect = {
-    	if = { # if you are already dealing with another artifact, queue this one up...
-    		limit = {
-    			has_character_flag = dealing_with_inherited_artifacts
-    			ai = no
+    	if = {
+    		limit = { FROM = { always = yes } } # artifact scope actually exists
+			
+    		if = { # if you are already dealing with another artifact, queue this one up...
+    			limit = {
+    				has_character_flag = dealing_with_inherited_artifacts
+    				ai = no
+    			}
+    			repeat_event = { id = HFP.16005 days = 12 }
     		}
-    		repeat_event = { id = HFP.16005 days = 12 }
     	}
     }
 

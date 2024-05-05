@@ -73,10 +73,22 @@ character_event = {
 				capital_scope = { 
 					ROOT = {
 						liege = {
-							any_demesne_province = {
-								OR = {
-									can_naval_path_to = PREVPREVPREV
-									can_land_path_to = PREVPREVPREV
+							trigger_if = {
+								limit = { num_of_count_titles >= 1 }
+	
+								any_demesne_province = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
+								}
+							}
+							trigger_else = {  # if we don't hold any count titles for some reason, use the capital scope
+								capital_scope = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
 								}
 							}
 						}
@@ -212,10 +224,22 @@ character_event = {
 					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 						ROOT = {
 							liege = {
-								any_demesne_province = {
-									OR = {
-										can_naval_path_to = PREVPREVPREV
-										can_land_path_to = PREVPREVPREV
+								trigger_if = {
+									limit = { num_of_count_titles >= 1 }
+		
+									any_demesne_province = {
+										OR = {
+											can_naval_path_to = PREVPREVPREV
+											can_land_path_to = PREVPREVPREV
+										}
+									}
+								}
+								trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+									capital_scope = { 
+										OR = {
+											can_naval_path_to = PREVPREVPREV
+											can_land_path_to = PREVPREVPREV
+										}
 									}
 								}
 							}
@@ -343,10 +367,22 @@ character_event = {
 				capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 					ROOT = {
 						liege = {
-							any_demesne_province = {
-								OR = {
-									can_naval_path_to = PREVPREVPREV
-									can_land_path_to = PREVPREVPREV
+							trigger_if = {
+								limit = { num_of_count_titles >= 1 }
+	
+								any_demesne_province = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
+								}
+							}
+							trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+								capital_scope = {
+									OR = {
+										can_naval_path_to = PREVPREVPREV
+										can_land_path_to = PREVPREVPREV
+									}
 								}
 							}
 						}
@@ -376,19 +412,25 @@ character_event = {
 		wealth = 500
 		clr_character_flag = do_not_disturb
 		liege = {
-			random_demesne_province = {
-				limit = {
-					event_target:adventurer_target = {
-						any_demesne_province = {
-							OR = {
-								can_naval_path_to = PREVPREV
-								can_land_path_to = PREVPREV
+			if = { 
+				limit = { num_of_count_titles >= 1 }	
+
+				random_demesne_province = {
+					limit = {
+						event_target:adventurer_target = {
+							capital_scope = {
+								OR = {
+									can_naval_path_to = PREVPREV
+									can_land_path_to = PREVPREV
+								}
 							}
 						}
 					}
+					save_event_target_as = embark_province
 				}
-				save_event_target_as = embark_province
 			}
+			else = { capital_scope = { save_event_target_as = embark_province } } # if our liege doesn't hold any count titles for some reason and we went through the trigger block, whe should be able to use the capital scope to invade from
+			
 			character_event = {
 				id = TOG.1203
 				days = 1
@@ -677,10 +719,22 @@ character_event = {
 					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 						ROOT = {
 							liege = {
-								any_demesne_province = {
-									OR = {
-										can_naval_path_to = PREVPREVPREV
-										can_land_path_to = PREVPREVPREV
+								trigger_if = {
+									limit = { num_of_count_titles >= 1 }
+		
+									any_demesne_province = {
+										OR = {
+											can_naval_path_to = PREVPREVPREV
+											can_land_path_to = PREVPREVPREV
+										}
+									}
+								}
+								trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+									capital_scope = {
+										OR = {
+											can_naval_path_to = PREVPREVPREV
+											can_land_path_to = PREVPREVPREV
+										}
 									}
 								}
 							}
@@ -808,10 +862,22 @@ character_event = {
 							limit = { is_coastal = yes }
 							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 								liege = {
-									any_demesne_province = {
-										can_naval_path_to = {
-											target = PREVPREVPREV
-											distance < 800
+									trigger_if = {
+										limit = { num_of_count_titles >= 1 }
+	
+										any_demesne_province = {
+											can_naval_path_to = {
+												target = PREVPREVPREV
+												distance < 800
+											}
+										}
+									}
+									trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+										capital_scope = {
+											can_naval_path_to = {
+												target = PREVPREVPREV
+												distance < 800
+											}
 										}
 									}
 								}
@@ -829,6 +895,11 @@ character_event = {
 				who = ROOT
 				years = 2
 			}
+		}
+
+		if = { # if we couldn't find an eligible target, leave the event
+			limit = { NOT = { event_target:adventurer_target = { always = yes } } }
+			break = yes
 		}
 
 		opinion = {
@@ -925,10 +996,22 @@ character_event = {
 						limit = { is_coastal = yes }
 						ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 							liege = {
-								any_demesne_province = {
-									can_naval_path_to = {
-										target = PREVPREVPREV
-										distance < 800
+								trigger_if = {
+									limit = { num_of_count_titles >= 1 }
+
+									any_demesne_province = {
+										can_naval_path_to = {
+											target = PREVPREVPREV
+											distance < 800
+										}
+									}
+								}
+								trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+									capital_scope = {
+										can_naval_path_to = {
+											target = PREVPREVPREV
+											distance < 800
+										}
 									}
 								}
 							}
@@ -965,10 +1048,22 @@ character_event = {
 							limit = { is_coastal = yes }
 							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 								liege = {
-									any_demesne_province = {
-										can_naval_path_to = {
-											target = PREVPREVPREV
-											distance < 800
+									trigger_if = {
+										limit = { num_of_count_titles >= 1 }
+
+										any_demesne_province = {
+											can_naval_path_to = {
+												target = PREVPREVPREV
+												distance < 800
+											}
+										}
+									}
+									trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+										capital_scope = {
+											can_naval_path_to = {
+												target = PREVPREVPREV
+												distance < 800
+											}
 										}
 									}
 								}
@@ -983,15 +1078,25 @@ character_event = {
 		}
 
 		liege = {
-			random_demesne_province = {
-				limit = {
-					OR = {
-						can_naval_path_to = event_target:adventurer_target_province
-						can_land_path_to = event_target:adventurer_target_province
+			if = {
+				limit = { num_of_count_titles >= 1 }
+				random_demesne_province = {
+					limit = {
+						OR = {
+							can_naval_path_to = event_target:adventurer_target_province
+							can_land_path_to = event_target:adventurer_target_province
+						}
 					}
+					save_event_target_as = embark_province
 				}
-				save_event_target_as = embark_province
+				if = { # if we went through the trigger block, we at the very least should be able to use the capital scope to invade from.
+					limit = { 
+						NOT = { event_target:embark_province = { always = yes } }
+					}
+					capital_scope = { save_event_target_as = embark_province }
+				}
 			}
+			else = { capital_scope = { save_event_target_as = embark_province } } 
 			character_event = {
 				id = TOG.1213
 				days = 1
