@@ -1,5 +1,233 @@
+# monster_county_reconquest
 # undead_county_conquest
 # evil_sea_county_conquest
+
+monster_county_reconquest = {
+	name = CB_NAME_MONSTER_RECONQUEST
+	war_name = WAR_MONSTER_RECONQUEST
+	sprite = 16
+	truce_days = 1825
+	sort_priority = 700
+
+	hostile_against_others = yes
+	is_permanent = yes
+	check_all_titles = yes # if permanent, setting this to true will check against all of someones titles, including vassal held titles
+	press_claim = yes
+	can_ask_to_join_war = no
+	allowed_to_target_tributaries = yes
+
+	can_use = {
+		ROOT = {
+			NOR = {
+				is_vassal_or_below_of = FROM
+				trait = creature_monster
+			}
+			mercenary = no
+		}
+
+		FROM = {
+			trait = creature_monster
+		}
+	}
+
+	can_use_title = {
+		real_tier = COUNT
+
+		holder_scope = {
+			OR = {
+				character = FROM
+				is_vassal_or_below_of = FROM
+			}
+		}
+
+		location = {
+			#NOT = { has_province_flag = locked_area }
+
+			any_neighbor_province = {
+				trigger_if = {
+					limit = { is_land = yes }
+					owner = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
+					}
+				}
+				trigger_else = {
+					any_neighbor_province = {
+						has_owner = yes
+						owner = {
+							OR = {
+								character = ROOT
+								is_vassal_or_below_of = ROOT
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid_title = {
+		holder_scope = {
+			trait = creature_monster
+			OR = {
+				character = FROM
+				is_vassal_or_below_of = FROM
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			declare_war_effect = yes
+		}
+	}
+
+	on_success_title = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 100
+			attacker_victory_effect = yes
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+
+		owner = {
+			show_scope_change = no
+
+			hidden_effect = {
+				any_courtier = {
+					limit = {
+						trait = creature_monster
+					}
+					death = {
+						death_reason = death_battle
+					}
+				}
+			}
+		}
+
+		if = {
+			limit = {
+				any_neighbor_province = {
+					owner = {
+						OR = {
+							character = attacker
+							same_realm = attacker
+						}
+					}
+				}
+			}
+			random_neighbor_province = {
+				limit = {
+					owner = {
+						OR = {
+							character = attacker
+							same_realm = attacker
+						}
+					}
+				}
+				save_event_target_as = ng_province
+			}
+		}
+		else = {
+			attacker = {
+				capital_scope = {
+					save_event_target_as = ng_province
+				}
+			}
+		}
+
+		location = {
+			culture = event_target:ng_province
+			religion = event_target:ng_province
+		}
+
+		usurp_title_plus_barony_if_unlanded = attacker
+
+		defender = {
+			show_scope_change = no
+
+			if = {
+				limit = { is_ruler = no }
+				death = {
+					death_reason = death_battle
+					killer = attacker
+				}
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 50
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 50 }
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 100
+			defender_victory_effect = yes
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 1.5
+	}
+}
 
 undead_county_conquest = {
 	name = CB_NAME_UNDEAD_CONQUEST
@@ -157,42 +385,42 @@ undead_county_conquest = {
 		}
 	}
 
-	on_success = {
+	on_success_title = {
 		hidden_effect = {
-			any_courtier = { # Kill part of the court.
-				limit = {
-					is_ruler = no
-					is_undead = no
-				}
-				random = {
-					chance = 25
-					mult_modifier = {
-						factor = 3
-						is_unimportant_trigger = yes
+			holder_scope = {
+				any_courtier = { # Kill part of the court.
+					limit = {
+						is_ruler = no
+						is_undead = no
 					}
-					mult_modifier = {
-						factor = 3
-						has_minor_title = title_commander
-					}
-					mult_modifier = { #Less likely to be in battle.
-						factor = 0.5
-						is_adult = no
-					}
-					mult_modifier = { #Less likely to be in battle.
-						factor = 0.5
-						is_adult = no
-						is_child_of = defender
-					}
+					random = {
+						chance = 25
+						mult_modifier = {
+							factor = 3
+							is_unimportant_trigger = yes
+						}
+						mult_modifier = {
+							factor = 2
+							has_minor_title = title_commander
+						}
+						mult_modifier = { #Less likely to be in battle.
+							factor = 0.5
+							is_adult = no
+						}
+						mult_modifier = { #Less likely to be in battle.
+							factor = 0.5
+							is_adult = no
+							is_child_of = PREV
+						}
 
-					death = {
-						death_reason = death_battle
+						death = {
+							death_reason = death_battle
+						}
 					}
 				}
 			}
 		}
-	}
 
-	on_success_title = {
 		usurp_title_plus_barony_if_unlanded = {
 			target = attacker
 			type = invasion
@@ -244,14 +472,14 @@ undead_county_conquest = {
 
 		defender = {
 			show_scope_change = no
-			
+
 			if = {
 				limit = { is_ruler = no }
 				random = {
 					chance = 25
 					death = {
 						death_reason = death_battle
-						killer = ROOT
+						killer = attacker
 					}
 				}
 			}
