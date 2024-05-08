@@ -218,20 +218,20 @@ narrative_event = {
 	}
 }
 
-# Clean up when a prepared invader dies
+# Clean up when a prepared invader dies or becomes landless
 character_event = {
 	id = fr_prepared_invasion.3 # HF.49208
 	picture = GFX_evt_steppe_mercenaries
 	hide_window = yes
 	is_triggered_only = yes
-    has_character_flag = prep_invader
+	has_character_flag = prep_invader
 
 	immediate = {
 		disband_event_forces = prepared_invasion
-    	persistent_event_target:prep_invader_target = {
-    		clr_character_flag = prep_inv_target
-    		character_event = { id = fr_prepared_invasion.16 days = 1 }
-    	}
+		persistent_event_target:prep_invader_target = {
+			clr_character_flag = prep_inv_target
+			character_event = { id = fr_prepared_invasion.16 days = 1 }
+		}
 	}
 }
 
@@ -334,37 +334,43 @@ character_event = {
 
 ## Prepared Invasion Ticker ## Adapted from the Reconquista Ticker
 character_event = {
-    id = fr_prepared_invasion.5
-    hide_window = yes
+	id = fr_prepared_invasion.5
+	hide_window = yes
 	picture = GFX_evt_steppe_mercenaries
-    is_triggered_only = yes
-    trigger = {
-    	persistent_event_target:prep_invader_target = { NOT = { war_with = ROOT } }
-    	persistent_event_target:prep_invader_target = { independent = yes }
-			OR = {
-				persistent_event_target:prep_invader_target = { any_realm_title = { real_tier = KING is_valid_viking_invasion_target = PREV } }
-				persistent_event_target:prep_invader_target = {
-					any_realm_title = {
-						any_de_jure_liege_title = {
-							real_tier = KING is_valid_viking_invasion_target = PREVPREV
-						}
+	is_triggered_only = yes
+	trigger = {
+		persistent_event_target:prep_invader_target = {
+			always = yes
+			has_character_flag = prep_inv_target
+			NOT = { war_with = ROOT }
+			independent = yes
+			any_realm_title = {
+				OR = {
+					AND = {
+						real_tier = KING
+						is_valid_viking_invasion_target = PREV
+					}
+					any_de_jure_liege_title = {
+						real_tier = KING
+						is_valid_viking_invasion_target = PREVPREV
 					}
 				}
 			}
-    	persistent_event_target:prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
-    	OR = {
-      	government = nomadic_tribal_government
-      	is_viking_invader_religion = yes
-        has_religion_feature = religion_feature_orc_evil
-        AND = {
-            OR = {
-                religion = orc_reformed
-                religion = goblin_reformed
-            }
-            NOT = { has_dlc = "Holy Fury" }
-        }
-    	}
-    }
+			has_opinion_modifier = { who = ROOT name = preparing_to_invade_me }
+		}
+		OR = {
+			government = nomadic_tribal_government
+			is_viking_invader_religion = yes
+			has_religion_feature = religion_feature_orc_evil
+			AND = {
+				OR = {
+					religion = orc_reformed
+					religion = goblin_reformed
+				}
+				NOT = { has_dlc = "Holy Fury" }
+			}
+		}
+	}
 
     fail_trigger_effect = {
     	character_event = { id = fr_prepared_invasion.15 }

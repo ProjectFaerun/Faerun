@@ -1515,52 +1515,37 @@ character_event = {
 ###########    Deal with Inherited artifacts    ###########
 ###########################################################
 character_event = {
-    id = HFP.16005
-    hide_window = yes
-    is_triggered_only = yes
+	id = HFP.16005
+	hide_window = yes
+	is_triggered_only = yes
 
-    trigger = {
-    	trigger_if = {
-    		limit = { FROM = { always = yes } } # artifact scope actually exists
-    		FROM = { NOT = { has_artifact_flag = ingredient } } #the artifact inherited is NOT an ingredient (those have their own event)...
-    	}
-    	trigger_else = {
-    		always = no
-    	}
-    	
-    	NOR = { #not already dealing with other inheritances... 
-    		#has_character_flag = dealing_with_inherited_ingredients
-    		has_character_flag = dealing_with_inherited_artifacts
-    	}
-    }
-    fail_trigger_effect = {
-    	if = {
-    		limit = { FROM = { always = yes } } # artifact scope actually exists
-			
-    		if = { # if you are already dealing with another artifact, queue this one up...
-    			limit = {
-    				has_character_flag = dealing_with_inherited_artifacts
-    				ai = no
-    			}
-    			repeat_event = { id = HFP.16005 days = 12 }
-    		}
-    	}
-    }
+	immediate = {
+		if = {
+			limit = { #the artifact inherited is NOT an ingredient (those have their own event)...
+				FROM = { has_artifact_flag = ingredient } 
+			}
 
-    immediate = {
-    	if = { #AIs get the short stick...
-    		limit = { ai = yes }
-    		FROM = { destroy_artifact = yes }
-    		break = yes
-    	}
+			break = yes
+		}
+		else_if = {
+			limit = { #not already dealing with other inheritances... 
+				has_character_flag = dealing_with_inherited_artifacts
+			}
 
-    	# Players get a choice...
-    	set_character_flag = dealing_with_inherited_artifacts
-    	FROM = { save_event_target_as = inherited_artifact }
-    	FROMFROM = { save_event_target_as = previous_owner }
+			repeat_event = { id = HFP.16005 days = 12 }
+		}
+		else_if = {
+			limit = { ai = yes } #AIs get the short stick...
 
-		character_event = { id = HFP.16006 days = 5 } #actual event
-    }
+			FROM = { destroy_artifact = yes }
+		}
+		else = { # Players get a choice...
+			set_character_flag = dealing_with_inherited_artifacts
+			FROM = { save_event_target_as = inherited_artifact }
+			FROMFROM = { save_event_target_as = previous_owner }
+			character_event = { id = HFP.16006 days = 5 } #actual event
+		}
+	}
 }
 
 #Inherited artifact - keep or no?
