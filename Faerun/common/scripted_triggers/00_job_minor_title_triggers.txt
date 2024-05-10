@@ -96,6 +96,7 @@ can_be_chancellor_trigger = {
 
 	NOR = {
 		trait = in_hiding
+		trait = travelling
 		has_character_modifier = resigned_in_anger
 
 		reverse_has_opinion_modifier = {
@@ -190,6 +191,7 @@ can_be_marshal_trigger = {
 
 	NOR = {
 		trait = in_hiding
+		trait = travelling
 		has_character_modifier = resigned_in_anger
 
 		reverse_has_opinion_modifier = {
@@ -276,6 +278,7 @@ can_be_treasurer_trigger = {
 
 	NOR = {
 		trait = in_hiding
+		trait = travelling
 		has_character_modifier = resigned_in_anger
 
 		reverse_has_opinion_modifier = {
@@ -370,6 +373,7 @@ can_be_spymaster_trigger = {
 
 	NOR = {
 		trait = in_hiding
+		trait = travelling
 		has_character_modifier = resigned_in_anger
 
 		reverse_has_opinion_modifier = {
@@ -462,99 +466,121 @@ can_be_spymaster_trigger = {
 	}
 }
 
-# can_be_spiritual_trigger = {
-	# #religion = liege
-	# independent = no
-	# prisoner = no
-	# is_incapable = no
+can_be_spiritual_trigger = {
+	independent = no
+	prisoner = no
+	is_incapable = no
+	NOR = {
+		trait = travelling
+		trait = in_hiding
+		trait = creature_monster
+		liege = { trait = creature_monster }
+		has_character_modifier = resigned_in_anger
 
-	# NOR = {
-		# trait = in_hiding
-		# has_character_modifier = resigned_in_anger
+		reverse_has_opinion_modifier = {
+			name = opinion_resigned_from_council
+			who = liege
+		}
+	}
 
-		# reverse_has_opinion_modifier = {
-			# name = opinion_resigned_from_council
-			# who = liege
-		# }
-	# }
+	trigger_if = {
+		limit = { NOT = { has_character_flag = special_spiritual } }
 
-	# OR = {
-		# AND = {
-			# OR = {
-				# AND = { #Patriarchal religions can only hire males. Matriarchal religions can only hire females.
-					# is_female = no
-					# NOT = { liege = { has_religion_feature = religion_matriarchal } }
-					# liege = {
-						# NOR = {
-							# religion = loviatar
-							# religion = lolth_cult
-							# religion = kiaransalee
-						# }
-					# }
-				# }
-				# AND = {
-					# is_female = yes
-					# NOT = { liege = { has_religion_feature = religion_patriarchal } }
-				# }
-				# trait = horse # So we can have female glitterhoofs! :D
-				# liege = {
-					# NOR = {
-						# liege = { has_religion_feature = religion_matriarchal }
-						# liege = { has_religion_feature = religion_patriarchal }
-					# }
-					# OR = {
-						# mother = { character = ROOT }
-						# any_spouse = { character = ROOT }
-					# }
-				# }
-				# OR = {
-					# AND = {
-						# is_female = yes
-						# liege = { primary_title = { has_law = status_of_women_4 } }
-					# }
-					# has_game_rule = {
-						# name = gender
-						# value = all
-					# }
-				# }
-			# }
-			# is_adult = yes
-		# }
-		# has_character_flag = special_spiritual
-	# }
-    
-    # trigger_if = {
+		is_adult = yes
 
-        # trigger_if = {
-			# trigger_if = {
-				# limit = { clan = yes }
-				# liege = { is_nomadic = yes }
-			# }
-			# trigger_else_if = {
-				# limit = {
-					# liege = {
-						# has_autocephaly = yes
-						# is_tribal = no
+		trigger_if = {
+			limit = {
+				NOR = {
+					trait = horse
 
-						# OR = {
-							# any_vassal = {
-								# is_theocracy = yes
-								# is_voter = no
-							# }
+					has_game_rule = {
+						name = gender
+						value = all
+					}
+				}
+			}
 
-							# job_spiritual = { is_theocracy = yes }
-						# }
-					# }
-				# }
+			trigger_if = {
+				limit = { is_female = yes }
 
-				# is_theocracy = yes
-			# }
-			# trigger_else = {
-				# is_ruler = no
-			# }
-		# }
-	# }
-# }
+				liege = {
+					OR = {
+						is_patriarchal_religion_or_culture = no
+						religion_allows_female_temple_holders = yes
+
+						trigger_if = { # Laws permitting
+							limit = {
+								OR = {
+									has_law = status_of_women_1
+									has_law = status_of_women_2
+									has_law = status_of_women_3
+								}
+							}
+
+							PREV = {
+								OR = {
+									dynasty = PREV
+									is_close_relative = PREV
+									is_married = PREV
+									is_consort = PREV
+									is_landed = yes
+									trait = nun
+									z_cleric = yes
+								}
+							}
+						}
+						trigger_else = {
+							has_law = status_of_women_4
+						}
+					}
+				}
+			}
+			trigger_else = {
+				liege = { 
+					OR = {
+						religion_allows_male_temple_holders = yes
+						NOR = { 
+							is_matriarchal_religion_or_culture = yes
+							religion = loviatar
+							religion = kiaransalee
+						}
+					}
+				}
+			}
+		}
+	}
+
+	OR = {
+		is_theocracy = yes
+		trigger_if = {
+			limit = { 
+				liege = {
+					OR = {
+						has_autocephaly = no
+						is_tribal = yes
+					}
+				}
+			}
+
+			is_ruler = no
+		}
+		trigger_if = {
+			limit = { clan = yes }
+
+			liege = { is_nomadic = yes }
+		}
+		trigger_if = {
+			limit = { 
+				liege = { has_autocephaly = yes } 
+				is_ruler = no
+			}
+			
+			NOT = {
+				liege = { any_vassal = { is_theocracy = yes } }
+			}
+		}
+	}
+}
 
 can_be_councilmember_king_trigger = {
 	is_adult = yes
