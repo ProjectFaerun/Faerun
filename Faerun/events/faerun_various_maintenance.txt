@@ -907,10 +907,41 @@ character_event = {
 character_event = {
 	id = frmaint.14
 	hide_window = yes
-
-	is_triggered_only = yes
+	is_triggered_only = yes # on_character_convert_religion
 
 	immediate = {
+		if = {
+			limit = { # some characters shouldn't be able to change religion except special cases
+				OR = {
+					trait = avatar
+					evilcat_is_chosen = yes
+					is_true_outsider = yes
+				}
+			}
+
+			if = {
+				limit = {
+					has_character_flag = ignore_conversion_immunity
+				}
+
+				clr_character_flag = ignore_conversion_immunity # clear the flag and proceed with the conversion
+			}
+			else_if = {
+				limit = { has_character_flag = reverting_religion_change } # exit the event if we are in a process of reverting the religion change
+
+				character_event = { # clear reverting flag in a day
+					id = frmaint.20
+					days = 1
+				}
+				break = yes # don't remove the patrons
+			}
+			else = { # otherwise we reverting the conversion
+				set_character_flag = reverting_religion_change # we should mark the character, so they wouldn't go into the endless on_character_convert_religion loop, crashing the game
+				religion = FROM
+				break = yes # don't remove the patrons
+			}
+		}
+
 		evilcat_remove_patrons = yes
 		if = {
 			limit = {
@@ -1011,28 +1042,16 @@ character_event = {
 	}
 }
 
-#character_event = { # avatars can't change religions unless they have a special flag
-#	id = frmaint.20
-#	hide_window = yes
-#
-#	is_triggered_only = yes
-#
-#	trigger = {
-#		trait = avatar
-#	}
-#
-#	immediate = {
-#		if = {
-#			limit = {
-#				has_character_flag = avatar_converts
-#			}
-#			clr_character_flag = avatar_converts
-#		}
-#		else = {
-#			religion = FROM
-#		}
-#	}
-#}
+character_event = {
+	id = frmaint.20
+	hide_window = yes
+
+	is_triggered_only = yes
+
+	immediate = {
+		clr_character_flag = reverting_religion_change
+	}
+}
 
 # Monster Mobs for all monster provinces - Kekvit
 character_event = {
@@ -1269,22 +1288,22 @@ character_event = {
 	}
 }
 
-character_event = {
-	id = frmaint.27
-	hide_window = yes
+# character_event = {
+# 	id = frmaint.27
+# 	hide_window = yes
 
-	is_triggered_only = yes
-	has_character_flag = embraced_by_auril
+# 	is_triggered_only = yes
+# 	has_character_flag = embraced_by_auril
 
-	trigger = {
-		NOT = { trait = patron_auril }
-	}
+# 	trigger = {
+# 		NOT = { trait = patron_auril }
+# 	}
 
-	immediate = {
-		remove_character_modifier = embraced_by_auril
-		clr_character_flag = embraced_by_auril
-	}
-}
+# 	immediate = {
+# 		remove_character_modifier = embraced_by_auril
+# 		clr_character_flag = embraced_by_auril
+# 	}
+# }
 
 
 character_event = {
@@ -2432,6 +2451,7 @@ character_event = {
 	trigger = {
 		muhjari_has_syncretism = yes
 		NOT = { religion = muhjari }
+		NOT = { has_character_flag = reverting_religion_change }
 	}
 
 	immediate = {
