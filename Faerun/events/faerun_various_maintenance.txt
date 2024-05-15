@@ -916,7 +916,26 @@ character_event = {
 	immediate = {
 		if = {
 			limit = { # some characters shouldn't be able to change religion except special cases
-				is_immune_to_conversion_trigger = yes
+				OR = {
+					is_immune_to_conversion_trigger = yes
+
+					has_character_flag = reverting_religion_change # we should go here if we're already in the process
+
+					trigger_if = {
+						limit = { # if the character is of any race except monster, block converting to the monster religion from a normal religion
+							religion = monster_pantheon
+							NOT = { trait = creature_monster } 
+						}
+
+						faerun_any_race = yes # we should check it in case the character is newly generated
+						FROM = { NOT = { religion = monster_pantheon } }
+					}
+					trigger_else_if = {
+						limit = { trait = creature_monster } # if the character is a monster, block any conversion, except converting to the monster religion
+
+						NOT = { religion = monster_pantheon }
+					}
+				}
 			}
 
 			if = {
@@ -929,15 +948,13 @@ character_event = {
 			else_if = {
 				limit = { has_character_flag = reverting_religion_change } # exit the event if we are in a process of reverting the religion change
 
-				character_event = { # clear reverting flag in a day
-					id = frmaint.20
-					days = 1
-				}
 				break = yes # don't remove the patrons
 			}
 			else = { # otherwise we reverting the conversion
-				set_character_flag = reverting_religion_change # we should mark the character, so they wouldn't go into the endless on_character_convert_religion loop, crashing the game
-				religion = FROM
+				set_character_flag = reverting_religion_change # we should mark the character, so they wouldn't go into the endless on_character_convert_religion events loop, crashing the game
+				religion = FROM # this will start another instance of on_character_convert_religion, which the game will resolve first before moving on to the instructions below
+				set_character_flag = reverting_religion_change # the flag was cleared after completing the instruction above, set it again: we still need it
+
 				break = yes # don't remove the patrons
 			}
 		}
@@ -1045,8 +1062,9 @@ character_event = {
 character_event = {
 	id = frmaint.20
 	hide_window = yes
-
 	is_triggered_only = yes
+
+	has_character_flag = reverting_religion_change
 
 	immediate = {
 		clr_character_flag = reverting_religion_change
