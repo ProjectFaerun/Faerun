@@ -2331,26 +2331,49 @@ character_event = {
 	immediate = {
 		remove_trait = bastard
 		add_trait = legit_bastard
+
 		if = {
 			limit = {
-				mother_even_if_dead = {
-					NOT = { dynasty = none }
+				true_father = { always = yes } # father exists
+				OR = {
+					employer = { # the child is at father's court and father is noble
+						ROOT = {
+							true_father = {
+								is_alive = yes
+								is_lowborn = no
+								character = PREVPREV
+							}
+						}
+					}
+
+					trigger_if = { # mother is lowborn and father is noble
+						limit = { mother_even_if_dead = { is_lowborn = yes } }
+
+						true_father = { is_lowborn = no }
+					}
 				}
 			}
-			mother_even_if_dead = {
+
+			true_father_even_if_dead = {
 				ROOT = {
 					dynasty = PREV
+					set_father = PREV
 					recalc_succession = yes
 				}
 			}
 		}
-		else_if = {
-			limit = {
-				true_father_even_if_dead = {
-					NOT = { dynasty = none }
+		else = {
+			true_father_even_if_dead = {
+				if = {
+					limit = { always = yes }
+
+					ROOT = {
+						set_father = PREV
+					}
 				}
 			}
-			true_father_even_if_dead = {
+
+			mother_even_if_dead = {
 				ROOT = {
 					dynasty = PREV
 					recalc_succession = yes
