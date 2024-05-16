@@ -1514,45 +1514,77 @@ character_event = {
 ###########################################################
 ###########    Deal with Inherited artifacts    ###########
 ###########################################################
+
+character_event = {
+	id = HFP.16004
+	hide_window = yes
+	is_triggered_only = yes # on_artifact_inheritance
+
+	trigger = {
+		FROM = {
+			is_indestructible = no # we don't want to bloat error.log
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				FROM = {
+					OR = {
+						has_artifact_flag = destroyed_on_death
+						artifact_type = claws_of_malar
+					}
+				}
+			}
+
+			repeat_event = { id = ARTF.1 }
+		}
+		else_if = {
+			limit = { FROM = { has_artifact_flag = ingredient } }
+
+			repeat_event = { id = BRO.5107 }
+		}
+		else = {
+			repeat_event = { id = HFP.16005 days = 12 }
+		}
+	}
+
+}
+
 character_event = {
 	id = HFP.16005
 	hide_window = yes
 	is_triggered_only = yes
 
-	trigger = {
-		num_of_artifacts > 0
-	}
-
 	immediate = {
-		if = {
-			limit = { 
+		random = {
+			chance = 5
+
+			mult_modifier = {
+				factor = 2 # AIs lose artifacts more often
+
+				ai = yes
+			}
+			mult_modifier = {
+				factor = 5 # Especially if the artifact is not used
+
+				ai = yes
 				FROM = {
-					OR = {
-						has_artifact_flag = ingredient # the artifact inherited is NOT an ingredient (those have their own event)...
-						is_indestructible = yes # we don't want to bloat error.log
-					}
+					is_artifact_equipped = no
 				}
 			}
-
-			break = yes
-		}
-		else_if = {
-			limit = { #not already dealing with other inheritances... 
-				has_character_flag = dealing_with_inherited_artifacts
+			
+			if = {
+				limit = { ai = yes } #AIs get the short stick...
+	
+				FROM = { destroy_artifact = yes }
 			}
-
-			repeat_event = { id = HFP.16005 days = 12 }
-		}
-		else_if = {
-			limit = { ai = yes } #AIs get the short stick...
-
-			FROM = { destroy_artifact = yes }
-		}
-		else = { # Players get a choice...
-			set_character_flag = dealing_with_inherited_artifacts
-			FROM = { save_event_target_as = inherited_artifact }
-			FROMFROM = { save_event_target_as = previous_owner }
-			character_event = { id = HFP.16006 days = 5 } #actual event
+			else = { # Players get a choice...
+				
+				FROM = { save_event_target_as = inherited_artifact }
+				FROMFROM = { save_event_target_as = previous_owner }
+				repeat_event = { id = HFP.16006 days = 1 random = 64 }
+			}
 		}
 	}
 }
@@ -1757,13 +1789,5 @@ character_event = {
         	show_scope_change = no
         	destroy_artifact = yes
         }
-    }
-
-#    option = { # Do something else
-#        name = EVTOPTC_HFP_16006
-#    }
-
-    after = {
-    	clr_character_flag = dealing_with_inherited_artifacts
     }
 }
