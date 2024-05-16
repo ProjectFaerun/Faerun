@@ -1,5 +1,6 @@
 # bhaalspawn_county_conquest
 # bhaalspawn_county_reconquest
+# great_align_conflict
 
 bhaalspawn_county_conquest = {
 	name = CB_NAME_BHAALSPAWN_CONQUEST
@@ -727,5 +728,304 @@ bhaalspawn_county_reconquest = {
 
 	ai_will_do = {
 		factor = 1.5
+	}
+}
+
+great_align_conflict = {
+	name = CB_NAME_GREAT_ALIGN_CONFLICT
+	war_name = WAR_NAME_GREAT_ALIGN_CONFLICT
+	sprite = 23
+	truce_days = 3650
+	sort_priority = 2000
+
+	is_holy_war = yes
+	battle_warscore_mult = 0.5
+	max_defender_occupation_score = 85
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			declare_war_effect = yes
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = 400
+			piety = 200
+			participation_scaled_prestige = 200
+			participation_scaled_piety = 100
+			attacker_victory_effect = yes
+
+			occupy_minors_of_occupied_settlements = FROM
+			gain_all_occupied_titles = {
+				who = FROM
+				type = invasion
+			}
+
+			if = {
+				limit = { has_nickname = no }
+				give_nickname = nick_the_conqueror
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = {
+				participation_scaled_prestige = 400
+				participation_scaled_piety = 200
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = -200
+			piety = -100
+
+			if = { # reset crown authority to minimum
+				limit = { NOT = { has_dlc = "Conclave" } }
+
+				any_demesne_title = {
+					limit = { is_crown_law_title = yes }
+					add_law = crown_authority_0
+				}
+			}
+
+			primary_title = {
+				show_scope_change = no
+
+				holder_scope = {
+					show_scope_change = no
+
+					any_demesne_title = { # eligible duke and king tier titles usurped
+						show_scope_change = no
+
+						limit = {
+							higher_real_tier_than = COUNT
+							NOT = { real_tier = PREVPREV }
+						}
+
+						usurp_title_plus_barony_if_unlanded = {
+							target = attacker
+							type = invasion
+						}
+					}
+
+					if = {
+						limit = {
+							attacker = { has_character_flag = chaotic_invader }
+							defender = {
+								NOT = {
+									any_demesne_title = {
+										title = e_shou_lung_west_governor
+									}
+								}
+							}
+						}
+						any_demesne_title = {
+							show_scope_change = no
+							limit = {
+								real_tier = PREVPREV
+								trigger_if = {
+									limit = { controls_religion = yes }
+									OR = { #religious head titles we don't mind to see destroyed
+										title = d_muhjari
+										title = d_myriadic
+										title = d_qisma
+										title = d_pantheist
+										title = k_black_altar
+									}
+								}
+								is_zulkirate = no
+							}
+							unsafe_destroy_landed_title = THIS
+						}
+					}
+					else_if = {
+						limit = {
+							defender = {
+								NOT = {
+									any_demesne_title = {
+										title = e_shou_lung_west_governor
+									}
+								}
+							}
+						}
+						any_demesne_title = {
+							show_scope_change = no
+							limit = {
+								real_tier = PREVPREV
+								NOR = {
+									controls_religion = yes
+									is_zulkirate = yes
+								}
+							}
+							usurp_title = {
+								target = attacker
+								type = invasion
+							}
+						}
+					}
+					else = {
+						any_demesne_title = {
+							show_scope_change = no
+							limit = {
+								real_tier = PREVPREV
+								NOR = {
+									controls_religion = yes
+									is_zulkirate = yes
+								}
+							}
+							usurp_title = {
+								target = attacker
+								type = invasion
+							}
+						}
+						attacker = {
+							hidden_effect = {
+								create_title = {
+									tier = EMPEROR
+									landless = no
+									temporary = no
+									custom_created = yes
+									culture = ROOT
+									holder = ROOT
+									base_title = e_shou_lung_west_governor
+									name = WESTERN_SHOU
+								}
+								new_title = {
+									add_law = {
+										law = succ_primogeniture
+										cooldown = no
+										opinion_effect = no
+									}
+								}
+							}
+						}
+						create_character = {
+							culture = wang
+							religion = the_path
+							trait = creature_human
+							random_traits = yes
+							age = 35
+						}
+						new_character = {
+							grant_title = e_shou_lung_west_governor
+						}
+					}
+				}
+			}
+
+			set_defacto_liege = ROOT
+		}
+
+		attacker = {
+			show_scope_change = no
+			if = {
+				limit = {
+					independent = no
+				}
+				set_defacto_liege = THIS
+			}
+
+			hidden_effect = {
+				disband_event_forces = decadence_revolters
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+
+			hidden_effect = {
+				disband_event_forces = decadence_revolters
+				if = {
+					limit = {
+						OR = {
+							is_landed = no
+							independent = no
+						}
+					}
+					death = { death_reason = death_planes }
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			participation_scaled_prestige = 200
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			piety = -100
+			set_defacto_liege = FROM
+
+			transfer_scaled_wealth = {
+				to = defender
+				value = 8.0
+			}
+
+			hidden_effect = {
+				disband_event_forces = decadence_revolters
+				if = {
+					limit = {
+						OR = {
+							is_landed = no
+							independent = no
+						}
+					}
+					death = { death_reason = death_planes }
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 400
+			piety = 200
+			defender_victory_effect = yes
+		}
+	}
+
+	on_reverse_demand_title = {
+		attacker = {
+			show_scope_change = no
+			remove_claim = PREV
+		}
+	}
+
+	attacker_ai_victory_worth = {
+		factor = 100
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 150
 	}
 }
