@@ -4,90 +4,65 @@ namespace = polyam
 
 # Meet the lover - two metamours are introduced as such for the first time
 
-# begin by setting the scopes
-
-character_event = { # polyam.100
-	id = polyam.100 # effect starts with new lover, as intended
-	is_triggered_only = yes
-	hide_window = yes
-	immediate = {
-		any_lover = {
-			character_event = { id = polyam.1 }
-		}
-	}
-}
-
-
-character_event = { # polyam.1
+# ROOT is partner to introduce lover to, FROM is lover to introduce
+character_event = { # parnters of new lover go there
 	id = polyam.1
 	hide_window = yes
 	is_triggered_only = yes
-	capable_only = yes
-	prisoner = no
+
 	min_age = 16
+
 	trigger = {
-		OR = {
-			any_lover = {
-				NOT = {	character = FROM }
-				is_metamour_of_root = no
-			}
-			any_spouse = {
-				NOT = {	character = FROM }
-				is_metamour_of_root = no
-			}
-			any_consort = {
-				NOT = {	character = FROM }
-				is_metamour_of_root = no
-			}
+		character = yes
+		is_alive = yes
+		event_target:introducing_partner = { 
+			character = yes 
+			is_alive = yes
+			is_partner_of_PREV = yes # check that they're still partners
 		}
-		NOT = { is_inaccessible_trigger = yes }
+		event_target:lover_to_introduce = { 
+			character = yes 
+			is_alive = yes
+			is_metamour_of_PREV = no # check that the new lover wasn't introduced already
+		}
 	}
+
+	fail_trigger_effect = {
+		if = {
+			limit = { has_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce }
+
+			clr_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce
+		}
+	}
+
 	immediate = {
-		any_spouse = {
-			limit = {
-				NOT = { character = FROM }
-				NOT = { character = ROOT } # should never happen
-				NOT = { trait = incapable }
-				is_inaccessible_trigger = no
-				is_metamour_of_root = no
-			}
-			character_event = {
-				id = polyam.2
-				days = 10
-				random = 15
-			}
+		if = {
+			limit = { # if someone is inaccessible, exit and repeat the event after a while
+				is_inaccessible_or_incapable_trigger = yes
+				event_target:lover_to_introduce = { is_inaccessible_or_incapable_trigger = yes }
+			} 
+
+			clear_delayed_event = { id = polyam.1 } # sometimes the game can get buggy and try to make 2 or more instances of delayed events, clear it all just in case
+			repeat_event = { id = polyam.1 days = 120 random = 120 }
 		}
-		any_consort = {
-			limit = {
-				NOT = { character = FROM }
-				NOT = { character = ROOT } # should never happen
-				NOT = { trait = incapable }
-				is_inaccessible_trigger = no
-				is_metamour_of_root = no
+		else = {
+			if = {
+				limit = { has_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce }
+	
+				clr_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce
 			}
-			character_event = {
+
+			save_event_target_as = partner_to_introduce_lover_to
+
+			repeat_event = { # repeat_event so the scopes remain the same
 				id = polyam.2
-				days = 25
-				random = 15
-			}
-		}
-		any_lover = {
-			limit = {
-				NOT = { character = FROM }
-				NOT = { character = ROOT } # should never happen
-				NOT = { trait = incapable }
-				is_inaccessible_trigger = no
-				is_metamour_of_root = no
-			}
-			character_event = {
-				id = polyam.2
-				days = 40
-				random = 15
 			}
 		}
 	}
+
 }
 
+# ROOT is partner to introduce lover to, FROM is lover to introduce
 character_event = { # polyam.2
 	id = polyam.2
 	is_triggered_only = yes
@@ -95,37 +70,78 @@ character_event = { # polyam.2
 		text = EVTDESC_POLYAM_2
 		trigger = {
 			NOR = {
-				is_friend = FROMFROM
-				is_lover = FROMFROM
+				is_friend = event_target:lover_to_introduce
+				is_lover = event_target:lover_to_introduce
+				is_consort = event_target:lover_to_introduce
+				is_senior_consort_party = event_target:lover_to_introduce
+				is_married = event_target:lover_to_introduce
 			}
 		}
 	}
 	desc = {
 		text = EVTDESC_POLYAM_2_FRIENDS
 		trigger = {
-			is_friend = FROMFROM
-			NOT = { is_lover = FROMFROM }
+			is_friend = event_target:lover_to_introduce
+			NOR = { 
+				is_lover = event_target:lover_to_introduce 
+				is_consort = event_target:lover_to_introduce
+				is_senior_consort_party = event_target:lover_to_introduce
+				is_married =  event_target:lover_to_introduce
+			}
 		}
 	}
 	desc = {
 		text = EVTDESC_POLYAM_2_LOVERS
 		trigger = {
-			is_lover = FROMFROM
+			is_lover = event_target:lover_to_introduce
+			NOR = {
+				is_consort = event_target:lover_to_introduce
+				is_senior_consort_party = event_target:lover_to_introduce
+				is_married =  event_target:lover_to_introduce
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_POLYAM_2_CONSORT
+		trigger = {
+			OR = {
+				is_consort = event_target:lover_to_introduce
+				is_senior_consort_party = event_target:lover_to_introduce
+			}
+			NOT = { is_married =  event_target:lover_to_introduce }
+		}
+	}
+	desc = {
+		text = EVTDESC_POLYAM_2_SPOUSE
+		trigger = {
+			is_married =  event_target:lover_to_introduce
 		}
 	}
 	picture = GFX_evt_gossip_1
-	immediate = {
-		log = "[Root.GetBestName] is flagged as a metamour of [FromFrom.GetBestName]."
-		if = {
-			limit = {
-				OR = {
-					FROM = { character = ROOT }
-					FROM = { character = FROMFROM }
-					FROMFROM = { character = ROOT }
-				}
+	portrait = event_target:lover_to_introduce
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
 			}
-			break = yes # fails out if the three parties aren't all distinct
-		}		
+		}
+	}
+	
+	fail_trigger_effect = {
+		repeat_event = {
+			id = polyam.16
+		}
+	}
+
+
+	immediate = {
+		log = "[partner_to_introduce_lover_to.GetBestName] is flagged as a metamour of [lover_to_introduce.GetBestName]."	
 	}
 	option = {
 		name = EVTOPTA_POLYAM_2 # Terrible news!
@@ -133,197 +149,350 @@ character_event = { # polyam.2
 			OR = {
 				religion_has_polyamory = no
 				NOR = {
-					is_friend = FROMFROM
-					is_lover = FROMFROM
+					is_friend = event_target:lover_to_introduce
+					is_lover = event_target:lover_to_introduce
+					is_consort = event_target:lover_to_introduce
+					is_senior_consort_party = event_target:lover_to_introduce
+					is_married = event_target:lover_to_introduce
+				}
+			}
+			trigger_if = {
+				limit = { is_close_relative = event_target:lover_to_introduce }
+
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
 				}
 			}
 		}
 		ai_chance = {
 			factor = 10.0
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
 				opinion = {
-					who = FROMFROM
+					who = event_target:lover_to_introduce
 					value <= -25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
-				FROMFROM = { 
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = kind 
 						trait = temperate
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
-				FROMFROM = { 
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = envious
 						trait = proud
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
-				FROMFROM = { 
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = wroth
 						trait = cruel
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				trait = kind
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10.0
-				is_rival = FROMFROM
+				is_rival = event_target:lover_to_introduce
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 3.5
 				OR = {
 					trait = envious
 					trait = proud
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 4.0
 				religion_has_polyamory = no
 			}
 		}
+
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = FROMFROM
+			who = event_target:lover_to_introduce
 		}
-		FROM = {
+		event_target:introducing_partner = {
 			character_event = { id = polyam.3 }
 		}
 	}
 	option = {
 		name = EVTOPTB_POLYAM_2 # This is fine.
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:lover_to_introduce }
+				
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 50.0
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
 				AND = {
 					opinion = {
-						who = FROMFROM
+						who = event_target:lover_to_introduce
 						value >= -25
 					}
 					opinion = {
-						who = FROMFROM
+						who = event_target:lover_to_introduce
 						value <= 25
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.3
 				trait = wroth
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2.5
 				trait = content
 			}
 		}
+
 		opinion = {
 			name = opinion_accepted_metamour
-			who = FROMFROM
+			who = event_target:lover_to_introduce
 		}
-		FROM = {
+		event_target:introducing_partner = {
 			character_event = { id = polyam.4 }
 		}
 	}
 	option = {
 		name = EVTOPTC_POLYAM_2 # A good choice!
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:lover_to_introduce }
+
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 10.0
-			modifier = {
+
+			mult_modifier = {
 				factor = 3.0
+
 				opinion = {
-					who = FROMFROM
+					who = event_target:lover_to_introduce
 					value >= 25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2.5
-				FROMFROM = { 
+
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = kind 
 						trait = temperate
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 5
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = beautiful
+				}
+			}
+			mult_modifier = {
+				factor = 3
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = fair
+				}
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = pretty
+				}
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_fair_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
+				factor = 2.5
+
+				event_target:lover_to_introduce = { 
+					OR = {
+						trait = kind 
+						trait = temperate
+					}
+				}
+			}
+			mult_modifier = {
 				factor = 0.3
-				FROMFROM = { 
+
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = envious
 						trait = proud
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.02
-				FROMFROM = { 
+
+				event_target:lover_to_introduce = { 
 					OR = {
 						trait = wroth
 						trait = cruel
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 0.2
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = unsightly
+				}
+			}
+			mult_modifier = {
+				factor = 0.35
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = ugly
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = plain
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_ugly_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
 				factor = 0.3
+
 				trait = proud
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
+
 				trait = lustful
 			}
-			modifier = {
+
+
+
+			mult_modifier = {
 				factor = 10.0
-				is_lover = FROMFROM
+
+				OR = {
+					is_lover = event_target:lover_to_introduce
+					is_consort = event_target:lover_to_introduce
+					is_senior_consort_party = event_target:lover_to_introduce
+					is_married = event_target:lover_to_introduce
+				}
+				
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
-				is_friend = FROMFROM
+
+				is_friend = event_target:lover_to_introduce
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
+
 				trait = charitable
 			}
 		}
+
 		opinion = {
 			name = opinion_popular_metamour
-			who = FROMFROM
+			who = event_target:lover_to_introduce
 		}
-		FROM = {
+		event_target:introducing_partner = {
 			character_event = { id = polyam.5 }
 		}
 	}
 	option = {
 		name = EVTOPTD_POLYAM_2 # That's my kin
 		trigger = {
-			is_close_relative = FROMFROM
-		}
-		ai_chance = {
-			factor = 100
-			modifier = {
-				factor = 0.02
-				FROMFROM = { 
-					religion_has_incest = yes
-				}
+			is_close_relative = event_target:lover_to_introduce
+			NOR = {
 				religion_has_incest = yes
+				trait = lustful
+				trait = hedonist
+				trait = seducer
+				trait = seductress
 			}
 		}
-		FROM = {
+
+		opinion = {
+			name = opinion_related_metamour
+			who = event_target:lover_to_introduce
+		}
+		event_target:introducing_partner = {
 			character_event = { id = polyam.3 }
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_2
+			repeat_event = {
+				id = polyam.15
+			}
 		}
 	}
 }
 
+# ROOT is introducing partner, FROM is partner to introduce lover to, FROMFROM is lover to introduce
 character_event = { # polyam.3 
 	id = polyam.3 # Bad initial reaction reported to central partner
 	is_triggered_only = yes
@@ -331,14 +500,50 @@ character_event = { # polyam.3
 		text = EVTDESC_POLYAM_3
 	}
 	picture = GFX_evt_quarrel
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		event_target:lover_to_introduce = {
+			character_event = { id = polyam.6 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_POLYAM_3
-		FROMFROMFROM = {
+		event_target:lover_to_introduce = {
 			character_event = { id = polyam.6 }
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_3
+			repeat_event = {
+				id = polyam.15
+			}
 		}
 	}
 }
 
+# ROOT is introducing partner, FROM is partner to introduce lover to, FROMFROM is lover to introduce
 character_event = { # polyam.4
 	id = polyam.4 # Neutral reaction reported to central partner
 	is_triggered_only = yes
@@ -346,14 +551,50 @@ character_event = { # polyam.4
 		text = EVTDESC_POLYAM_4
 	}
 	picture = GFX_evt_gossip_1
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		event_target:lover_to_introduce = {
+			character_event = { id = polyam.7 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_POLYAM_4
-		FROMFROMFROM = {
+		event_target:lover_to_introduce = {
 			character_event = { id = polyam.7 }
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_4
+			repeat_event = {
+				id = polyam.15
+			}
 		}
 	}
 }
 
+# ROOT is introducing partner, FROM is partner to introduce lover to, FROMFROM is lover to introduce
 character_event = { # polyam.5
 	id = polyam.5 # Positive reaction reported to central partner
 	is_triggered_only = yes
@@ -361,14 +602,50 @@ character_event = { # polyam.5
 		text = EVTDESC_POLYAM_5
 	}
 	picture = GFX_evt_lovers
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		event_target:lover_to_introduce = {
+			character_event = { id = polyam.8 }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_POLYAM_5
-		FROMFROMFROM = {
+		event_target:lover_to_introduce = {
 			character_event = { id = polyam.8 }
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_5
+			repeat_event = {
+				id = polyam.15
+			}
 		}
 	}
 }
 
+# ROOT is lover to introduce, FROM is introducing partner, FROMFROM is partner to introduce lover to
 character_event = { # polyam.6
 	id = polyam.6 # Negative reaction reported to newcomer
 	is_triggered_only = yes
@@ -376,25 +653,64 @@ character_event = { # polyam.6
 		text = EVTDESC_POLYAM_6
 	}
 	picture = GFX_evt_quarrel
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		repeat_event = { id = polyam.17 }
+	}
+
 	option = { # screw you too
 		name = EVTOPTA_POLYAM_6
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 75.0
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
 				opinion = {
-					who = FROMFROM
+					who = event_target:partner_to_introduce_lover_to
 					value <= -25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.5
 				OR = {
 					trait = kind
 					trait = patient
 				}
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 0.01
+				reverse_has_opinion_modifier = {
+					name = opinion_related_metamour
+					who = event_target:lover_to_introduce
+				}
+			}
+			mult_modifier = {
 				factor = 5.0
 				OR = {
 					trait = wroth
@@ -402,21 +718,43 @@ character_event = { # polyam.6
 					trait = proud
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 4.0
 				religion_has_polyamory = no
 			}
 		}
+
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # we can keep the peace
 		name = EVTOPTB_POLYAM_6
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 10.0
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				OR = {
 					trait = content
@@ -424,32 +762,94 @@ character_event = { # polyam.6
 				}
 			}
 		}
+
 		opinion = {
 			name = opinion_accepted_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # I shall be good
 		name = EVTOPTC_POLYAM_6
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 0 # Never ever
 		}
+
 		opinion = {
 			name = opinion_popular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
 		}
-	}
-	after = {
-		FROMFROM = {
+		event_target:partner_to_introduce_lover_to = {
 			character_event = {
 				id = polyam.9
-				months = 1
+				days = 30
 				random = 90
+			}
+		}
+	}
+
+	option = { # That's awkward
+		name = EVTOPTD_POLYAM_6
+		trigger = {
+			is_close_relative = event_target:partner_to_introduce_lover_to
+			NOR = {
+				religion_has_incest = yes
+				trait = lustful
+				trait = hedonist
+				trait = seducer
+				trait = seductress
+			}
+		}
+
+		opinion = {
+			name = opinion_related_metamour
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_6
+			repeat_event = {
+				id = polyam.15
 			}
 		}
 	}
 }
 
+# ROOT is lover to introduce, FROM is introducing partner, FROMFROM is partner to introduce lover to
 character_event = { # polyam.7
 	id = polyam.7 # Neutral reaction reported to newcomer
 	is_triggered_only = yes
@@ -457,25 +857,57 @@ character_event = { # polyam.7
 		text = EVTDESC_POLYAM_7
 	}
 	picture = GFX_evt_gossip_1
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		repeat_event = { id = polyam.17 }
+	}
+
 	option = { # Not to my taste
 		name = EVTOPTA_POLYAM_7
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 10.0
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
 				opinion = {
-					who = FROMFROM
+					who = event_target:partner_to_introduce_lover_to
 					value <= -25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				OR = {
 					trait = kind
 					trait = patient
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
 				OR = {
 					trait = wroth
@@ -483,21 +915,43 @@ character_event = { # polyam.7
 					trait = proud
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 4.0
 				religion_has_polyamory = no
 			}
 		}
+		
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # We shall do well
 		name = EVTOPTB_POLYAM_7
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 60.0
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				OR = {
 					trait = content
@@ -506,46 +960,164 @@ character_event = { # polyam.7
 				}
 			}
 		}
+
 		opinion = {
 			name = opinion_accepted_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # I can do better
 		name = EVTOPTC_POLYAM_7
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 15.0
-			modifier = {
+			mult_modifier = {
 				factor = 3.0
 				opinion = {
-					who = FROMFROM
+					who = event_target:partner_to_introduce_lover_to
 					value >= 25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
 				OR = {
 					trait = charitable
 					trait = temperate
 				}
 			}
+			mult_modifier = {
+				factor = 5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = beautiful
+				}
+			}
+			mult_modifier = {
+				factor = 3
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = fair
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = pretty
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_fair_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
+				factor = 0.2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = unsightly
+				}
+			}
+			mult_modifier = {
+				factor = 0.35
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = ugly
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = plain
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_ugly_trait_non_congenital_trigger = yes
+				}
+			}
 		}
+		
 		opinion = {
 			name = opinion_popular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
 		}
-	}
-	after = {
-		FROMFROM = {
+		event_target:partner_to_introduce_lover_to = {
 			character_event = {
 				id = polyam.9
-				months = 1
+				days = 30
 				random = 90
+			}
+		}
+	}
+
+	option = { # That's awkward
+		name = EVTOPTD_POLYAM_7
+		trigger = {
+			is_close_relative = event_target:partner_to_introduce_lover_to
+			NOR = {
+				religion_has_incest = yes
+				trait = lustful
+				trait = hedonist
+				trait = seducer
+				trait = seductress
+			}
+		}
+
+		opinion = {
+			name = opinion_related_metamour
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_7
+			repeat_event = {
+				id = polyam.15
 			}
 		}
 	}
 }
 
+# ROOT is lover to introduce, FROM is introducing partner, FROMFROM is partner to introduce lover to
 character_event = { # polyam.8
 	id = polyam.8 # Positive reaction reported to newcomer
 	is_triggered_only = yes
@@ -553,25 +1125,79 @@ character_event = { # polyam.8
 		text = EVTDESC_POLYAM_8
 	}
 	picture = GFX_evt_lovers
+	portrait = event_target:partner_to_introduce_lover_to
+
+	trigger = {
+		trigger_if = {
+			limit = { ai = no }
+
+			NOR = {
+				has_character_flag = polyamour_autorespond_positively
+				has_character_flag = polyamour_autorespond_neutrally
+				has_character_flag = polyamour_autorespond_negatively
+				has_character_flag = polyamour_autorespond_automatically
+			}
+		}
+	}
+	
+	fail_trigger_effect = {
+		repeat_event = { id = polyam.17 }
+	}
+
 	option = { # Throw it back
 		name = EVTOPTA_POLYAM_8
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 25.0
-			modifier = {
+			mult_modifier = {
 				factor = 0
 				religion_has_polyamory = yes
 			}
 		}
+
 		opinion = {
 			name = opinion_unpopular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # They're fine, I suppose
 		name = EVTOPTB_POLYAM_8
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 15.0
-			modifier = {
+			mult_modifier = {
 				factor = 2.5
 				OR = {
 					trait = arbitrary
@@ -580,49 +1206,183 @@ character_event = { # polyam.8
 				}
 			}
 		}
+
 		opinion = {
 			name = opinion_accepted_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
 		}
 	}
+
 	option = { # We shall be bosom friends
 		name = EVTOPTC_POLYAM_8
+		trigger = {
+			trigger_if = {
+				limit = { is_close_relative = event_target:partner_to_introduce_lover_to }
+	
+				OR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+		}
 		ai_chance = {
 			factor = 50.0
-			modifier = {
+
+			mult_modifier = {
 				factor = 3.0
 				opinion = {
-					who = FROMFROM
+					who = event_target:partner_to_introduce_lover_to
 					value >= 25
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2.0
+
 				OR = {
 					trait = lustful
 					trait = gregarious
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10.0
-				is_lover = FROMFROM
+
+				OR = {
+					is_lover = event_target:partner_to_introduce_lover_to
+					is_consort = event_target:partner_to_introduce_lover_to
+					is_senior_consort_party = event_target:partner_to_introduce_lover_to
+					is_married = event_target:partner_to_introduce_lover_to
+				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5.0
-				is_friend = FROMFROM
+
+				is_friend = event_target:partner_to_introduce_lover_to
+			}
+			mult_modifier = {
+				factor = 5
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = beautiful
+				}
+			}
+			mult_modifier = {
+				factor = 3
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = fair
+				}
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = pretty
+				}
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_fair_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
+				factor = 0.2
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = unsightly
+				}
+			}
+			mult_modifier = {
+				factor = 0.35
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = ugly
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = plain
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_ugly_trait_non_congenital_trigger = yes
+				}
 			}				
 		}
+
 		opinion = {
 			name = opinion_popular_metamour
-			who = FROMFROM
+			who = event_target:partner_to_introduce_lover_to
 		}
-	}
-	after = {
-		FROMFROM = {
+		event_target:partner_to_introduce_lover_to = {
 			character_event = {
 				id = polyam.9
-				months = 1
+				days = 30
 				random = 90
+			}
+		}
+	}
+
+	option = { # That's awkward
+		name = EVTOPTD_POLYAM_8
+		trigger = {
+			is_close_relative = event_target:partner_to_introduce_lover_to
+			NOR = {
+				religion_has_incest = yes
+				trait = lustful
+				trait = hedonist
+				trait = seducer
+				trait = seductress
+			}
+		}
+
+		opinion = {
+			name = opinion_related_metamour
+			who = event_target:partner_to_introduce_lover_to
+		}
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTE_POLYAM_2 # offer to disable notifications
+		trigger = {
+			ai = no
+		}
+		custom_tooltip = {
+			text = EVTOPTE_TOOLTIP_POLYAM_2
+			set_character_flag = polyamour_current_event_8
+			repeat_event = {
+				id = polyam.15
 			}
 		}
 	}
@@ -630,83 +1390,87 @@ character_event = { # polyam.8
 
 # metamour reactions
 # we begin by checking for metamour status and if they've been through this event together
+# ROOT is partner to introduce lover to
 character_event = { # polyam.9
 	id = polyam.9
 	hide_window = yes
-	
 	is_triggered_only = yes
+
+	trigger = {
+		character = yes
+		is_alive = yes
+		event_target:introducing_partner = {
+			character = yes
+			is_alive = yes
+			is_partner_of_PREV = yes
+			event_target:lover_to_introduce = {
+				is_partner_of_PREV = yes
+			}
+		}
+		event_target:lover_to_introduce = {
+			character = yes
+			is_alive = yes
+			is_metamour_of_PREV = yes
+		}
+	}
 	
 	immediate = {
 		if = {
-			limit = {
-				ROOT = { character = FROM }
-			}
-			break = yes
-		}
-		if = {
-			limit = {
-				NOT = {
-					has_opinion_modifier = {
-						name = opinion_metamour_check
-						who = FROM
+			if = {
+				limit = {
+					OR = {
+						is_inaccessible_or_incapable_trigger = yes
+						event_target:lover_to_introduce = {
+							is_inaccessible_or_incapable_trigger = yes
+						}
 					}
 				}
 			}
+
+			clear_delayed_event = { id = polyam.9 }
+			repeat_event = { id = polyam.9 days = 120 random = 120 }
+
 			break = yes
 		}
 		if = {
 			limit = {
 				has_opinion_modifier = {
 					name = opinion_unpopular_metamour
-					who = FROM
+					who = event_target:lover_to_introduce
 				}
-				NOT = { is_rival = FROM }
+				NOT = { is_rival = event_target:lover_to_introduce }
 			}
-			character_event = { id = polyam.10 }
-#			FROM = { id = polyam.10 }
+			repeat_event = { id = polyam.10 }
 		}
 		else_if = {
 			limit = {
 				has_opinion_modifier = {
 					name = opinion_popular_metamour
-					who = FROM
+					who = event_target:lover_to_introduce
 				}
 			}
 			if = {
 				limit = {
-					FROM = {
-						is_romance_compatible_with_root = yes 
+					event_target:lover_to_introduce = {
+						ROOT = { attracted_to_prev_trigger = yes }
 						NOT = { is_lover = ROOT }
 					}
 				}
-				character_event = { id = polyam.11 }
-#				FROM = { id = polyam.11 }
+				repeat_event = { id = polyam.12 }
 			}
 			else_if = {
 				limit = {
-					FROM = {
+					event_target:lover_to_introduce = {
 						NOT = { is_friend = ROOT }
 					}
 				}
-				character_event = { id = polyam.12 }
-#				FROM = { id = polyam.12 }
-			}
-		}
-	}
-	after = {
-		opinion = {
-			name = opinion_metamour_check
-			who = FROM
-		}
-		FROM = {
-			opinion = {
-				name = opinion_metamour_check
-				who = ROOT
+				repeat_event = { id = polyam.11 }
 			}
 		}
 	}
 }
 
+# ROOT is partner to introduce lover to
 character_event = { # polyam.10
 	id = polyam.10
 	is_triggered_only = yes
@@ -714,28 +1478,29 @@ character_event = { # polyam.10
 		text = EVTDESC_POLYAM_10 # can't stand them, etc etc
 	}
 	picture = GFX_evt_quarrel
+	portrait = event_target:lover_to_introduce
 	
 	option = {
 		name = EVTOPTA_POLYAM_10 # something rivalryesque
 		ai_chance = {
 			factor = 50
-			modifier = {
+			mult_modifier = {
 				factor = 0
-				is_close_relative = FROM
+				is_close_relative = event_target:lover_to_introduce
 				NOR = {
 					trait = wroth
 					is_any_kinslayer_trigger = yes
 					religion_tolerates_kinslaying = yes
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:lover_to_introduce
 						name = opinion_unpopular_metamour
 					}
-					FROM = {
+					event_target:lover_to_introduce = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_unpopular_metamour
@@ -743,12 +1508,12 @@ character_event = { # polyam.10
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 5
 				trait = patron_hoar
 			}
 		}
-		add_rival = FROM
+		add_rival = event_target:lover_to_introduce
 	}
 	option = {
 		name = EVTOPTB_POLYAM_10 # I sheath my sword
@@ -767,6 +1532,7 @@ character_event = { # polyam.10
 	}
 }
 
+# ROOT is partner to introduce lover to
 character_event = { # polyam.11
 	id = polyam.11
 	is_triggered_only = yes
@@ -774,26 +1540,28 @@ character_event = { # polyam.11
 		text = EVTDESC_POLYAM_11 # something about becoming friend, etc etc
 	}
 	picture = GFX_evt_gossip_1	
+	portrait = event_target:lover_to_introduce
+
 	option = {
 		name = EVTOPTA_POLYAM_11 # something friendlyesque
 		ai_chance = {
 			factor = 50
-			modifier = {
+			mult_modifier = {
 				factor = 0.2
 				trait = shy
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 4
 				trait = gregarious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:lover_to_introduce
 						name = opinion_popular_metamour
 					}
-					FROM = {
+					event_target:lover_to_introduce = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_popular_metamour
@@ -802,7 +1570,7 @@ character_event = { # polyam.11
 				}
 			}
 		}
-		add_friend = FROM
+		add_friend = event_target:lover_to_introduce
 	}
 	option = {
 		name = EVTOPTB_POLYAM_11 # let's not go overboard
@@ -813,6 +1581,7 @@ character_event = { # polyam.11
 	}
 }
 
+# ROOT is partner to introduce lover to
 character_event = { # polyam.12
 	id = polyam.12
 	is_triggered_only = yes
@@ -820,38 +1589,96 @@ character_event = { # polyam.12
 		text = EVTDESC_POLYAM_12 # something about becoming lovers, etc etc
 	}
 	picture = GFX_evt_gossip_1
+	portrait = event_target:lover_to_introduce
+
 	option = {
 		name = EVTOPTA_POLYAM_12 # something loveryesque
 		ai_chance = {
 			factor = 75
-			modifier = {
+			mult_modifier = {
 				factor = 0
 				trait = chaste
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 3
 				trait = lustful
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = hedonist
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 5
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = beautiful
+				}
+			}
+			mult_modifier = {
+				factor = 3
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = fair
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = pretty
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_fair_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
+				factor = 0.2
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = unsightly
+				}
+			}
+			mult_modifier = {
+				factor = 0.35
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = ugly
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = plain
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:lover_to_introduce = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_ugly_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
 				factor = 0
-				is_close_relative = FROM
+				is_close_relative = event_target:lover_to_introduce
 				OR = {
 					religion_has_incest = no
-					FROM = { religion_has_incest = no }
+					event_target:lover_to_introduce = { religion_has_incest = no }
 				}
 			}	
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:lover_to_introduce
 						name = opinion_popular_metamour
 					}
-					FROM = {
+					event_target:lover_to_introduce = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_popular_metamour
@@ -860,32 +1687,32 @@ character_event = { # polyam.12
 				}
 			}
 		}
-		FROM = { character_event = { id = polyam.13 } }
+		event_target:lover_to_introduce = { character_event = { id = polyam.13 } }
 	}
 	option = {
 		name = EVTOPTB_POLYAM_12 # not lovers, but friends
 		ai_chance = {
 			factor = 15
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = shy
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = gregarious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = loyal
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:lover_to_introduce
 						name = opinion_popular_metamour
 					}
-					FROM = {
+					event_target:lover_to_introduce = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_popular_metamour
@@ -895,9 +1722,9 @@ character_event = { # polyam.12
 			}
 		}
 		trigger = {
-			NOT = { is_friend = FROM }
+			NOT = { is_friend = event_target:lover_to_introduce }
 		}	
-		add_friend = FROM
+		add_friend = event_target:lover_to_introduce
 	}
 	option = {
 		name = EVTOPTC_POLYAM_12 # not striking enough to tempt me
@@ -908,6 +1735,7 @@ character_event = { # polyam.12
 	}
 }
 
+# ROOT is lover to introduce
 character_event = { # polyam.13
 	id = polyam.13
 	is_triggered_only = yes
@@ -915,38 +1743,96 @@ character_event = { # polyam.13
 		text = EVTDESC_POLYAM_13 # My metamour wants to be my lover
 	}
 	picture = GFX_evt_lovers
+	portrait = event_target:partner_to_introduce_lover_to
+
 	option = {
 		name = EVTOPTA_POLYAM_13 # Accept
 		ai_chance = {
 			factor = 50
-			modifier = {
+			mult_modifier = {
 				factor = 0
 				OR = { 
 					trait = chaste
 					trait = loyal
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0
 				AND = {
-					FROM = {
-						is_romance_compatible_with_root = no					
+					event_target:partner_to_introduce_lover_to = {
+						ROOT = { attracted_to_prev_trigger = no }				
 					}
 					NOT = { trait = hedonist }
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 3
 				trait = lustful
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = beautiful
+				}
+			}
+			mult_modifier = {
+				factor = 3
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = fair
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = pretty
+				}
+			}
+			mult_modifier = {
+				factor = 2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_fair_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
+				factor = 0.2
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = unsightly
+				}
+			}
+			mult_modifier = {
+				factor = 0.35
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = ugly
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					trait = plain
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+				event_target:partner_to_introduce_lover_to = { 
+					ROOT = { attracted_to_prev_trigger = yes }
+					has_ugly_trait_non_congenital_trigger = yes
+				}
+			}
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:partner_to_introduce_lover_to
 						name = opinion_popular_metamour
 					}
-					FROM = {
+					event_target:partner_to_introduce_lover_to = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_popular_metamour
@@ -955,38 +1841,69 @@ character_event = { # polyam.13
 				}
 			}
 		}
-		FROM = { save_event_target_as = new_lover }
-		new_lover_effect = yes
-		any_lover = {
-			limit = {
-				any_lover = {
-					character = FROM
+
+		event_target:introducing_partner = {
+			if = {
+				limit = { 
+					event_target:partner_to_introduce_lover_to = {
+						is_metamour_of_PREV = no
+					}
 				}
-				ai = no
+
+				opinion = {
+					name = opinion_popular_metamour
+					who = event_target:partner_to_introduce_lover_to
+				}
+				reverse_opinion = {
+					name = opinion_popular_metamour
+					who = event_target:partner_to_introduce_lover_to
+				}
 			}
+			if = {
+				limit = { 
+					event_target:lover_to_introduce = {
+						is_metamour_of_PREV = no
+					}
+				}
+
+				opinion = {
+					name = opinion_popular_metamour
+					who = event_target:lover_to_introduce
+				}
+				reverse_opinion = {
+					name = opinion_popular_metamour
+					who = event_target:lover_to_introduce
+				}
+			}
+
 			character_event = { id = polyam.14 }
 		}
+		event_target:partner_to_introduce_lover_to = { save_event_target_as = new_lover }
+		clear_event_target = lover_to_introduce
+		clear_event_target = partner_to_introduce_lover_to
+		clear_event_target = introducing_partner
+		new_lover_effect = yes
 	}
 	option = {
 		name = EVTOPTB_POLYAM_13 # friends
 		ai_chance = {
 			factor = 25
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				trait = shy
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = gregarious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
 				NAND = {
 					has_opinion_modifier = {
-						who = FROM
+						who = event_target:partner_to_introduce_lover_to
 						name = opinion_popular_metamour
 					}
-					FROM = {
+					event_target:partner_to_introduce_lover_to = {
 						has_opinion_modifier = {
 							who = ROOT
 							name = opinion_popular_metamour
@@ -995,7 +1912,7 @@ character_event = { # polyam.13
 				}
 			}
 		}
-		add_friend = FROM
+		add_friend = event_target:partner_to_introduce_lover_to
 	}
 	option = {
 		name = EVTOPTC_POLYAM_13 # Decline
@@ -1004,7 +1921,7 @@ character_event = { # polyam.13
 		}
 		reverse_opinion = {
 			name = opinion_rejected_friend
-			who = FROM
+			who = event_target:partner_to_introduce_lover_to
 			months = 6
 		}
 	}
@@ -1013,11 +1930,918 @@ character_event = { # polyam.13
 character_event = { # polyam.14
 	id = polyam.14
 	is_triggered_only = yes
-	desc = {
-		text = EVTDESC_POLYAM_14 # My lovers are lovers
-	}
 	picture = GFX_evt_lovers
+	desc = EVTDESC_POLYAM_14
+	portrait = event_target:lover_to_introduce
+
+	ai = no
+
 	option = {
 		name = EVTOPTA_POLYAM_14
+		event_target:partner_to_introduce_lover_to = { # for portrait to show
+			save_event_target_as = partner_to_introduce_lover_to
+		}
+	}
+}
+
+character_event = { # autorespond event for players
+	id = polyam.15
+	is_triggered_only = yes
+	picture = GFX_evt_lovers
+	desc = EVTDESC_POLYAM_15
+	
+	option = {
+		name = EVTOPTA_POLYAM_15
+		
+		hidden_effect = {
+			set_character_flag = polyamour_autorespond_positively
+		}
+	}
+	option = {
+		name = EVTOPTB_POLYAM_15
+
+		hidden_effect = {
+			set_character_flag = polyamour_autorespond_neutrally
+		}
+	}
+	option = {
+		name = EVTOPTC_POLYAM_15
+
+		hidden_effect = {
+			set_character_flag = polyamour_autorespond_negatively
+		}
+	}
+	option = {
+		name = EVTOPTD_POLYAM_15
+
+		custom_tooltip = {
+			text = EVTOPTD_TOOLTIP_POLYAM_15
+
+			set_character_flag = polyamour_autorespond_automatically
+		}
+	}
+
+	after = {
+		hidden_effect = {
+			trigger_switch = {
+				on_trigger = has_character_flag
+
+				polyamour_current_event_2 = { clr_character_flag = polyamour_current_event_2 repeat_event = { id = polyam.2 } }
+				polyamour_current_event_3 = { clr_character_flag = polyamour_current_event_3 repeat_event = { id = polyam.3 } }
+				polyamour_current_event_4 = { clr_character_flag = polyamour_current_event_4 repeat_event = { id = polyam.4 } }
+				polyamour_current_event_5 = { clr_character_flag = polyamour_current_event_5 repeat_event = { id = polyam.5 } }
+				polyamour_current_event_6 = { clr_character_flag = polyamour_current_event_6 repeat_event = { id = polyam.6 } }
+				polyamour_current_event_7 = { clr_character_flag = polyamour_current_event_7 repeat_event = { id = polyam.7 } }
+				polyamour_current_event_8 = { clr_character_flag = polyamour_current_event_8 repeat_event = { id = polyam.8 } }
+			}
+			
+		}
+	}
+}
+
+# ROOT is partner to introduce lover to, FROM is lover to introduce
+character_event = { # polyam.2 autorespond variant
+	id = polyam.16
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { 
+				is_close_relative = event_target:lover_to_introduce
+				NOR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+
+			opinion = {
+				name = opinion_related_metamour
+				who = event_target:lover_to_introduce
+			}
+			event_target:introducing_partner = {
+				character_event = { id = polyam.3 }
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_negatively }
+
+			opinion = {
+				name = opinion_unpopular_metamour
+				who = event_target:lover_to_introduce
+			}
+			event_target:introducing_partner = {
+				character_event = { id = polyam.3 }
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_neutrally }
+
+			opinion = {
+				name = opinion_accepted_metamour
+				who = event_target:lover_to_introduce
+			}
+			event_target:introducing_partner = {
+				character_event = { id = polyam.4 }
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_positively }
+
+			opinion = {
+				name = opinion_popular_metamour
+				who = event_target:lover_to_introduce
+			}
+			event_target:introducing_partner = {
+				character_event = { id = polyam.5 }
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_automatically }
+
+			random_list = {
+				10 = {
+					trigger = {
+						OR = {
+							religion_has_polyamory = no
+							NOR = {
+								is_friend = event_target:lover_to_introduce
+								is_lover = event_target:lover_to_introduce
+								is_consort = event_target:lover_to_introduce
+								is_senior_consort_party = event_target:lover_to_introduce
+								is_married = event_target:lover_to_introduce
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 3.0
+
+						opinion = {
+							who = event_target:lover_to_introduce
+							value <= -25
+						}
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = kind 
+								trait = temperate
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 3.0
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = envious
+								trait = proud
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = wroth
+								trait = cruel
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						trait = kind
+					}
+					mult_modifier = {
+						factor = 10.0
+
+						is_rival = event_target:lover_to_introduce
+					}
+					mult_modifier = {
+						factor = 3.5
+
+						OR = {
+							trait = envious
+							trait = proud
+						}
+					}
+					mult_modifier = {
+						factor = 4.0
+
+						religion_has_polyamory = no
+					}
+
+					opinion = {
+						name = opinion_unpopular_metamour
+						who = event_target:lover_to_introduce
+					}
+					event_target:introducing_partner = {
+						character_event = { id = polyam.3 }
+					}
+				}
+				50 = {
+					mult_modifier = {
+						factor = 3.0
+
+						AND = {
+							opinion = {
+								who = event_target:lover_to_introduce
+								value >= -25
+							}
+							opinion = {
+								who = event_target:lover_to_introduce
+								value <= 25
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 0.3
+
+						trait = wroth
+					}
+					mult_modifier = {
+						factor = 2.5
+
+						trait = content
+					}
+
+					opinion = {
+						name = opinion_accepted_metamour
+						who = event_target:lover_to_introduce
+					}
+					event_target:introducing_partner = {
+						character_event = { id = polyam.4 }
+					}
+				}
+				10 = {
+					mult_modifier = {
+						factor = 3.0
+
+						opinion = {
+							who = event_target:lover_to_introduce
+							value >= 25
+						}
+					}
+					mult_modifier = {
+						factor = 2.5
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = kind 
+								trait = temperate
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 5
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = beautiful
+						}
+					}
+					mult_modifier = {
+						factor = 3
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = fair
+						}
+					}
+					mult_modifier = {
+						factor = 2
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = pretty
+						}
+					}
+					mult_modifier = {
+						factor = 2
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							has_fair_trait_non_congenital_trigger = yes
+						}
+					}
+					mult_modifier = {
+						factor = 2.5
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = kind 
+								trait = temperate
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 0.3
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = envious
+								trait = proud
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 0.02
+
+						event_target:lover_to_introduce = { 
+							OR = {
+								trait = wroth
+								trait = cruel
+							}
+						}
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = unsightly
+						}
+					}
+					mult_modifier = {
+						factor = 0.35
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = ugly
+						}
+					}
+					mult_modifier = {
+						factor = 0.5
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = plain
+						}
+					}
+					mult_modifier = {
+						factor = 0.5
+
+						event_target:lover_to_introduce = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							has_ugly_trait_non_congenital_trigger = yes
+						}
+					}
+					mult_modifier = {
+						factor = 0.3
+
+						trait = proud
+					}
+					mult_modifier = {
+						factor = 1.5
+
+						trait = lustful
+					}
+					mult_modifier = {
+						factor = 10.0
+
+						OR = {
+							is_lover = event_target:lover_to_introduce
+							is_consort = event_target:lover_to_introduce
+							is_senior_consort_party = event_target:lover_to_introduce
+							is_married = event_target:lover_to_introduce
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						is_friend = event_target:lover_to_introduce
+					}
+					mult_modifier = {
+						factor = 1.5
+
+						trait = charitable
+					}
+
+					opinion = {
+						name = opinion_popular_metamour
+						who = event_target:lover_to_introduce
+					}
+					event_target:introducing_partner = {
+						character_event = { id = polyam.5 }
+					}
+				}
+			}
+		}
+		
+	}
+}
+
+
+# ROOT is lover to introduce, FROM is introducing partner, FROMFROM is partner to introduce lover to
+character_event = { # polyam.6, polyam.7, polyam.8 autorespond variant
+	id = polyam.17
+	hide_window = yes
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { 
+				is_close_relative = event_target:partner_to_introduce_lover_to
+				NOR = {
+					religion_has_incest = yes
+					trait = lustful
+					trait = hedonist
+					trait = seducer
+					trait = seductress
+				}
+			}
+
+			opinion = {
+				name = opinion_related_metamour
+				who = event_target:partner_to_introduce_lover_to
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_negatively }
+
+			opinion = {
+				name = opinion_unpopular_metamour
+				who = event_target:partner_to_introduce_lover_to
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_neutrally }
+
+			opinion = {
+				name = opinion_accepted_metamour
+				who = event_target:partner_to_introduce_lover_to
+			}
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_positively }
+
+			opinion = {
+				name = opinion_popular_metamour
+				who = event_target:partner_to_introduce_lover_to
+			}
+			
+		}
+		else_if = {
+			limit = { has_character_flag = polyamour_autorespond_automatically }
+
+			random_list = {
+				10 = {
+					mult_modifier = {
+						factor = 3.0
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_unpopular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						opinion = {
+							who = event_target:partner_to_introduce_lover_to
+							value <= -25
+						}
+					}
+					mult_modifier = {
+						factor = 0.5
+
+						reverse_has_opinion_modifier = {
+							name = opinion_unpopular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = kind
+							trait = patient
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_unpopular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						OR = {
+							trait = wroth
+							trait = envious
+							trait = proud
+						}
+					}
+					mult_modifier = {
+						factor = 4.0
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_unpopular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						religion_has_polyamory = no
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = kind
+							trait = patient
+						}
+					}
+
+					mult_modifier = {
+						factor = 2.5
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+					mult_modifier = {
+						factor = 0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						religion_has_polyamory = yes
+					}
+
+					mult_modifier = {
+						factor = 0.01
+
+						reverse_has_opinion_modifier = {
+							name = opinion_related_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+
+					opinion = {
+						name = opinion_unpopular_metamour
+						who = event_target:partner_to_introduce_lover_to
+					}
+				}
+				10 = {
+					mult_modifier = {
+						factor = 1.5
+
+						reverse_has_opinion_modifier = {
+							name = opinion_unpopular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = content
+							trait = temperate
+						}
+					}
+
+					mult_modifier = {
+						factor = 3.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						opinion = {
+							who = event_target:partner_to_introduce_lover_to
+							value <= -25
+						}
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = kind
+							trait = patient
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = wroth
+							trait = envious
+							trait = proud
+						}
+					}
+					mult_modifier = {
+						factor = 4.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						religion_has_polyamory = no
+					}
+
+					mult_modifier = {
+						factor = 1.5
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+					mult_modifier = {
+						factor = 2.5
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = arbitrary
+							trait = chaste
+							trait = cynical
+						}
+					}
+
+					opinion = {
+						name = opinion_accepted_metamour
+						who = event_target:partner_to_introduce_lover_to
+					}
+				}
+				10 = {
+					mult_modifier = {
+						factor = 0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_unpopular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+
+					mult_modifier = {
+						factor = 1.5
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+					mult_modifier = {
+						factor = 3.0
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						opinion = {
+							who = event_target:partner_to_introduce_lover_to
+							value >= 25
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_accepted_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = charitable
+							trait = temperate
+						}
+					}
+					mult_modifier = {
+						factor = 5
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = beautiful
+						}
+					}
+					mult_modifier = {
+						factor = 3
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = fair
+						}
+					}
+					mult_modifier = {
+						factor = 2
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = pretty
+						}
+					}
+					mult_modifier = {
+						factor = 2
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							has_fair_trait_non_congenital_trigger = yes
+						}
+					}
+					mult_modifier = {
+						factor = 0.2
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = unsightly
+						}
+					}
+					mult_modifier = {
+						factor = 0.35
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = ugly
+						}
+					}
+					mult_modifier = {
+						factor = 0.5
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							trait = plain
+						}
+					}
+					mult_modifier = {
+						factor = 0.5
+
+						OR = {
+							reverse_has_opinion_modifier = {
+								name = opinion_accepted_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+							reverse_has_opinion_modifier = {
+								name = opinion_popular_metamour
+								who = event_target:partner_to_introduce_lover_to
+							}
+						}
+						event_target:partner_to_introduce_lover_to = { 
+							ROOT = { attracted_to_prev_trigger = yes }
+							has_ugly_trait_non_congenital_trigger = yes
+						}
+					}
+
+					mult_modifier = {
+						factor = 5
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+					}
+					mult_modifier = {
+						factor = 2.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							trait = lustful
+							trait = gregarious
+						}
+					}
+					mult_modifier = {
+						factor = 10.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						OR = {
+							is_lover = event_target:partner_to_introduce_lover_to
+							is_consort = event_target:partner_to_introduce_lover_to
+							is_senior_consort_party = event_target:partner_to_introduce_lover_to
+							is_married = event_target:partner_to_introduce_lover_to
+						}
+					}
+					mult_modifier = {
+						factor = 5.0
+
+						reverse_has_opinion_modifier = {
+							name = opinion_popular_metamour
+							who = event_target:partner_to_introduce_lover_to
+						}
+						is_friend = event_target:partner_to_introduce_lover_to
+					}
+
+					opinion = {
+						name = opinion_popular_metamour
+						who = event_target:partner_to_introduce_lover_to
+					}
+
+				}
+			}
+		}
+	}
+
+	after = {
+		event_target:partner_to_introduce_lover_to = {
+			character_event = {
+				id = polyam.9
+				days = 30
+				random = 90
+			}
+		}
 	}
 }

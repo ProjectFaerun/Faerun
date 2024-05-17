@@ -376,25 +376,81 @@ impregnate_effect_event_target = {
 }
 
 new_lover_effect = {
-	add_lover = event_target:new_lover
-#	if = {
-#		limit = {
-#			religion_has_polyamory = yes
-#		}
-#		event_target:new_lover = {
-#			save_event_target_as = polyam_newcomer
-#		}
-#		character_event = { id = polyam.1 }
-#	}
-	event_target:new_lover = {
-		if = {
-			limit = {
-				religion_has_polyamory = yes
+	if = {
+		limit = {
+			event_target:new_lover = {
+				always = yes
+				character = yes
+				NOT = { is_lover = PREV }
 			}
-#			PREV = {
-#				save_event_target_as = polyam_newcomer
-#			}
-			character_event = { id = polyam.100 }
+		}
+
+		add_lover = event_target:new_lover
+
+		event_target:new_lover = {
+			if = {  # if the new lover is polyamour, they introduce the scoped character to other polyamours if any
+				limit = { religion_has_polyamory = yes }
+
+				PREV = { save_event_target_as = lover_to_introduce }
+
+				save_event_target_as = introducing_partner
+
+				any_lover = {
+					limit = { NOT = { character = event_target:lover_to_introduce } }
+					
+					set_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce
+					character_event = { id = polyam.1 days = 40 random = 15 }
+				}
+				any_spouse = {
+					limit = { NOT = { character = event_target:lover_to_introduce } }
+					
+					set_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce
+					character_event = { id = polyam.1 days = 10 random = 15 }
+				}
+				any_consort = {
+					limit = {
+						NOT = { character = PREV } # for some reason the game sometimes thinks that the character is a consort of himself
+						NOT = { character = event_target:lover_to_introduce } 
+					}
+					
+					set_character_flag = polyamour_getting_introduced_to@event_target:lover_to_introduce
+					character_event = { id = polyam.1 days = 25 random = 15 }
+				}
+			}
+		}
+
+		if = { # scoped character introduces the new lover too if eligible
+			limit = { religion_has_polyamory = yes }
+
+			event_target:new_lover = { save_event_target_as = lover_to_introduce }
+
+			save_event_target_as = introducing_partner
+
+			any_lover = {
+				limit = { 
+					NOT = { character = event_target:lover_to_introduce } 
+					NOT = { has_character_flag = polyamour_getting_introduced_to@event_target:introducing_partner } 
+				}
+				
+				character_event = { id = polyam.1 days = 40 random = 15 }
+			}
+			any_spouse = {
+				limit = { 
+					NOT = { character = event_target:lover_to_introduce } 
+					NOT = { has_character_flag = polyamour_getting_introduced_to@event_target:introducing_partner } 
+				}
+				
+				character_event = { id = polyam.1 days = 10 random = 15 }
+			}
+			any_consort = {
+				limit = {
+					NOT = { character = PREV } # for some reason the game sometimes thinks that the character is a consort of himself
+					NOT = { character = event_target:lover_to_introduce } 
+					NOT = { has_character_flag = polyamour_getting_introduced_to@event_target:new_lover } 
+				}
+				
+				character_event = { id = polyam.1 days = 25 random = 15 }
+			}
 		}
 	}
 }
