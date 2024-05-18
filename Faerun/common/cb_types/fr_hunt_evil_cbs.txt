@@ -1,0 +1,691 @@
+# overthrow_evil_ruler
+
+overthrow_evil_ruler = {
+	name = CB_NAME_OVERTHROW_EVIL_RULER
+	war_name = WAR_OVERTHROW_EVIL_RULER
+	sprite = 33
+	truce_days = 900
+	sort_priority = 500
+
+	is_holy_war = yes
+	is_permanent = yes
+	can_ask_to_join_war = yes
+	allowed_to_target_tributaries = no
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+			piety >= 250
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		FROM = {
+			OR = {
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = undead_realm_lord
+				has_character_modifier = fr_nomad_conquerer_modifier
+				trigger_if = {
+					limit = { has_character_modifier = known_satanist }
+					ROOT = {
+						NOR = {
+							secret_religion = infernal
+							has_character_modifier = known_satanist
+							has_character_modifier = syncretic_infernal
+						}
+					}
+				}
+			}
+		}
+
+		ROOT = {
+			is_evil_religion = no
+
+			NOR = {
+				#religion = triadic
+				mercenary = yes
+				trait = creature_monster
+				AND = {
+					government = nomadic_tribal_government
+					FROM = { has_character_modifier = fr_nomad_conquerer_modifier }
+				}
+			}
+		}
+	}
+
+	can_use_title = {
+		FROM = {
+			any_realm_title = {
+				location = {
+					any_neighbor_province = { # have a border
+						trigger_if = {
+							limit = { has_owner = yes }
+
+							owner = {
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
+								}
+							}
+						}
+						trigger_else = {
+							is_land = no # first sea zone
+
+							any_neighbor_province = {
+								trigger_if = {
+									limit = { has_owner = yes }
+
+									owner = {
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
+										}
+									}
+								}
+								trigger_else = {
+									is_land = no # second sea zone
+
+									any_neighbor_province = {
+										owner = {
+											OR = {
+												character = ROOT
+												is_vassal_or_below_of = ROOT
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	is_valid = {
+		FROM = {
+			is_landed = yes
+			OR = {
+				is_evil_religion = yes
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = undead_realm_lord
+				has_character_modifier = fr_nomad_conquerer_modifier
+				has_character_modifier = known_satanist
+			}
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			piety = -250
+			declare_war_effect = yes
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			participation_scaled_piety = 100
+			participation_scaled_prestige = 100
+			attacker_victory_effect = yes
+
+			add_rival = FROM
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				modifier = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+
+			hidden_effect = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 100
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			imprison = ROOT
+			prestige = -500
+
+			if = { # lower crown authority
+				limit = { NOT = { has_dlc = "Conclave" } }
+
+				any_demesne_title = {
+					limit = { is_crown_law_title = yes }
+
+					trigger_switch = {
+						on_trigger = has_law
+
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_0 }
+						crown_authority_3 = { add_law = crown_authority_1 }
+						crown_authority_4 = { add_law = crown_authority_2 }
+					}
+				}
+			}
+			else = {
+				any_demesne_title = { # All titles
+					limit = {
+						OR = {
+							tier = DUKE
+							tier = KING
+							tier = EMPEROR
+						}
+						NOT = { has_law = revoke_title_law_0 }
+					}
+
+					trigger_switch = {
+						on_trigger = has_law
+
+						revoke_title_law_1 = { add_law = revoke_title_law_0 }
+						revoke_title_law_2 = { add_law = revoke_title_law_0 }
+					}
+				}
+			}
+
+			capital_scope = {
+				county = { save_event_target_as = depose_evil_ruler_capital }
+			}
+
+			random_realm_character = {
+				preferred_limit = {
+					is_heir = defender
+					independent = no
+					is_evil_religion = no
+					defender = { NOT = { has_dynasty_flag = evil_once_punished } }
+				}
+				preferred_limit = {
+					is_child_of = defender
+					independent = no
+					is_evil_religion = no
+					defender = { NOT = { has_dynasty_flag = evil_once_punished } }
+				}
+				preferred_limit = {
+					dynasty = FROM
+					is_close_relative = defender
+					independent = no
+					NOT = { is_married = defender }
+					olrox_is_good_religion_trigger = yes
+					defender = { NOT = { has_dynasty_flag = evil_once_punished } }
+				}
+				preferred_limit = {
+					dynasty = FROM
+					is_close_relative = defender
+					independent = no
+					NOT = { is_married = defender }
+					is_evil_religion = no
+					defender = { NOT = { has_dynasty_flag = evil_once_punished } }
+				}
+				preferred_limit = {
+					vassal_of = FROM
+					is_powerful_vassal = yes
+					is_incapable = no
+					is_adult = yes
+					olrox_is_good_religion_trigger = yes
+				}
+				preferred_limit = {
+					is_vassal_or_below_of = defender
+					is_powerful_vassal = yes
+					is_incapable = no
+					is_adult = yes
+					olrox_is_good_religion_trigger = yes
+				}
+				preferred_limit = {
+					vassal_of = FROM
+					is_powerful_vassal = yes
+					is_incapable = no
+					is_adult = yes
+					is_evil_religion = no
+				}
+				preferred_limit = {
+					is_vassal_or_below_of = defender
+					is_powerful_vassal = yes
+					is_incapable = no
+					is_adult = yes
+					is_evil_religion = no
+				}
+				preferred_limit = {
+					vassal_of = FROM
+					is_incapable = no
+					is_adult = yes
+					olrox_is_good_religion_trigger = yes
+				}
+				preferred_limit = {
+					is_vassal_or_below_of = defender
+					is_incapable = no
+					is_adult = yes
+					olrox_is_good_religion_trigger = yes
+				}
+				preferred_limit = {
+					vassal_of = FROM
+					is_incapable = no
+					is_adult = yes
+					is_evil_religion = no
+				}
+				preferred_limit = {
+					is_vassal_or_below_of = defender
+					is_incapable = no
+					is_adult = yes
+					is_evil_religion = no
+				}
+				preferred_limit = {
+					is_ruler = no
+					is_heir = no
+					is_adult = yes
+					is_incapable = no
+					is_evil_religion = no
+				}
+				save_event_target_as = depose_evil_heir
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_character_modifier = undead_realm_lord
+						has_character_modifier = fr_nomad_conquerer_modifier
+						event_target:depose_evil_heir = {
+							is_evil_religion = yes
+						}
+					}
+				}
+				random_demesne_title = {
+					limit = { tier = COUNT }
+
+					location = {
+						create_character = {
+							religion = ROOT
+							culture = THIS
+							dynasty = random
+							random_traits = yes
+							female = 50
+							age = 20
+							health = 7
+							fertility = 0.7
+							attributes = {
+								martial = 10
+								diplomacy = 10
+								stewardship = 10
+							}
+							flag = is_religious_liberation_ruler
+						}
+						new_character = {
+							remove_trait = cynical
+							add_trait = zealous
+							set_character_flag = ai_flag_refuse_conversion
+							wealth = 500
+							prestige = 500
+							piety = 500
+							save_event_target_as = new_ruler
+						}
+					}
+				}
+
+				any_demesne_title = {
+					event_target:new_ruler = {
+						usurp_title = {
+							target = defender
+							type = invasion
+						}
+					}
+				}
+
+				attacker = {
+					opinion = {
+						modifier = in_non_aggression_pact
+						who = event_target:new_ruler
+						years = 10
+						origin_description = EVTTITLE_overthrow_evil_ruler
+					}
+				}
+
+				event_target:new_ruler = {
+					opinion = {
+						modifier = in_non_aggression_pact
+						who = attacker
+						years = 10
+						origin_description = EVTTITLE_overthrow_evil_ruler
+					}
+
+					if = {
+						limit = {
+							is_female = yes
+							NOR = {
+								trait = homosexual
+								trait = asexual
+							}
+						}
+						location = {
+							create_character = {
+								religion = event_target:new_ruler
+								culture = event_target:new_ruler
+								dynasty = none
+								random_traits = yes
+								female = no
+								age = 20
+								health = 7
+								fertility = 0.7
+								flag = is_religious_liberation_ruler
+							}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								add_spouse_matrilineal = event_target:new_ruler
+								add_lover = event_target:new_ruler
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							is_female = no
+							NOR = {
+								trait = homosexual
+								trait = asexual
+							}
+						}
+						location = {
+							create_character = {
+								religion = event_target:new_ruler
+								culture = event_target:new_ruler
+								dynasty = none
+								random_traits = yes
+								female = yes
+								age = 20
+								health = 7
+								fertility = 0.7
+								flag = is_religious_liberation_ruler
+							}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								add_spouse = event_target:new_ruler
+								add_lover = event_target:new_ruler
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							is_female = yes
+							trait = homosexual
+						}
+						location = {
+							create_character = {
+								religion = event_target:new_ruler
+								culture = event_target:new_ruler
+								dynasty = none
+								random_traits = yes
+								female = yes
+								age = 20
+								health = 7
+								fertility = 0.7
+								flag = is_religious_liberation_ruler
+							}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								add_spouse_matrilineal = event_target:new_ruler
+								add_lover = event_target:new_ruler
+							}
+						}
+					}
+					else_if = {
+						limit = {
+							is_female = no
+							trait = homosexual
+						}
+						location = {
+							create_character = {
+								religion = event_target:new_ruler
+								culture = event_target:new_ruler
+								dynasty = none
+								random_traits = yes
+								female = no
+								age = 20
+								health = 7
+								fertility = 0.7
+								flag = is_religious_liberation_ruler
+							}
+							new_character = {
+								remove_trait = cynical
+								add_trait = zealous
+								add_spouse = event_target:new_ruler
+								add_lover = event_target:new_ruler
+							}
+						}
+					}
+				}
+			}
+
+			else = {
+				if = {
+					limit = {
+						event_target:depose_evil_heir = {
+							NOT = { dynasty = FROM }
+							higher_tier_than = COUNT
+						}
+					}
+					gain_title_plus_barony_if_unlanded = {
+						target = event_target:depose_evil_ruler_capital
+						type = invasion
+					}
+				}
+				abdicate_to = event_target:depose_evil_heir
+			}
+
+			set_dynasty_flag = evil_once_punished
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+			piety = -100
+			add_rival = defender
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 50
+			participation_scaled_piety = 50
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = {
+				participation_scaled_piety = 50
+				participation_scaled_prestige = 50
+			}
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			piety = -200
+			transfer_scaled_wealth = {
+				to = defender
+				value = 4.0
+			}
+			add_rival = defender
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 100
+			participation_scaled_piety = 100
+			defender_victory_effect = yes
+
+			if = {
+				limit = { uses_decadence = yes }
+				participation_scaled_decadence = -10
+			}
+
+			religion_authority = {
+				name = won_holy_war
+				years = 20
+			}
+
+			hidden_effect = {
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+
+		any_defender = {
+			limit = { NOT = { character = FROM } }
+			hidden_effect = {
+				participation_scaled_piety = 100
+				participation_scaled_prestige = 100
+
+				if = {
+					limit = { uses_decadence = yes }
+					participation_scaled_decadence = -10
+				}
+
+				if = {
+					limit = { has_ambition = obj_strengthen_religion }
+
+					change_variable = {
+						which = strengthen_religion
+						value = 1
+					}
+				}
+			}
+		}
+	}
+
+	on_defender_leader_death = {
+		any_attacker = {
+			letter_event = { id = 251 } # Our enemy has died, the war has ended
+		}
+
+		end_war = invalid
+	}
+
+	attacker_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.5 # Low prio CB
+
+		mult_modifier = {
+			factor = 0.5
+			ROOT = {
+				trait = slothful
+			}
+		}
+		mult_modifier = {
+			factor = 0.2
+			ROOT = {
+				trait = impaler
+			}
+		}
+		mult_modifier = {
+			factor = 0.1
+			ROOT = {
+				trait = cruel
+			}
+		}
+		mult_modifier = {
+			factor = 0.5
+			ROOT = {
+				trait = deceitful
+			}
+		}
+		mult_modifier = {
+			factor = 3
+			ROOT = {
+				trait = kind
+			}
+		}
+		mult_modifier = {
+			factor = 2
+			ROOT = {
+				trait = just
+			}
+		}
+		mult_modifier = {
+			factor = 3
+			ROOT = {
+				trait = brave
+			}
+		}
+		mult_modifier = {
+			factor = 4
+			ROOT = {
+				trait = ambitious
+			}
+		}
+		mult_modifier = {
+			factor = 4
+			ROOT = {
+				trait = zealous
+			}
+		}
+		mult_modifier = {
+			factor = 0.01
+			ROOT = {
+				lower_real_tier_than = DUKE
+			}
+		}
+	}
+}
