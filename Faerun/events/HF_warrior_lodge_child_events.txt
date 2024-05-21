@@ -161,11 +161,11 @@ character_event = {
 				event_target:recruiting_parent = { character_event = { id = HF.25407 days = 250 random = 150 } }
 			}
 			15 = { #Brawny for Shrewd switch.
-				trigger = { NOR = { trait = robust trait = sturdy trait = feeble } } #Only if from average physical shape.
+				trigger = { NOR = { is_strong_non_congenital_trigger = yes trait = sturdy is_weak_non_congenital_trigger = yes } } #Only if from average physical shape.
 				event_target:recruiting_parent = { character_event = { id = HF.25410 days = 250 random = 150 } }
 			}
 			15 = { #Brawny for Groomed switch.
-				trigger = { NOT = { trait = robust trait = sturdy trait = feeble } }
+				trigger = { NOR = { is_strong_non_congenital_trigger = yes trait = sturdy is_weak_non_congenital_trigger = yes } }
 				event_target:recruiting_parent = { character_event = { id = HF.25413 days = 250 random = 150 } }
 			}
 			15 = { #Hero wants to make child brave.
@@ -225,7 +225,7 @@ character_event = {
 				trigger = { 
 					OR = { 
 						trait = sturdy 
-						trait = feeble 
+						is_weak_non_congenital_trigger = yes
 					} 
 					any_society_member = { #A potential hero teacher exists.
 						same_society_as = ROOT
@@ -233,7 +233,7 @@ character_event = {
 						society_rank = 4
 						NOT = { event_target:recruiting_parent = { character = PREV } }
 						NOR = { 
-							trait = feeble
+							is_weak_non_congenital_trigger = yes
 							trait = sturdy
 							character = ROOT 
 							is_rival = ROOT
@@ -250,7 +250,7 @@ character_event = {
 							society_rank = 4
 							NOT = { event_target:recruiting_parent = { character = PREV } }
 							NOR = { 
-								trait = feeble
+								is_weak_non_congenital_trigger = yes
 								trait = sturdy
 								character = ROOT 
 								is_rival = ROOT
@@ -268,7 +268,7 @@ character_event = {
 							society_rank = 4
 							NOT = { event_target:recruiting_parent = { character = PREV } }
 							NOR = { 
-								trait = feeble
+								is_weak_non_congenital_trigger = yes
 								trait = sturdy
 								character = ROOT 
 								is_rival = ROOT
@@ -719,36 +719,27 @@ character_event = {
 		tooltip = {  
 			FROM = {
 				if = { #First remove brains.
-					limit = { trait = dull }
+					limit = { is_smart_non_congenital_trait_downgradeable_trigger = no }
 					change_diplomacy = -1
 					change_stewardship = -1
 					change_intrigue = -1
 					change_learning = -1
 				} 
-				else_if = { 
-					limit = { NOR = { trait = dull trait = shrewd } }
-					add_trait = dull
-				}
-				else_if = { 
-					limit = { trait = shrewd }
-					remove_trait = shrewd
+				else = { 
+					downgrade_smart_non_congenital_trait_effect = yes
 				}
 
 				if = { #Then add brawn.
-					limit = { trait = robust }
+					limit = { is_strong_non_congenital_trait_upgradeable_trigger = no }
 					health = 0.5 #Safety check, shouldn't fire if already Brawny.
 				} 
-				else_if = { 
-					limit = { NOR = { trait = feeble trait = sturdy trait = robust } }
-					add_trait = robust 
-				} 
-				else_if = { 
-					limit = { trait = feeble }
-					remove_trait = feeble
-				}
-				else_if = { 
-					limit = { trait = sturdy }
-					remove_trait = sturdy
+				else = { 
+					upgrade_strong_non_congenital_trait_effect = yes
+					if = {
+						limit = { is_strong_non_congenital_trigger = yes trait = sturdy }
+
+						remove_trait = sturdy
+					}
 				}
 			}
 		}
@@ -794,36 +785,29 @@ character_event = {
 	option = { 
 		name = EVTOPTAHF25412
 		if = { #First remove brains.
-			limit = { trait = dull }
+			limit = { is_smart_non_congenital_trait_downgradeable_trigger = no }
+
 			change_diplomacy = -1
 			change_stewardship = -1
 			change_intrigue = -1
 			change_learning = -1
 		} 
-		else_if = { 
-			limit = { NOR = { trait = dull trait = shrewd } }
-			add_trait = dull
-		}
-		else_if = { 
-			limit = { trait = shrewd }
-			remove_trait = shrewd
+		else = { 
+			downgrade_smart_non_congenital_trait_effect = yes
 		}
 
 		if = { #Then add brawn.
-			limit = { trait = robust }
+			limit = { is_strong_non_congenital_trait_upgradeable_trigger = no }
+
 			health = 0.5 #Safety check, shouldn't fire if already Brawny.
 		} 
-		else_if = { 
-			limit = { NOR = { trait = feeble trait = sturdy trait = robust } }
-			add_trait = robust 
-		} 
-		else_if = { 
-			limit = { trait = feeble }
-			remove_trait = feeble
-		}
-		else_if = { 
-			limit = { trait = sturdy }
-			remove_trait = sturdy
+		else = { 
+			upgrade_strong_non_congenital_trait_effect = yes
+			if = {
+				limit = { is_strong_non_congenital_trigger = yes trait = sturdy }
+
+				remove_trait = sturdy
+			}
 		}
 	}
 	after = { hidden_tooltip = { character_event = { id = HF.25400 } } } #Umbrella again.
@@ -868,7 +852,7 @@ character_event = {
 
 	option = { #Intolerable.
 		name = EVTOPTAHF25413
-		trigger = { trait = groomed }
+		trigger = { has_fair_trait_non_congenital_trigger = yes }
 		tooltip_info = groomed
 		tooltip = {  
 			FROM = {
@@ -895,7 +879,7 @@ character_event = {
 	}
 	option = { #Intolerable.
 		name = EVTOPTAHF25413
-		trigger = { trait = proud NOT = { trait = groomed } }
+		trigger = { trait = proud NOT = { has_fair_trait_non_congenital_trigger = yes } }
 		tooltip_info = proud
 		tooltip = {  
 			FROM = {
@@ -925,34 +909,27 @@ character_event = {
 		tooltip = {  
 			FROM = {
 				if = { #First remove looks.
-					limit = { trait = uncouth }
+					limit = { is_fair_non_congenital_trait_downgradeable_trigger = no }
+
 					change_diplomacy = -3
 					change_intrigue = -1
 				} 
-				else_if = { 
-					limit = { NOR = { trait = uncouth trait = groomed } }
-					add_trait = uncouth
-				}
-				else_if = { 
-					limit = { trait = groomed }
-					remove_trait = groomed
+				else = { 
+					downgrade_fair_non_congenital_trait_effect = yes
 				}
 
 				if = { #Then add brawn.
-					limit = { trait = robust }
+					limit = { is_strong_non_congenital_trait_upgradeable_trigger = no }
+					
 					health = 0.5 #Safety check, shouldn't fire if already Brawny.
 				} 
-				else_if = { 
-					limit = { NOR = { trait = feeble trait = sturdy trait = robust } }
-					add_trait = robust 
-				} 
-				else_if = { 
-					limit = { trait = feeble }
-					remove_trait = feeble
-				}
-				else_if = { 
-					limit = { trait = sturdy }
-					remove_trait = sturdy
+				else = { 
+					upgrade_strong_non_congenital_trait_effect = yes
+					if = {
+						limit = { is_strong_non_congenital_trigger = yes trait = sturdy }
+
+						remove_trait = sturdy
+					}
 				}
 			}
 		}
@@ -1010,34 +987,27 @@ character_event = {
 	option = { 
 		name = EVTOPTAHF25415
 		if = { #First remove looks.
-			limit = { trait = uncouth }
-			change_diplomacy = -2
-			change_intrigue = -2
+			limit = { is_fair_non_congenital_trait_downgradeable_trigger = no }
+
+			change_diplomacy = -3
+			change_intrigue = -1
 		} 
-		else_if = { 
-			limit = { NOR = { trait = uncouth trait = groomed } }
-			add_trait = uncouth
-		}
-		else_if = { 
-			limit = { trait = groomed }
-			remove_trait = groomed
+		else = { 
+			downgrade_fair_non_congenital_trait_effect = yes
 		}
 
 		if = { #Then add brawn.
-			limit = { trait = robust }
+			limit = { is_strong_non_congenital_trait_upgradeable_trigger = no }
+			
 			health = 0.5 #Safety check, shouldn't fire if already Brawny.
 		} 
-		else_if = { 
-			limit = { NOR = { trait = feeble trait = sturdy trait = robust } }
-			add_trait = robust 
-		} 
-		else_if = { 
-			limit = { trait = feeble }
-			remove_trait = feeble
-		}
-		else_if = { 
-			limit = { trait = sturdy }
-			remove_trait = sturdy
+		else = { 
+			upgrade_strong_non_congenital_trait_effect = yes
+			if = {
+				limit = { is_strong_non_congenital_trigger = yes trait = sturdy }
+
+				remove_trait = sturdy
+			}
 		}
 	}
 	after = { hidden_tooltip = { character_event = { id = HF.25400 } } } #Umbrella again.
@@ -1144,7 +1114,7 @@ character_event = {
 		text = EVTDESCBHF25418
 		trigger = { 
 			FROM = { 
-				trait = feeble
+				is_weak_non_congenital_trigger = yes
 			}
 		}
 	}
@@ -1197,7 +1167,7 @@ character_event = {
 		text = EVTDESCBHF25419
 		trigger = { 
 			FROM = { 
-				trait = feeble
+				is_weak_non_congenital_trigger = yes
 			}
 		}
 	}
@@ -1222,8 +1192,8 @@ character_event = {
 			hidden_tooltip = { FROM = { character_event = { id = HF.25420 days = 50 } } }
 		}
 		if = { 
-			limit = { trait = feeble } 
-			remove_trait = feeble
+			limit = { is_weak_non_congenital_trigger = yes } 
+			upgrade_strong_non_congenital_trait_effect = yes
 			hidden_tooltip = { FROM = { character_event = { id = HF.25421 days = 50 } } }
 		}
 		ai_chance = { 
@@ -1266,7 +1236,7 @@ character_event = {
 			}
 			modifier = { 
 				factor = 1.75
-				trait = feeble
+				is_weak_non_congenital_trigger = yes
 				trait = temperate
 			}
 			modifier = { 
@@ -1338,7 +1308,7 @@ character_event = {
 		text = EVTDESCBHF25422
 		trigger = { 
 			FROM = { 
-				trait = feeble
+				is_weak_non_congenital_trigger = yes
 			}
 		}
 	}
@@ -1524,7 +1494,7 @@ character_event = {
 				}
 				modifier = {
 					factor = 2
-					trait = groomed
+					has_fair_trait_non_congenital_trigger = yes
 				}
 				modifier = {
 					factor = 2
@@ -1536,7 +1506,7 @@ character_event = {
 				}
 				modifier = {
 					factor = 0.5
-					trait = uncouth
+					has_ugly_trait_non_congenital_trigger = yes
 				}
 				set_character_flag = flag_prospective_child_warrior_is_lady
 			}
