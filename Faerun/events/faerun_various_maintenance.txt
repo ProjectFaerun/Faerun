@@ -773,7 +773,10 @@ character_event = {
 	is_triggered_only = yes # on_character_convert_religion
 
 	trigger = {
-		NOT = { is_reformed_religion = FROM } # we should not block conversion of any characters nor remove a patron trait if the new religion is the reformed version of the character's old one
+		NOR = {
+			is_reformed_religion = FROM # we should not block conversion of any characters nor remove a patron trait if the new religion is the reformed version of the character's old one
+			has_character_flag = reverting_religion_change # not in a process of reverting religion change
+		}
 	}
 
 	immediate = {
@@ -781,8 +784,6 @@ character_event = {
 			limit = { # some characters shouldn't be able to change religion except special cases
 				OR = {
 					is_immune_to_conversion_trigger = yes
-
-					has_character_flag = reverting_religion_change # we should go here if we're already in the process
 
 					trigger_if = {
 						limit = { # if the character is of any race except monster, block converting to the monster religion from a normal religion
@@ -807,11 +808,6 @@ character_event = {
 				}
 
 				clr_character_flag = ignore_conversion_immunity # clear the flag and proceed with the conversion
-			}
-			else_if = {
-				limit = { has_character_flag = reverting_religion_change } # exit the event if we are in a process of reverting the religion change
-
-				break = yes # don't remove the patrons
 			}
 			else = { # otherwise we reverting the conversion
 
