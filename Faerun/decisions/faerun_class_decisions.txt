@@ -390,35 +390,14 @@ decisions = {
 					wealth = -150
 				}
 			}
-			add_trait_wounded_effect = yes
 			hidden_tooltip = {
 				export_to_variable = {
-					which = global_clone_health
+					which = local_clone_health
 					value = base_health
 				}
 				export_to_variable = {
-					which = global_clone_fertility
+					which = local_clone_fertility
 					value = fertility
-				}
-				export_to_variable = {
-					which = global_clone_diplomacy
-					value = diplomacy
-				}
-				export_to_variable = {
-					which = global_clone_martial
-					value = martial
-				}
-				export_to_variable = {
-					which = global_clone_stewardship
-					value =	stewardship
-				}
-				export_to_variable = {
-					which = global_clone_intrigue
-					value = intrigue
-				}
-				export_to_variable = {
-					which = global_clone_learning
-					value =	learning
 				}
 			}
 			create_character = {
@@ -429,19 +408,15 @@ decisions = {
 				dynasty = ROOT
 				trait = is_clone
 				trait = stasis_clone
-				attributes = {
-					diplomacy = global_clone_diplomacy
-					martial = global_clone_martial
-					stewardship = global_clone_stewardship
-					intrigue = global_clone_intrigue
-					learning = global_clone_learning
-				}
+				genetic_father = ROOT
+				genetic_mother = ROOT
 			}
 			new_character = {
-				fertility = global_clone_fertility
-				health = global_clone_health
+				fertility = local_clone_fertility
+				health = local_clone_health
 				culture = ROOT
 				religion = ROOT
+
 				if = {
 					limit = {
 						ROOT = {
@@ -451,18 +426,65 @@ decisions = {
 					set_father = ROOT
 					set_gender = male
 				}
-				else_if = {
-					limit = {
-						ROOT = {
-							is_female = yes
-						}
-					}
+				else = {
 					set_mother = ROOT
 					set_gender = female
 				}
-				copy_traits_of_root = yes
-				ROOT = {
-					recalc_succession = yes
+				set_name = ROOT
+
+				copy_traits_of_PREV = yes
+
+				change_diplomacy = -100
+				change_martial = -100
+				change_stewardship = -100
+				change_intrigue = -100
+				change_learning = -100
+
+				while = {
+					count = 10
+					limit = { diplomacy < ROOT }
+
+					change_diplomacy = 1
+				}
+				while = {
+					count = 10
+					limit = { martial < ROOT }
+					
+					change_martial = 1
+				}
+				while = {
+					count = 10
+					limit = { stewardship < ROOT }
+					
+					change_stewardship = 1
+				}
+				while = {
+					count = 10
+					limit = { intrigue < ROOT }
+					
+					change_intrigue = 1
+				}
+				while = {
+					count = 10
+					limit = { learning < ROOT }
+					
+					change_learning = 1
+				}
+
+				if = {
+					limit = { ROOT = { has_character_flag = had_religion_change_event } }
+
+					set_character_flag = had_religion_change_event
+				}
+				if = {
+					limit = { ROOT = { has_character_flag = patron_chosen } }
+
+					set_character_flag = patron_chosen
+				}
+				if = {
+					limit = { ROOT = { has_character_flag = patron_rechosen } }
+
+					set_character_flag = patron_rechosen
 				}
 				any_sibling = {
 					limit = {
@@ -471,6 +493,8 @@ decisions = {
 					add_rival = PREV
 				}
 			}
+			recalc_succession = yes
+			add_trait_wounded_effect = yes
 		}
 		ai_will_do = {
 			factor = 0.05
@@ -480,7 +504,7 @@ decisions = {
 			}
 			mult_modifier = {
 				factor = 0.1
-				NOT = { wealth = 300 }
+				wealth < 300
 			}
 			mult_modifier = {
 				factor = 0.5
@@ -499,7 +523,7 @@ decisions = {
 				
 				any_child = {
 					trait = is_clone
-					count >= 15
+					count >= 10
 				}
 			}
 		}
