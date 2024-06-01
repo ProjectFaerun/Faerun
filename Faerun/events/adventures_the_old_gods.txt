@@ -43,16 +43,19 @@ character_event = {
 		
 		any_claim = {
 			has_holder = yes
+
 			OR = {
 				real_tier = KING
 				is_primary_holder_title_tier = yes
 			}
+
 			holder_scope = {
 				independent = yes
 
 				# Don't target my liege unless I am ambitious
 				trigger_if = {
 					limit = { is_liege_or_above_of = ROOT }
+
 					ROOT = { trait = ambitious }
 				}
 
@@ -63,6 +66,7 @@ character_event = {
 						NOT = { de_jure_liege_or_above = PREVPREV }
 					}
 				}
+
 				ROOT = {
 					NOR = {
 						obedient = PREV
@@ -181,6 +185,11 @@ character_event = {
 		}
 
 		mult_modifier = {
+			factor = 0.25
+			is_pacifist_religion = yes
+		}
+
+		mult_modifier = {
 			factor = 0.02
 
 			has_game_rule = {
@@ -202,8 +211,10 @@ character_event = {
 
 				holder_scope = {
 					independent = yes # Only do this vs independent rulers
+
 					trigger_if = {
 						limit = { is_liege_or_above_of = ROOT }
+
 						ROOT = { trait = ambitious }
 					}
 
@@ -221,6 +232,7 @@ character_event = {
 							non_interference = PREV
 						}
 					}
+					
 					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 						ROOT = {
 							liege = {
@@ -329,6 +341,11 @@ character_event = {
 		event_target:adventurer_target_title = {
 			holder = event_target:adventurer_target
 
+			OR = {
+				real_tier = KING
+				is_primary_holder_title_tier = yes
+			}
+
 			holder_scope = {
 				NOT = {
 					defending_against_claimant = {
@@ -347,6 +364,7 @@ character_event = {
 				# Don't target my liege unless I am ambitious
 				trigger_if = {
 					limit = { is_liege_or_above_of = ROOT }
+
 					ROOT = { trait = ambitious }
 				}
 
@@ -364,6 +382,7 @@ character_event = {
 						non_interference = PREV
 					}
 				}
+
 				capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 					ROOT = {
 						liege = {
@@ -388,10 +407,6 @@ character_event = {
 						}
 					}
 				}
-			}
-			OR = {
-				real_tier = KING
-				is_primary_holder_title_tier = yes
 			}
 		}
 
@@ -450,7 +465,6 @@ character_event = {
 		}
 
 		set_character_flag = claimant_adventurer
-
 
 		random_list = {
 			1 = {
@@ -553,7 +567,7 @@ character_event = {
 			who = event_target:adventurer_target
 		}
 
-		#log = "TOG.1202: [Root.GetBestName] starts claim adventure for [adventurer_target_title.GetName]"
+		log = "TOG.1202: [Root.GetBestName] starts claim adventure for [adventurer_target_title.GetName] embarking from [embark_province.GetName]."
 
 		unsafe_war = {
 			target = event_target:adventurer_target
@@ -624,6 +638,20 @@ character_event = {
 		is_ruler = no
 
 		trigger_if = {
+			limit = { is_pacifist_religion = yes }
+
+			NOR = {
+				trait = zealous
+				trait = kind
+			}
+			OR = {
+				trait = ambitious
+				trait = cynical
+				trait = cruel
+			}
+		}
+
+		trigger_if = {
 			limit = { faerun_immortal_race_trigger = no }
 
 			is_old_enough_to_die_trigger = no
@@ -645,6 +673,14 @@ character_event = {
 		health >= 4
 
 		OR = {
+			liege = {
+				dynasty = ROOT
+			}
+
+			any_sibling_even_if_dead = {
+				higher_real_tier_than = BARON
+			}
+
 			father_even_if_dead = {
 				OR = {
 					higher_real_tier_than = BARON
@@ -654,6 +690,10 @@ character_event = {
 					}
 
 					mother_even_if_dead = {
+						higher_real_tier_than = BARON
+					}
+
+					any_sibling_even_if_dead = {
 						higher_real_tier_than = BARON
 					}
 				}
@@ -668,6 +708,10 @@ character_event = {
 					}
 
 					mother_even_if_dead = {
+						higher_real_tier_than = BARON
+					}
+
+					any_sibling_even_if_dead = {
 						higher_real_tier_than = BARON
 					}
 				}
@@ -700,6 +744,7 @@ character_event = {
 
 			# Handled by event TOG.1200
 			any_claim = {
+
 				has_holder = yes
 
 				OR = {
@@ -711,10 +756,23 @@ character_event = {
 					independent = yes
 
 					trigger_if = {
+						limit = { is_liege_or_above_of = ROOT }
+	
+						ROOT = { trait = ambitious }
+					}
+	
+					trigger_if = {
 						limit = { is_merchant_republic = yes }
-
+	
 						capital_holding = {
 							NOT = { de_jure_liege_or_above = PREVPREV }
+						}
+					}
+	
+					ROOT = {
+						NOR = {
+							obedient = PREV
+							non_interference = PREV
 						}
 					}
 
@@ -741,13 +799,6 @@ character_event = {
 								}
 							}
 						}
-					}
-				}
-
-				ROOT = {
-					NOR = {
-						obedient = PREV
-						non_interference = PREV
 					}
 				}
 			}
@@ -815,6 +866,11 @@ character_event = {
 		}
 
 		mult_modifier = {
+			factor = 0.1
+			is_pacifist_religion = yes
+		}
+
+		mult_modifier = {
 			factor = 0.33
 			any_liege = { ai = no }
 		}
@@ -862,6 +918,7 @@ character_event = {
 						}
 						trigger_if = {
 							limit = { is_coastal = yes }
+
 							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 								liege = {
 									trigger_if = {
@@ -886,6 +943,13 @@ character_event = {
 							}
 						}
 					}
+				}
+			}
+			preferred_limit = {
+				trigger_if = { # less dynastic infighting unless ROOT is evil
+					limit = { dynasty = ROOT }
+
+					ROOT = { is_evil_religion = yes }
 				}
 			}
 
@@ -972,6 +1036,7 @@ character_event = {
 		}
 
 		event_target:adventurer_target = {
+			is_alive = yes
 			is_landed = yes
 			independent = yes
 			# Previously targeted ruler is still an independent ruler
@@ -985,6 +1050,13 @@ character_event = {
 				is_liege_or_above_of = ROOT
 			}
 
+			ROOT = {
+				NOR = {
+					obedient = PREV
+					non_interference = PREV
+				}
+			}
+
 			any_realm_province = {
 				held_under_PREV = yes
 
@@ -996,6 +1068,7 @@ character_event = {
 					}
 					trigger_if = {
 						limit = { is_coastal = yes }
+
 						ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 							liege = {
 								trigger_if = {
@@ -1021,13 +1094,6 @@ character_event = {
 					}
 				}
 			}
-
-			ROOT = {
-				NOR = {
-					obedient = PREV
-					non_interference = PREV
-				}
-			}
 		}
 	}
 	
@@ -1048,6 +1114,7 @@ character_event = {
 						}
 						trigger_if = {
 							limit = { is_coastal = yes }
+
 							ROOT = { # There should be a direct naval path, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
 								liege = {
 									trigger_if = {
@@ -1082,6 +1149,7 @@ character_event = {
 		liege = {
 			if = {
 				limit = { num_of_count_titles >= 1 }
+
 				random_demesne_province = {
 					limit = {
 						OR = {
@@ -1092,13 +1160,13 @@ character_event = {
 					save_event_target_as = embark_province
 				}
 				if = { # if we went through the trigger block, we at the very least should be able to use the capital scope to invade from.
-					limit = { 
-						NOT = { event_target:embark_province = { always = yes } }
-					}
+					limit = { NOT = { event_target:embark_province = { always = yes } } }
+
 					capital_scope = { save_event_target_as = embark_province }
 				}
 			}
 			else = { capital_scope = { save_event_target_as = embark_province } } 
+			
 			character_event = {
 				id = TOG.1213
 				days = 1
@@ -1166,7 +1234,7 @@ character_event = {
 			tier = DUKE
 		}
 
-		#log = "TOG.1212: [Root.GetBestName] starts adventure for [adventurer_target_title.Duchy.GetName]"
+		log = "TOG.1212: [Root.GetBestName] starts adventure for [adventurer_target_title.Duchy.GetName] embarking from [embark_province.GetName]."
 
 		remove_opinion = {
 			name = opinion_duchy_adventure_target
