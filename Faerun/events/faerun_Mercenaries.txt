@@ -47,127 +47,66 @@ character_event = {
 	is_married = no
 
 	trigger = {
-		liege = {
+		OR = {
 			mercenary = yes
-			OR = {
-				has_law = enatic_succession
-				has_law = enatic_cognatic_succession
-				has_law = true_cognatic_succession
+			liege = {
+				mercenary = yes
 			}
 		}
-		is_alive = yes
+
+		OR = {
+			has_law = enatic_succession
+			has_law = enatic_cognatic_succession
+			has_law = true_cognatic_succession
+		}
+
 		NOR = {
-			has_character_flag = mercenary_gender_checked
 			father = { always = yes }
 			mother = { always = yes }
 		}
-		is_lowborn = yes
-		num_of_lovers == 0
-		is_immune_to_pruning = no
+
+		faerun_any_race = no
+
+		trigger_if = {
+			limit = { is_ruler = no }
+
+			is_lowborn = yes
+			is_immune_to_pruning = no
+		}
+
 		historical = no
 		has_children = no
-		faerun_any_race = no
 	}
-
-	immediate = { # If succession law is enatic, we always change gender, otherwise with 50% chance. Couldn't use "set_gender = female" because there is seemingly no way to change existing character's name to random.
-		liege = {
-			any_courtier = { # Somehow, I've had troubles with names not being correctly randomized, so I've had to use any_courtier method.
-				limit = {
-					NOR = {
-						has_character_flag = mercenary_gender_checked
-						is_female = yes
-						father = { always = yes }
-						mother = { always = yes }
-					}
-					is_lowborn = yes
-					host = { character = liege }
-					is_adult = yes
-					num_of_friends == 0
-					num_of_rivals == 0
-					num_of_lovers == 0
-					prisoner = no
-					is_married = no
-					is_ruler = no
-					is_immune_to_pruning = no
-					historical = no
-					has_children = no
-					faerun_any_race = no
-				}
-				random_list = {
-					50 = {
-						create_random_soldier = {
-							dynasty = none
-							female = yes
-							random_traits = yes
-							culture = THIS
-							religion = THIS
-							employer = PREV
-						}
-						new_character = {
-							remove_trait = imbecile
-							remove_trait = idiot
-							remove_trait = slow
-							remove_trait = dumb
-							remove_trait = dim
-							remove_trait = weak
-							remove_trait = delicate
-							remove_trait = soft
-	
-							remove_lifestyle_trait_effect = yes
-							character_event = { id = character_trait.1 }
-					
-							random_list = { # Flavor Randomization
-								35 = { } # Nothing
-								15 = { change_martial = 2 }
-								10 = { add_trait = robust }
-								10 = { add_trait = duelist }
-								10 = { add_trait = hunter }
-									5 = { add_trait = strategist }
-									5 = { change_martial = 4 }
-					
-									5 = {
-									trigger = { has_dlc = "Reapers" }
-									add_trait = one_eyed
-								}
-					
-									5 = { add_trait = shrewd }
-									3 = { add_trait = giant }
-							}
-							set_character_flag = class_selection_includes_fighter
-							set_character_flag = class_selection_includes_ranger
-							set_character_flag = class_selection_includes_barbarian
-							pick_random_class_effect = yes
-						}
-						death = { death_reason = death_missing }
-					}
-					50 = {
-						trigger = {
-							liege = { NOT = { has_law = enatic_succession } }
-						}
-						set_character_flag = mercenary_gender_checked
-						character_event = { id = FaerunMercenaries.1001 days = 1 }
-					}
-				}
-			}
-			if = {
-				limit = {
-					is_female = no
-					has_law = enatic_succession
-				}
-				recalc_succession = yes
-				abdicate = yes
-				death = { death_reason = death_missing }
-			}
-		}
-	}
-}
-
-character_event = {
-	id = FaerunMercenaries.1001
-	hide_window = yes
-	is_triggered_only = yes
 
 	immediate = {
-		clr_character_flag = mercenary_gender_checked
+		random = {
+			chance = 50 # 50% chance of nothing in case the succession law is not strictly enatic
+			additive_modifier = {
+				value = 50
+
+				has_law = enatic_succession
+			}
+
+			set_gender = female
+			if = {
+				limit = { trait = seducer }
+
+				remove_trait = seducer
+				add_trait = seductress
+			}
+			random_character = {
+				limit = {
+					culture = ROOT
+					is_female = yes
+					NOT = { character = ROOT }
+					historical = no # no unique name stealing
+				}
+				preferred_limit = { # avoid same names if possible
+					NOT = { same_liege = ROOT }
+				}
+
+				ROOT = { set_name = PREV }
+			}
+		}
 	}
 }
