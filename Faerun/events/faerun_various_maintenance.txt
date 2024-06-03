@@ -7,24 +7,28 @@ character_event = {
 	is_triggered_only = yes # on_decade_pulse
 
 	ai = yes
-	min_age = 40
+	min_age = 50
 	prisoner = no
 	has_job_title = no
 
 	trigger = {
 		is_ruler = no
 		immortal = yes
-		liege = { 
-			ai = yes 
-			OR = {
-				NOT = { dynasty = ROOT }
-				ROOT = { is_lowborn = yes }
-			}
-		}
+		has_minor_title = no
 		historical = no
 		num_of_claims == 0
-		has_minor_title = no
 		is_consort = no
+		liege = {
+			trigger_if = {
+				limit = { ai = no }
+
+				free_court_slots <= -30
+			}
+			trigger_else = {
+				num_of_courtiers > 15
+			}
+			NOT = { is_close_relative = ROOT }
+		}
 		trigger_if = {
 			limit = { is_in_society = yes }
 
@@ -62,20 +66,31 @@ character_event = {
 
 	immediate = {
 		random = {
-			chance = 33
+			chance = 50
 			additive_modifier = {
-				value = 33
+				value = 25
 
 				liege = {
-					num_of_courtiers >= 30
+					num_of_courtiers >= 25
 				}
 			}
 			additive_modifier = {
-				value = 34
+				value = 25
 
 				liege = {
-					free_court_slots < 5
+					num_of_courtiers >= 35
 				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				is_lowborn = no
+				liege = { dynasty = ROOT }
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				ai = no
 			}
 			
 			if = {
@@ -101,6 +116,16 @@ character_event = {
 	
 						death = {
 							death_reason = death_trait
+						}
+					}
+					200 = {
+						trigger = {
+							is_old_enough_to_die_trigger = yes
+							faerun_immortal_race_trigger = no
+						}
+	
+						death = {
+							death_reason = death_longlived
 						}
 					}
 					100 = {
@@ -129,6 +154,7 @@ character_event = {
 							trait = adventurer
 						}
 
+						simulate_duel_injury_fatal_effect = yes
 						death = {
 							death_reason = death_adventuring
 						}
