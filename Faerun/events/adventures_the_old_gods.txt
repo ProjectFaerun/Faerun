@@ -23,12 +23,7 @@ character_event = {
 	
 	trigger = {
 		is_ruler = no
-
-		trigger_if = {
-			limit = { faerun_immortal_race_trigger = no }
-
-			is_old_enough_to_die_trigger = no
-		}
+		num_of_claims > 0
 		
 		trigger_if = {
 			limit = { is_female = yes }
@@ -39,6 +34,40 @@ character_event = {
 				has_law = enatic_cognatic_succession
 				has_law = true_cognatic_succession
 			}
+		}
+
+		diplomacy >= 7
+		health >= 4
+
+		NOR = {
+			trait = content
+			trait = craven
+			trait = infirm
+			culture = monster
+
+			has_character_modifier = planning_claimant_adventure
+			has_character_modifier = planning_duchy_adventure
+
+			has_game_rule = {
+				name = adventurers
+				value = none
+			}
+
+			any_spouse = {
+				is_ruler = yes
+			}
+			is_consort = yes
+
+			# Somewhat clunky way of checking that the character does not stand to inherit any titles
+			any_heir_title = {
+				always = yes
+			}
+		}
+
+		trigger_if = {
+			limit = { faerun_immortal_race_trigger = no }
+
+			is_old_enough_to_die_trigger = no
 		}
 		
 		any_claim = {
@@ -99,34 +128,6 @@ character_event = {
 						}
 					}
 				}
-			}
-		}
-
-		diplomacy >= 7
-		health >= 4
-
-		NOR = {
-			trait = content
-			trait = craven
-			trait = infirm
-			culture = monster
-
-			has_character_modifier = planning_claimant_adventure
-			has_character_modifier = planning_duchy_adventure
-
-			has_game_rule = {
-				name = adventurers
-				value = none
-			}
-
-			any_spouse = {
-				is_ruler = yes
-			}
-			is_consort = yes
-
-			# Somewhat clunky way of checking that the character does not stand to inherit any titles
-			any_heir_title = {
-				always = yes
 			}
 		}
 	}
@@ -637,6 +638,21 @@ character_event = {
 	trigger = {
 		is_ruler = no
 
+		diplomacy >= 7
+		martial >= 9
+		health >= 4
+		
+		trigger_if = {
+			limit = { is_female = yes }
+
+			OR = {
+				gender_equality_trigger = yes
+				has_law = enatic_succession
+				has_law = enatic_cognatic_succession
+				has_law = true_cognatic_succession
+			}
+		}
+
 		trigger_if = {
 			limit = { is_pacifist_religion = yes }
 
@@ -651,36 +667,7 @@ character_event = {
 			}
 		}
 
-		trigger_if = {
-			limit = { faerun_immortal_race_trigger = no }
-
-			is_old_enough_to_die_trigger = no
-		}
-		
-		trigger_if = {
-			limit = { is_female = yes }
-
-			OR = {
-				gender_equality_trigger = yes
-				has_law = enatic_succession
-				has_law = enatic_cognatic_succession
-				has_law = true_cognatic_succession
-			}
-		}
-
-		diplomacy >= 7
-		martial >= 9
-		health >= 4
-
 		OR = {
-			liege = {
-				dynasty = ROOT
-			}
-
-			any_sibling_even_if_dead = {
-				higher_real_tier_than = BARON
-			}
-
 			father_even_if_dead = {
 				OR = {
 					higher_real_tier_than = BARON
@@ -690,10 +677,6 @@ character_event = {
 					}
 
 					mother_even_if_dead = {
-						higher_real_tier_than = BARON
-					}
-
-					any_sibling_even_if_dead = {
 						higher_real_tier_than = BARON
 					}
 				}
@@ -708,10 +691,6 @@ character_event = {
 					}
 
 					mother_even_if_dead = {
-						higher_real_tier_than = BARON
-					}
-
-					any_sibling_even_if_dead = {
 						higher_real_tier_than = BARON
 					}
 				}
@@ -741,59 +720,70 @@ character_event = {
 			any_heir_title = {
 				always = yes
 			}
-
-			# Handled by event TOG.1200
-			any_claim = {
-
-				has_holder = yes
-
-				OR = {
-					real_tier = KING
-					is_primary_holder_title_tier = yes
-				}
-
-				holder_scope = {
-					independent = yes
-
-					trigger_if = {
-						limit = { is_liege_or_above_of = ROOT }
-	
-						ROOT = { trait = ambitious }
-					}
-	
-					trigger_if = {
-						limit = { is_merchant_republic = yes }
-	
-						capital_holding = {
-							NOT = { de_jure_liege_or_above = PREVPREV }
-						}
-					}
-	
-					ROOT = {
-						NOR = {
-							obedient = PREV
-							non_interference = PREV
-						}
-					}
-
-					capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
-						ROOT = {
-							liege = {
-								trigger_if = {
-									limit = { num_of_count_titles >= 1 }
+		}
 		
-									any_demesne_province = {
-										OR = {
-											can_naval_path_to = PREVPREVPREV
-											can_land_path_to = PREVPREVPREV
+		trigger_if = {
+			limit = { faerun_immortal_race_trigger = no }
+
+			is_old_enough_to_die_trigger = no
+		}
+
+		trigger_if = {
+			limit = { num_of_claims > 0 }
+
+			NOT = { # leave for last because of expensive calculations
+				any_claim = { # Handled by event TOG.1200
+
+					has_holder = yes
+
+					OR = {
+						real_tier = KING
+						is_primary_holder_title_tier = yes
+					}
+
+					holder_scope = {
+						independent = yes
+
+						trigger_if = {
+							limit = { is_liege_or_above_of = ROOT }
+		
+							ROOT = { trait = ambitious }
+						}
+		
+						trigger_if = {
+							limit = { is_merchant_republic = yes }
+		
+							capital_holding = {
+								NOT = { de_jure_liege_or_above = PREVPREV }
+							}
+						}
+		
+						ROOT = {
+							NOR = {
+								obedient = PREV
+								non_interference = PREV
+							}
+						}
+
+						capital_scope = { # There should be a direct path either through land or sea, otherwise AI's pathfinding breaks and it just stay here until losing due to ticking warscore
+							ROOT = {
+								liege = {
+									trigger_if = {
+										limit = { num_of_count_titles >= 1 }
+			
+										any_demesne_province = {
+											OR = {
+												can_naval_path_to = PREVPREVPREV
+												can_land_path_to = PREVPREVPREV
+											}
 										}
 									}
-								}
-								trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
-									capital_scope = {
-										OR = {
-											can_naval_path_to = PREVPREVPREV
-											can_land_path_to = PREVPREVPREV
+									trigger_else = { # if we don't hold any count titles for some reason, use the capital scope
+										capital_scope = {
+											OR = {
+												can_naval_path_to = PREVPREVPREV
+												can_land_path_to = PREVPREVPREV
+											}
 										}
 									}
 								}

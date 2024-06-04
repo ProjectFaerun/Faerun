@@ -128,13 +128,12 @@ targeted_decisions = {
 		from_potential = {
 			is_member_of_any_thieves_guild_trigger = yes
 			is_adult = yes
-			is_inaccessible_or_incapable_trigger = no
 		}
 
 		potential = {
-			NOT = { character = FROM }
-			is_ruler = yes
 			is_within_diplo_range = FROM
+			is_landed = yes
+			NOT = { character = FROM }
 		}
 
 		allow = {
@@ -270,21 +269,28 @@ targeted_decisions = {
 				}
 			}
 			is_adult = yes
-			is_inaccessible_or_incapable_trigger = no
 			
 		}
 
 		potential = {
-			NOT = { character = FROM }
-			age = 10
-			is_ruler = yes
 			OR = {
 				FROM = { ai = yes } # Only checks realm, so by definition in range
 				is_within_diplo_range = FROM
 			}
+			is_landed = yes
+			NOT = { character = FROM }
+			age = 10
 		}
 
 		allow = {
+			OR = {
+				FROM = { society_rank == 4 }
+				ROOT = { same_realm = FROM }
+			}
+			FROM = {
+				has_society_currency_medium_trigger = yes
+				is_inaccessible_or_incapable_trigger = no
+			}
 			ROOT = {
 				NOR = { 
 					society_member_of = twisted_rune 
@@ -310,14 +316,6 @@ targeted_decisions = {
 				}
 				is_inaccessible_or_incapable_trigger = no
 				NOT = { owes_favor_to = FROM }
-			}
-			OR = {
-				FROM = { society_rank == 4 }
-				ROOT = { same_realm = FROM }
-			}
-			FROM = {
-				has_society_currency_medium_trigger = yes
-				is_inaccessible_or_incapable_trigger = no
 			}
 			NOT = {
 				has_opinion_modifier = {
@@ -417,12 +415,6 @@ targeted_decisions = {
 		}
 
 		potential = {
-			NOT = { character = FROM }
-			age = 16
-			ai = yes
-			is_pregnant = no
-			is_undead = no
-			undead_incompatible_race = no
 			OR = {
 				NOT = { has_character_flag = evaded_turning_vassal_undead }
 				AND = {
@@ -430,6 +422,12 @@ targeted_decisions = {
 					host = { character = FROM }
 				}
 			}
+			is_undead = no
+			undead_incompatible_race = no
+			is_adult = yes
+			is_pregnant = no
+			NOT = { character = FROM }
+			ai = yes
 		}
 
 		allow = {
@@ -646,9 +644,9 @@ targeted_decisions = {
 		potential = {
 			is_member_of_any_knight_order_trigger = yes
 			society_rank >= 2
-			is_adult = yes
 			NOT = { has_character_flag = choosing_warrior_training } #to stop you spamming the button
 			has_current_knight_order_leader_trait_trigger = no #to keep it hidden once you're done
+			is_adult = yes
 		}
 
 		allow = {
@@ -690,10 +688,10 @@ targeted_decisions = {
 		}
 
 		potential = {
-			NOT = { character = FROM }
-			is_adult = yes
-			is_ruler = yes
 			is_within_diplo_range = FROM
+			is_ruler = yes
+			is_adult = yes
+			NOT = { character = FROM }
 		}
 
 		allow = {
@@ -747,8 +745,8 @@ targeted_decisions = {
 				rank = 4
 				society = harpers
 			}
-			is_pacifist_religion = no
 			war = no
+			is_pacifist_religion = no
 			mercenary = no
 			holy_order = no
 			is_incapable = no
@@ -761,14 +759,14 @@ targeted_decisions = {
 		}
 
 		potential = {
+			is_within_diplo_range = FROM
+			independent = yes
 			NOR = { 
 				has_truce = FROM
 				character = FROM
 				is_liege_or_above_of = FROM
 				trait = creature_monster
 			}
-			is_within_diplo_range = FROM
-			independent = yes
 		}
 
 		allow = {
@@ -913,11 +911,11 @@ targeted_decisions = {
 				character = FROM
 			}
 			OR = {
-				FROM = { ai = no }
-				character = FROM
 				is_close_relative = FROM
 				is_friend = FROM
 				is_lover = FROM
+				FROM = { ai = no }
+				character = FROM
 			}
 		}
 
@@ -1039,10 +1037,7 @@ society_decisions = {
 				}
 			}
 			new_character = {
-				remove_trait = weak
-				remove_trait = slow
-				remove_trait = imbecile
-				remove_trait = dull
+				remove_all_negative_congenital_traits_effect = yes
 				remove_trait = mystic
 				remove_trait = socializer
 				remove_trait = gamer
@@ -1177,10 +1172,7 @@ society_decisions = {
 				}
 			}
 			new_character = {
-				remove_trait = weak
-				remove_trait = slow
-				remove_trait = imbecile
-				remove_trait = dull
+				remove_all_negative_congenital_traits_effect = yes
 				remove_trait = mystic
 				remove_trait = socializer
 				remove_trait = gamer
@@ -1392,8 +1384,6 @@ society_decisions = {
 				society = kraken_society
 				rank == 4
 			}
-			not_casting = yes
-			is_adult = yes
 			OR = {
 				society_has_active_progress = no
 				society = {
@@ -1403,10 +1393,12 @@ society_decisions = {
 		            }
 	            }
 			}
+			is_adult = yes
+			not_casting = yes
 		}
 		allow = {
 			has_society_currency_major_trigger = yes
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 			custom_tooltip = {
 				text = legendary_gathering_cd_tt
 				society = {
@@ -1692,7 +1684,7 @@ society_decisions = {
 		}
 		allow = {
 			has_society_currency_medium_trigger = yes
-			is_inaccessible_trigger = no
+			is_inaccessible_or_incapable_trigger = no
 		}
 		effect = {
 			detract_society_currency_medium_effect = yes
@@ -2031,15 +2023,11 @@ society_decisions = {
 
 		allow = {
 			has_society_currency_massive_trigger = yes
-			prisoner = no
 			custom_tooltip = {
 				text = build_knight_bloodline_cooldown_tooltip
 				NOT = { has_character_modifier = build_knight_bloodline_cooldown }
 			}
-			NOR = {
-				is_incapable = yes
-				is_inaccessible_trigger = yes
-			}
+			is_inaccessible_or_incapable_trigger = no
 		}
 
 		effect = {
@@ -2176,18 +2164,14 @@ society_decisions = {
 		}
 
 		allow = {
-			prisoner = no
 			has_society_currency_medium_trigger = yes
-			NOR = {
-				trait = incapable
-				is_inaccessible_trigger = yes
-			}
 			custom_tooltip = {
 				text = harper_training_cooldown_custom_tooltip
 				hidden_tooltip = {
 					NOT = { has_character_modifier = harper_training_cooldown }
 				}
 			}
+			is_inaccessible_or_incapable_trigger = no
 		}
 
 		effect = {
@@ -2220,13 +2204,11 @@ society_decisions = {
 		}
 
 		allow = {
-			NOT = {
-				has_character_modifier = in_seclusion
-			}
 			custom_tooltip = {
 				text = lord_all_diplo_cooldown_tooltip
 				NOT = { has_character_modifier = lord_all_diplo_cooldown }
 			}
+			is_inaccessible_or_incapable_trigger = no
 		}
 
 		effect = {
@@ -2720,13 +2702,12 @@ society_decisions = {
 				society_member_of = brotherhood_of_true_flame
 			}
 			has_quest = quest_hermetics_build_laboratory
-			is_playable = yes
-			not_casting = yes
-			block_general_event_trigger = no
 			NOR = { 
 				has_character_flag = building_laboratory 
 				has_character_flag = built_laboratory 
 			}
+			block_general_event_trigger = no
+			not_casting = yes
 		}
 		allow = {
 			wealth = 50
@@ -2762,21 +2743,22 @@ society_decisions = {
 				society = arcane_brotherhood
 				rank >= 1
 			}
+			NOT = { has_landed_title = k_a_brotherhood }
 			not_casting = yes
 		}
 
 		allow = {
 			has_society_currency_minor_trigger = yes
-			NOR = {
-				has_character_modifier = in_seclusion
-				has_landed_title = k_a_brotherhood
-				k_a_brotherhood = {
-					has_holder = no
-				}
-			}
 			custom_tooltip = {
 				text = long_live_the_brotherhood_cooldown_tooltip
 				NOT = { has_character_modifier = long_live_the_brotherhood_cooldown }
+			}
+			is_inaccessible_or_incapable_trigger = no
+			k_a_brotherhood = {
+				has_holder = yes
+				holder_scope = {
+					NOT = { is_allied_with = ROOT }
+				}
 			}
 		}
 
@@ -2824,15 +2806,15 @@ society_decisions = {
 			not_casting = yes
 		}
 		allow = {
-			prisoner = no
 			NOT = {
 				has_landed_title = k_a_brotherhood
 			}
 			has_society_currency_major_trigger = yes
+			is_inaccessible_or_incapable_trigger = no
 			custom_tooltip = {
 				text = overthrow_archmage_cooldown_tooltip
 				NOT = { has_character_modifier = overthrow_archmage_cooldown }
-      }
+			}
 		}
 		effect = {
 			detract_society_currency_major_effect = yes
@@ -3462,20 +3444,17 @@ society_decisions = {
 			is_member_of_any_zhent_like_society_trigger = yes
 			society_rank = 4
 			NOT = { society_member_of = warlock_knights }
+			is_landed = yes
 			not_casting = yes
 		}
 
 		allow = {
 			has_society_currency_major_trigger = yes
-			prisoner = no
 			custom_tooltip = {
 				text = zhent_trade_cooldown_tooltip
 				NOT = { has_character_modifier = zhent_trade_cooldown }
 			}
-			NOR = {
-				trait = incapable
-				is_inaccessible_trigger = yes
-			}
+			is_inaccessible_or_incapable_trigger = no
 		}
 
 		effect = {
@@ -3717,21 +3696,22 @@ society_decisions = {
 				society = brotherhood_of_true_flame
 				rank >= 1
 			}
+			NOT = { has_landed_title = d_brotherhood_of_true_flame }
 			not_casting = yes
 		}
 
 		allow = {
 			has_society_currency_minor_trigger = yes
-			NOR = {
-				has_character_modifier = in_seclusion
-				has_landed_title = d_brotherhood_of_true_flame
-				d_brotherhood_of_true_flame = {
-					has_holder = no
-				}
-			}
 			custom_tooltip = {
 				text = long_live_the_brotherhood_cooldown_tooltip
 				NOT = { has_character_modifier = long_live_the_brotherhood_cooldown }
+			}
+			is_inaccessible_or_incapable_trigger = no
+			d_brotherhood_of_true_flame = {
+				has_holder = yes
+				holder_scope = {
+					NOT = { is_allied_with = ROOT }
+				}
 			}
 		}
 
@@ -3973,11 +3953,11 @@ society_decisions = {
 			not_casting = yes
 		}
 		allow = {
-			prisoner = no
-			is_pregnant = no
-			is_incapable = no
 			is_undead = no
 			undead_incompatible_race = no
+			is_pregnant = no
+			is_inaccessible_or_incapable_trigger = no
+			is_adult = yes
 			has_society_currency_major_trigger = yes
 		}
 		effect = {
@@ -4333,12 +4313,16 @@ society_decisions = {
 			not_casting = yes
 			is_landed = yes
 			is_adult = yes
-			prisoner = no
 		}
 
 		allow = {
 			war = no
 			has_society_currency_minor_trigger = yes
+			is_inaccessible_or_incapable_trigger = no
+			custom_tooltip = {
+				text = appease_spirits_cooldown_tooltip
+				hidden_tooltip = { NOT = { has_character_modifier = worshipped_spirits_timer } }
+			}
 			custom_tooltip = {
 				text = UNOCCUPIED_DEMESNE_TITLE
 				hidden_tooltip = {
@@ -4347,11 +4331,6 @@ society_decisions = {
 						is_occupied = no
 					}
 				}
-			}
-			is_inaccessible_or_incapable_trigger = no
-			custom_tooltip = {
-				text = appease_spirits_cooldown_tooltip
-				hidden_tooltip = { NOT = { has_character_modifier = worshipped_spirits_timer } }
 			}
 		}
 
@@ -4542,32 +4521,28 @@ society_decisions = {
 			not_casting = yes
 	    }
 
-	    allow = {
-	      prisoner = no
-	      has_society_currency_major_trigger = yes
-				any_war = {
-					OR = {
-						any_defender = {
-							character = ROOT
-							is_primary_war_defender = yes
-						}
-						any_attacker = {
-							character = ROOT
-							is_primary_war_attacker = yes
-						}
+		allow = {
+			has_society_currency_major_trigger = yes
+			any_war = {
+				OR = {
+					any_defender = {
+						character = ROOT
+						is_primary_war_defender = yes
+					}
+					any_attacker = {
+						character = ROOT
+						is_primary_war_attacker = yes
 					}
 				}
-	      NOR = {
-	        trait = incapable
-	        is_inaccessible_trigger = yes
-	      }
-	      custom_tooltip = {
-	        text = nature_favor_cooldown_custom_tooltip
-	        hidden_tooltip = {
-	          NOT = { has_character_modifier = nature_favor_timer }
-	        }
-	      }
-	    }
+			}
+			custom_tooltip = {
+				text = nature_favor_cooldown_custom_tooltip
+				hidden_tooltip = {
+					NOT = { has_character_modifier = nature_favor_timer }
+				}
+			}
+			is_inaccessible_or_incapable_trigger = no
+		}
 
 	    effect = {
 			detract_society_currency_major_effect = yes
@@ -5114,8 +5089,8 @@ title_decisions = {
 		only_playable = yes
 		ai_check_interval = 36
 
-		ai_target_filter = realm_owned
-		filter = realm_owned
+		ai_target_filter = owned
+		filter = owned
 
 		from_potential = {
 			is_member_of_any_thieves_guild_trigger = yes
@@ -5124,8 +5099,12 @@ title_decisions = {
 
 		potential = {
 			tier = COUNT
-			holder_scope = {
-				character = FROM
+			location = {
+				NOR = {
+					has_province_modifier = shadow_thieves_guild
+					has_province_modifier = night_masks_guild
+					has_province_modifier = shadow_telflamm_guild
+				}
 			}
 		}
 
@@ -5248,9 +5227,6 @@ title_decisions = {
 
 		potential = {
 			tier = COUNT
-			holder_scope = {
-				character = FROM
-			}
 		}
 
 		allow = {
@@ -5372,9 +5348,6 @@ title_decisions = {
 
 		potential = {
 			tier = COUNT
-			holder_scope = {
-				character = FROM
-			}
 		}
 
 		allow = {
@@ -5505,8 +5478,8 @@ title_decisions = {
 		only_playable = yes
 		ai_check_interval = 36
 
-		ai_target_filter = realm_owned
-		filter = realm_owned
+		ai_target_filter = owned
+		filter = owned
 
 		from_potential = {
 			society_rank >= 3
@@ -5515,8 +5488,8 @@ title_decisions = {
 
 		potential = {
 			tier = COUNT
-			holder_scope = {
-				character = FROM
+			location = {
+				NOT = { has_province_modifier = secret_cult_cell }
 			}
 		}
 
@@ -5596,9 +5569,6 @@ title_decisions = {
 
 		potential = {
 			tier = COUNT
-			holder_scope = {
-				character = FROM
-			}
 		}
 
 		allow = {
@@ -5794,11 +5764,6 @@ settlement_decisions = {
 			NOT = { has_character_flag = inspiring_warriors }
 		}
 
-		potential = {
-			holder_scope = {
-				character = FROM
-			}
-		}
 		allow = {
 			#show_only_failed_conditions = yes
 			FROM = {
