@@ -33,78 +33,167 @@ letter_event = {
 	}
 }
 
-# maintenance event where we correct mercenaries gender for special mercenary titles
+# maintenance event for pruning male courtiers from enatic mercenary companies
 character_event = {
 	id = FaerunMercenaries.1000
 	hide_window = yes
-	is_triggered_only = yes
+	is_triggered_only = yes # on_startup, on_employer_change
 
 	only_men = yes
 	min_age = 16
-	friends = no
-	rivals = no
-	prisoner = no
-	is_married = no
 
 	trigger = {
-		OR = {
+		liege = {
 			mercenary = yes
-			liege = {
-				mercenary = yes
-			}
 		}
-
-		OR = {
-			has_law = true_cognatic_succession
-			has_law = enatic_succession
-			has_law = enatic_cognatic_succession
-		}
-
+		has_law = enatic_succession
+		is_lowborn = yes
+		faerun_any_race = no # character is not initialized yet
+		historical = no # historical characters, invited chiniese courtiers, wandering gurs, etc. should persist
+		has_children = no
 		NOR = {
 			father = { always = yes }
 			mother = { always = yes }
 		}
-
-		faerun_any_race = no # character is not initialized yet
-
-		trigger_if = {
-			limit = { is_ruler = no }
-
-			is_lowborn = yes
-		}
-
-		historical = no
-		has_children = no
 	}
 
 	immediate = {
-		random = {
-			chance = 50 # 50% chance of nothing in case the succession law is not strictly enatic
-			additive_modifier = {
-				value = 50
+		leave_court_and_die_effect = yes
+	}
+}
 
-				has_law = enatic_succession
+# maintenance event for spawning female courtiers for non-agnatic mercenary companies
+character_event = {
+	id = FaerunMercenaries.1001
+	hide_window = yes
+	is_triggered_only = yes # on_startup, on_yearly_pulse
+
+	only_playable = yes
+
+	trigger = {
+		mercenary = yes
+		NOR = {
+			has_law = agnatic_succession
+			any_courtier = {
+				is_female = yes
+				liege = { character = ROOT }
+				count >= 4
+			}
+		}
+	}
+
+	immediate = {
+		set_variable = { # num of created females
+			which = local_loop_count
+			value = 1
+		}
+		if = {
+			limit = { has_law = enatic_succession } # double for enatic mercenaries
+
+			change_variable = {
+				which = local_loop_count
+				value = 1
+			}
+		}
+		
+		while = {
+			limit = {
+				check_variable = {
+					which = local_loop_count
+					value > 0
+				}
 			}
 
-			set_gender = female
+			create_random_soldier = {
+				culture = primary_title
+				religion = primary_title
+				random_traits = yes
+				dynasty = none
+				female = yes
+			}
+			new_character = {
+				remove_trait = imbecile
+				remove_trait = idiot
+				remove_trait = slow
+				remove_trait = dumb
+				remove_trait = dim
+				remove_trait = weak
+				remove_trait = delicate
+				remove_trait = soft
+	
+				remove_lifestyle_trait_effect = yes
+				character_event = { id = character_trait.1 }
+		
+				random_list = { # Flavor Randomization
+					35 = { } # Nothing
+					15 = { change_martial = 2 }
+					10 = { add_trait = robust }
+					10 = { add_trait = duelist }
+					10 = { add_trait = hunter }
+						5 = { add_trait = strategist }
+						5 = { change_martial = 4 }
+		
+						5 = {
+						trigger = { has_dlc = "Reapers" }
+						add_trait = one_eyed
+					}
+		
+						5 = { add_trait = shrewd }
+						3 = { add_trait = giant }
+				}
+				pick_martial_class_effect = yes
+			}
+
+			subtract_variable = {
+				which = local_loop_count
+				value = 1
+			}
+		}
+
+		if = {
+			limit = { is_female = no has_law = enatic_succession } # if ROOT is a male captain of enatic mercenary company
+
 			if = {
-				limit = { trait = seducer }
+				limit = { # change gender if ROOT is unimportant
+					historical = no
+					has_children = no
+					NOR = {
+						father = { always = yes }
+						mother = { always = yes }
+					}
+				}
 
-				remove_trait = seducer
-				add_trait = seductress
+				random_character = { # steal the name of random female who share culture with ROOT
+					limit = {
+						culture = ROOT
+						is_female = yes
+						historical = no # no unique name stealing
+					}
+
+					ROOT = {
+						set_name = PREV
+					}
+				}
+				if = {
+					limit = { trait = seducer }
+
+					remove_trait = seducer
+					add_trait = seductress
+				}
+				set_gender = female
 			}
-			random_character = {
-				limit = {
-					culture_group = ROOT
-					is_female = yes
-					NOT = { character = ROOT }
-					historical = no # no unique name stealing
-				}
-				preferred_limit = { # avoid same names if possible
-					NOT = { same_liege = ROOT }
+			else = { # else just abdicate
+				recalc_succession = yes
+
+				primary_title = {
+					save_event_target_as = mercenary_title
 				}
 
-				ROOT = { set_name = PREV }
+				abdicate = yes
+
+				event_target:mercenary_title = {
+					remove_claim = ROOT
+				}
 			}
 		}
 	}
