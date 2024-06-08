@@ -1,0 +1,803 @@
+# barbarian_adventure
+# barbarian_legend_cb
+
+barbarian_adventure = {
+	name = CB_NAME_BARBARIAN_ADVENTURE
+	war_name = WAR_NAME_INVASION
+	sprite = 7
+	truce_days = 3650
+	infamy_modifier = 2
+	sort_priority = 2000
+
+	hostile_against_others = yes
+	can_ask_to_join_war = no
+	is_permanent = yes
+	allowed_to_target_tributaries = no
+	apply_short_occ_mod = no # Do not apply the 'recently_conquered' modifier to Holdings
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		ROOT = {
+			independent = yes
+			z_barbarian = yes
+			NOR = {
+				same_realm = FROM
+				mercenary = yes
+				has_character_flag = barbarian_adventure_flag
+			}
+		}
+
+		FROM = {
+			independent = yes
+			OR = {
+				real_tier = ROOT
+				higher_real_tier_than = ROOT
+			}
+			NOT = { trait = creature_monster }
+
+			distance_from_realm = {
+				who = ROOT
+				value < 500
+			}
+		}
+	}
+
+	is_valid_title = {
+		FROM = {
+			has_landed_title = PREV
+			NOT = { same_realm = ROOT }
+			independent = yes
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+
+			set_character_flag = barbarian_adventure_flag
+			declare_war_effect = yes
+
+			if = {
+				limit = {
+					is_faerun_horse_nomad_culture = yes
+				}
+				spawn_unit = {
+					province = capital_scope
+					owner = attacker
+					earmark = barbarian_adventure_unit
+					troops = {
+						light_cavalry = { 5 5 }
+						horse_archers = { 2 2 }
+					}
+					match_character = defender
+					match_mult = 0.15
+					cannot_inherit = yes
+					maintenance_multiplier = 0.5
+					reinforces = no
+				}
+			}
+			else = {
+				spawn_unit = {
+					province = capital_scope
+					owner = attacker
+					earmark = barbarian_adventure_unit
+					troops = {
+						archers = { 5 5 }
+						light_infantry = { 10 10 }
+						heavy_infantry = { 2 2 }
+					}
+					match_character = defender
+					match_mult = 0.33
+					cannot_inherit = yes
+					maintenance_multiplier = 0.5
+					reinforces = no
+				}
+			}
+		}
+	}
+
+	on_success = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = 200
+			participation_scaled_prestige = 200
+			attacker_victory_effect = yes
+
+			any_demesne_title = {
+				set_title_flag = barbarian_old_lands
+			}
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = { participation_scaled_prestige = 200 }
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -200
+		}
+	}
+
+	on_success_title = {
+		custom_tooltip = {
+			text = invasion_succ_tip
+
+			usurp_title_plus_barony_if_unlanded = {
+				target = attacker
+				type = invasion
+			}
+
+			defender = {
+				any_vassal = {
+					set_character_flag = preserve_vassal_structure_@ROOT
+				}
+
+				set_defacto_liege = ROOT
+				imprison = ROOT
+			}
+
+			if = {
+				limit = {
+					any_independent_ruler = {
+						has_character_flag = preserve_vassal_structure_@ROOT
+					}
+				}
+				any_independent_ruler = {
+					limit = {
+						has_character_flag = preserve_vassal_structure_@ROOT
+					}
+					set_defacto_liege = ROOT
+				}
+			}
+		}
+
+		attacker = {
+			custom_tooltip = {
+				text = barbarian_adventure_tooltip
+
+				log = "Barbarian Adventure of [Root.GetTitledName] on [From.GetTitledName]"
+
+				occupy_minors_of_occupied_settlements = FROM
+				gain_all_occupied_titles = FROM
+
+				any_demesne_title = { # handles king and emperor titles
+					limit = {
+						higher_real_tier_than = DUKE
+						has_title_flag = barbarian_old_lands
+					}
+					destroy_landed_title = THIS
+					clr_title_flag = barbarian_old_lands
+				}
+
+				any_demesne_title = { # handles duke titles
+					limit = {
+						real_tier = DUKE
+						has_title_flag = barbarian_old_lands
+					}
+
+					clr_title_flag = barbarian_old_lands
+					attacker = { # and the titles under those duchies
+						random_courtier = {
+							limit = {
+								NOR = {
+									dynasty = ROOT
+									character = defender
+								}
+								prisoner = no
+							}
+							preferred_limit = {
+								PREVPREV = {
+									capital_scope = {
+										culture = PREVPREV
+									}
+								}
+							}
+
+							log = "Barbarian Adventure: Grant [PrevPrev.GetName] to [This.GetBestName]."
+							save_event_target_as = new_duke
+							gain_title_plus_barony_if_unlanded = {
+								target = PREVPREV
+								type = grant
+							}
+							set_defacto_liege = THIS
+						}
+					}
+
+					any_de_jure_vassal_title = {
+						limit = {
+							holder = attacker
+						}
+
+						event_target:new_duke = { # back to the random courtier
+							grant_title_no_opinion = PREV
+						}
+					}
+					any_de_jure_vassal_title = {
+						limit = {
+							NOT = { holder = attacker }
+							owner = { vassal_of = ROOT }
+						}
+						set_defacto_liege = event_target:new_duke # the random courtier
+					}
+				}
+
+				any_demesne_title = { # and then loose counties and baronies
+					limit = {
+						lower_real_tier_than = DUKE
+						holder = attacker
+						has_title_flag = barbarian_old_lands
+					}
+
+					attacker = {
+						random_realm_character = {
+							limit = {
+								NOR = {
+									dynasty = ROOT
+									character = defender
+								}
+								prisoner = no
+								is_landed = no
+							}
+							preferred_limit = {
+								culture = PREVPREV
+							}
+
+							log = "Barbarian Adventure: Grant county of [PrevPrev.GetName] to [This.GetBestName]."
+							grant_title = PREVPREV
+							if = {
+								limit = { event_target:new_duke = { always = yes } }
+								set_defacto_liege = event_target:new_duke
+							}
+							else = {
+								set_defacto_liege = THIS
+							}
+						}
+					}
+					clr_title_flag = barbarian_old_lands
+				}
+
+				if = {
+					limit = {
+						is_tribal = yes
+						any_demesne_title = {
+							lower_tier_than = DUKE
+							holding_type = castle
+						}
+						is_government_potential = feudal_government
+					}
+					set_correct_feudal_government_type_effect = yes
+				}
+
+				any_vassal = {
+					clr_character_flag = preserve_vassal_structure_@ROOT
+				}
+				roman_victory_triumph_effect = yes
+
+				if = {
+					limit = {
+						higher_tier_than = BARON
+						NOT = { culture = ROOT }
+					}
+					conquest_culture = ROOT
+				}
+
+				if = {
+					limit = {
+						OR = {
+							has_nickname = no
+							this_has_average_nickname_trigger = yes
+							this_has_lame_nickname_trigger = yes
+						}
+					}
+
+					random_list = {
+						10 = { give_nickname = nick_the_great }
+						10 = { give_nickname = nick_the_victorious }
+						10 = { give_nickname = nick_the_bold }
+						10 = { give_nickname = nick_the_conqueror }
+						5 = { give_nickname = nick_the_barbarian }
+					}
+				}
+			}
+		}
+	}
+
+	on_invalidation = {
+		hidden_effect = {
+			attacker = {
+				clr_character_flag = barbarian_adventure_flag
+				disband_event_forces = barbarian_adventure_unit
+			}
+		}
+	}
+
+	on_fail = {
+		attacker = {
+			show_scope_change = no
+			prestige = -200
+			hidden_effect = { disband_event_forces = barbarian_adventure_unit }
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = 100
+			participation_scaled_prestige = 100
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 100 }
+		}
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			transfer_scaled_wealth = {
+				to = defender
+				value = 8.0
+			}
+
+			hidden_effect = { disband_event_forces = barbarian_adventure_unit }
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			participation_scaled_prestige = 200
+			defender_victory_effect = yes
+			roman_victory_triumph_effect = yes
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 200 }
+		}
+	}
+
+	on_defender_leader_death = {
+		any_attacker = {
+			letter_event = { id = 251 } # Our enemy has died, the war has ended
+		}
+
+		end_war = whitepeace
+	}
+
+	attacker_ai_victory_worth = {
+		factor = 150
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.5
+
+		trigger = {
+			ROOT = {
+				trigger_if = {
+					limit = { ai = yes }
+					lower_tier_than = KING
+				}
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.2
+			ROOT = {
+				relative_realm_size = {
+					who = FROM
+					size < 1
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.2
+			ROOT = {
+				OR = {
+					culture = rashemi
+					culture = sossrim
+					culture = uthgardt
+					culture = reghedman
+					culture = shaaran
+					culture = mari
+					culture = centaur
+					culture = wemic
+					culture = goliath
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 2
+			ROOT = {
+				OR = {
+					culture = northlander
+					culture = illuskan
+					culture = gnoll
+					culture = orc
+					culture = orog
+					culture = tanarukk
+					culture = goblin
+					culture = hobgoblin
+					culture = bugbear
+					culture = flind
+					culture = tuigan
+					culture = troll
+					culture = ogre
+					culture = merrow
+					culture = ogre_magi
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.4
+			ROOT = { trait = content }
+		}
+		mult_modifier = {
+			factor = 2
+			ROOT = { trait = ambitious }
+		}
+	}
+}
+
+barbarian_legend_cb = {
+	name = CB_NAME_BARBARIAN_RAMPAGE
+	war_name = WAR_NAME_BARBARIAN_RAMPAGE
+	sprite = 22
+	truce_days = 3650
+	sort_priority = 3000
+
+	hostile_against_others = yes
+	can_ask_to_join_war = no
+	is_permanent = yes
+	allowed_to_target_tributaries = no
+	allow_whitepeace = no
+	attacker_can_call_allies = no
+	max_attacker_battle_score = 100
+
+	can_use_gui = {
+		ROOT = {
+			show_scope_change = no
+			war_cost = yes
+		}
+	}
+
+	can_use = {
+		ROOT = {
+			has_ambition = obj_barb_legend
+			mercenary = no
+			is_within_diplo_range = FROM
+			NOT = {
+				any_war = {
+					using_cb = barbarian_legend_cb
+				}
+			}
+		}
+
+		FROM = {
+			NOR = {
+				same_realm = ROOT
+				mercenary = yes
+				trait = creature_monster
+			}
+		}
+	}
+
+	is_valid = {
+		ROOT = {
+			has_ambition = obj_barb_legend
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+
+			hidden_effect = {
+				add_character_modifier = {
+					name = barb_warmonger
+					stacking = yes
+					years = 3
+				}
+			}
+
+			declare_war_effect = yes
+		}
+
+		defender = {
+			show_scope_change = no
+
+			if = {
+				limit = {
+					relative_power_including_allies_defender = {
+						who = attacker
+						power <= 0.5
+					}
+				}
+				attacker = {
+					set_character_flag = much_weaker_opponent
+				}
+			}
+			else_if = {
+				limit = {
+					relative_power_including_allies_defender = {
+						who = attacker
+						power <= 0.8
+					}
+				}
+				attacker = {
+					set_character_flag = weaker_opponent
+				}
+			}
+			else_if = {
+				limit = {
+					relative_power_including_allies_defender = {
+						who = attacker
+						power <= 1.2
+					}
+				}
+				attacker = {
+					set_character_flag = matched_opponent
+				}
+			}
+			else_if = {
+				limit = {
+					relative_power_including_allies_defender = {
+						who = attacker
+						power <= 1.9
+					}
+				}
+				attacker = {
+					set_character_flag = strong_opponent
+				}
+			}
+			else = {
+				attacker = {
+					set_character_flag = much_stronger_opponent
+				}
+			}
+		}
+	}
+
+	on_success = {
+		attacker = {
+			if = {
+				limit = {
+					has_character_flag = much_weaker_opponent
+				}
+				prestige = 20
+				participation_scaled_prestige = 20
+				clr_character_flag = much_weaker_opponent
+			}
+			else_if = {
+				limit = {
+					has_character_flag = weaker_opponent
+				}
+				prestige = 50
+				participation_scaled_prestige = 50
+				random = {
+					chance = 33
+					hidden_effect = {
+						change_variable = {
+							which = barbarian_xp
+							value = 50
+						}
+					}
+					barb_legend_raise_tier = yes
+				}
+				clr_character_flag = weaker_opponent
+			}
+			else_if = {
+				limit = {
+					has_character_flag = matched_opponent
+				}
+				prestige = 100
+				participation_scaled_prestige = 100
+				random = {
+					chance = 75
+					hidden_effect = {
+						change_variable = {
+							which = barbarian_xp
+							value = 75
+						}
+					}
+					barb_legend_raise_tier = yes
+				}
+				clr_character_flag = matched_opponent
+			}
+			else_if = {
+				limit = {
+					has_character_flag = stronger_opponent
+				}
+				prestige = 170
+				participation_scaled_prestige = 170
+				hidden_effect = {
+					change_variable = {
+						which = barbarian_xp
+						value = 100
+					}
+				}
+				barb_legend_raise_tier = yes
+				clr_character_flag = stronger_opponent
+			}
+			else = {
+				prestige = 220
+				participation_scaled_prestige = 220
+				hidden_effect = {
+					change_variable = {
+						which = barbarian_xp
+						value = 120
+					}
+				}
+				barb_legend_raise_tier = yes
+				clr_character_flag = much_stronger_opponent
+			}
+
+			attacker_victory_effect = yes
+			roman_victory_triumph_effect = yes
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -100
+		}
+	}
+
+	on_fail = {
+		clr_character_flag = much_weaker_opponent
+		clr_character_flag = weaker_opponent
+		clr_character_flag = matched_opponent
+		clr_character_flag = stronger_opponent
+		clr_character_flag = much_stronger_opponent
+	}
+
+	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			transfer_scaled_wealth = {
+				to = FROM
+				value = 8.0
+			}
+
+			if = {
+				limit = {
+					has_character_flag = much_weaker_opponent
+				}
+				barb_legend_lower_tier = yes
+				clr_character_flag = much_weaker_opponent
+			}
+			else_if = {
+				limit = {
+					has_character_flag = weaker_opponent
+				}
+				random = {
+					chance = 75
+					barb_legend_lower_tier = yes
+				}
+				clr_character_flag = weaker_opponent
+			}
+			else_if = {
+				limit = {
+					has_character_flag = matched_opponent
+				}
+				random = {
+					chance = 10
+					barb_legend_lower_tier = yes
+				}
+				clr_character_flag = matched_opponent
+			}
+			else = {
+				clr_character_flag = stronger_opponent
+				clr_character_flag = much_stronger_opponent
+			}
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = 200
+			participation_scaled_prestige = 200
+			defender_victory_effect = yes
+			roman_victory_triumph_effect = yes
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 200 }
+		}
+	}
+
+	on_defender_leader_death = {
+		any_attacker = {
+			letter_event = { id = 251 } # Our enemy has died, the war has ended
+		}
+
+		end_war = invalid
+	}
+
+	attacker_ai_victory_worth = {
+		factor = 150
+	}
+
+	attacker_ai_defeat_worth = {
+		factor = 100
+	}
+
+	defender_ai_victory_worth = {
+		factor = -1 # always accept
+	}
+
+	defender_ai_defeat_worth = {
+		factor = 100
+	}
+
+	ai_will_do = {
+		factor = 0.8
+
+		mult_modifier = {
+			factor = 0.4
+			ROOT = { trait = content }
+		}
+		mult_modifier = {
+			factor = 2
+			ROOT = { trait = ambitious }
+		}
+		mult_modifier = {
+			factor = 2
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power >= 0.8
+				}
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power <= 1.2
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.7
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power >= 1.2
+				}
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power <= 1.9
+				}
+			}
+		}
+		mult_modifier = {
+			factor = 0.3
+			FROM = {
+				relative_power_including_allies_defender = {
+					who = ROOT
+					power > 1.9
+				}
+			}
+		}
+	}
+}
