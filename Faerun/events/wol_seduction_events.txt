@@ -9226,9 +9226,22 @@ character_event = {
 # Lunatics: Seduction of a centaur.
 character_event = {
 	id = WoL.570
-	desc = EVTDESC_WOL_570
 	picture = GFX_evt_lovers
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:fey_lover
+
+	desc = {
+		trigger = {
+			event_target:fey_lover = { trait = creature_centaur }
+		}
+		text = EVTDESC_WOL_570_CASE1
+	}
+	desc = {
+		trigger = {
+			event_target:fey_lover = { trait = creature_satyr }
+		}
+		text = EVTDESC_WOL_570_CASE2
+	}
 	
 	only_playable = yes
 	only_capable = yes
@@ -9236,7 +9249,23 @@ character_event = {
 	
 	trigger = {
 		has_focus = focus_seduction
-		trait = lunatic
+		fertility > 0
+		OR = {
+			is_genetically_compatible_with_centaur = yes
+			AND = {
+				capital_scope = { terrain = forest }
+				is_genetically_compatible_with_satyr = yes
+			}
+		}
+		OR = {
+			religion = sylvan
+			trait = origin_wild_magic
+			trait = patron_shiallia
+			trait = feytouched
+			trait = warlock_fey
+			trait = lunatic
+		}
+		
 		OR = {
 			AND = {
 				is_female = yes
@@ -9250,17 +9279,12 @@ character_event = {
 				}
 			}
 		}
-		NOT = { trait = eunuch }
 		is_ill = no
 		has_regent = no
-		NOT = {
-			OR = {
-				trait = incapable
-				trait = infirm
-				trait = celibate
-			}
+		NOR = { 
+			trait = infirm
+			has_character_modifier = hidden_seduced_tree
 		}
-		NOT = { has_character_modifier = hidden_seduced_tree }
 	}
 	
 	mean_time_to_happen = {
@@ -9281,6 +9305,16 @@ character_event = {
 			factor = 0.33
 			trait = possessed
 		}
+		mult_modifier = {
+			factor = 0.5
+			OR = {
+				religion = sylvan
+				trait = origin_wild_magic
+				trait = patron_shiallia
+				trait = feytouched
+				trait = warlock_fey
+			}
+		}
 	}
 	
 	immediate = {
@@ -9288,6 +9322,74 @@ character_event = {
 			modifier = hidden_seduced_tree
 			duration = -1
 			hidden = yes
+		}
+
+		random_list = {
+			150 = {
+				trigger = {
+					capital_scope = {
+						terrain = forest
+					}
+				}
+
+				create_random_soldier = {
+					random_traits = yes
+					age = 20
+					female = no
+					dynasty = none
+					culture = satyr
+					religion = sylvan
+					fertility = 1
+					health = 6
+		
+					attributes = {
+						diplomacy = 4
+						martial = 8
+						stewardship = 4
+						intrigue = 4
+						learning = 4
+					}
+					add_trait = creature_satyr
+				}
+			}
+			50 = {
+				create_random_soldier = {
+					random_traits = yes
+					age = 20
+					female = no
+					dynasty = none
+					culture = centaur
+					religion = sylvan
+					fertility = 1
+					health = 6
+		
+					attributes = {
+						diplomacy = 4
+						martial = 8
+						stewardship = 4
+						intrigue = 4
+						learning = 4
+					}
+					add_trait = creature_centaur
+				}
+			}
+		}
+
+		new_character = {
+			remove_all_negative_congenital_traits_effect = yes
+			add_trait = strong
+			add_trait = fair
+			
+			if = {
+				limit = {
+					trait = misguided_warrior
+				}
+
+				remove_trait = misguided_warrior
+				add_trait = tough_soldier
+			}
+
+			save_event_target_as = fey_lover
 		}
 	}
 	
@@ -9299,15 +9401,38 @@ character_event = {
 		character_event = { id = WoL.571 days = 1 tooltip = EVTTOOLTIP_WoL_571 }
 	}
 	option = {
-		name = EVTOPTB_WOL_570
+		name = {
+			trigger = {
+				event_target:fey_lover = { trait = creature_centaur }
+			}
+			text = EVTOPTB_WOL_570_CASE1
+		}
+		name = {
+			trigger = {
+				event_target:fey_lover = { trait = creature_satyr }
+			}
+			text = EVTOPTB_WOL_570_CASE2
+		}
+
 		ai_chance = {
 			factor = 1
 		}
-		random = {
-			chance = 10
-			remove_trait = lunatic
-			hidden_tooltip = {
-				character_event = { id = 38309 } # Notify lost Lunatic trait
+
+		if = {
+			limit = { trait = lunatic }
+
+			random = {
+				chance = 10
+				remove_trait = lunatic
+				hidden_tooltip = {
+					character_event = { id = 38309 } # Notify lost Lunatic trait
+				}
+			}
+		}
+
+		hidden_effect = {
+			event_target:fey_lover = {
+				leave_court_and_die_effect = yes
 			}
 		}
 	}
@@ -9315,39 +9440,36 @@ character_event = {
 
 character_event = {
 	id = WoL.571
-	desc = EVTDESC_WOL_571
 	picture = GFX_evt_lovers
 	border = GFX_event_normal_frame_intrigue
-	
 	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				is_female = yes
-				is_pregnant = no
-				practical_age <= 45
-				fertility = 0.25
-			}
-			random = {
-				chance = 50
-				if = {
-					limit = {
-						is_married = no
-						is_consort = no
-					}
-					impregnate = yes
-					break = yes
-				}
-				impregnate_cuckoo = yes
-#				log = "WoL.571: [Root.GetTitledName] is impregnated by a centaur (lunatic)"
-			}
+
+	desc = {
+		trigger = {
+			event_target:fey_lover = { trait = creature_centaur }
 		}
+		text = EVTDESC_WOL_571_CASE1
+	}
+	desc = {
+		trigger = {
+			event_target:fey_lover = { trait = creature_satyr }
+		}
+		text = EVTDESC_WOL_571_CASE2
 	}
 	
+	immediate = {
+		event_target:fey_lover = {
+			save_event_target_as = sex_partner
+		}
+		unprotected_sex_effect_event_target = yes
+	}
+
 	option = {
 		name = EVTOPTA_WOL_571
-		
+		ai_chance = {
+			factor = 1
+		}
+
 		if = {
 			limit = { trait = zealous }
 			random = {
@@ -9358,6 +9480,55 @@ character_event = {
 				}
 			}
 		}
+		custom_tooltip = {
+			text = EVTOPTA_WOL_571_TOOLTIP
+	
+			hidden_effect = {
+				event_target:fey_lover = {
+					leave_court_and_die_effect = yes
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = EVTOPTB_WOL_571
+		ai_chance = {
+			factor = 100
+		}
+
+		if = {
+			limit = { trait = chaste }
+
+			random = {
+				chance = 50
+				remove_trait = chaste
+				hidden_tooltip = {
+					character_event = { id = 38303 days = 1 } # Notify chaste lost
+				}
+			}
+		}
+		else_if = {
+			limit = { NOT = { trait = lustful } }
+
+			random = {
+				chance = 50
+				add_trait = lustful
+				hidden_tooltip = {
+					character_event = { id = 38272 days = 1 } # Notify lustful gain
+				}
+			}
+		}
+
+		event_target:fey_lover = {
+			save_event_target_as = new_lover
+		}
+		custom_tooltip = {
+			text = EVTOPTB_WOL_571_TOOLTIP
+
+			new_lover_effect = yes
+		}
+		
 	}
 }
 
