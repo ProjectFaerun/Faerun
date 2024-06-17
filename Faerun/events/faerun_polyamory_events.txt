@@ -3117,3 +3117,462 @@ character_event = { # polyam.6, polyam.7, polyam.8 autorespond variant
 		}
 	}
 }
+
+
+character_event = { # a child is born in polyamorous relationship, a landed spouse decide if they want to adopt the child
+	id = polyam.100
+	picture = GFX_evt_born_purple_byzantine
+	is_triggered_only = yes # from event 300
+
+	trigger = {
+		FROM = {
+			mother_even_if_dead = {
+				OR = {
+					is_married = ROOT
+					is_consort = ROOT
+				}
+			}
+		}
+	}
+	
+	immediate = {
+		FROM = { save_event_target_as = newborn }
+		FROM = { mother_even_if_dead = { save_event_target_as = polyamory_mother } }
+		FROM = { father_even_if_dead = { save_event_target_as = true_father } }
+		ROOT = { save_event_target_as = polyamory_spouse }
+	}
+
+	desc = {
+		trigger = {
+			FROM = { father_even_if_dead = { always = yes } }
+		}
+		text = EVTDESC_POLYAM_100_CASE_1
+	}
+
+	desc = {
+		trigger = {
+			NOT = { FROM = { father_even_if_dead = { always = yes } } } # the true father is a non-existent character
+		}
+		text = EVTDESC_POLYAM_100_CASE_2
+	}
+
+	option = {
+		name = EVTOPTA_POLYAM_100
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 4
+
+				trait = charitable
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = kind
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = content
+			}
+			mult_modifier = {
+				factor = 2
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value >= 50
+				}
+			}
+			mult_modifier = {
+				factor = 3
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value >= 75
+				}
+			}
+			mult_modifier = {
+				factor = 4
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value >= 95
+				}
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:newborn = { is_smart_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:newborn = { is_strong_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:newborn = { has_fair_trait_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 2
+
+				event_target:newborn = { trait = half_dragon }
+			}
+			mult_modifier = {
+				factor = 4
+
+				event_target:newborn = { trait = half_fiend }
+				is_evil_religion = yes
+			}
+			mult_modifier = {
+				factor = 4
+
+				event_target:newborn = { trait = half_celestial }
+				olrox_is_good_religion_trigger = yes
+			}
+			mult_modifier = {
+				factor = 10
+
+				NOT = {
+					any_child = {
+						is_alive = yes
+						count >= 3
+					}
+				}
+			}
+			mult_modifier = {
+				factor = 20
+
+				num_of_children == 0
+			}
+
+
+			mult_modifier = {
+				factor = 0.25
+
+				trait = greedy
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				trait = cruel
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				trait = ambitious
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				trait = envious
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value < 0
+				}
+			}
+			mult_modifier = {
+				factor = 0.33
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value < -25
+				}
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				opinion = {
+					who = event_target:polyamory_mother
+					value < -50
+				}
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:newborn = { is_dumb_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:newborn = { is_weak_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 0.5
+
+				event_target:newborn = { has_ugly_trait_congenital_trigger = yes }
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				event_target:newborn = { trait = half_fiend }
+				olrox_is_good_religion_trigger = yes
+				
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				event_target:newborn = { trait = half_celestial }
+				is_evil_religion = yes
+			}
+			mult_modifier = {
+				factor = 0.25
+
+				event_target:newborn = { trait = half_troll }
+				NOR = {
+					trait = creature_troll
+					trait = half_troll
+					culture = troll
+					religion = vaprak
+				}
+			}
+		}
+
+		event_target:newborn = {
+			show_portrait = yes
+			if = {
+				limit = { 
+					OR = { # change the dynasty to father's when it makes sense
+						event_target:polyamory_mother = { is_married_matrilineally = no }
+						NOT = { dynasty = event_target:polyamory_mother }
+						trigger_if = {
+							limit = { event_target:polyamory_mother = { is_lowborn = yes } }
+
+							ROOT = { is_lowborn = no }
+						}
+					}
+				}
+
+				dynasty = ROOT
+			}
+			set_father = ROOT
+			if = {
+				limit = { event_target:true_father = { always = yes } }
+	
+				set_real_father = event_target:true_father
+			}
+			ROOT = { recalc_succession = yes }
+		}
+		event_target:polyamory_mother = {
+			show_portrait = yes
+			opinion = {
+				name = opinion_accepted_anothers_child
+				who = ROOT
+				years = 10
+			}
+		}
+		if = {
+			limit = { event_target:true_father = { always = yes } }
+
+			event_target:true_father = { 
+				show_portrait = yes
+				character_event = { id = polyam.101 }
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_POLYAM_100
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 0
+
+				event_target:polyamory_mother = { same_sex = ROOT } # same sex female spouse always adopts the child
+			}
+		}
+		if = {
+			limit = { event_target:true_father = { always = yes } }
+
+			event_target:true_father = { 
+				show_portrait = yes
+				character_event = { id = polyam.102 }
+			}
+		}
+	}
+}
+
+character_event = { # the true father gets a notification about adoption
+	id = polyam.101
+	picture = GFX_evt_born_purple_byzantine
+	desc = EVTDESC_POLYAM_101
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_POLYAM_101
+		ai_chance = {
+			factor = 100
+
+			mult_modifier = {
+				factor = 4
+
+				trait = charitable
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = kind
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = content
+			}
+			mult_modifier = {
+				factor = 4
+
+				religion_has_polyamory = yes
+			}
+			mult_modifier = {
+				factor = 4
+
+				has_opinion_modifier = {
+					name = opinion_accepted_metamour
+					who = event_target:polyamory_spouse
+				}
+			}
+			mult_modifier = {
+				factor = 10
+
+				has_opinion_modifier = {
+					name = opinion_popular_metamour
+					who = event_target:polyamory_spouse
+				}
+			}
+			mult_modifier = {
+				factor = 15
+
+				is_friend = event_target:polyamory_spouse
+			}
+		}
+		event_target:polyamory_mother = {
+			show_portrait = yes
+		}
+		event_target:newborn = {
+			show_portrait = yes
+		}
+	}
+	option = {
+		name = EVTOPTB_POLYAM_101
+		ai_chance = {
+			factor = 100
+			
+			mult_modifier = {
+				factor = 0
+
+				OR = {
+					is_lowborn = yes
+					trait = content
+					NOR = {
+						trait = envious
+						trait = ambitious
+						trait = greedy
+					}
+				}
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = greedy
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = cruel
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = ambitious
+			}
+			mult_modifier = {
+				factor = 4
+
+				trait = envious
+			}
+			mult_modifier = {
+				factor = 4
+
+				has_opinion_modifier = {
+					name = opinion_unpopular_metamour
+					who = event_target:polyamory_spouse
+				}
+			}
+		}
+
+		opinion = {
+			name = opinion_adopted_my_child
+			who = event_target:polyamory_spouse
+			years = 10
+		}
+
+		if = {
+			limit = { is_friend = event_target:polyamory_spouse }
+
+			remove_friend = event_target:polyamory_spouse
+		}
+		else_if = {
+			limit = { 
+				has_opinion_modifier = {
+					name = opinion_popular_metamour
+					who = event_target:polyamory_spouse
+				}
+			}
+
+			remove_opinion = {
+				name = opinion_popular_metamour
+				who = event_target:polyamory_spouse
+			}
+			opinion = {
+				name = opinion_accepted_metamour
+				who = event_target:polyamory_spouse
+			}
+		}
+		else_if = {
+			limit = { 
+				has_opinion_modifier = {
+					name = opinion_accepted_metamour
+					who = event_target:polyamory_spouse
+				}
+			}
+
+			remove_opinion = {
+				name = opinion_accepted_metamour
+				who = event_target:polyamory_spouse
+			}
+			opinion = {
+				name = opinion_unpopular_metamour
+				who = event_target:polyamory_spouse
+			}
+		}
+		else_if = {
+			limit = { NOT = { is_rival = event_target:polyamory_spouse } }
+
+			add_rival = event_target:polyamory_spouse
+		}
+	}
+}
+
+character_event = { # the true father gets a notification about the child
+	id = polyam.102
+	picture = GFX_evt_born_purple_byzantine
+	desc = EVTDESC_POLYAM_102
+	is_triggered_only = yes
+
+	option = {
+		name = EXCELLENT
+		event_target:polyamory_mother = {
+			show_portrait = yes
+		}
+		event_target:newborn = {
+			show_portrait = yes
+		}
+	}
+}

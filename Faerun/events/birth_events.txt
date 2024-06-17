@@ -1406,6 +1406,7 @@ character_event = {
 		}
 		name = EVTOPTA402
 		tooltip = { add_trait = pregnant }
+		father_of_unborn_known = yes
 		
 		spouse = {
 			show_scope_change = no
@@ -2887,15 +2888,28 @@ character_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		was_conceived_a_bastard = yes
 		OR = {
-			NOT = { real_father = { always = yes } } # There is no 'real_father' set, i.e. this is not a hidden, cuckoo bastard
-			AND = { 
-				real_father = { is_alive = yes is_ruler = yes } 
-				mother_even_if_dead = {  # The mother is the landless lover of somebody else.
-					is_married = no 
+			was_conceived_a_bastard = yes
+			trigger_if = {
+				limit = { NOT = { true_father = { always = yes } } } # father is a non-existent character
+
+				mother_even_if_dead = {
+					OR = {
+						is_married = yes
+						is_consort = yes
+					}
 				}
-			} 
+			}
+			
+		}
+		
+		trigger_if = {
+			limit = { real_father = { always = yes } } 
+
+			real_father = { is_alive = yes is_ruler = yes } 
+			mother_even_if_dead = {  # The mother is the landless lover of somebody else.
+				is_married = no 
+			}
 		}
 	}
 	
@@ -2903,34 +2917,48 @@ character_event = {
 		trigger = {
 			mother_even_if_dead = { religion_has_polyamory = yes }
 		}
-		real_father_even_if_dead = {
-			ROOT = {
-				set_father = PREV
-				add_trait = legit_bastard
-			}
-		}
+		name = OK
+
 		if = {
-			limit = {
-				mother_even_if_dead = {
-					OR = {
-						has_law = agnatic_succession
-						has_law = cognatic_succession
-					}
-				}
-				real_father_even_if_dead = {
-					ROOT = {
-						dynasty = PREV
-					}
-				}
-			}
-		}
-		else = {
+			limit = { NOT = { real_father = { always = yes } } } # There is no 'real_father' set, i.e. this is not a hidden, cuckoo bastard
+
 			mother_even_if_dead = {
-				ROOT = {
-					dynasty = PREV
+				if = {
+					limit = { 
+						is_consort = yes
+						consort = {
+							trigger_if = {
+								limit = { NOT = { same_sex = PREV } } # if the consort is in non same-sex relationship with the mother, they must be playable and landed
+	
+								is_playable = yes
+								is_landed = yes
+							}
+						}
+					}
+	
+					consort = {
+						character_event = { id = polyam.100 days = 1 }
+					}
+				}
+				else_if = {
+					limit = {
+						is_married = yes
+						spouse = {
+							trigger_if = {
+								limit = { NOT = { same_sex = PREV } } # if the spouse is in non same-sex relationship with the mother, they must be playable and landed
+	
+								is_playable = yes
+								is_landed = yes
+							}
+						}
+					}
+					spouse = {
+						character_event = { id = polyam.100 days = 1 }
+					}
 				}
 			}
 		}
+		add_trait = bastard # the case will be resolved further down on_birth chain
 	}
 
 	option = {
