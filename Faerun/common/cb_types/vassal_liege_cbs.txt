@@ -276,19 +276,108 @@ depose_liege = {
 	}
 
 	is_valid = {
-		always = no
+		# Defender
+		FROM = {
+			any_demesne_title = {
+				NOT = { lower_tier_than = ROOT }
+				temporary = no
+			}
+
+			in_revolt = no
+		}
+	}
+
+	on_add = {
+		attacker = {
+			show_scope_change = no
+			declare_war_effect = yes
+		}
 	}
 
 	on_success = {
-	}
+		attacker = {
+			show_scope_change = no
 
-	on_success_title = {
+			participation_scaled_prestige = 250
+			attacker_victory_effect = yes
+		}
+
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_effect = { participation_scaled_prestige = 250 }
+		}
+
+		defender = {
+			show_scope_change = no
+
+			prestige = -500
+
+			if = { # lower crown authority
+				limit = { NOT = { has_dlc = "Conclave" } }
+
+				any_demesne_title = { # All titles
+					limit = { is_crown_law_title = yes }
+
+					trigger_switch = {
+						on_trigger = has_law
+
+						crown_authority_1 = { add_law = crown_authority_0 }
+						crown_authority_2 = { add_law = crown_authority_1 }
+						crown_authority_3 = { add_law = crown_authority_2 }
+						crown_authority_4 = { add_law = crown_authority_3 }
+					}
+				}
+			}
+
+			abdicate_to_most_liked_by = attacker
+		}
 	}
 
 	on_fail = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -100
+		}
 	}
 
 	on_reverse_demand = {
+		attacker = {
+			show_scope_change = no
+
+			prestige = -200
+			imprison = defender
+		}
+
+		defender = {
+			show_scope_change = no
+
+			participation_scaled_prestige = 50
+			defender_victory_effect = yes
+
+			hidden_effect = {
+				if = {
+					limit = {
+						NOT = {
+							has_opinion_modifier = { # Allow free revocation of a title
+								name = opinion_traitor
+								who = attacker
+							}
+						}
+					}
+
+					opinion = {
+						name = opinion_traitor
+						who = attacker
+					}
+				}
+			}
+		}
+
+		any_defender = {
+			limit = { NOT = { character = defender } }
+			hidden_effect = { participation_scaled_prestige = 50 }
+		}
 	}
 
 	attacker_ai_victory_worth = {
