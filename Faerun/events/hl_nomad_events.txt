@@ -6,71 +6,69 @@ namespace = HL
 
 character_event = { # Pillaging Repeating Event
 	id = HL.4800
+
+	is_triggered_only = yes # pillage_settlement, settlement_decisions.txt
 	hide_window = yes
-	
-	is_triggered_only = yes
-	
+
 	trigger = {
-		any_realm_province = {
-			any_province_holding = {
-				owner = {
-                    OR = {
-                        character = ROOT
-                        AND = {
-                            vassal_of = ROOT
-                            tier = BARON
-                        }
-                    }
-                }
-				has_holding_modifier = recently_burnt_the_land
-				NOT = { has_holding_modifier = stop_burning_land }
-			}
+		any_demesne_title = {
+			has_holding_modifier = recently_burnt_the_land
+			NOT = { has_holding_modifier = stop_burning_land }
 		}
 	}
-	
+
 	immediate = {
-		character_event = { id = HL.4800 days = 180 }
-		add_character_modifier = {
-			modifier = pillage_cooldown
-			hidden = yes
+		repeat_event = {
+			id = HL.4800
 			months = 6
 		}
+
+		add_character_modifier = {
+			name = pillage_cooldown
+			months = 6
+			hidden = yes
+		}
+
 		any_realm_province = {
 			any_province_holding = {
 				limit = {
+					NOT = { holding_type = tribal }
 					owner = {
-                        OR = {
-                            character = ROOT
-                            AND = {
-                                vassal_of = ROOT
-                                tier = BARON
-                            }
-                        }
+						OR = {
+							character = ROOT
+							AND = {
+								vassal_of = ROOT
+								tier = BARON
+							}
+						}
 					}
 					has_holding_modifier = recently_burnt_the_land
 					NOT = { has_holding_modifier = stop_burning_land }
 				}
+
 				add_holding_modifier = {
-					modifier = recently_burnt_the_land
+					name = recently_burnt_the_land
 					months = 7
 				}
 			}
+
 			any_province_holding = {
 				limit = {
+					NOT = { holding_type = tribal }
 					owner = {
-                        OR = {
-                            character = ROOT
-                            AND = {
-                                vassal_of = ROOT
-                                tier = BARON
-                            }
-                        }
+						OR = {
+							character = ROOT
+							AND = {
+								vassal_of = ROOT
+								tier = BARON
+							}
+						}
 					}
 					has_holding_modifier = recently_burnt_the_land
 					NOT = { has_holding_modifier = stop_burning_land }
 					has_siege = no
 				}
-				
+
 				if = {
 					limit = { NOT = { holding_type = tribal } }
 					ROOT = {
@@ -89,41 +87,25 @@ character_event = { # Pillaging Repeating Event
 						}
 					}
 				}
-				
-				# if = {
-					# limit = { holding_type = tribal }
-					# ROOT = { 
-						# wealth = 25 
-						# population = 150 
-					# }
-				# }
-				
+
 				destroy_random_building = THIS
 				destroy_random_building = THIS
-				
+
 				location = {
 					add_province_modifier = {
-						modifier = rampaging_nomads
+						name = rampaging_nomads
+						years = 10
+					}
+					add_province_modifier = {
+						name = burnt_the_land
 						years = 10
 					}
 				}
 
-				location = {
-					add_province_modifier = {
-						modifier = burnt_the_land
-						years = 10
-					}
-				}
-				
 				if = {
 					limit = {
 						num_of_buildings == 0
-						OR = {
-							owner = { government = nomadic_tribal_government }
-							location = {
-								num_of_settlements >= 2
-							}
-						}
+						#NOT = { holding_type = tribal }
 						owner = {
 							OR = {
 								character = ROOT
@@ -134,11 +116,13 @@ character_event = { # Pillaging Repeating Event
 							}
 						}
 					}
+
 					location = {
 						# province_event = { id = HL.4810 days = 1 }
 						save_event_target_as = target_location
 						ROOT = { character_event = { id = HL.4814 days = 2 random = 2 } }
 					}
+
 					destroy_settlement = THIS
 					event_target:target_location = {
 						if = {
@@ -163,7 +147,7 @@ character_event = { # Pillaging Repeating Event
 						}
 					}
 				}
-				if = {
+				else_if = {
 					limit = {
 						num_of_buildings == 0
 						NOR = {
