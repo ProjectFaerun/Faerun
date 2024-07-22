@@ -9,7 +9,7 @@
 #
 # Written by Sara Wendel-Örtqvist
 
-# Irresistable young wench
+# Irresistable young wench #rewritten for Faerun
 character_event = {
 	id = 76000
 	desc = EVTDESC76000
@@ -20,9 +20,7 @@ character_event = {
 
 	only_rulers = yes
 	min_age = 16
-	max_age = 25
 	only_capable = yes
-	is_married = no
 
 	trigger = {
 		has_lover = no
@@ -32,7 +30,6 @@ character_event = {
 			trait = chaste
 			trait = celibate
 			trait = homosexual
-			trait = asexual
 			trait = eunuch
 		}
 	}
@@ -57,20 +54,6 @@ character_event = {
 	}
 
 	option = {
-		trigger = {
-			religion_has_polyamory = yes
-		}
-		name = EVTOPTA76000a
-		random = {
-			chance = 50
-			add_trait_fully_lustful_effect = yes
-		}
-	}
-
-	option = {
-		trigger = {
-			religion_has_polyamory = no
-		}
 		name = EVTOPTA76000
 
 		piety = -10
@@ -82,21 +65,8 @@ character_event = {
 	}
 
 	option = {
-		trigger = {
-			religion_has_polyamory = yes
-		}
-		name = EVTOPTB76000a
-		random = {
-			chance = 50
-			add_trait_fully_silently_chaste_effect = yes
-		}
-	}
+		name = EVTOPTB76000
 
-	option = {
-		trigger = {
-			religion_has_polyamory = no
-		}
-		name = "EVTOPTB76000"
 		if = {
 			limit = { religion_group = qismaite_group }
 			piety = 5
@@ -107,43 +77,35 @@ character_event = {
 	}
 }
 
-#Unwed daughter
+# Unwed daughter
 character_event = {
 	id = 76005
 	desc = EVTDESC76005
 	picture = GFX_evt_pregnancy
 	border = GFX_event_normal_frame_intrigue
-	
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	only_playable = yes
-	capable_only = yes
-	
-	is_triggered_only = yes
-	
+	only_capable = yes
+
 	trigger = {
+		job_spymaster = { always = yes }
+
 		any_child = {
-			is_councillor = no
 			is_female = yes
-			is_alive = yes
-			age = 16
-			NOT = { age = 45 }
 			is_married = no
-			fertility = 0.4
-			NOT = {
+			is_adult = yes
+			practical_age < 45
+			fertility >= 0.40
+			is_councillor = no
+
+			NOR = {
 				trait = chaste
-			}
-			NOT = {
 				trait = celibate
-			}
-			NOT = {
 				trait = homosexual
-			}
-			NOT = {
 				trait = asexual
 			}
-			religion_has_polyamory = no
-		}
-		any_courtier = {
-			has_job_title = job_spymaster
 		}
 	}
 
@@ -151,109 +113,100 @@ character_event = {
 		random_child = {
 			limit = {
 				is_female = yes
-				is_councillor = no
-				is_alive = yes
-				age = 16
-				NOT = { age = 45 }
 				is_married = no
-				fertility = 0.4
-				NOT = {
+				is_adult = yes
+				practical_age < 45
+				fertility >= 0.40
+				is_councillor = no
+
+				NOR = {
 					trait = chaste
-				}
-				NOT = {
 					trait = celibate
-				}
-				NOT = {
 					trait = homosexual
-				}
-				NOT = {
 					trait = asexual
 				}
-				religion_has_polyamory = no
 			}
+
 			save_event_target_as = daughter_with_bastard
 		}
 	}
-	
+
 	weight_multiplier = {
-		days = 1
+		factor = 1
 	}
-	
+
 	option = {
-		name = "EVTOPTA76005"
+		name = EVTOPTA76005
+
 		character_event = {
 			id = 76006
-			tooltip = "EVTTOOLTIP76006"
+			tooltip = EVTTOOLTIP76006
 		}
 	}
 
 	option = {
-		name = "EVTOPTB76005"
+		name = EVTOPTB76005
+
 		event_target:daughter_with_bastard = {
+			show_scope_change = no
+
 			create_character = {
 				age = 0
-				trait = bastard
+				add_trait = bastard
+				genetic_mother = PREV
 			}
+
 			new_character = {
 				set_mother = PREV
 			}
+
 			opinion = {
-				modifier = opinion_grateful
+				name = opinion_grateful
 				who = ROOT
 				years = 5
 			}
 		}
+
 		prestige = -100
 
-		if = {
-			limit = { NOT = { trait = kind } }
-			random = {
-				chance = 25
-				add_trait = kind
-				hidden_tooltip = {
-					character_event = {
-						id = 38268 #Notify Kind
-					}
-				}
-			}
+		random = {
+			chance = 25
+			add_trait_fully_kind_effect = yes
 		}
 	}
+
 	option = {
-		name = "EVTOPTC76005"
+		name = EVTOPTC76005
+
 		event_target:daughter_with_bastard = {
+			show_scope_change = no
 
 			opinion = {
-				modifier = opinion_betrayed
+				name = opinion_betrayed
 				who = ROOT
 				years = 20
 			}
+
 			if = {
 				limit = {
-					NOT = {
+					NOR = {
 						religion_group = qismaite_group
+						trait = chaste
 					}
-					NOT = { trait = chaste }
 				}
 				add_trait = chaste
 			}
+
 			health = -1
 		}
 
-		if = {
-			limit = { NOT = { trait = cruel } }
-			random = {
-				chance = 25
-				add_trait = cruel
-				hidden_tooltip = {
-					character_event = {
-						id = 38259 #Notify Cruel
-					}
-				}
-			}
+		random = {
+			chance = 25
+			add_trait_fully_cruel_effect = yes
 		}
 	}
 }
- 
+
 #Spymaster advice you
 character_event = {
 	id = 76006
