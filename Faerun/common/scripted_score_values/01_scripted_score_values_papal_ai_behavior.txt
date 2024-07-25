@@ -6,8 +6,9 @@
 # ask_for_crusade_chance
 # ask_for_claim_chance
 # nominate_bishop_chance
+
 # AI logic for how the Pope should respond to the hardcoded Ask for Excommunication action
-# ROOT is the asker, FROM is the Pope, FROMFROM is the target
+# ROOT is the asker, FROM is the religious head, FROMFROM is the target
 ask_for_excommunication_chance = {
 	additive_modifier = {
 		value = -50
@@ -30,18 +31,20 @@ ask_for_excommunication_chance = {
 
 	additive_modifier = {
 		value = -1000
-		localisation_key = AIREASON_EXCOM_TARGET_HAS_REPENTED_SINS
+		localisation_key = POPE_AIREASON_MODIFIER_EXCOM_TARGET_HAS_REPENTED_SINS
 
-		FROM = {
-			has_opinion_modifier = {
+		FROMFROM = {
+			reverse_has_opinion_modifier = {
 				name = opinion_repented_sins
-				who = ROOT_FROMFROM
+				who = ROOT_FROM
 			}
 		}
 	}
+
 	additive_modifier = {
 		value = -50
 		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_REQUESTED_EXCOM_ALREADY
+		NOT = { character = FROM } # Not on yourself, dirty Pope
 
 		reverse_has_opinion_modifier = {
 			name = opinion_requested_excommunication
@@ -66,7 +69,6 @@ ask_for_excommunication_chance = {
 	# The Papacy will tend to excommunicate bad priests
 	additive_modifier = {
 		value = 15
-
 		# No loc needed, it's just for the Pope
 		character = FROM
 
@@ -75,20 +77,6 @@ ask_for_excommunication_chance = {
 			is_theocracy = yes
 			has_bad_priest_trait_trigger = yes
 		}
-	}
-
-	# Saintly Bloodline boost
-	additive_modifier = {
-		value = 5
-		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE
-
-		any_owned_bloodline = {
-			has_bloodline_flag = saintly_bloodline
-			bloodline_is_active_for = PREV
-			NOT = { has_bloodline_flag = wicked_saint }
-		}
-
-		NOT = { character = FROM }
 	}
 
 	additive_modifier = {
@@ -121,6 +109,18 @@ ask_for_excommunication_chance = {
 		localisation_key = POPE_AIREASON_MODIFIER_IS_EXCOMMUNICATED
 
 		excommunicated_for = FROM
+	}
+
+	additive_modifier = { # Saintly Bloodline boost
+		value = 5
+		localisation_key = POPE_AIREASON_MODIFIER_RULER_HAS_SAINTLY_BLOODLINE
+		NOT = { character = FROM } # Not on yourself, dirty Pope
+
+		any_owned_bloodline = {
+			has_bloodline_flag = saintly_bloodline
+			bloodline_is_active_for = PREV
+			NOT = { has_bloodline_flag = wicked_saint }
+		}
 	}
 
 	# additive_modifier = {
@@ -162,11 +162,11 @@ ask_for_excommunication_chance = {
 	additive_modifier = {
 		value = -15
 		localisation_key = POPE_AIREASON_MODIFIER_UNCROWNED_RULER
+		NOT = { character = FROM } # Not on yourself, dirty Pope
 
 		is_decision_potential = prepare_coronation_ceremony
 		religion = FROM
 		is_adult = yes
-		NOT = { character = FROM } # Not on yourself, dirty Pope
 	}
 
 	# additive_modifier = {
