@@ -4609,10 +4609,88 @@ faction_independence = {
 			war = no
 			in_seclusion = no
 			preparing_invasion = no
-			liege = {
-				current_heir = {
-					NOT = {
-						character = ROOT
+			NOT = { is_heir = liege }
+
+			trigger_if = {
+				limit = {
+					religion = liege
+					culture = liege
+				}
+
+				OR = {
+					trigger_if = {
+						limit = { is_unreformed_pagan_trigger = yes }
+
+						distance = {
+							who = liege
+							value >= 100
+						}
+					}
+					trigger_else = {
+						distance = {
+							who = liege
+							value >= 200
+						}
+					}
+
+					NAND = {
+						de_jure_liege_or_above = liege
+						lower_real_tier_than = KING
+					}
+				}
+			}
+			trigger_else = {
+				OR = {
+					higher_real_tier_than = DUKE
+					is_not_unreformed_pagan_trigger = yes
+
+					NAND = {
+						culture_group = liege
+						religion_group = liege
+
+						OR = {
+							culture = liege
+							religion = liege
+						}
+
+						distance = {
+							who = liege
+							value < 200
+						}
+					}
+				}
+			}
+
+			# Try to exclude people who should rather support a claimant
+			trigger_if = {
+				limit = {
+					lower_real_tier_than = KING
+
+					NAND = {
+						culture = liege
+						religion = liege
+					}
+				}
+
+				NOT = {
+					liege = {
+						any_demesne_title = {
+							OR = {
+								is_primary_holder_title_tier = yes # Vanilla has is_primary_holder_title, which seems wrong
+								higher_real_tier_than = DUKE
+							}
+
+							ROOT = {
+								primary_title = {
+									de_jure_liege_or_above = PREVPREV
+								}
+							}
+
+							any_claimant = {
+								culture = ROOT
+								religion = ROOT
+							}
+						}
 					}
 				}
 			}
@@ -4631,76 +4709,6 @@ faction_independence = {
 				opinion = {
 					who = LIEGE
 					value < 60
-				}
-			}
-			
-			# Try to exclude people who should rather support a claimant
-			OR = {
-				real_tier = king
-				liege = {
-					NAND = {
-						culture = ROOT
-						religion = ROOT
-						any_demesne_title = {
-							is_primary_holder_title_tier = yes # Vanilla has is_primary_holder_title, which seems wrong
-							higher_tier_than = DUKE
-							ROOT = {
-								primary_title = {
-									de_jure_liege_or_above = PREVPREV
-								}
-							}
-							any_claimant = {
-								culture = ROOT
-								religion = ROOT
-							}
-						}
-					}
-				}
-			}
-			
-			NOT = {
-				liege = {
-					religion = ROOT
-					culture = ROOT
-					OR = {
-						distance = {
-							who = ROOT
-							distance < 100
-						}
-						AND = {
-							distance = {
-								who = ROOT
-								distance < 200
-							}
-							ROOT = {
-								is_unreformed_pagan_trigger = no
-							}
-							is_unreformed_pagan_trigger = no
-						}
-						AND = {
-							de_jure_vassal_or_below = ROOT
-							ROOT = {
-								lower_real_tier_than = KING
-							}
-						}
-					}
-				}
-			}
-			
-			NAND = {
-				lower_tier_than = KING
-				is_unreformed_pagan_trigger = no
-				liege = {
-					culture_group = ROOT
-					religion_group = ROOT
-					OR = {
-						religion = ROOT
-						culture = ROOT
-					}
-					distance = {
-						who = ROOT
-						distance < 200
-					}
 				}
 			}
 		}
@@ -4726,11 +4734,9 @@ faction_independence = {
 
 			is_not_unreformed_pagan_trigger = yes
 
-			liege = {
-				distance = {
-					who = ROOT
-					value < 200
-				}
+			distance = {
+				who = liege
+				value < 200
 			}
 		}
 
@@ -4746,22 +4752,18 @@ faction_independence = {
 		mult_modifier = {
 			factor = 1.5
 
-			liege = {
-				distance = {
-					who = ROOT
-					value >= 300
-				}
+			distance = {
+				who = LIEGE
+				value >= 300
 			}
 		}
 
 		mult_modifier = {
 			factor = 2.0
 
-			liege = {
-				distance = {
-					who = ROOT
-					value >= 400
-				}
+			distance = {
+				who = LIEGE
+				value >= 400
 			}
 		}
 
@@ -4967,157 +4969,133 @@ faction_independence = {
 		factor = 4
 
 		trigger = {
-			prisoner = no
-			is_incapable = no # Works here!
-			is_adult = yes
-			is_landed = yes
+			in_seclusion = no
 			preparing_invasion = no
-			NOT = {
-				has_character_modifier = faction_independence_ultimatum_timer
+
+			#NOT = {
+			#	# Hordes should have less problems with this type of faction until ca 1350
+			#	liege = {
+			#		year < 1350
+			#		has_horde_culture = yes
+			#		culture = ROOT
+			#		religion = ROOT
+			#	}
+			#}
+
+			trigger_if = {
+				limit = { is_patrician = yes }
+				is_merchant_republic = no
 			}
-			
-			NOT = {
-				has_opinion_modifier = {
-					who = LIEGE
-					modifier = opinion_coerced_into_leaving_faction
-				}
-			}
-			
-			# Try to exclude people who should rather support a claimant
-			OR = {
-				real_tier = king
-				liege = {
-					NAND = {
-						culture = ROOT
-						religion = ROOT
-						any_demesne_title = {
-							is_primary_holder_title_tier = yes # Vanilla has is_primary_holder_title, which seems wrong
-							higher_tier_than = DUKE
-							ROOT = {
-								primary_title = {
-									de_jure_liege_or_above = PREVPREV
+
+			# The following require spymaster coercion to overrule
+			trigger_if = {
+				limit = {
+					OR = {
+						is_heir = liege
+
+						# To stay in the faction
+						trigger_if = {
+							limit = { in_faction = faction_independence }
+
+							opinion = {
+								who = LIEGE
+								value >= 80
+							}
+						}
+						# To join the faction
+						trigger_else = {
+							opinion = {
+								who = LIEGE
+								value >= 60
+							}
+						}
+
+						AND = {
+							religion = liege
+							culture = liege
+
+							trigger_if = {
+								limit = { is_unreformed_pagan_trigger = yes }
+
+								distance = {
+									who = LIEGE
+									value < 100
 								}
 							}
-							any_claimant = {
+							trigger_else = {
+								distance = {
+									who = LIEGE
+									value < 200
+								}
+							}
+
+							de_jure_liege_or_above = liege
+							lower_real_tier_than = KING
+						}
+
+						AND = {
+							lower_real_tier_than = KING
+
+							is_not_unreformed_pagan_trigger = yes
+
+							culture_group = liege
+							religion_group = liege
+
+							OR = {
+								religion = liege
+								culture = liege
+							}
+
+							distance = {
+								who = liege
+								value < 200
+							}
+						}
+
+						# Try to exclude people who should rather support a claimant
+						liege = {
+							NAND = {
 								culture = ROOT
 								religion = ROOT
 							}
-						}
-					}
-				}
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-			
-			# The current heir never joins willingly
-			OR = {
-				liege = {
-					NOT = {
-						current_heir = {
-							character = ROOT
-						}
-					}
-				}
-				
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
 
-			# If we like the liege too much, we only join if forced to
-			OR = {
-				opinion = {
-					who = LIEGE
-					value < 40
-				}
-			
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-			
-			OR = {
-				NOT = {
-					liege = {
-						religion = ROOT
-						culture = ROOT
-						OR = {
-							distance = {
-								who = ROOT
-								distance < 100
-							}
-							AND = {
-								distance = {
-									who = ROOT
-									distance < 200
+							any_demesne_title = {
+								OR = {
+									is_primary_holder_title_tier = yes # Vanilla has is_primary_holder_title, which seems wrong
+									higher_real_tier_than = DUKE
 								}
+
 								ROOT = {
-									is_unreformed_pagan_trigger = no
+									primary_title = {
+										de_jure_liege_or_above = PREVPREV
+									}
 								}
-								is_unreformed_pagan_trigger = no
-							}
-							AND = {
-								de_jure_vassal_or_below = ROOT
-								ROOT = {
-									lower_real_tier_than = KING
+
+								any_claimant = {
+									culture = ROOT
+									religion = ROOT
 								}
 							}
 						}
-					}
-				}
-			
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-			
-			OR = {
-				NAND = {
-					lower_tier_than = KING
-					is_unreformed_pagan_trigger = no
-					liege = {
-						culture_group = ROOT
-						religion_group = ROOT
-						OR = {
-							religion = ROOT
-							culture = ROOT
-						}
-						distance = {
-							who = ROOT
-							distance < 200
-						}
-					}
-				}
-			
-				has_opinion_modifier = {
-					who = FROM
-					modifier = opinion_coerced_into_joining_faction
-				}
-			}
-			
-			OR = {
-				NOT = {
-					liege = {
-						capital_scope = {
-							any_neighbor_province = {
-								ROOT = {
-									capital_scope = {
-										province = PREVPREV
+
+						# Won't join this type of faction if our capital borders the liege's capital
+						liege = {
+							capital_scope = {
+								any_neighbor_province = {
+									ROOT = {
+										capital_scope = {
+											province = PREVPREV
+										}
 									}
 								}
 							}
 						}
 					}
 				}
-			
+
 				has_opinion_modifier = {
+					name = opinion_coerced_into_joining_faction
 					who = FROM
-					modifier = opinion_coerced_into_joining_faction
 				}
 			}
 		}
@@ -5137,10 +5115,10 @@ faction_independence = {
 			factor = 0.2
 
 			pacifist = yes
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5150,16 +5128,7 @@ faction_independence = {
 			factor = 1000
 
 			has_opinion_modifier = {
-				modifier = opinion_coerced_into_joining_faction
-				who = FROM
-			}
-		}
-
-		mult_modifier = {
-			factor = 1000
-
-			has_opinion_modifier = {
-				modifier = opinion_intimidated
+				name = opinion_coerced_into_joining_faction
 				who = FROM
 			}
 		}
@@ -5168,17 +5137,15 @@ faction_independence = {
 			factor = 0.1
 
 			is_not_unreformed_pagan_trigger = yes
-			
-			liege = {
-				distance = {
-					who = ROOT
-					value < 200
-				}
+
+			distance = {
+				who = LIEGE
+				value < 200
 			}
-			
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5205,33 +5172,29 @@ faction_independence = {
 				religion = ROOT
 				culture = ROOT
 			}
-			NOR = {
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
 		}
-		
+
 		mult_modifier = {
 			factor = 1.5
-			
-			liege = {
-				distance = {
-					who = ROOT
-					value >= 300
-				}
+
+			distance = {
+				who = LIEGE
+				value >= 300
 			}
 		}
-		
+
 		mult_modifier = {
 			factor = 2.0
-			
-			liege = {
-				distance = {
-					who = ROOT
-					value >= 400
-				}
+
+			distance = {
+				who = LIEGE
+				value >= 400
 			}
 		}
 
@@ -5239,7 +5202,7 @@ faction_independence = {
 			factor = 2.0
 			is_unreformed_pagan_trigger = yes
 		}
-		
+
 		mult_modifier = {
 			factor = 2.0
 			liege = {
@@ -5298,10 +5261,10 @@ faction_independence = {
 			factor = 0.025
 
 			trait = content
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5311,10 +5274,10 @@ faction_independence = {
 			factor = 0.025
 
 			trait = imbecile
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5324,10 +5287,10 @@ faction_independence = {
 			factor = 0.025
 
 			trait = craven
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5337,10 +5300,10 @@ faction_independence = {
 			factor = 0.1
 
 			trait = inbred
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5350,10 +5313,10 @@ faction_independence = {
 			factor = 0.1
 
 			is_dumb_trigger = yes
-				
-			NOR = {
+
+			NOT = {
 				has_opinion_modifier = {
-					modifier = opinion_coerced_into_joining_faction
+					name = opinion_coerced_into_joining_faction
 					who = FROM
 				}
 			}
@@ -5418,7 +5381,7 @@ faction_independence = {
 			factor = 2.0
 			trait = deceitful
 		}
-		
+
 		mult_modifier = {
 			factor = 3.0
 			is_evil_religion = yes
@@ -5434,12 +5397,12 @@ faction_independence = {
 
 			OR = {
 				has_opinion_modifier = {
-					modifier = opinion_evil_tyrant
+					name = opinion_evil_tyrant
 					who = LIEGE
 				}
 
 				has_opinion_modifier = {
-					modifier = opinion_tyrant
+					name = opinion_tyrant
 					who = LIEGE
 				}
 			}
@@ -5460,24 +5423,25 @@ faction_independence = {
 			}
 		}
 	}
-	
+
 	success = {
 		independent = yes
 	}
-	
+
 	effect = {
 		FROM = {
 			any_faction_backer = {
 				faction = faction_independence
+
 				reverse_opinion = {
-					modifier = opinion_grateful
+					name = opinion_grateful
 					who = FROM
 					years = 5
 				}
 			}
 		}
 	}
-	
+
 	abort = {
 		always = no	# Factions will abort if the Potential or Allow trigger is no longer valid
 	}
