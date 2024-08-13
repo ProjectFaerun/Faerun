@@ -10,24 +10,37 @@
 # EVENTS LEADING UP TO BASTARD PREGNANCY
 #############################################
 
-# A courtier initiates romance with the liege
+# A courtier initiates romance with their liege
 # Hidden start
 character_event = {
 	id = 449
-	
+
+	is_triggered_only = yes # on_yearly_pulse, random_events, courtier_liege_romance
 	hide_window = yes
-	
+
 	only_playable = yes
-	only_capable = yes
-	prisoner = no
 	min_age = 16
 	#max_age = 65
-	
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
 		is_landed = yes
 		is_pregnant = no
 		has_regent = no
-		
+		num_of_lovers < 5
+		is_inaccessible_trigger = no
+
+		trigger_if = {
+			limit = { is_female = yes }
+			practical_age < 40
+		}
+
+		trigger_if = {
+			limit = { is_married = yes }
+			NOT = { trait = chaste }
+		}
+
 		NOR = {
 			trait = infirm
 			trait = celibate
@@ -38,13 +51,49 @@ character_event = {
 			spouse = { is_lover = ROOT }
 			has_character_modifier = lustful_affair_timer
 		}
-		
-		OR = {
-			is_married = no
-			NOT = { trait = chaste }
+
+		any_courtier = {
+			trigger_if = {
+				limit = { is_female = yes }
+				practical_age < 40
+			}
+
+			is_valid_romance_target = ROOT
+			has_lover = no
+			is_consort = no
+			is_pregnant = no
+			prisoner = no
+			is_inaccessible_trigger = no
+
+			NOR = {
+				is_married = ROOT
+				is_rival = ROOT
+				trait = infirm
+				trait = celibate
+				trait = eunuch
+				trait = chaste
+				trait = disfigured
+			}
+
+			trigger_if = {
+				limit = { is_married = yes }
+
+				OR = {
+					trait = lustful
+					trait = deceitful
+					trait = hedonist
+
+					AND = {
+						NOT = { spouse = { is_lover = ROOT } }
+
+						opinion = {
+							who = spouse
+							value < 50
+						}
+					}
+				}
+			}
 		}
-		
-		NOT = { num_of_lovers = 5 }
 	}
 
 	mean_time_to_happen = {
