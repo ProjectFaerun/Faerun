@@ -453,6 +453,11 @@ character_event = {
 
 		ai_chance = {
 			factor = 5
+			
+			mult_modifier = {
+				factor = 10
+				trait = loyal
+			}
 
 			mult_modifier = {
 				factor = 10
@@ -620,47 +625,166 @@ character_event = {
 	trigger = {
 		is_ruler = no
 		is_marriage_adult = yes
-		
-		has_lover = no
-		is_pregnant = no
-		is_ill = no
-		
+
 		liege = {
-			OR = {
-				ai = no
+			trigger_if = {
+				limit = { ai = yes }
 				higher_tier_than = DUKE
 			}
 		}
-		
-		NOT = { trait = chaste }
-		NOT = { trait = infirm }
-		NOT = { trait = celibate }
-		NOT = { trait = eunuch }
-		NOT = { trait = asexual }
-		NOT = { is_inaccessible_trigger = yes }
-		
-		# Faithful spouses don't cheat
-		OR = {
-			is_married = no
-			trait = lustful
-			trait = deceitful
-			trait = arbitrary
-			religion_has_polyamory = yes
-			spouse = {
-				NOT = { reverse_opinion = { who = ROOT value = 0 } }
+
+		trigger_if = {
+			limit = { is_female = yes }
+			practical_age < 40
+		}
+
+		# Faithful spouses/consorts don't cheat
+		trigger_if = {
+			limit = { is_married = yes }
+
+			OR = {
+				trait = lustful
+				trait = deceitful
+				trait = arbitrary
+				religion_has_polyamory = yes
+
+				opinion = {
+					who = spouse
+					value < 0
+				}
+				#add if above doesn't work
+				#spouse = {
+				#	NOT = { reverse_opinion = { who = ROOT value = 0 } }
+				#}
 			}
 		}
-		OR = {
-			is_consort = no
-			trait = lustful
-			trait = deceitful
-			trait = arbitrary
-			religion_has_polyamory = yes
-			consort = {
-				NOT = { reverse_opinion = { who = ROOT value = 0 } }
+
+		trigger_if = {
+			limit = { is_consort = yes }
+
+			OR = {
+				trait = lustful
+				trait = deceitful
+				trait = arbitrary
+				religion_has_polyamory = yes
+
+				opinion = {
+					who = consort
+					value < 0
+				}
+				#add if above doesn't work
+				#consort = {
+				#	NOT = { reverse_opinion = { who = ROOT value = 0 } }
+				#}
+			}
+		}
+
+		NOR = {
+			trait = chaste
+			trait = infirm
+			trait = celibate
+			trait = eunuch
+			trait = asexual
+		}
+
+		has_lover = no
+		is_pregnant = no
+		is_ill = no
+		is_inaccessible_trigger = no
+
+		liege = {
+			any_courtier = {
+				is_valid_romance_target = ROOT
+
+				trigger_if = {
+					limit = { is_female = yes }
+					practical_age < 40
+				}
+
+				opinion = {
+					who = ROOT
+					value >= 0
+				}
+
+				reverse_opinion = {
+					who = ROOT
+					value >= 0
+				}
+
+				is_ruler = no
+				has_lover = no
+				is_pregnant = no
+				prisoner = no
+				is_ill = no
+				is_inaccessible_trigger = no
+
+				NOR = {
+					character = ROOT
+					is_close_relative = ROOT
+					is_married = ROOT
+					is_consort = ROOT
+					is_former_lover = ROOT
+					has_character_modifier = lustful_affair_timer
+					trait = infirm
+					trait = celibate
+					trait = eunuch
+					trait = chaste
+					trait = asexual
+				}
+
+				trigger_if = {
+					limit = {
+						OR = {
+							trait = inbred
+							trait = imbecile
+							trait = dwarf
+						}
+					}
+
+					ROOT = {
+						OR = {
+							trait = inbred
+							trait = imbecile
+							trait = dwarf
+							has_ugly_trait_trigger = yes
+						}
+					}
+				}
+
+				# Faithful spouses/consorts don't cheat
+				trigger_if = {
+					limit = { is_married = yes }
+
+					OR = {
+						trait = lustful
+						trait = deceitful
+						trait = arbitrary
+
+						opinion = {
+							who = spouse
+							value < 0
+						}
+					}
+				}
+
+				trigger_if = {
+					limit = { is_consort = yes }
+
+					OR = {
+						trait = lustful
+						trait = deceitful
+						trait = arbitrary
+
+						opinion = {
+							who = consort
+							value < 0
+						}
+					}
+				}
 			}
 		}
 	}
+
 
 	mean_time_to_happen = {
 		months = 4000
