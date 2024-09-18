@@ -814,27 +814,79 @@ character_event = {
 			factor = 1.33
 			practical_age < 20
 		}
-		
+
+		mult_modifier = {
+			factor = 0.5
+
+			is_female = yes
+			practical_age >= 30
+		}
+
 		# Harems are well guarded...
-		modifier = {
-			factor = 3.0
+		mult_modifier = {
+			factor = 0.33
+
+			is_female = yes
 			is_married = yes
 			has_polygamy = yes
 		}
+
+		# Wives and Concubines of rulers have a harder time initiating this (unless it's their Focus)
+		mult_modifier = {
+			factor = 0.33
+
+			is_female = yes
+			NOT = { has_focus = focus_seduction }
+
+			OR = {
+				is_married = liege
+				is_consort = liege
+			}
+		}
 	}
-	
+
 	immediate = {
 		liege = {
 			any_courtier = {
 				limit = {
+					is_valid_romance_target = ROOT
+
+					trigger_if = {
+						limit = { is_female = yes }
+						practical_age < 40
+					}
+
+					opinion = {
+						who = ROOT
+						value >= 0
+					}
+
+					reverse_opinion = {
+						who = ROOT
+						value >= 0
+					}
+
 					is_ruler = no
 					has_lover = no
 					is_pregnant = no
 					prisoner = no
-					is_marriage_adult = yes
 					is_ill = no
-					
-					NOT = { is_close_relative = ROOT }
+					is_inaccessible_trigger = no
+
+					NOR = {
+						character = ROOT
+						is_close_relative = ROOT
+						is_married = ROOT
+						is_consort = ROOT
+						is_former_lover = ROOT
+						has_character_modifier = lustful_affair_timer
+						trait = infirm
+						trait = celibate
+						trait = eunuch
+						trait = chaste
+						trait = asexual
+					}
+
 					OR = {
 						trait = bisexual
 						AND = {
@@ -848,18 +900,7 @@ character_event = {
 							same_sex = ROOT
 						}
 					}
-					
-					NOT = {
-						has_character_modifier = lustful_affair_timer
-					}
-					
-					NOT = { trait = infirm }
-					NOT = { trait = incapable }
-					NOT = { trait = celibate }
-					NOT = { trait = eunuch }
-					NOT = { trait = asexual }
-					NOT = { trait = chaste }
-					
+
 					OR = {
 						ROOT = {
 							OR = {
