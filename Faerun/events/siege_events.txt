@@ -1732,7 +1732,7 @@ character_event = {
 
 	desc = EVTDESC62100
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_siege_over_loc_chars, random_events
 
 	trigger = {
 		new_character = {
@@ -1742,73 +1742,86 @@ character_event = {
 
 		OR = {
 			is_ruler = yes
+
 			AND = {
 				is_female = yes
-				NOT = { age = 40 }
+				practical_age < 40
+				new_character = {
+					has_concubinage = yes
+					fancies_women_trigger = yes
+				}
+			}
+
+			AND = {
+				is_female = no
+				practical_age < 40
+				new_character = {
+					has_concubinage = yes
+					fancies_men_trigger = yes
+				}
 			}
 
 			host = {
 				OR = {
 					is_close_relative = ROOT
-					any_spouse = {
-						character = ROOT
-					}
+					is_married = ROOT
+
 					any_consort = {
 						character = ROOT
 					}
-				}
-			}
-			new_character = {
-				ROOT = {
-					prisoner = yes
-					employer = {
-						character = PREVPREV
-					}
-				}
-			}
 
-			AND = {
-				new_character = {
-					ROOT = {
-						host = {
-							top_liege = {
-								war_with = PREVPREVPREV
-							}
-						}
-					}
-				}
-
-				host = {
 					top_liege = {
+						war_with = new_character
 						is_close_relative = ROOT
 					}
+				}
+			}
+
+			# Doesn't work, on_action doesn't seem to fire for these characters
+			trigger_if = {
+				limit = { prisoner = yes }
+
+				employer = {
+					character = new_character
 				}
 			}
 		}
 	}
 
 	weight_multiplier = {
-		days = 1
-		modifier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+			is_female = no
+			new_character = {
+				has_concubinage = yes
+				fancies_men_trigger = yes
+			}
+		}
+
+		mult_modifier = {
 			factor = 2
 			is_female = yes
 			new_character = {
-				religion_group = humanoid_group
+				has_concubinage = yes
+				fancies_women_trigger = yes
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4 # Free prisoner
-			new_character = {
-				ROOT = {
-					prisoner = yes
-					employer = {
-						character = PREVPREV
-					}
-				}
+
+			prisoner = yes
+
+			employer = {
+				character = new_character
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10 # if new_char (the sieger) was a warrior lodge member
+
 			new_character = {
 				is_member_of_any_warrior_lodge_trigger = yes
 				NOR = {
@@ -1818,14 +1831,18 @@ character_event = {
 				society_rank > 1 #Must be rank 2 or higher
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 4 # if new_char (the sieger) is an illithid
+
 			new_character = {
 				trait = creature_illithid
 			}
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10 # if new_char (the sieger) has a particular Legendary bloodline
+
 			new_character = {
 				any_owned_bloodline = {
 					has_bloodline_flag = bloodline_reaver
