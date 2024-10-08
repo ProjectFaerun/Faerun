@@ -284,49 +284,69 @@ confucian_government_allow_trigger = {}
 
 # Merchant Republic
 merchant_republic_government_potential_trigger = {
-	# Patrician and Doge requirements
-	OR = {
-		# Doge requirements
-		# Does not require being a patrician, to allow creation of new Merchant Republics
-		AND = {
-			# Must always be coastal
-			capital_scope = { is_coastal = yes }
 
-			# Require at least one province and be Duke tier or higher
-			higher_real_tier_than = COUNT
-			num_of_count_titles >= 1
+	trigger_if = { # Established MR requiremends
+		limit = {
+			is_merchant_republic = yes
+			has_game_started = yes
+		}
 
-			# MR can't be under MR
-			trigger_if = {
-				limit = { independent = no }
+		# Require at least one province and be Duke tier or higher
+		higher_real_tier_than = COUNT
+		num_of_count_titles >= 1
 
-				liege_before_war = {
-					is_merchant_republic = no
+		# MR can't be under MR
+		trigger_if = {
+			limit = { independent = no }
+
+			liege_before_war = {
+				is_merchant_republic = no
+			}
+		}
+	}
+	trigger_else_if = { # Established Patrician requirements
+		limit = {
+			is_patrician = yes
+			has_game_started = yes
+		}
+
+		OR = {
+			trait = secret_patrician # for periodic election purposes
+			# Liege must be MR
+			liege_before_war = {
+				is_merchant_republic = yes
+
+				# MR can't be under MR
+				trigger_if = {
+					limit = { independent = no }
+
+					liege_before_war = {
+						is_merchant_republic = no
+					}
 				}
 			}
 		}
-
-		# Patrician requirements
-		AND = {
+	}
+	trigger_else = { # Pre-game and new MR requirements
+		OR = {
 			is_patrician = yes
+			trait = secret_patrician # for periodic election purposes
 
-			OR = {
-				trait = secret_patrician # for periodic election purposes
-				# Liege must be MR
-				liege_before_war = {
-					is_merchant_republic = yes
+			trigger_if = {
+				limit = { capital_scope = { is_coastal = yes } }
 
-					# MR can't be under MR
-					trigger_if = {
-						limit = { independent = no }
+				# Require at least one province and be Duke tier or higher
+				higher_real_tier_than = COUNT
+				num_of_count_titles >= 1
 
-						liege_before_war = {
-							is_merchant_republic = no
-						}
+				# MR can't be under MR
+				trigger_if = {
+					limit = { independent = no }
+
+					liege_before_war = {
+						is_merchant_republic = no
 					}
 				}
-
-				has_game_started = no
 			}
 		}
 	}
