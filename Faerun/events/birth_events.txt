@@ -452,7 +452,7 @@ character_event = {
 
 		ai_chance = {
 			factor = 5
-			
+
 			mult_modifier = {
 				factor = 10
 				trait = loyal
@@ -3586,164 +3586,283 @@ character_event = {
 			}
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTB301 # Acknowledge the child
+
 		trigger = {
-			OR = {
-				FROM = { 
-					mother = { 
-						tier = ROOT 	# In case mother is same tier as real_father, real_father gets to claim the child provided that agnatic succession is in place.
-						NOR = { 
-							has_law = enatic_succession
-							has_law = enatic_cognatic_succession
-							has_law = true_cognatic_succession
-						} 
-					} 
+			FROM = {
+				mother = {
+					OR = {
+						# In case the mother is a higher tier ruler, she gets to decide what happens to the child.
+						lower_real_tier_than = ROOT
+
+						# In case mother is same tier as real_father, real_father gets to claim the child, depending on succession law
+						AND = {
+							real_tier = ROOT
+
+							NOR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
+								has_law = true_cognatic_succession
+							}
+						}
+					}
 				}
-				FROM = { mother = { lower_tier_than = ROOT } } #In case the mother is a higher tier ruler, she gets to decide what happens to the child.
 			}
 		}
+
+		custom_tooltip = { text = EVTOPTB301_DESC }
+
+		spouse = {
+			show_scope_change = no
+
+			tooltip = {
+				opinion = { # Spouse reaction
+					name = acknowledged_bastard
+					who = ROOT
+					years = 10
+				}
+			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = { id = 306 } # The child gets the father's dynasty, but is not legitimized.
+
+			if = {
+				limit = { trait = born_in_the_purple }
+				remove_trait = born_in_the_purple
+			}
+
+			mother = {
+				show_scope_change = no
+
+				tooltip = {
+					opinion = {
+						name = acknowledged_child
+						who = ROOT
+						years = 10
+					}
+				}
+
+				character_event = {
+					id = 307 # The child's mother is pleased
+					# tooltip = EVTTOOLTIP307
+				}
+
+				spouse = {
+					show_scope_change = no
+
+					tooltip = {
+						opinion = {
+							name = opinion_cuckolded
+							who = ROOT
+							years = 10
+						}
+					}
+
+					character_event = {
+						id = 304 # The child's mother's husband is pissed off
+						# tooltip = EVTTOOLTIP304
+					}
+				}
+
+				consort = {
+					show_scope_change = no
+
+					tooltip = {
+						opinion = {
+							name = opinion_cuckolded
+							who = ROOT
+							years = 10
+						}
+					}
+
+					character_event = {
+						id = 304 # The child's mother's man is pissed off
+						# tooltip = EVTTOOLTIP304
+					}
+				}
+			}
+		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
 				FROM = { is_female = yes }
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
+
 				trait = zealous
 				religion_group = good_human_pantheon_group
+				gender_equality_trigger = no
+
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
 				trait = just
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
 				trait = kind
 			}
 		}
-		
-		custom_tooltip = { text = EVTOPTB301_DESC }
-		
-		spouse = {
-			show_scope_change = no
-			tooltip = { opinion = { who = ROOT modifier = acknowledged_bastard years = 10 } } # Spouse reaction.
+	}
+
+	option = {
+		name = EVTOPTC301 # Denounce the child
+
+		trigger = {
+			FROM = {
+				mother = {
+					OR = {
+						# In case the mother is a higher tier ruler, she gets to decide what happens to the child.
+						lower_real_tier_than = ROOT
+
+						# In case mother is same tier as real_father, real_father gets to claim the child, depending on succession law
+						AND = {
+							real_tier = ROOT
+
+							NOR = {
+								has_law = enatic_succession
+								has_law = enatic_cognatic_succession
+								has_law = true_cognatic_succession
+							}
+						}
+					}
+				}
+			}
 		}
+
+		custom_tooltip = { text = EVTOPTC301_DESC }
+
 		FROM = {
 			show_scope_change = no
-			hidden_tooltip = {
-				character_event = { id = 306 } # The child gets the father's dynasty, but is not legitimized.
-			}
+
+			character_event = { id = 309 } # The child founds a new bastard dynasty
+
 			if = {
 				limit = { trait = born_in_the_purple }
 				remove_trait = born_in_the_purple
 			}
+
 			mother = {
 				show_scope_change = no
-				tooltip = { opinion = { who = ROOT modifier = acknowledged_child years = 10 } }
-				hidden_tooltip = { character_event = { id = 307 tooltip = EVTTOOLTIP307 } } # The child's mother is pleased
+
+				tooltip = {
+					opinion = {
+						name = denounced_child
+						who = ROOT
+						years = 10
+					}
+				}
+
+				character_event = {
+					id = 310 # The child's mother is dishonoured
+					# tooltip = EVTTOOLTIP310
+				}
+
 				spouse = {
 					show_scope_change = no
-					tooltip = { opinion = { who = ROOT modifier = opinion_cuckolded years = 10 } }
-					hidden_tooltip = { character_event = { id = 304 tooltip = EVTTOOLTIP304 } } # The child's mother's husband is pissed off
+
+					tooltip = {
+						opinion = {
+							name = opinion_cuckolded
+							who = ROOT
+							years = 10
+						}
+					}
+
+					character_event = {
+						id = 304 # The child's mother's husband is pissed off
+						# tooltip = EVTTOOLTIP304
+					}
 				}
+
 				consort = {
 					show_scope_change = no
-					tooltip = { opinion = { who = ROOT modifier = opinion_cuckolded years = 10 } }
-					hidden_tooltip = { character_event = { id = 304 tooltip = EVTTOOLTIP304 } } # The child's mother's man is pissed off
-				}				
-			}
-		}
-	}
-	
-	option = {
-		name = EVTOPTC301 # Denounce the child
-		trigger = {
-			OR = {
-				FROM = { 
-					mother = { 
-						tier = ROOT 	# In case mother is same tier as real_father, real_father gets to claim the child provided that agnatic succession is in place.
-						NOR = { 
-							has_law = enatic_succession
-							has_law = enatic_cognatic_succession
-							has_law = true_cognatic_succession
-						} 
-					} 
+
+					tooltip = {
+						opinion = {
+							name = opinion_cuckolded
+							who = ROOT
+							years = 10
+						}
+					}
+
+					character_event = {
+						id = 304 # The child's mother's man is pissed off
+						# tooltip = EVTTOOLTIP304
+					}
 				}
-				FROM = { mother = { lower_tier_than = ROOT } } #In case the mother is a higher tier ruler, she gets to decide what happens to the child.
 			}
 		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
 				trait = cruel
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2.0
 				trait = arbitrary
 			}
 		}
-		
-		custom_tooltip = { text = EVTOPTC301_DESC }
-		
-		FROM = {
-			show_scope_change = no
-			hidden_tooltip = {
-				character_event = { id = 309 } #  The child founds a new bastard dynasty
-			}
-			if = {
-				limit = { trait = born_in_the_purple }
-				remove_trait = born_in_the_purple
-			}
-			mother = {
-				show_scope_change = no
-				tooltip = { opinion = { who = ROOT modifier = denounced_child years = 10 } }
-				hidden_tooltip = { character_event = { id = 310 tooltip = EVTTOOLTIP310 } } # The child's mother is dishonoured
-				spouse = {
-					show_scope_change = no
-					tooltip = { opinion = { who = ROOT modifier = opinion_cuckolded years = 10 } }
-					hidden_tooltip = { character_event = { id = 304 tooltip = EVTTOOLTIP304 } } # The child's mother's husband is pissed off
-				}	
-				consort = {
-					show_scope_change = no
-					tooltip = { opinion = { who = ROOT modifier = opinion_cuckolded years = 10 } }
-					hidden_tooltip = { character_event = { id = 304 tooltip = EVTTOOLTIP304 } } # The child's mother's man is pissed off
-				}				
-			}
-		}
 	}
+
 	option = {
 		name = EVTOPTD301 # Do nothing
+
 		trigger = {
-			FROM = { mother = { higher_tier_than = ROOT } } #In case the mother is a lower tier ruler, the father gets to decide what happens to the child.
+			FROM = {
+				mother = {
+					# In case the mother is a lower tier ruler, the father gets to decide what happens to the child.
+					higher_real_tier_than = ROOT
+				}
+			}
 		}
-		ai_chance = {
-			factor = 100
-		}
+
+		ai_chance = { factor = 100 }
 	}
 }
 
 # The child gets the father's dynasty
 character_event = {
 	id = 302
-	
-	is_triggered_only = yes 
 	desc = EVTDESC302
 	picture = GFX_evt_birth
 	border = GFX_event_normal_frame_intrigue
 
+	is_triggered_only = yes
+
 	option = {
 		name = OK
+
 		dynasty = FROM
 		remove_trait = bastard
 		add_trait = legit_bastard
-		
+
 		father = {
+			show_scope_change = no
+
 			spouse = {
-				character_event = { id = 305 tooltip = EVTTOOLTIP305 } # The father's wife is enraged
+				show_scope_change = no
+
+				character_event = {
+					id = 305 # The father's wife is enraged
+					tooltip = EVTTOOLTIP305
+				}
 			}
 		}
 	}
@@ -3752,17 +3871,18 @@ character_event = {
 # The child's mother is very pleased
 character_event = {
 	id = 303
-	
-	is_triggered_only = yes 
 	desc = EVTDESC303
 	picture = GFX_evt_birth
 	border = GFX_event_normal_frame_diplomacy
 
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA303
+
 		opinion = {
+			name = legitimized_child
 			who = FROM
-			modifier = legitimized_child
 			years = 10
 		}
 	}
@@ -3773,8 +3893,10 @@ character_event = {
 	id = 304
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_intrigue
+
 	desc = {
-		text = EVTDESC304
+		text = evt_304_desc_a
+
 		trigger = {
 			FROMFROM = {
 				mother = {
@@ -3786,8 +3908,10 @@ character_event = {
 			}
 		}
 	}
+
 	desc = {
-		text = EVTDESC304_B
+		text = evt_CK2_304_desc_b
+
 		trigger = {
 			FROMFROM = {
 				mother = {
@@ -3799,24 +3923,31 @@ character_event = {
 			}
 		}
 	}
-	
-	
-	is_triggered_only = yes 
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA304
+
 		FROMFROM = {
+			show_scope_change = no
+
 			real_father = {
+				show_scope_change = no
+
 				reverse_opinion = {
+					name = opinion_cuckolded
 					who = ROOT
-					modifier = opinion_cuckolded
 					years = 10
 				}
 			}
+
 			mother = {
+				show_scope_change = no
+
 				reverse_opinion = {
+					name = opinion_unfaithful_wife
 					who = ROOT
-					modifier = opinion_unfaithful_wife
 					years = 10
 				}
 			}
@@ -3829,26 +3960,29 @@ character_event = {
 	id = 305
 	desc = EVTDESC305
 	picture = GFX_evt_quarrel
-	
-	is_triggered_only = yes 
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA305
+
+		opinion = {
+			name = legitimized_bastard
+			who = spouse
+			years = 20
+		}
+
 		FROM = {
+			show_scope_change = no
+
 			mother = {
+				show_scope_change = no
+
 				reverse_opinion = {
+					name = slut_seductress
 					who = ROOT
-					modifier = slut_seductress
 					years = 20
 				}
-			}
-		}
-		
-		spouse = {
-			reverse_opinion = {
-				who = ROOT
-				modifier = legitimized_bastard
-				years = 20
 			}
 		}
 	}
@@ -3857,20 +3991,27 @@ character_event = {
 # The child gets the father's dynasty, but is not legitimized.
 character_event = {
 	id = 306
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC306
 	picture = GFX_evt_birth
 
+	is_triggered_only = yes
+
 	option = {
 		name = OK
+
 		dynasty = FROM
 		add_trait = bastard
-		
+
 		father = {
+			show_scope_change = no
+
 			spouse = {
-				character_event = { id = 308 tooltip = EVTTOOLTIP308 } # The father's wife is angered
+				show_scope_change = no
+
+				character_event = {
+					id = 308 # The father's wife is angered
+					tooltip = EVTTOOLTIP308
+				}
 			}
 		}
 	}
@@ -3879,17 +4020,17 @@ character_event = {
 # The child's mother is pleased
 character_event = {
 	id = 307
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC307
 	picture = GFX_evt_birth
 
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA307
+
 		opinion = {
+			name = acknowledged_child
 			who = FROM
-			modifier = acknowledged_child
 			years = 10
 		}
 	}
@@ -3898,29 +4039,31 @@ character_event = {
 # The father's wife is angered
 character_event = {
 	id = 308
-	picture = GFX_evt_quarrel
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC308
+	picture = GFX_evt_quarrel
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA308
+
+		opinion = {
+			name = acknowledged_bastard
+			who = spouse
+			years = 10
+		}
+
 		FROM = {
+			show_scope_change = no
+
 			mother = {
+				show_scope_change = no
+
 				reverse_opinion = {
+					name = slut_seductress
 					who = ROOT
-					modifier = slut_seductress
 					years = 20
 				}
-			}
-		}
-		
-		spouse = {
-			reverse_opinion = {
-				who = ROOT
-				modifier = acknowledged_bastard
-				years = 10
 			}
 		}
 	}
@@ -3929,21 +4072,22 @@ character_event = {
 # The child is denounced
 character_event = {
 	id = 309
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC309
 	picture = GFX_evt_birth
 
+	is_triggered_only = yes
+
 	option = {
 		name = OK
+
 		dynasty = mother_bastard
-		
+
 		father = {
 			spouse = {
 				character_event = { id = 311 } # The father's wife is displeased
 			}
 		}
+
 		set_father = 0
 		set_real_father = FROM
 	}
@@ -3952,17 +4096,17 @@ character_event = {
 # The child's mother is dishonoured
 character_event = {
 	id = 310
-	picture = GFX_evt_quarrel
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC310
+	picture = GFX_evt_quarrel
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA310
+
 		opinion = {
+			name = denounced_child
 			who = FROM
-			modifier = denounced_child
 			years = 10
 		}
 	}
@@ -3971,38 +4115,44 @@ character_event = {
 # The father's wife is displeased
 character_event = {
 	id = 311
-	picture = GFX_evt_quarrel
-	
-	is_triggered_only = yes 
-		
 	desc = EVTDESC311
+	picture = GFX_evt_quarrel
+
+	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA311
+
 		FROM = {
+			show_scope_change = no
+
 			mother = {
+				show_scope_change = no
+
 				reverse_opinion = {
+					name = slut_seductress
 					who = ROOT
-					modifier = slut_seductress
 					years = 20
 				}
 			}
 		}
-		
+
 		spouse = {
+			show_scope_change = no
+
 			if = {
-				limit = { gender_equality_trigger = no }
+				limit = { gender_equality_trigger = yes }
+
 				reverse_opinion = {
+					name = opinion_unfaithful_husband_crime
 					who = ROOT
-					modifier = opinion_unfaithful_husband
 					years = 5
 				}
 			}
-			if = {
-				limit = { gender_equality_trigger = yes }
+			else = {
 				reverse_opinion = {
+					name = opinion_unfaithful_husband
 					who = ROOT
-					modifier = opinion_unfaithful_husband_crime
 					years = 5
 				}
 			}
@@ -4012,71 +4162,59 @@ character_event = {
 
 character_event = {
 	id = 312
-	
-	is_triggered_only = yes
+
+	is_triggered_only = yes # on_birth
 	hide_window = yes
-	
-	trigger = {
-		OR = {
-			mother = {
-				is_consort = yes
-			}
-			father = {
-				is_consort = yes
-			}
-		}
-	}	
-	
+
 	option = {
-		if = { 
+		if = {
 			limit = {
 				mother = { is_consort = yes }
-			} 
+			}
 			add_trait = child_of_consort
 		}
-		if = { 
+		else_if = {
 			limit = {
 				father = { is_consort = yes }
-			} 
+			}
 			add_trait = child_of_consort_male
 		}
 	}
 }
 
-# On-action event: Birth complications - Pointing out that the baby receives this event, and thus he is the one that has to decide if his mother gets to die or not.
+# On-action event: Birth complications - Pointing out that the baby receives this event, and thus he is the one that has to 'decide' if his mother gets to die or not.
 character_event = {
 	id = 313
-	
+
+	is_triggered_only = yes # on_post_birth
 	hide_window = yes
-	
-	is_triggered_only = yes
-	
+
 	trigger = {
-		NOT = { age = 1 }
+		age < 1
 	}
 
 	immediate = {
+		# Child born in good health?
 		random_list = {
-			80 = {
-				# All is well
-			}
+			80 = { } # All is well
+
 			10 = {
-				modifier = { #Old remedy
+				mult_modifier = { # Old remedy
 					factor = 0.25
-					mother = {
-						has_character_flag = flag_mother_dark_rest 
-					}
+					mother = { has_character_flag = flag_mother_dark_rest }
 				}
+
 				add_trait = sickly
 
-				#Sickly infant treatment event
+				# Sickly infant treatment event
 				if = {
-					limit = { 
-						has_dlc = "Reapers" 
+					limit = {
+						has_dlc = "Reapers"
+
 						host = {
 							any_courtier_or_vassal = {
-								has_minor_title = title_court_physician 
-								liege = { character = PREVPREV }
+								has_minor_title = title_court_physician
+								vassal_of = PREVPREV
 							}
 						}
 					}
@@ -4084,308 +4222,392 @@ character_event = {
 					save_event_target_as = sickly_infant
 					father = { save_event_target_as = sickly_father }
 
-					#Decided which parent will choose treatment
-					if = { 
-						limit = { 
-							father = { is_ruler = yes } 
+					# Decided which parent will choose treatment
+					if = {
+						limit = {
+							father = { is_ruler = yes }
 							host = { character = event_target:sickly_father }
-							NOT = { mother = { is_ruler = yes } }
+							mother = { is_ruler = no }
 						}
-						father = { save_event_target_as = infant_guardian }
+
+						father = {
+							save_event_target_as = infant_guardian
+						}
+					}
+					else = {
+						mother = {
+							save_event_target_as = infant_guardian
+						}
 					}
 
-					if = { 
-						limit = { 
-							NOT = {
-								father = { is_ruler = yes } 
-								host = { character = event_target:sickly_father }
-								NOT = { mother = { is_ruler = yes } }
-							}
-						}
-						mother = { save_event_target_as = infant_guardian }
-					}
-
-					#Makes court physician examine child
-					host = { 
+					# Makes court physician examine child
+					host = {
 						random_courtier_or_vassal = {
-							limit = { 
-								has_minor_title = title_court_physician 
-								liege = { character = PREVPREV }
+							limit = {
+								has_minor_title = title_court_physician
+								vassal_of = PREV
 							}
-							character_event = { id = RIP.11066 days = 7 }
+
+							save_event_target_as = court_physician
+						}
+					}
+
+					event_target:infant_guardian = {
+						character_event = {
+							id = RIP.11067
+							days = 7
 						}
 					}
 				}
 			}
 		}
-	}
 
-	option = { # No complications
-		trigger = { 
-			NOT = { 
-				mother = { trait = troubled_pregnancy }
-			} 
-		}
-		ai_chance = {
-			factor = 80
-			modifier = {
-				factor = 2.0
-				mother = {
-					health = 6
+		# Chance mother gets sick
+		random_list = {
+			80 = { # No complications
+				trigger = {
+					mother = {
+						NOT = { trait = troubled_pregnancy }
+					}
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					mother = { health >= 6 }
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					mother = { health >= 7 }
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					mother = { num_of_children >= 3 }
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					mother = { practical_age >= 20 }
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					mother = { practical_age >= 25 }
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					mother = { practical_age >= 30 }
 				}
 			}
-			modifier = {
-				factor = 2.0
+
+			4 = { # Mother gets ill
+				trigger = {
+					mother = {
+						is_ill = no
+						NOT = { trait = troubled_pregnancy }
+						evilcat_is_disease_immune = no
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+					mother = { trait = hard_pregnancy }
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					mother = { health < 4.1 }
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					mother = { num_of_children < 2 }
+				}
+
 				mother = {
-					health = 7
+					character_event = { id = 315 } # Mother ill after giving birth
 				}
 			}
-			modifier = {
-				factor = 2.0
+
+			16 = { # Mother has troubled pregnancy
+				trigger = {
+					mother = {
+						OR = {
+							is_ill = yes
+							trait = troubled_pregnancy
+
+							check_variable = {
+								which = troubled_pregnancy_variable
+								value >= 1
+							}
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					mother = { health < 4.1 }
+				}
+
+				mult_modifier = {
+					factor = 6.0
+					mother = { health < 3.1 }
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					mother = { num_of_children < 2 }
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					mother = {
+						check_variable = {
+							which = troubled_pregnancy_variable
+							value >= 2
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					mother = {
+						check_variable = {
+							which = troubled_pregnancy_variable
+							value >= 3
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+
+					mother = {
+						check_variable = {
+							which = troubled_pregnancy_variable
+							value >= 4
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 3
+
+					mother = {
+						check_variable = {
+							which = troubled_pregnancy_variable
+							value >= 5
+						}
+					}
+				}
+
 				mother = {
-					num_of_children = 3
+					character_event = { id = 316 } # Troubled pregnancy gets worse
 				}
 			}
-			modifier = {
-				factor = 0.85
-				mother = {
-					age = 20
-				}
-			}
-			modifier = {
-				factor = 0.85
-				mother = {
-					age = 25
-				}
-			}
-			modifier = {
-				factor = 0.85
-				mother = {
-					age = 30
-				}
-			}
-		}
-	}
-	option = { # Mother gets ill
-		trigger = { 
-			NOT = { evilcat_is_disease_immune = yes }
-			NOT = { 
-				mother = { trait = troubled_pregnancy }
-			} 
-			NOT = { 
-				mother = { is_ill = yes }
-			} 
-		}
-		ai_chance = {
-			factor = 4
-			modifier = {
-				factor = 2
-				mother = {
-					trait = hard_pregnancy
-				}
-			}
-			modifier = {
-				factor = 2.0
-				mother = {
-					NOT = { health = 4.1 }
-				}
-			}
-			modifier = {
-				factor = 1.5
-				mother = {
-					NOT = { num_of_children = 2 }
-				}
-			}
-		}
-		
-		mother = {
-			character_event = { id = 315 }
-		}
-	}
-	option = { # Mother has troubled pregnancy.
-		trigger = { 
-			OR = { 
-				mother = { trait = troubled_pregnancy }
-				mother = { is_ill = yes }
-				mother = { check_variable = { which = troubled_pregnancy_variable value = 1 } }
-			} 
-		}
-		ai_chance = {
-			factor = 16
-			
-			modifier = {
-				factor = 2.0
-				mother = {
-					NOT = { health = 4.1 }
-				}
-			}
-			modifier = {
-				factor = 6.0
-				mother = {
-					NOT = { health = 3.1 }
-				}
-			}
-			modifier = {
-				factor = 1.5
-				mother = {
-					NOT = { num_of_children = 2 }
-				}
-			}
-			modifier = {
-				factor = 1.5
-				mother = {
-					check_variable = { which = troubled_pregnancy_variable value = 2 }
-				}
-			}
-			modifier = {
-				factor = 1.5
-				mother = {
-					check_variable = { which = troubled_pregnancy_variable value = 3 }
-				}
-			}
-			modifier = {
-				factor = 2
-				mother = {
-					check_variable = { which = troubled_pregnancy_variable value = 4 }
-				}
-			}
-			modifier = {
-				factor = 3
-				mother = {
-					check_variable = { which = troubled_pregnancy_variable value = 5 }
-				}
-			}
-		}
-		
-		mother = {
-				character_event = { id = 316 } #Troubled pregnancy gets worse.
+
+		#	2 = { # Mother dies - Obsolete now
+		#		mother = {
+		#			death = {
+		#				death_reason = death_childbirth
+		#			}
+		#		}
+		#
+		#		mult_modifier = {
+		#			factor = 2.0
+		#			mother = { health < 4.1 }
+		#		}
+		#
+		#		mult_modifier = {
+		#			factor = 6.0
+		#			mother = { health < 3.1 }
+		#		}
+		#
+		#		mult_modifier = {
+		#			factor = 1.5
+		#			mother = { num_of_children < 2 }
+		#		}
+		#	}
 		}
 	}
 }
 
-# On-action event: Birth complications after a stillbirth - Technically disabled. 
+# On-action event: Birth complications after a stillbirth - Technically disabled.
 # (in mother scope)
 character_event = {
 	id = 314
-	
+
 	hide_window = yes
-	
-	is_triggered_only = yes
-	
+	is_triggered_only = yes # on_post_birth_stillbirth
+
 	trigger = {
-		age = 1
+		age >= 1
 	}
-	
-	option = { # No complications
-		trigger = { 
-			NOT = { 
-				trait = troubled_pregnancy
-			} 
+
+	immediate = {
+		random_list = {
+			70 = { # No complications
+				trigger = {
+					NOT = { trait = troubled_pregnancy }
+				}
+
+				mult_modifier = {
+					factor = 0.7
+					trait = hard_pregnancy
+				}
+
+				mult_modifier = {
+					factor = 0.7
+					is_ill = yes
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					health = 6
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					health = 7
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					num_of_children = 3
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					practical_age >= 20
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					practical_age >= 25
+				}
+
+				mult_modifier = {
+					factor = 0.85
+					practical_age >= 30
+				}
+			}
+
+			5 = { # Mother gets ill
+				trigger = {
+					is_ill = no
+					NOT = { trait = troubled_pregnancy }
+				}
+
+				mult_modifier = {
+					factor = 2
+					trait = hard_pregnancy
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					health < 4.1
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					num_of_children < 2
+				}
+
+				character_event = { id = 315 } # Mother ill after giving birth
+			}
+
+			25 = { # Mother has troubled pregnancy
+				trigger = {
+					OR = {
+						trait = troubled_pregnancy
+						is_ill = yes
+
+						check_variable = {
+							which = troubled_pregnancy_variable
+							value = 1
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 2.0
+					health < 4.1
+				}
+
+				mult_modifier = {
+					factor = 6.0
+					health < 3.1
+				}
+
+				mult_modifier = {
+					factor = 1.5
+					num_of_children < 2
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					check_variable = {
+						which = troubled_pregnancy_variable
+						value >= 2
+					}
+				}
+
+				mult_modifier = {
+					factor = 1.5
+
+					check_variable = {
+						which = troubled_pregnancy_variable
+						value >= 3
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+
+					check_variable = {
+						which = troubled_pregnancy_variable
+						value >= 4
+					}
+				}
+
+				mult_modifier = {
+					factor = 3
+
+					check_variable = {
+						which = troubled_pregnancy_variable
+						value >= 5
+					}
+				}
+
+				character_event = { id = 316 } # Troubled pregnancy gets worse
+			}
+
+		#	2 = { # Mother dies - Obsolete, handled by troubled pregnancy events.
+		#		mult_modifier = {
+		#			factor = 2.0
+		#			health < 4.1
+		#		}
+		#
+		#		mult_modifier = {
+		#			factor = 6.0
+		#			health < 3.1
+		#		}
+		#
+		#		mult_modifier = {
+		#			factor = 1.5
+		#			num_of_children < 2
+		#		}
+		#
+		#		death = {
+		#			death_reason = death_childbirth
+		#		}
+		#	}
 		}
-		ai_chance = {
-			factor = 70
-			modifier = {
-				factor = 0.7
-				trait = hard_pregnancy
-			}
-			modifier = {
-				factor = 0.7
-				is_ill = yes
-			}
-			modifier = {
-				factor = 2.0
-				health = 6
-			}
-			modifier = {
-				factor = 2.0
-				health = 7
-			}
-			modifier = {
-				factor = 2.0
-				num_of_children = 3
-			}
-			modifier = {
-				factor = 0.85
-				age = 20
-			}
-			modifier = {
-				factor = 0.85
-				age = 25
-			}
-			modifier = {
-				factor = 0.85
-				age = 30
-			}
-		}
-	}
-	option = { # Mother gets ill
-		trigger = { 
-			NOT = { 
-				trait = troubled_pregnancy
-			} 
-			NOT = { 
-				is_ill = yes
-			} 
-		}
-		ai_chance = {
-			factor = 5
-			modifier = {
-				factor = 2
-				trait = hard_pregnancy
-			}
-			modifier = {
-				factor = 2.0
-				NOT = { health = 4.1 }
-			}
-			modifier = {
-				factor = 1.5
-				NOT = { num_of_children = 2 }
-			}
-		}
-		
-		character_event = { id = 315 }
-	}
-	option = { # Mother has troubled pregnancy.
-		trigger = { 
-			OR = { 
-				trait = troubled_pregnancy
-				is_ill = yes
-				check_variable = { which = troubled_pregnancy_variable value = 1 }
-			} 
-		}
-		ai_chance = {
-			factor = 25
-			
-			modifier = {
-				factor = 2.0
-				NOT = { health = 4.1 }
-			}
-			modifier = {
-				factor = 6.0
-				NOT = { health = 3.1 }
-			}
-			modifier = {
-				factor = 1.5
-				NOT = { num_of_children = 2 }
-			}
-			modifier = {
-				factor = 1.5
-				check_variable = { which = troubled_pregnancy_variable value = 2 }
-			}
-			modifier = {
-				factor = 1.5
-				check_variable = { which = troubled_pregnancy_variable value = 3 }
-			}
-			modifier = {
-				factor = 2
-				check_variable = { which = troubled_pregnancy_variable value = 4 }
-			}
-			modifier = {
-				factor = 3
-				check_variable = { which = troubled_pregnancy_variable value = 5 }
-			}
-		}
-		character_event = { id = 316 } #Troubled pregnancy gets worse.
 	}
 }
 
@@ -4394,28 +4616,18 @@ character_event = {
 	id = 315
 	desc = EVTDESC315
 	picture = GFX_evt_illness
-	
+
 	is_triggered_only = yes
-	
-	#immediate = {
-	#	add_trait = ill
-	#}
 
 	option = {
 		name = EVTOPTA315
+
 		if = {
-			limit = {
-				NOT = {
-					has_dlc = "Reapers"
-				}
-			}
-			add_trait = ill
-		}
-		if = {
-			limit = {
-				has_dlc = "Reapers"
-			}
+			limit = { has_dlc = "Reapers" }
 			add_symptom_effect = yes
+		}
+		else = {
+			add_trait = ill
 		}
 	}
 }
@@ -4423,24 +4635,20 @@ character_event = {
 # Mother troubled after giving birth
 character_event = {
 	id = 316
+	picture = GFX_evt_illness
+
 	desc = {
 		text = EVTDESCA316
-		trigger = {
-			trait = troubled_pregnancy
-		}
+		trigger = { trait = troubled_pregnancy }
 	}
 	desc = {
 		text = EVTDESCB316
-		trigger = { 
-			NOT = {
-				trait = troubled_pregnancy
-			}
+		trigger = {
+			NOT = { trait = troubled_pregnancy }
 		}
 	}
-	picture = GFX_evt_illness
-	
+
 	is_triggered_only = yes
-	
 
 	option = {
 		name = EVTOPTA315
