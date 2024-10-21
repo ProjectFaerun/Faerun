@@ -363,27 +363,44 @@ great_realm_conflict = {
 		# The attacker needs at least one county in the target kingdom, a border or be at the most two sea zones away
 		any_direct_de_jure_vassal_title = { # duchies
 			any_direct_de_jure_vassal_title = { # counties
-				OR = {
-					holder_scope = {
-						OR = {
-							character = ROOT
-							is_vassal_or_below_of = ROOT
-						}
-					}
-
-					AND = {
+				trigger_if = {
+					limit = {
 						holder_scope = {
-							OR = {
-								character = FROM
-								is_vassal_or_below_of = FROM
+							NOR = { # part of attacker's realm
+								character = ROOT
+								is_vassal_or_below_of = ROOT
 							}
 						}
-						location = {
+					}
+				}
+
+				holder_scope = {
+					OR = { # Actually part of Defender's realm, not a random title in the same de jure duchy
+						character = FROM
+						is_vassal_or_below_of = FROM
+					}
+				}
+
+				location = {
+					any_neighbor_province = { # bordering province
+						trigger_if = {
+							limit = { has_owner = yes }
+
+							owner = { # part of attacker's realm
+								OR = {
+									character = ROOT
+									is_vassal_or_below_of = ROOT
+								}
+							}
+						}
+						trigger_else = {
+							is_land = no # first sea zone
+
 							any_neighbor_province = {
 								trigger_if = {
-									limit = { has_owner = yes } # border county
+									limit = { has_owner = yes }
 
-									owner = {
+									owner = { # part of attacker's realm
 										OR = {
 											character = ROOT
 											is_vassal_or_below_of = ROOT
@@ -391,29 +408,13 @@ great_realm_conflict = {
 									}
 								}
 								trigger_else = {
-									is_land = no # first sea zone
+									is_land = no # second sea zone
 
 									any_neighbor_province = {
-										trigger_if = {
-											limit = { has_owner = yes }
-
-											owner = {
-												OR = {
-													character = ROOT
-													is_vassal_or_below_of = ROOT
-												}
-											}
-										}
-										trigger_else = {
-											is_land = no # second sea zone
-
-											any_neighbor_province = {
-												owner = {
-													OR = {
-														character = ROOT
-														is_vassal_or_below_of = ROOT
-													}
-												}
+										owner = { # part of attacker's realm
+											OR = {
+												character = ROOT
+												is_vassal_or_below_of = ROOT
 											}
 										}
 									}
