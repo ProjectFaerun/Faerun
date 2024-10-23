@@ -17,7 +17,19 @@ religious = {
 	allowed_to_target_tributaries = no
 
 	can_use_gui = {
+		# Attacker
 		ROOT = {
+			# General Requirements
+			is_nomadic = no
+			is_pacifist_religion = no
+			mercenary = no
+
+			NOR = {
+				same_realm = FROM
+				government = nomadic_tribal_government
+				trait = creature_monster
+			}
+
 			show_scope_change = no
 
 			trigger_if = {
@@ -47,22 +59,6 @@ religious = {
 			}
 			war_cost = yes
 			NOT = { has_character_modifier = recent_holy_war }
-		}
-	}
-
-	can_use = {
-		# Attacker
-		ROOT = {
-			# General requirements
-			is_nomadic = no
-			is_pacifist_religion = no
-			mercenary = no
-
-			NOR = {
-				same_realm = FROM
-				government = nomadic_tribal_government
-				trait = creature_monster
-			}
 
 			OR = {
 				is_heresy_of = FROM
@@ -75,16 +71,32 @@ religious = {
 				}
 			}
 
-			top_liege = {
-				religion_group = ROOT
+			trigger_if = {
+				limit = { independent = no }
 
-				# Religion must match, or neither is a heretic
-				OR = {
-					religion = ROOT
+				top_liege = {
+					religion_group = ROOT
 
-					AND = {
-						is_heretic = no
-						ROOT = { is_heretic = no }
+					# Religion must match, or neither is a heretic
+					OR = {
+						religion = ROOT
+
+						AND = {
+							is_heretic = no
+							ROOT = { is_heretic = no }
+						}
+					}
+
+					# Can holy war known devil worshippers of top liege's religion
+					trigger_if = {
+						limit = { religion = FROM }
+
+						FROM = { has_character_modifier = known_satanist }
+						NOT = { has_character_modifier = known_satanist }
+
+						ROOT = {
+							NOT = { has_character_modifier = known_satanist }
+						}
 					}
 				}
 			}
@@ -97,59 +109,76 @@ religious = {
 	can_use_title = {
 		# The attacker needs at least one county in the target duchy, or a border, or be only two sea zones away from one of your counties
 		any_direct_de_jure_vassal_title = {
-			OR = {
-				holder_scope = { # attacker owns a county in target duchy
-					OR = {
-						character = ROOT
-						is_vassal_or_below_of = ROOT
+			trigger_if = {
+				limit = {
+					holder_scope = {
+						NOR = { # part of attacker's realm
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
 					}
 				}
 
-				AND = {
-					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
+				holder_scope = {
+					OR = { # Actually part of Defender's realm, not a random title in the same de jure duchy
+						character = FROM
+						is_vassal_or_below_of = FROM
+					}
+				}
+			}
+
+			location = {
+				any_neighbor_province = { # bordering province
+					trigger_if = {
+						limit = { has_owner = yes }
+
+						owner = { # part of attacker's realm
+							OR = {
+								character = ROOT
+								is_vassal_or_below_of = ROOT
+							}
 						}
 					}
-					location = {
+					trigger_else = {
+						is_land = no # first sea zone
+
+						#OR = { # religion requirements for attack across sea zones
+						#	ROOT = { religion_group = muslim }
+						#	FROM = { religion_group = muslim }
+
+						#	trigger_if = {
+						#		limit = { ROOT = { religion_group = pagan_group } }
+						#		has_global_flag = pagan_ghws_unlocked
+						#	}
+						#	trigger_else_if = {
+						#		limit = { ROOT = { religion_group = christian } }
+						#		has_global_flag = christian_crusades_unlocked
+						#	}
+						#	trigger_else = {
+						#		ROOT = { religion_group = muslim }
+						#		has_global_flag = muslim_jihads_unlocked
+						#	}
+						#}
+
 						any_neighbor_province = {
 							trigger_if = {
-								limit = { has_owner = yes } # not wasteland or sea zone
+								limit = { has_owner = yes }
 
-								owner = {
+								owner = { # part of attacker's realm
 									OR = {
 										character = ROOT
 										is_vassal_or_below_of = ROOT
 									}
 								}
 							}
-
 							trigger_else = {
-								is_land = no # first sea zone
+								is_land = no # second sea zone
 
-								any_neighbor_province = { # county one sea zone away
-									trigger_if = {
-										limit = { has_owner = yes } # not wasteland or sea zone
-
-										owner = {
-											OR = {
-												character = ROOT
-												is_vassal_or_below_of = ROOT
-											}
-										}
-									}
-
-									trigger_else = {
-										is_land = no # second seazone
-
-										any_neighbor_province = { # county two sea zones away
-											owner = {
-												OR = {
-													character = ROOT
-													is_vassal_or_below_of = ROOT
-												}
-											}
+								any_neighbor_province = {
+									owner = { # part of attacker's realm
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
 										}
 									}
 								}
@@ -170,6 +199,12 @@ religious = {
 			OR = {
 				is_heresy_of = FROM
 				is_parent_religion = FROM
+
+				# Can holy war known demon worshippers in the same religion group
+				AND = {
+					FROM = { has_character_modifier = known_satanist }
+					NOT = { has_character_modifier = known_satanist }
+				}
 
 				FROM = {
 					ROOT = {
@@ -257,9 +292,15 @@ religious = {
 			piety = -100
 			prestige = -50
 
-			religion_authority = {
-				name = lost_holy_war
-				years = 20
+			if = {
+				limit = {
+					NOT = { has_character_modifier = known_satanist }
+				}
+
+				religion_authority = {
+					name = lost_holy_war
+					years = 20
+				}
 			}
 		}
 	}
@@ -503,28 +544,45 @@ liberate_religion = {
 		}
 
 		# The attacker needs at least one county in the target kingdom, or a border, or be only two sea zones away from one of your counties
-		any_de_jure_vassal_title = {
-			OR = {
-				holder_scope = { # own a county
-					OR = {
-						character = ROOT
-						is_vassal_or_below_of = ROOT
-					}
-				}
-
-				AND = {
+		any_direct_de_jure_vassal_title = {
+			trigger_if = {
+				limit = {
 					holder_scope = {
-						OR = {
-							character = FROM
-							is_vassal_or_below_of = FROM
+						NOR = { # part of attacker's realm
+							character = ROOT
+							is_vassal_or_below_of = ROOT
 						}
 					}
-					location = {
-						any_neighbor_province = { # have a border
+				}
+			}
+
+			holder_scope = {
+				OR = { # Actually part of Defender's realm, not a random title in the same de jure duchy
+					character = FROM
+					is_vassal_or_below_of = FROM
+				}
+			}
+
+			location = {
+				any_neighbor_province = { # bordering province
+					trigger_if = {
+						limit = { has_owner = yes }
+
+						owner = { # part of attacker's realm
+							OR = {
+								character = ROOT
+								is_vassal_or_below_of = ROOT
+							}
+						}
+					}
+					trigger_else = {
+						is_land = no # first sea zone
+
+						any_neighbor_province = {
 							trigger_if = {
 								limit = { has_owner = yes }
 
-								owner = {
+								owner = { # part of attacker's realm
 									OR = {
 										character = ROOT
 										is_vassal_or_below_of = ROOT
@@ -532,29 +590,13 @@ liberate_religion = {
 								}
 							}
 							trigger_else = {
-								is_land = no # first sea zone
+								is_land = no # second sea zone
 
 								any_neighbor_province = {
-									trigger_if = {
-										limit = { has_owner = yes }
-
-										owner = {
-											OR = {
-												character = ROOT
-												is_vassal_or_below_of = ROOT
-											}
-										}
-									}
-									trigger_else = {
-										is_land = no # second sea zone
-
-										any_neighbor_province = {
-											owner = {
-												OR = {
-													character = ROOT
-													is_vassal_or_below_of = ROOT
-												}
-											}
+									owner = { # part of attacker's realm
+										OR = {
+											character = ROOT
+											is_vassal_or_below_of = ROOT
 										}
 									}
 								}
