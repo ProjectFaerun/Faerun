@@ -1,44 +1,44 @@
 # Written by Flavio
 
-namespace=HFP
+namespace = HFP
 
 ###################################################
 ###################################################
 
-#Physical state is affected by physique_variable.
-#Threshold to become fat is 15. Any score above causes increasingly bad health issues.
-#Threshold to become malnourished is -15. Any score below causes increasingly bad health issues.
+# Physical state is affected by physique_variable.
+# Threshold to become fat is 15. Any score above causes increasingly bad health issues.
+# Threshold to become malnourished is -15. Any score below causes increasingly bad health issues.
 
-#If you apply one of the two traits by event without checking the variable, any event that does check the variable will automatically remove it whenever it fires.
-#All variable checks are saved in 00_scripted_effects, these are the most commonly used:
+# If you apply one of the two traits by event without checking the variable, any event that does check the variable will automatically remove it whenever it fires.
+# All variable checks are saved in 00_scripted_effects, these are the most commonly used:
 
-# gain_weight_small_effect 		(+5 physique_variable)
-# gain_weight_medium_effect 		(+10 physique_variable)
-# gain_weight_large_effect 		(+15 physique_variable)
+# gain_weight_small_effect		(+5 physique_variable)
+# gain_weight_medium_effect		(+10 physique_variable)
+# gain_weight_large_effect		(+15 physique_variable)
 
-# balance_weight_small_effect 	(+/-2 physique_variable)
-# balance_weight_medium_effect 	(+/-5 physique_variable)
-# balance_weight_large_effect 	(+/-10 physique_variable)
+# balance_weight_small_effect	(+/-2 physique_variable)
+# balance_weight_medium_effect	(+/-5 physique_variable)
+# balance_weight_large_effect	(+/-10 physique_variable)
 
-# lose_weight_small_effect 		(-5 physique_variable)
-# lose_weight_medium_effect 		(-10 physique_variable)
-# lose_weight_large_effect 		(-15 physique_variable)
+# lose_weight_small_effect		(-5 physique_variable)
+# lose_weight_medium_effect		(-10 physique_variable)
+# lose_weight_large_effect		(-15 physique_variable)
 
-## Balance_Weight_Effects are used for training and healthy habits events. 
+## Balance_Weight_Effects are used for training and healthy habits events.
 ## They reduce physique_variable of fat characters and increase physique_variable of malnourished characters, attempting to bring it back to 0.
 
 # weight_trait_check_effect		Checks and applies the correct trait the character deserves without affecting the physique_variable.
 
-# Note that you need to use weight_trait_check after using one of the other effects, otherwise the traits will not be applied automatically, even if 
+# Note that you need to use weight_trait_check after using one of the other effects, otherwise the traits will not be applied automatically, even if
 # the character has surpassed the variable threshold.
 
 # Example:
 
 
-#	option = { #I will fast for a week
-#		name = EVTOPTAHFP20600
-#		lose_weight_medium_effect = yes  	#Reduces the variable's score
-#		weight_trait_check_effect = yes 	#Checks what is the variable's score after reduction and either removes is_fat, adds is_malnourished, or both, depending on the circumstance.
+#	option = { # I will fast for a week
+#		name = I_SEE
+#		lose_weight_medium_effect = yes		# Reduces the variable's score
+#		weight_trait_check_effect = yes		# Checks what is the variable's score after reduction and either removes fat, adds malnourished, or both, depending on the circumstance.
 #	}
 
 # The check is handled by a separate effect in the event of the scripter wishing to have it fire in a later event, or in case the trait is added in some other manner.
@@ -46,404 +46,444 @@ namespace=HFP
 ###################################################
 ###################################################
 
-#Notification: is_fat
+# Notification: fat
 character_event = {
 	id = HFP.20600
 	desc = EVTDESCHFP20600
 	picture = GFX_evt_fancy_feast
 
+	is_triggered_only = yes
 	notification = yes
 
-	is_triggered_only = yes
+	ai = no
 
-	option = { 
-		name = EVTOPTAHFP20600
+	option = {
+		name = I_SEE
 	}
 }
-#Notification: no longer is_fat
+
+# Notification: no longer fat
 character_event = {
 	id = HFP.20601
 	desc = EVTDESCHFP20601
 	picture = GFX_evt_recovery
 
+	is_triggered_only = yes
 	notification = yes
 
-	is_triggered_only = yes
+	ai = no
 
-	option = { 
-		name = EVTOPTAHFP20601
+	option = {
+		name = I_SEE
 	}
 }
 
-#Notification: is_malnourished
+# Notification: malnourished
 character_event = {
 	id = HFP.20602
 	desc = EVTDESCHFP20602
 	picture = GFX_evt_bad_news
 
+	is_triggered_only = yes
 	notification = yes
 
-	is_triggered_only = yes
+	ai = no
 
-	option = { 
-		name = EVTOPTAHFP20602
+	option = {
+		name = I_SEE
 	}
 }
 
-#Notification: no longer is_malnourished
+# Notification: no longer malnourished
 character_event = {
 	id = HFP.20603
 	desc = EVTDESCHFP20603
 	picture = GFX_evt_recovery
 
+	is_triggered_only = yes
 	notification = yes
 
-	is_triggered_only = yes
+	ai = no
 
-	option = { 
-		name = EVTOPTAHFP20603
+	option = {
+		name = I_SEE
 	}
 }
 
-#On_action: on_five_years pulse. Hidden event to check all of a character's traits/modifiers/etc. and determine if he gains or lose a small amount of physique_variable.
-##The event may then decide if the character receives a random event tied to his current score or not.
+# on_action: on_five_years pulse. Hidden event to check all of a character's traits/modifiers/etc. and determine if he gains or lose a small amount of physique_variable.
+## The event may then decide if the character receives a random event tied to his current score or not.
  character_event = {
 	id = HFP.20604
+
+	is_triggered_only = yes # on_five_year_pulse
 	hide_window = yes
 
 	min_age = 11
 
-	is_triggered_only = yes
+	trigger = {
+		practical_age <= 55
+	}
 
-	immediate = { 
-		#Traits
-		if = { 
-			limit = { trait = indulgent_wastrel
-				OR = { 
-					prisoner = no
+	immediate = {
+		# Traits
+		if = {
+			limit = {
+				trait = indulgent_wastrel
+
+				trigger_if = {
+					limit = { prisoner = yes }
 					has_character_modifier = house_arrest
 				}
 			}
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
-			limit = { 
-				trait = tough_soldier 
-				check_variable = { which = physique_variable value = 1 }
+
+		if = {
+			limit = {
+				trait = tough_soldier
+				check_variable = { which = physique_variable value >= 1 }
 			}
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+
+		if = {
 			limit = { trait = haughty }
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
+
+		if = {
 			limit = { trait = timid }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
-			limit = { 
-				trait = rowdy 
-				check_variable = { which = physique_variable value = 1 }
+
+		if = {
+			limit = {
+				trait = rowdy
+				check_variable = { which = physique_variable value >= 1 }
 			}
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
-			limit = { trait = indolent
-				OR = { 
-					prisoner = no
+
+		if = {
+			limit = {
+				trait = indolent
+
+				trigger_if = {
+					limit = { prisoner = yes }
 					has_character_modifier = house_arrest
 				}
-			 }
+			}
 			change_variable = { which = physique_variable value = 2 }
 		}
-		if = { 
-			limit = { 
-				trait = playful 
-				check_variable = { which = physique_variable value = 1 }
+
+		if = {
+			limit = {
+				trait = playful
+				check_variable = { which = physique_variable value >= 1 }
 			}
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+
+		if = {
 			limit = { trait = fussy }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
-			limit = { 
-				trait = stressed 
-				trait = gluttonous
-				OR = { 
-					prisoner = no
-					has_character_modifier = house_arrest
+
+		if = {
+			limit = { trait = stressed }
+
+			if = {
+				limit = {
+					trait = gluttonous
+
+					trigger_if = {
+						limit = { prisoner = yes }
+						has_character_modifier = house_arrest
+					}
 				}
-			
+
+				change_variable = { which = physique_variable value = 1 }
 			}
-			change_variable = { which = physique_variable value = 1 }
+			else_if = {
+				limit = { trait = temperate }
+				change_variable = { which = physique_variable value = -1 }
+			}
+			else = {
+				random_list = {
+					50 = { change_variable = { which = physique_variable value = -1 } }
+					50 = { change_variable = { which = physique_variable value = 1 } }
+					10 = { }
+				}
+			}
 		}
-		if = { 
-			limit = { 
-				trait = stressed 
-				trait = temperate
+
+		if = {
+			limit = { trait = depressed }
+
+			if = {
+				limit = {
+					trait = gluttonous
+
+					trigger_if = {
+						limit = { prisoner = yes }
+						has_character_modifier = house_arrest
+					}
+				}
+
+				change_variable = { which = physique_variable value = 2 }
 			}
+
+			else_if = {
+				limit = { trait = temperate }
+				change_variable = { which = physique_variable value = -2 }
+			}
+			else = {
+				random_list = {
+					50 = { change_variable = { which = physique_variable value = -2 } }
+					50 = { change_variable = { which = physique_variable value = 2 } }
+					10 = { }
+				}
+			}
+		}
+
+		if = {
+			limit = { trait = temperate }
+
 			change_variable = { which = physique_variable value = -1 }
+
+			if = {
+				limit = { trait = slothful }
+				change_variable = { which = physique_variable value = -1 }
+			}
+
+			if = {
+				limit = { trait = wroth }
+				change_variable = { which = physique_variable value = -1 }
+			}
 		}
-		if = { 
-			limit = { 
-				trait = stressed 
-				NOR = { 
-					trait = temperate 
-					trait = gluttonous
+		else_if = {
+			limit = { trait = gluttonous }
+
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { prisoner = yes }
+						has_character_modifier = house_arrest
+					}
+				}
+
+				change_variable = { which = physique_variable value = 1 }
+
+				if = {
+					limit = { trait = slothful }
+					change_variable = { which = physique_variable value = 1 }
+				}
+
+				if = {
+					limit = { trait = wroth }
+					change_variable = { which = physique_variable value = 1 }
 				}
 			}
-			random_list = { 
-				50 = { change_variable = { which = physique_variable value = -1 } } 
-				50 = { change_variable = { which = physique_variable value = 1 } } 
-				10 = {  } 
-			}
 		}
-		if = { 
-			limit = { 
-				trait = depressed 
-				trait = gluttonous
-				OR = { 
-					prisoner = no
-					has_character_modifier = house_arrest
-				}
-			
-			}
-			change_variable = { which = physique_variable value = 2 }
-		}
-		if = { 
-			limit = { 
-				trait = depressed 
-				trait = temperate
-			}
-			change_variable = { which = physique_variable value = -2 }
-		}
-		if = { 
-			limit = { 
-				trait = depressed 
-				NOR = { 
-					trait = temperate 
-					trait = gluttonous
+		else = {
+			if = {
+				limit = { trait = wroth }
+
+				random_list = {
+					50 = { change_variable = { which = physique_variable value = -1 } }
+					50 = { change_variable = { which = physique_variable value = 1 } }
+					10 = { }
 				}
 			}
-			random_list = { 
-				50 = { change_variable = { which = physique_variable value = -2 } } 
-				50 = { change_variable = { which = physique_variable value = 2 } }
-				10 = {  } 
-			}
-		}
-		if = { 
-			limit = { 
-				trait = wroth 
-				NOR = { 
-					trait = temperate 
-					trait = gluttonous
+
+
+			if = {
+				limit = { trait = slothful }
+
+				random_list = {
+					50 = { change_variable = { which = physique_variable value = -1 } }
+					50 = { change_variable = { which = physique_variable value = 1 } }
 				}
 			}
-			random_list = { 
-				50 = { change_variable = { which = physique_variable value = -1 } } 
-				50 = { change_variable = { which = physique_variable value = 1 } } 
-				10 = {  } 
-			}
 		}
-		if = { 
+
+		if = {
 			limit = { trait = maimed }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = infirm }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = incapable }
 			change_variable = { which = physique_variable value = -4 }
 		}
-		if = { 
+		if = {
 			limit = { trait = drunkard }
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
-			limit = { 
-				trait = physician
-				check_variable = { which = physique_variable value = 1 }
+
+		if = {
+			limit = { trait = physician }
+
+			if = {
+				limit = { check_variable = { which = physique_variable value >= 1 } }
+				change_variable = { which = physique_variable value = -1 }
 			}
-			change_variable = { which = physique_variable value = -1 }
-		}
-		if = { 
-			limit = { 
-				trait = physician
-				NOT = { check_variable = { which = physique_variable value = -1 } }
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -1 } }
+				change_variable = { which = physique_variable value = 1 }
 			}
-			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
+
+		if = {
 			limit = { trait = ill }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = pneumonic }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = syphilitic }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = leper }
 			change_variable = { which = physique_variable value = -3 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_tuberculosis }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_typhoid_fever }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_typhus }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_bubonic_plague }
 			change_variable = { which = physique_variable value = -3 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_measles }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_small_pox }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = has_aztec_disease }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = sickly }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = flu }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = dysentery }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = gout }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = food_poisoning }
 			change_variable = { which = physique_variable value = -3 }
 		}
-		if = { 
+		if = {
 			limit = { trait = cancer }
 			change_variable = { which = physique_variable value = -2 }
 		}
-		if = { 
+		if = {
 			limit = { trait = dancing_plague }
 			change_variable = { which = physique_variable value = -3 }
 		}
-		if = { 
+		if = {
 			limit = { trait = scurvy }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
+		if = {
 			limit = { trait = mangled }
 			change_variable = { which = physique_variable value = -3 }
 		}
-		if = { 
+		if = {
 			limit = { trait = pregnant }
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
-			limit = { 
-				trait = strong 
-				NOT = { check_variable = { which = physique_variable value = -1 } }
+
+		if = {
+			limit = {
+				is_strong_tier_3_trigger = yes
+				check_variable = { which = physique_variable value < -1 }
 			}
 			change_variable = { which = physique_variable value = 2 }
 		}
 		if = { 
 			limit = { 
 				OR = {
-					trait = tough
-					trait = hardy
+					is_strong_tier_2_trigger = yes
+					is_strong_tier_1_trigger = yes
 				}
-				NOT = { check_variable = { which = physique_variable value = -1 } }
+				check_variable = { which = physique_variable value < -1 }
 			}
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
-			limit = { 
-				trait = harelip 
-			}
+
+		if = {
+			limit = { trait = harelip }
 			change_variable = { which = physique_variable value = -1 }
+		}
+
+		if = {
+			limit = { trait = inbred }
+			change_variable = { which = physique_variable value = -2 }
 		}
 		if = { 
 			limit = { 
-				trait = inbred 
+				is_weak_tier_3_trigger = yes
+				check_variable = { which = physique_variable value = 1 }
 			}
 			change_variable = { which = physique_variable value = -2 }
 		}
 		if = { 
 			limit = { 
-				trait = weak 
-				check_variable = { which = physique_variable value = 1 }
-			}
-			change_variable = { which = physique_variable value = -2 }
-		}
-		if = { 
-			limit = { 
-				OR ={
-					trait = delicate 
-					trait = soft
+				OR = {
+					is_weak_tier_2_trigger = yes
+					is_weak_tier_1_trigger = yes
 				}
 				check_variable = { which = physique_variable value = 1 }
 			}
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
-			limit = { 
-				is_weak_non_congenital_trigger = yes
-				check_variable = { which = physique_variable value = 1 }
-			}
-			change_variable = { which = physique_variable value = -1 }
-		}
-		if = { 
-			limit = { 
-				is_strong_non_congenital_trigger = yes
-				NOT = { check_variable = { which = physique_variable value = -1 } }
-			}
+
+		if = {
+			limit = { trait = sturdy }
 			change_variable = { which = physique_variable value = 1 }
 		}
-		if = { 
-			limit = { 
-				trait = sturdy 
-			}
-			change_variable = { which = physique_variable value = 1 }
-		}
-		if = { 
-			limit = { 
-				trait = hedonist 
-			}
+
+		if = {
+			limit = { trait = hedonist }
 			change_variable = { which = physique_variable value = 2 }
 		}
-		if = { 
-			limit = { 
-				trait = scholar 
-			}
+
+		if = {
+			limit = { trait = scholar }
 			change_variable = { which = physique_variable value = -1 }
 		}
-		if = { 
-			limit = { 
-				trait = mystic 
-			}
+
+		if = {
+			limit = { trait = mystic }
 			change_variable = { which = physique_variable value = -1 }
 		}
 		if = { 
