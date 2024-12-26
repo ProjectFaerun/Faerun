@@ -1,0 +1,463 @@
+namespace = frimmortal
+
+# Vampire hunter
+character_event = {
+	id = frimmortal.1
+	desc = FRIMMORTAL.1.D
+	picture = GFX_evt_bad_news
+	border = GFX_event_normal_frame_intrigue
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		NOT = { has_character_modifier = recent_duel_timer }
+		OR = {
+			trait = vampire
+			trait = vampire_spawn
+		}
+		OR = {
+			NOT = { has_character_flag = vampire_hunter_spawned }
+			had_character_flag = {
+				flag = vampire_hunter_spawned
+				years > 5
+			}
+		}
+	}
+	
+	mean_time_to_happen = {
+		years = 5
+		modifier = {
+			factor = 1.5
+			trait = vampire_spawn
+		}
+		modifier = {
+			factor = 4
+			is_ruler = no
+		}
+		modifier = {
+			factor = 0.3
+			has_character_modifier = known_vamp_modifier
+		}
+		modifier = {
+			factor = 2
+			intrigue = 10
+		}
+		modifier = {
+			factor = 1.5 # stacks with the above
+			intrigue = 15
+		}
+		modifier = {
+			factor = 0.5
+			NOT = { intrigue = 6 }
+		}
+		modifier = {
+			factor = 0.1
+			NOT = { intrigue = 1 }
+		}
+	}
+	
+	immediate = {
+		clr_character_flag = vampire_hunter_spawned
+		set_character_flag = vampire_hunter_spawned
+	}
+	
+	option = {
+		trigger = {
+			is_ruler = yes
+			wealth = 50
+		}
+		name = FRIMMORTAL.1.Oa
+		wealth = -50
+		hidden_tooltip = {
+			random_list = {
+				1 = {
+					modifier = { # these should all stack
+						factor = 1.5
+						intrigue = 7
+					}
+					modifier = {
+						factor = 1.5
+						intrigue = 10
+					}
+					modifier = {
+						factor = 1.5
+						intrigue = 15
+					}
+					modifier = {
+						factor = 1.5
+						intrigue = 20
+					}
+					modifier = {
+						factor = 1.5
+						intrigue = 25
+					}
+					hidden_tooltip = {
+						character_event = { id = frimmortal.2 days = 10 }
+					}
+				}
+				5 = {
+					set_character_flag = failed_killing_vampire_hunter
+					hidden_tooltip = {
+						character_event = { id = frimmortal.3 days = 10 }
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = FRIMMORTAL.1.Ob
+		hidden_tooltip = {
+			character_event = { id = frimmortal.3 days = 10 }
+		}
+	}
+}
+
+character_event = {
+	id = frimmortal.2
+	desc = FRIMMORTAL.2.D
+	picture = GFX_evt_burning_house
+	border = GFX_event_normal_frame_intrigue
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRIMMORTAL.2.Oa
+	}
+}
+
+character_event = {
+	id = frimmortal.3
+	desc = {
+		trigger = {
+			NOT = { has_character_flag = failed_killing_vampire_hunter }
+		}
+		text = FRIMMORTAL.3.Da
+	}
+	desc = {
+		trigger = {
+			has_character_flag = failed_killing_vampire_hunter
+		}
+		text = FRIMMORTAL.3.Db
+	}
+	picture = GFX_evt_bandits
+	border = GFX_event_normal_frame_war
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRIMMORTAL.3.Oa
+		clr_character_flag = failed_killing_vampire_hunter
+		add_character_modifier = {
+			modifier = recent_duel_timer
+			hidden = yes
+			months = 3
+		}
+		pacifists_lose_piety_effect = yes
+        if = {
+            limit = { #Warriors like a warrior who acts like one...
+                is_member_of_any_warrior_lodge_trigger = yes
+            }
+            add_legend_progress_trivial_effect = yes
+        }
+		set_character_flag = is_in_duel
+		set_character_flag = add_duel_xp
+		save_event_target_as = combatant_1
+		set_character_flag = flag_duel_no_draws
+		location = {
+			create_character = {
+				attributes = {
+					martial = 10
+					intrigue = 10
+				}
+				trait = brave
+				trait = hunter
+				random_traits = yes
+				female = random
+				dynasty = actually_culture
+				flag = do_not_undead
+			}
+		}
+		new_character = {
+			character_event = { id = character_trait.1 }
+			religion = triadic
+			add_trait = patron_tyr
+			if = {
+				limit = {
+					ROOT = {
+						OR = {
+							z_basic_class = yes
+							z_has_class = no
+						}
+					}
+				}
+				random_list = {
+					5 = {
+						random_list = {
+							1 = {
+								add_trait = cleric
+							}
+							1 = {
+								add_trait = paladin
+							}
+							1 = {
+								add_trait = ranger
+							}
+							1 = {
+								add_trait = fighter
+							}
+							1 = {
+								add_trait = rogue
+							}
+							1 = {
+								add_trait = class_monk
+							}
+						}
+					}
+					3 = {
+						random_list = {
+							1 = {
+								add_trait = trained_cleric
+							}
+							1 = {
+								add_trait = trained_paladin
+							}
+							1 = {
+								add_trait = trained_ranger
+							}
+							1 = {
+								add_trait = trained_fighter
+							}
+							1 = {
+								add_trait = trained_rogue
+							}
+							1 = {
+								add_trait = trained_monk
+							}
+						}
+					}
+					1 = {
+						random_list = {
+							1 = {
+								add_trait = journeyman_cleric
+							}
+							1 = {
+								add_trait = journeyman_paladin
+							}
+							1 = {
+								add_trait = journeyman_ranger
+							}
+							1 = {
+								add_trait = journeyman_fighter
+							}
+							1 = {
+								add_trait = journeyman_rogue
+							}
+							1 = {
+								add_trait = journeyman_monk
+							}
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					ROOT = {
+						OR = {
+							z_trained_class = yes
+							z_journeyman_class = yes
+						}
+					}
+				}
+				random_list = {
+					5 = {
+						random_list = {
+							1 = {
+								add_trait = cleric
+							}
+							1 = {
+								add_trait = paladin
+							}
+							1 = {
+								add_trait = ranger
+							}
+							1 = {
+								add_trait = fighter
+							}
+							1 = {
+								add_trait = rogue
+							}
+							1 = {
+								add_trait = class_monk
+							}
+						}
+					}
+					4 = {
+						random_list = {
+							1 = {
+								add_trait = trained_cleric
+							}
+							1 = {
+								add_trait = trained_paladin
+							}
+							1 = {
+								add_trait = trained_ranger
+							}
+							1 = {
+								add_trait = trained_fighter
+							}
+							1 = {
+								add_trait = trained_rogue
+							}
+							1 = {
+								add_trait = trained_monk
+							}
+						}
+					}
+					3 = {
+						random_list = {
+							1 = {
+								add_trait = journeyman_cleric
+							}
+							1 = {
+								add_trait = journeyman_paladin
+							}
+							1 = {
+								add_trait = journeyman_ranger
+							}
+							1 = {
+								add_trait = journeyman_fighter
+							}
+							1 = {
+								add_trait = journeyman_rogue
+							}
+							1 = {
+								add_trait = journeyman_monk
+							}
+						}
+					}
+					1 = {
+						random_list = {
+							1 = {
+								add_trait = expert_cleric
+							}
+							1 = {
+								add_trait = expert_paladin
+							}
+							1 = {
+								add_trait = expert_ranger
+							}
+							1 = {
+								add_trait = expert_fighter
+							}
+							1 = {
+								add_trait = expert_rogue
+							}
+							1 = {
+								add_trait = expert_monk
+							}
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					ROOT = {
+						OR = {
+							z_expert_class = yes
+							z_renowned_class = yes
+							z_legendary_class = yes
+						}
+					}
+				}
+				random_list = {
+					5 = {
+						random_list = {
+							1 = {
+								add_trait = expert_cleric
+							}
+							1 = {
+								add_trait = expert_paladin
+							}
+							1 = {
+								add_trait = expert_ranger
+							}
+							1 = {
+								add_trait = expert_fighter
+							}
+							1 = {
+								add_trait = expert_rogue
+							}
+							1 = {
+								add_trait = expert_monk
+							}
+						}
+					}
+					1 = {
+						random_list = {
+							1 = {
+								add_trait = renowned_cleric
+							}
+							1 = {
+								add_trait = renowned_paladin
+							}
+							1 = {
+								add_trait = renowned_ranger
+							}
+							1 = {
+								add_trait = renowned_fighter
+							}
+							1 = {
+								add_trait = renowned_rogue
+							}
+							1 = {
+								add_trait = renowned_monk
+							}
+						}
+					}
+					4 = {
+						random_list = {
+							1 = {
+								add_trait = journeyman_cleric
+							}
+							1 = {
+								add_trait = journeyman_paladin
+							}
+							1 = {
+								add_trait = journeyman_ranger
+							}
+							1 = {
+								add_trait = journeyman_fighter
+							}
+							1 = {
+								add_trait = journeyman_rogue
+							}
+							1 = {
+								add_trait = journeyman_monk
+							}
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					is_female = no
+					trait = creature_human
+					z_monk = yes
+				}
+				random = {
+					chance = 1
+					set_name = "Joseph"
+				}
+			}
+			add_character_modifier = {
+                modifier = recent_duel_timer
+                hidden = yes
+                months = 3
+            }
+			set_character_flag = is_in_duel
+			set_character_flag = add_duel_xp
+			save_event_target_as = combatant_2
+		}
+		character_event = { id = HFP.10100 }
+	}
+}
