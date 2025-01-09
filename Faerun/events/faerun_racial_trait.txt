@@ -698,9 +698,6 @@ character_event = {
 			woodgiantgfx 	= { # Voadkyn, Verbeeg, Firbolg
 				add_trait = creature_giant
 			}
-			halfgiantgfx	= { # Half-Giants
-				add_trait = creature_half_giant
-			}
 			halfogregfx		= { # Half-Ogres
 				add_trait = creature_half_ogre
 			}
@@ -728,8 +725,59 @@ character_event = {
 			trollgfx	= { # Trolls
 				add_trait = creature_troll
 			}
-			goliathgfx	= { # Gol-Kaa (goliaths)
-				add_trait = creature_goliath
+			goliathgfx	= { # Gol-Kaa, Stone Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
+			}
+			stormgoliathgfx = { # Storm Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
+			}
+			cloudgoliathgfx = { # Cloud Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
+			}
+			firegoliathgfx = { # Fire Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
+			}
+			frostgoliathgfx = { # Frost Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
+			}
+			halfgiantgfx = { # Hill Goliaths/Half-Giants (goliaths)
+				if = {
+					limit = { culture_group = mordrin_group }
+					add_trait = creature_goliath
+				}
+				else = {
+					add_trait = creature_half_giant
+				}
 			}
 
 			# human block - most humans are in the fallback section below
@@ -951,13 +999,25 @@ character_event = {
 				add_trait = creature_half_gnoll
 			}			
 			tabaxigfx		= { # Tabaxi, ura/tiger hengeyokai
-				add_trait = creature_tabaxi
+				if = {
+					limit = { culture_group = fey_group }
+					add_trait = creature_hengeyokai
+				}
+				else = {
+					add_trait = creature_tabaxi
+				}
 			}
 			
 			# fish group
 			
 			sahuagingfx		= { # Sahuagin, koi/carp hengeyokai
-				add_trait = creature_sahuagin
+				if = {
+					limit = { culture_group = fey_group }
+					add_trait = creature_hengeyokai
+				}
+				else = {
+					add_trait = creature_sahuagin
+				}
 			}
 			slanngfx 		= { # Kuo-Toa, hydroloths
 				add_trait = creature_kuotoa
@@ -978,7 +1038,13 @@ character_event = {
 			# avian group
 
 			tengugfx		= { # Tengu (eastern tengu/kenku) and kurasu/crow hengeyokai
-				add_trait = creature_tengu
+				if = {
+					limit = { culture_group = fey_group }
+					add_trait = creature_hengeyokai
+				}
+				else = {
+					add_trait = creature_tengu
+				}
 			}
 			kenkugfx		= { # Kenku (western tengu/kenku)
 				add_trait = creature_tengu
@@ -1059,10 +1125,18 @@ character_event = {
 				random_list = {
 					1 = {
 						add_trait = creature_angel
-						random_list = {
-							75 = {}
-							20 = { set_graphical_culture = angel } # Trumpet and Sword archons
-							5 = { set_graphical_culture = warden_archon } #Warden archons
+						if = {
+							limit = {
+								OR = {
+									is_playable = no
+									had_global_flag = { flag = faerun_started days = 1 }
+								}
+							}
+							random_list = {
+								75 = {}
+								20 = { set_graphical_culture = angel } # Trumpet and Sword archons
+								5 = { set_graphical_culture = warden_archon } #Warden archons
+							}
 						}
 					}
 					1 = {
@@ -1215,16 +1289,25 @@ character_event = {
 			beargfx = { # Ursinals (guardinals) - this is the default guardinal
 				if = {
 					limit = { culture_group = celestial_group }
-					random_list = {
-						1 = {
-							spawn_random_guardinal = yes
+					if = {
+						limit = {
+							is_playable = yes
+							NOT = { had_global_flag = { flag = faerun_started days = 1 } }
 						}
-						1 = {
-							trigger = {
-								allow_changing_race = yes
-								liege = { is_landed = yes }
+						add_trait = creature_angel
+					}
+					else = {
+						random_list = {
+							1 = {
+								spawn_random_guardinal = yes
 							}
-							spawn_random_aasimar = yes
+							1 = {
+								trigger = {
+									allow_changing_race = yes
+									liege = { is_landed = yes }
+								}
+								spawn_random_aasimar = yes
+							}
 						}
 					}
 				}
@@ -1268,16 +1351,26 @@ character_event = {
 			# fiendish group
 
 			khorneprincegfx = { # Pit fiends (baatezu) - this is the default baatezu
-				random_list = {
-					1 = {
-						spawn_random_baatezu = yes
+				if = {
+					limit = {
+						is_playable = yes
+						NOT = { had_global_flag = { flag = faerun_started days = 1 } }
 					}
-					1 = {
-						trigger = {
-							allow_changing_race = yes
-							liege = { is_landed = yes }
+					add_trait = creature_fiend
+					add_trait = greater_fiend
+				}
+				else = {
+					random_list = {
+						1 = {
+							spawn_random_baatezu = yes
 						}
-						spawn_random_tiefling = yes
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							spawn_random_tiefling = yes
+						}
 					}
 				}
 			}
@@ -1313,16 +1406,25 @@ character_event = {
 				add_trait = creature_fiend
 			}
 			tzeentchprincegfx = { # Vrocks (tanar'ri)- this is the default tanar'ri 
-				random_list = {
-					1 = {
-						spawn_random_tanarri = yes
+				if = {
+					limit = {
+						is_playable = yes
+						NOT = { had_global_flag = { flag = faerun_started days = 1 } }
 					}
-					1 = {
-						trigger = {
-							allow_changing_race = yes
-							liege = { is_landed = yes }
+					add_trait = creature_fiend
+				}
+				else = {
+					random_list = {
+						1 = {
+							spawn_random_tanarri = yes
 						}
-						spawn_random_tiefling = yes
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							spawn_random_tiefling = yes
+						}
 					}
 				}
 			}
@@ -1386,16 +1488,25 @@ character_event = {
 				}
 			}
 			nycalothgfx		= { # Nycaloths (yugoloths) - this is the default yugoloth
-				random_list = {
-					1 = {
-						spawn_random_yugoloth = yes
+				if = {
+					limit = {
+						is_playable = yes
+						NOT = { had_global_flag = { flag = faerun_started days = 1 } }
 					}
-					1 = {
-						trigger = {
-							allow_changing_race = yes
-							liege = { is_landed = yes }
+					add_trait = creature_fiend
+				}
+				else = {
+					random_list = {
+						1 = {
+							spawn_random_yugoloth = yes
 						}
-						spawn_random_tiefling = yes
+						1 = {
+							trigger = {
+								allow_changing_race = yes
+								liege = { is_landed = yes }
+							}
+							spawn_random_tiefling = yes
+						}
 					}
 				}
 			}
@@ -2489,13 +2600,17 @@ character_event = {
 										# do nothing
 										}
 										5 = {
+											trigger = { allow_changing_culture = yes }
 											religion = turm
 										}
 										5 = {
 											set_graphical_culture = turmic
-											random = {
-												chance = 35
-												religion = turm
+											if = {
+												limit = { allow_changing_culture = yes }
+												random = {
+													chance = 35
+													religion = turm
+												}
 											}
 										}
 										5 = {
