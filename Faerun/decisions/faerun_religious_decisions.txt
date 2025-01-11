@@ -6626,6 +6626,41 @@ decisions = {
 				}
 			}
 		}
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	create_direguard = {
+		ai_check_interval = 40
+		
+		potential = {
+			not_casting = yes
+			OR = {
+				religion = church_of_cyric = yes
+				has_character_modifier = syncretic_cyric
+			}
+			is_inaccessible_or_incapable_trigger = no
+			NOT = { trait = infirm }
+			is_adult = yes
+			NOT = {
+				any_artifact = {
+					artifact_type = direguard_artf
+				}
+			}
+		}
+		allow = {
+			piety = 90
+			wealth = 80
+		}
+		effect = {
+			add_artifact = direguard_artf
+			piety = -90
+			wealth = -80
+		}
+		ai_will_do = {
+			factor = 0.3
+		}
 	}
 }
 
@@ -6721,10 +6756,13 @@ targeted_decisions = {
 				is_undead = yes
 				trait = construct
 				trait = creature_monster
-				AND = {
-					trait = creature_dwarf
-					gfx_culture_scope = {
-						culture = derro
+				custom_tooltip = {
+					text = is_derro
+					AND = {
+						trait = creature_dwarf
+						gfx_culture_scope = {
+							culture = derro
+						}
 					}
 				}
 			}
@@ -6823,10 +6861,13 @@ targeted_decisions = {
 				is_undead = yes
 				trait = construct
 				trait = creature_monster
-				AND = {
-					trait = creature_dwarf
-					gfx_culture_scope = {
-						culture = derro
+				custom_tooltip = {
+					text = is_derro
+					AND = {
+						trait = creature_dwarf
+						gfx_culture_scope = {
+							culture = derro
+						}
 					}
 				}
 			}
@@ -6934,6 +6975,76 @@ targeted_decisions = {
 			}
 			opinion = {
 				modifier = opinion_invaded_my_mind
+				who = FROM
+			}
+		}
+		ai_will_do = {
+			factor = 0.3
+		}
+	}
+	
+	spread_madness = {
+		ai_target_filter = home_court
+		only_playable = yes
+		ai_check_interval = 360
+
+		from_potential = {
+			OR = {
+				religion = church_of_cyric
+				has_character_modifier = syncretic_cyric
+			}
+			age = 16
+		}
+
+		potential = {
+			prisoner = yes
+			host = { character = FROM }
+			NOR = {
+				trait = lunatic
+				trait = creature_construct
+				is_undead = yes
+				trait = construct
+				trait = creature_monster
+				custom_tooltip = {
+					text = is_derro
+					AND = {
+						trait = creature_dwarf
+						gfx_culture_scope = {
+							culture = derro
+						}
+					}
+				}
+			}
+			hidden_tooltip = {
+				ai = yes
+			}
+		}
+
+		allow = {
+			NOT = { trait = lunatic }
+			FROM = { 
+				piety = 70
+				is_inaccessible_or_incapable_trigger = no
+			}
+		}
+
+		effect = {
+			FROM = {
+				piety = -70
+				if = {
+					limit = {
+						trait = kind
+					}
+					remove_trait = kind
+				}
+				random = {
+					chance = 65
+					add_trait = cruel
+				}
+			}
+			add_trait = lunatic
+			opinion = {
+				modifier = opinion_tortured_me
 				who = FROM
 			}
 		}
@@ -8503,6 +8614,61 @@ targeted_decisions = {
 			modifier = {
 				factor = 1.5
 				trait = impaler
+			}
+		}
+	}
+	
+	cyric_make_rival = {
+		ai_check_interval = 80
+		filter = all
+		ai_target_filter = independent_rulers
+		
+		from_potential = {
+			NOT = { character = ROOT }
+			religion = church_of_cyric
+			is_adult = yes
+			is_inaccessible_or_incapable_trigger = no
+			NOT = { trait = infirm }
+			not_casting = yes
+		}
+		
+		potential = {
+			religion = yes church_of_cyric
+			is_adult = yes
+			is_inaccessible_or_incapable_trigger = no
+			NOT = { trait = infirm }
+		}
+		
+		allow = {
+			FROM = { piety = 70 }
+			NOR = {
+				is_foe = FROM
+				is_friend = FROM
+				is_lover = FROM
+				any_spouse = { # a good chunk of this list is to prevent this from being too strong as a way to remove characters
+					character = FROM
+				}
+				any_consort = {
+					character = FROM
+				}
+				any_liege = {
+					character = FROM
+				}
+				any_vassal = {
+					character = FROM
+				}
+				FROM = {
+					any_child = {
+						character = ROOT
+					}
+				}
+			}
+		}
+		
+		effect = {
+			FROM = {
+				piety = -70
+				character_event = { id = divrel.31 }
 			}
 		}
 	}
