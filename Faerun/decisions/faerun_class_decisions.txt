@@ -30,7 +30,7 @@ decisions = {
 		allow = {
 			NOT = { trait = patron_kelemvor }
 			is_incapable = no
-
+			wild_magic_recovery = yes
 			OR = {
 				AND = {
 					custom_tooltip = {
@@ -70,6 +70,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -120,18 +121,23 @@ decisions = {
 			}
 			if = {
 				limit = {
-					ai = yes
+					wild_magic_recovery = yes
 				}
-				add_trait = longevity
-			}
-			else = {
-				character_event = { id = wizinit.6 }
-			}
-			if = {
-				limit = {
-					trait = infirm
+				if = {
+					limit = {
+						ai = yes
+					}
+					add_trait = longevity
 				}
-				remove_trait = infirm
+				else = {
+					character_event = { id = wizinit.6 }
+				}
+				if = {
+					limit = {
+						trait = infirm
+					}
+					remove_trait = infirm
+				}
 			}
 		}
 		ai_will_do = {
@@ -181,6 +187,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			OR = {
 				AND = {
 					custom_tooltip = {
@@ -226,6 +233,7 @@ decisions = {
 			is_incapable = no
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -306,11 +314,16 @@ decisions = {
 			}
 			if = {
 				limit = {
-					trait = infirm
+					wild_magic_recovery = yes
 				}
-				remove_trait = infirm
+				if = {
+					limit = {
+						trait = infirm
+					}
+					remove_trait = infirm
+				}
+				character_event = { id = wizinit.7 }
 			}
-			character_event = { id = wizinit.7 }
 		}
 		ai_will_do = {
 			factor = 0.05
@@ -360,6 +373,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			NOT = { trait = patron_kelemvor }
 			OR = {
 				AND = {
@@ -380,6 +394,7 @@ decisions = {
 			is_incapable = no
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -392,114 +407,119 @@ decisions = {
 					wealth = -150
 				}
 			}
-			hidden_tooltip = {
-				export_to_variable = {
-					which = local_clone_health
-					value = base_health
+			if = {
+				limit = {
+					wild_magic_recovery = yes
 				}
-				export_to_variable = {
-					which = local_clone_fertility
-					value = fertility
+				hidden_tooltip = {
+					export_to_variable = {
+						which = local_clone_health
+						value = base_health
+					}
+					export_to_variable = {
+						which = local_clone_fertility
+						value = fertility
+					}
 				}
-			}
-			create_character = {
-				age = 20
-				random_traits = no
-				religion = ROOT
-				culture = ROOT
-				dynasty = ROOT
-				trait = is_clone
-				trait = stasis_clone
-				genetic_father = ROOT
-				genetic_mother = ROOT
-			}
-			new_character = {
-				fertility = local_clone_fertility
-				health = local_clone_health
-				culture = ROOT
-				religion = ROOT
+				create_character = {
+					age = 20
+					random_traits = no
+					religion = ROOT
+					culture = ROOT
+					dynasty = ROOT
+					trait = is_clone
+					trait = stasis_clone
+					genetic_father = ROOT
+					genetic_mother = ROOT
+				}
+				new_character = {
+					fertility = local_clone_fertility
+					health = local_clone_health
+					culture = ROOT
+					religion = ROOT
 
-				if = {
-					limit = {
-						ROOT = {
-							is_female = no
+					if = {
+						limit = {
+							ROOT = {
+								is_female = no
+							}
 						}
+						set_father = ROOT
+						set_gender = male
 					}
-					set_father = ROOT
-					set_gender = male
-				}
-				else = {
-					set_mother = ROOT
-					set_gender = female
-				}
-				set_name = ROOT
-
-				copy_traits_of_PREV = yes
-
-				character_event = { id = frxp.1 }
-
-				change_diplomacy = -100
-				change_martial = -100
-				change_stewardship = -100
-				change_intrigue = -100
-				change_learning = -100
-
-				while = {
-					count = 10
-					limit = { diplomacy < ROOT }
-
-					change_diplomacy = 1
-				}
-				while = {
-					count = 10
-					limit = { martial < ROOT }
-					
-					change_martial = 1
-				}
-				while = {
-					count = 10
-					limit = { stewardship < ROOT }
-					
-					change_stewardship = 1
-				}
-				while = {
-					count = 10
-					limit = { intrigue < ROOT }
-					
-					change_intrigue = 1
-				}
-				while = {
-					count = 10
-					limit = { learning < ROOT }
-					
-					change_learning = 1
-				}
-
-				if = {
-					limit = { ROOT = { has_character_flag = had_religion_change_event } }
-
-					set_character_flag = had_religion_change_event
-				}
-				if = {
-					limit = { ROOT = { has_character_flag = patron_chosen } }
-
-					set_character_flag = patron_chosen
-					set_character_flag = patron_checked
-				}
-				if = {
-					limit = { ROOT = { has_character_flag = patron_rechosen } }
-
-					set_character_flag = patron_rechosen
-				}
-				any_sibling = {
-					limit = {
-						trait = is_clone
+					else = {
+						set_mother = ROOT
+						set_gender = female
 					}
-					add_rival = PREV
+					set_name = ROOT
+
+					copy_traits_of_PREV = yes
+
+					character_event = { id = frxp.1 }
+
+					change_diplomacy = -100
+					change_martial = -100
+					change_stewardship = -100
+					change_intrigue = -100
+					change_learning = -100
+
+					while = {
+						count = 10
+						limit = { diplomacy < ROOT }
+
+						change_diplomacy = 1
+					}
+					while = {
+						count = 10
+						limit = { martial < ROOT }
+						
+						change_martial = 1
+					}
+					while = {
+						count = 10
+						limit = { stewardship < ROOT }
+						
+						change_stewardship = 1
+					}
+					while = {
+						count = 10
+						limit = { intrigue < ROOT }
+						
+						change_intrigue = 1
+					}
+					while = {
+						count = 10
+						limit = { learning < ROOT }
+						
+						change_learning = 1
+					}
+
+					if = {
+						limit = { ROOT = { has_character_flag = had_religion_change_event } }
+
+						set_character_flag = had_religion_change_event
+					}
+					if = {
+						limit = { ROOT = { has_character_flag = patron_chosen } }
+
+						set_character_flag = patron_chosen
+						set_character_flag = patron_checked
+					}
+					if = {
+						limit = { ROOT = { has_character_flag = patron_rechosen } }
+
+						set_character_flag = patron_rechosen
+					}
+					any_sibling = {
+						limit = {
+							trait = is_clone
+						}
+						add_rival = PREV
+					}
 				}
+				recalc_succession = yes
+				add_trait_wounded_effect = yes
 			}
-			recalc_succession = yes
-			add_trait_wounded_effect = yes
 		}
 		ai_will_do = {
 			factor = 0.05
@@ -557,6 +577,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			war = yes
 			custom_tooltip = {
 				text = ANIMATEDEADCD
@@ -638,6 +659,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -683,11 +705,16 @@ decisions = {
 					wealth = -200
 				}
 			}
-			add_character_modifier = {
-				name = summoned_dead_cooldown
-				days = 666
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				add_character_modifier = {
+					name = summoned_dead_cooldown
+					days = 666
+				}
+				character_event = { id = wizinit.8 }
 			}
-			character_event = { id = wizinit.8 }
 		}
 		ai_will_do = {
 			factor = 0.75
@@ -742,6 +769,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			custom_tooltip = {
 				text = PBINDINGCD
 				hidden_tooltip = {
@@ -892,6 +920,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			hidden_effect = {
 				if = {
 					limit = {
@@ -1042,8 +1071,12 @@ decisions = {
 				}
 				wealth = local_summon_cost_negative
 			}
-
-			character_event = { id = wizinit.11 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.11 }
+			}
 		}
 		ai_will_do = {
 			factor = 0.4
@@ -1075,6 +1108,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			NOR = {
 				has_artifact = homunculus_artf
 				has_artifact = wiz_familiar_artf
@@ -1155,6 +1189,7 @@ decisions = {
 		}
 
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -1200,7 +1235,12 @@ decisions = {
 					wealth = -150
 				}
 			}
-			character_event = { id = wizinit.26 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.26 }
+			}
 		}
 
 		ai_will_do = {
@@ -1231,6 +1271,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			custom_tooltip = {
 				text = DIVINETHREATCD
 				hidden_tooltip = {
@@ -1326,6 +1367,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			clr_character_flag = wiz_divine_threat
 			set_character_flag = wiz_divine_threat
 			trigger_switch = {
@@ -1373,7 +1415,12 @@ decisions = {
 					wealth = -200
 				}
 			}
-			character_event = { id = wizinit.27 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.27 }
+			}
 		}
 
 		ai_will_do = {
@@ -1412,6 +1459,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			war = yes
 			custom_tooltip = {
 				text = ANIMATEDEADCD
@@ -1500,6 +1548,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -1570,7 +1619,12 @@ decisions = {
 				name = summoned_cooldown
 				years = 2
 			}
-			character_event = { id = wizinit.28 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.28 }
+			}
 		}
 		ai_will_do = {
 			factor = 0.5
@@ -1619,6 +1673,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			war = yes
 			OR = {
 				custom_tooltip = {
@@ -1729,6 +1784,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -1799,7 +1855,12 @@ decisions = {
 				name = summoned_cooldown
 				years = 2
 			}
-			character_event = { id = wizinit.31 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.31 }
+			}
 		}
 		ai_will_do = {
 			factor = 0.5
@@ -2005,6 +2066,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			war = yes
 			custom_tooltip = {
 				text = SUMMONEDCD
@@ -2086,6 +2148,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_wizard = {
@@ -2135,7 +2198,12 @@ decisions = {
 				name = summoned_cooldown
 				years = 2
 			}
-			character_event = { id = wizinit.34 }
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				character_event = { id = wizinit.34 }
+			}
 		}
 		ai_will_do = {
 			factor = 0.5
@@ -2314,6 +2382,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				OR = {
 					always = no
 					trigger_if = {
@@ -2347,24 +2416,13 @@ decisions = {
 				}
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_detect_thoughts_cooldown
 				if = {
 					limit = {
 						z_sorcerer = yes
 					}
 					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -7 } }
-					hidden_tooltip = {
-						if = {
-							limit = {
-								trait = origin_wild_magic
-							}
-							random = {
-								chance = 5
-								character_event = { id = spellaux.4 }
-								break = yes
-							}
-						}
-					}
 				}
 				else_if = {
 					limit = {
@@ -2375,9 +2433,14 @@ decisions = {
 						small_psi_stress = yes
 					}
 				}
-				add_character_modifier = {
-					name = detect_thoughts_mod
-					years = 3
+				if = {
+					limit = {
+						wild_magic_recovery = yes
+					}
+					add_character_modifier = {
+						name = detect_thoughts_mod
+						years = 3
+					}
 				}
 			}
 			ai_will_do = {
@@ -2492,6 +2555,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				war = yes
 				custom_tooltip = {
 					text = NOSUMMONEDDEMONS
@@ -2517,122 +2581,128 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_phantasmal_force_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
 				if = {
 					limit = {
-						OR = {
-							trait = sorcerer
-							trait = trained_sorcerer
-						}
+						wild_magic_recovery = yes
 					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_illusions
-								troops = {
-									illusory_troops = { 400 400 }
+					if = {
+						limit = {
+							OR = {
+								trait = sorcerer
+								trait = trained_sorcerer
+							}
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_illusions
+									troops = {
+										illusory_troops = { 400 400 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = journeyman_sorcerer
-							trait = expert_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = journeyman_sorcerer
+								trait = expert_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_illusions
-								troops = {
-									illusory_troops = { 750 750 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_illusions
+									troops = {
+										illusory_troops = { 750 750 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = master_sorcerer
-							trait = renowned_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = master_sorcerer
+								trait = renowned_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_illusions
-								troops = {
-									illusory_troops = { 1200 1200 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_illusions
+									troops = {
+										illusory_troops = { 1200 1200 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						trait = legendary_sorcerer
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_illusions
-								troops = {
-									illusory_troops = { 1600 1600 }
+					else_if = {
+						limit = {
+							trait = legendary_sorcerer
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_illusions
+									troops = {
+										illusory_troops = { 1600 1600 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
+					hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
 				}
-				hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
 			}
 			ai_will_do = {
 				factor = 1
@@ -2696,6 +2766,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				in_command = yes
 				custom_tooltip = {
 					text = HAS5SPELLPOINTS
@@ -2718,23 +2789,17 @@ decisions = {
 				}
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_longstrider_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -5 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				add_character_modifier = {
-					modifier = spell_longstrider_mod
-					years = 2
+					add_character_modifier = {
+						modifier = spell_longstrider_mod
+						years = 2
+					}
 				}
 			}
 			ai_will_do = {
@@ -2803,6 +2868,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				war = yes
 				custom_tooltip = {
 					text = HAS12SPELLPOINTS
@@ -2828,122 +2894,128 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_conjure_elementals_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -12 } }
 				if = {
 					limit = {
-						OR = {
-							trait = sorcerer
-							trait = trained_sorcerer
-						}
+						wild_magic_recovery = yes
 					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_elementals
-								troops = {
-									elemental_troops = { 150 150 }
+					if = {
+						limit = {
+							OR = {
+								trait = sorcerer
+								trait = trained_sorcerer
+							}
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_elementals
+									troops = {
+										elemental_troops = { 150 150 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = journeyman_sorcerer
-							trait = expert_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = journeyman_sorcerer
+								trait = expert_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_elementals
-								troops = {
-									elemental_troops = { 300 300 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_elementals
+									troops = {
+										elemental_troops = { 300 300 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = master_sorcerer
-							trait = renowned_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = master_sorcerer
+								trait = renowned_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_elementals
-								troops = {
-									elemental_troops = { 450 450 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_elementals
+									troops = {
+										elemental_troops = { 450 450 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						trait = legendary_sorcerer
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_elementals
-								troops = {
-									elemental_troops = { 600 600 }
+					else_if = {
+						limit = {
+							trait = legendary_sorcerer
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_elementals
+									troops = {
+										elemental_troops = { 600 600 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
+					hidden_tooltip = { character_event = { id = spellaux.40 months = 12 } }
 				}
-				hidden_tooltip = { character_event = { id = spellaux.40 months = 12 } }
 			}
 			ai_will_do = {
 				factor = 1
@@ -2973,6 +3045,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -3002,23 +3075,17 @@ decisions = {
 				NOT = { has_character_modifier = legend_lore_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_legend_lore_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				add_character_modifier = {
-					name = legend_lore_mod
-					years = 3
+					add_character_modifier = {
+						name = legend_lore_mod
+						years = 3
+					}
 				}
 			}
 			ai_will_do = {
@@ -3054,6 +3121,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -3087,23 +3155,17 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_tensers_transformation_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				add_character_modifier = {
-					name = tensers_transformation_mod
-					years = 2
+					add_character_modifier = {
+						name = tensers_transformation_mod
+						years = 2
+					}
 				}
 			}
 			ai_will_do = {
@@ -3140,6 +3202,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				war = yes
 				custom_tooltip = {
 					text = NOSUMMONEDDEMONS
@@ -3165,122 +3228,128 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_animate_dead_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
 				if = {
 					limit = {
-						OR = {
-							trait = sorcerer
-							trait = trained_sorcerer
-						}
+						wild_magic_recovery = yes
 					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_animate_dead
-								troops = {
-									undead_troops = { 400 400 }
+					if = {
+						limit = {
+							OR = {
+								trait = sorcerer
+								trait = trained_sorcerer
+							}
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_animate_dead
+									troops = {
+										undead_troops = { 400 400 }
+									}
+									attrition = 0.05
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.05
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = journeyman_sorcerer
-							trait = expert_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = journeyman_sorcerer
+								trait = expert_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_animate_dead
-								troops = {
-									undead_troops = { 750 750 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_animate_dead
+									troops = {
+										undead_troops = { 750 750 }
+									}
+									attrition = 0.05
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.05
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = master_sorcerer
-							trait = renowned_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = master_sorcerer
+								trait = renowned_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_animate_dead
-								troops = {
-									undead_troops = { 1200 1200 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_animate_dead
+									troops = {
+										undead_troops = { 1200 1200 }
+									}
+									attrition = 0.05
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.05
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						trait = legendary_sorcerer
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_animate_dead
-								troops = {
-									undead_troops = { 1600 1600 }
+					else_if = {
+						limit = {
+							trait = legendary_sorcerer
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_animate_dead
+									troops = {
+										undead_troops = { 1600 1600 }
+									}
+									attrition = 0.05
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.05
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
+					hidden_tooltip = { character_event = { id = spellaux.37 months = 12 } }
 				}
-				hidden_tooltip = { character_event = { id = spellaux.37 months = 12 } }
 			}
 			ai_will_do = {
 				factor = 1
@@ -3317,6 +3386,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS13SPELLPOINTS
 					hidden_tooltip = {
@@ -3349,22 +3419,16 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_create_homunculus_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -13 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
+					add_trait_wounded_effect = yes
+					add_artifact = homunculus_artf
 				}
-				add_trait_wounded_effect = yes
-				add_artifact = homunculus_artf
 			}
 			ai_will_do = {
 				factor = 0.5
@@ -3398,6 +3462,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -3423,130 +3488,136 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_summon_lesser_demons_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
 				if = {
 					limit = {
-						OR = {
-							trait = sorcerer
-							trait = trained_sorcerer
-						}
+						wild_magic_recovery = yes
 					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_lesser_demons
-								troops = {
-									archers = { 25 25 }
-									light_infantry = { 200 200 }
-									heavy_infantry = { 25 25 }
+					if = {
+						limit = {
+							OR = {
+								trait = sorcerer
+								trait = trained_sorcerer
+							}
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_lesser_demons
+									troops = {
+										archers = { 25 25 }
+										light_infantry = { 200 200 }
+										heavy_infantry = { 25 25 }
+									}
+									attrition = 0.5
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.5
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = journeyman_sorcerer
-							trait = expert_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = journeyman_sorcerer
+								trait = expert_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_lesser_demons
-								troops = {
-									archers = { 50 50 }
-									light_infantry = { 400 400 }
-									heavy_infantry = { 50 50 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_lesser_demons
+									troops = {
+										archers = { 50 50 }
+										light_infantry = { 400 400 }
+										heavy_infantry = { 50 50 }
+									}
+									attrition = 0.5
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.5
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = master_sorcerer
-							trait = renowned_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = master_sorcerer
+								trait = renowned_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_lesser_demons
-								troops = {
-									archers = { 75 75 }
-									light_infantry = { 600 600 }
-									heavy_infantry = { 75 75 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_lesser_demons
+									troops = {
+										archers = { 75 75 }
+										light_infantry = { 600 600 }
+										heavy_infantry = { 75 75 }
+									}
+									attrition = 0.5
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.5
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						trait = legendary_sorcerer
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_lesser_demons
-								troops = {
-									archers = { 100 100 }
-									light_infantry = { 800 800 }
-									heavy_infantry = { 100 100 }
+					else_if = {
+						limit = {
+							trait = legendary_sorcerer
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_lesser_demons
+									troops = {
+										archers = { 100 100 }
+										light_infantry = { 800 800 }
+										heavy_infantry = { 100 100 }
+									}
+									attrition = 0.5
+									maintenance_multiplier = 0.1
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0.5
-								maintenance_multiplier = 0.1
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
+					hidden_tooltip = { character_event = { id = spellaux.19 months = 12 } }
 				}
-				hidden_tooltip = { character_event = { id = spellaux.19 months = 12 } }
 			}
 			ai_will_do = {
 				factor = 1
@@ -3576,6 +3647,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -3607,158 +3679,164 @@ decisions = {
 				is_incapable = no
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_planar_binding_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				custom_tooltip = {
-					text = OUTSIDERSUMMONED
 					hidden_tooltip = {
-						random_list = {
-							1 = {
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 5
-										martial = 6
-										stewardship = 5
-										intrigue = 9
-										learning = 5
-									}
-									female = random
-									trait = creature_fiend
-									random_traits = yes
-									religion = infernal
-									culture = baatezu
-									dynasty = none
-									immortal_age = 30
-								}
+						if = {
+							limit = {
+								trait = origin_wild_magic
 							}
-							1 = {
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 4
-										martial = 9
-										stewardship = 4
-										intrigue = 6
-										learning = 5
-									}
-									female = random
-									trait = creature_fiend
-									random_traits = yes
-									religion = abyssal_cult
-									culture = tanarri
-									dynasty = none
-									immortal_age = 30
-								}
-							}
-							1 = {
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 6
-										martial = 7
-										stewardship = 6
-										intrigue = 6
-										learning = 4
-									}
-									female = random
-									trait = creature_fiend
-									random_traits = yes
-									religion = shadow_gods
-									culture = yugoloth
-									dynasty = none
-									immortal_age = 30
-								}
-							}
-							1 = {
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 5
-										martial = 7
-										stewardship = 7
-										intrigue = 6
-										learning = 4
-									}
-									female = random
-									trait = creature_fiend
-									random_traits = yes
-									religion = shadow_gods
-									culture = gehreleth
-									dynasty = none
-									immortal_age = 30
-								}
-							}
-							1 = {
-								mult_modifier = {
-									NOR = {
-										culture_group = zakharan_group
-										culture_group = old_zakharan_group
-										culture_group = genie_group
-										culture = marrashi
-									}
-									factor = 0
-								}
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 6
-										martial = 7
-										stewardship = 6
-										intrigue = 6
-										learning = 4
-									}
-									female = random
-									trait = creature_fiend
-									random_traits = yes
-									religion = primordial
-									culture = marrashi
-									dynasty = none
-									immortal_age = 30
-								}
-							}
-						}
-						new_character = {
-							opinion = {
-								modifier = planar_binding_mod
-								who = ROOT
-								years = 10
-							}
-							character_event = { id = spellaux.43 years = 20 }
-							if = {
-								limit = {
-									culture = baatezu
-								}
-								spawn_random_baatezu = yes
-							}
-							else_if = {
-								limit = {
-									culture = tanarri
-								}
-								spawn_random_tanarri = yes
-							}
-							else_if = {
-								limit = {
-									culture = yugoloth
-								}
-								spawn_random_yugoloth = yes
+							random = {
+								chance = 5
+								character_event = { id = spellaux.4 }
+								break = yes
 							}
 						}
 					}
+					custom_tooltip = {
+						text = OUTSIDERSUMMONED
+						hidden_tooltip = {
+							random_list = {
+								1 = {
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 5
+											martial = 6
+											stewardship = 5
+											intrigue = 9
+											learning = 5
+										}
+										female = random
+										trait = creature_fiend
+										random_traits = yes
+										religion = infernal
+										culture = baatezu
+										dynasty = none
+										immortal_age = 30
+									}
+								}
+								1 = {
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 4
+											martial = 9
+											stewardship = 4
+											intrigue = 6
+											learning = 5
+										}
+										female = random
+										trait = creature_fiend
+										random_traits = yes
+										religion = abyssal_cult
+										culture = tanarri
+										dynasty = none
+										immortal_age = 30
+									}
+								}
+								1 = {
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 6
+											martial = 7
+											stewardship = 6
+											intrigue = 6
+											learning = 4
+										}
+										female = random
+										trait = creature_fiend
+										random_traits = yes
+										religion = shadow_gods
+										culture = yugoloth
+										dynasty = none
+										immortal_age = 30
+									}
+								}
+								1 = {
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 5
+											martial = 7
+											stewardship = 7
+											intrigue = 6
+											learning = 4
+										}
+										female = random
+										trait = creature_fiend
+										random_traits = yes
+										religion = shadow_gods
+										culture = gehreleth
+										dynasty = none
+										immortal_age = 30
+									}
+								}
+								1 = {
+									mult_modifier = {
+										NOR = {
+											culture_group = zakharan_group
+											culture_group = old_zakharan_group
+											culture_group = genie_group
+											culture = marrashi
+										}
+										factor = 0
+									}
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 6
+											martial = 7
+											stewardship = 6
+											intrigue = 6
+											learning = 4
+										}
+										female = random
+										trait = creature_fiend
+										random_traits = yes
+										religion = primordial
+										culture = marrashi
+										dynasty = none
+										immortal_age = 30
+									}
+								}
+							}
+							new_character = {
+								opinion = {
+									modifier = planar_binding_mod
+									who = ROOT
+									years = 10
+								}
+								character_event = { id = spellaux.43 years = 20 }
+								if = {
+									limit = {
+										culture = baatezu
+									}
+									spawn_random_baatezu = yes
+								}
+								else_if = {
+									limit = {
+										culture = tanarri
+									}
+									spawn_random_tanarri = yes
+								}
+								else_if = {
+									limit = {
+										culture = yugoloth
+									}
+									spawn_random_yugoloth = yes
+								}
+							}
+						}
+					}
+					character_event = { id = generalmisc.52 }
 				}
-			character_event = { id = generalmisc.52 }
 			}
 			ai_will_do = {
 				factor = 0.05
@@ -3837,6 +3915,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
 					hidden_tooltip = {
@@ -3870,11 +3949,17 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_tensers_transformation_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
-				add_character_modifier = {
-					name = tensers_transformation_mod
-					years = 2
+				if = {
+					limit = {
+						wild_magic_recovery = yes
+					}
+					add_character_modifier = {
+						name = tensers_transformation_mod
+						years = 2
+					}
 				}
 			}
 			ai_will_do = {
@@ -3909,6 +3994,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -3940,120 +4026,114 @@ decisions = {
 				is_incapable = no
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_planar_binding_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				custom_tooltip = {
-					text = OUTSIDERSUMMONED
-					hidden_tooltip = {
-						random_list = {
-							1 = {
-								create_character = {
-									age = 300
-									female = random
-									trait = creature_genie
-									random_traits = yes
-									religion = ten_thousand_gods
-									culture = jann
-									dynasty = none
-									immortal_age = 30
-								}
-							}
-							1 = {
-								create_character = {
-									age = 500
-									attributes = {
-										diplomacy = 6
-										martial = 7
-										stewardship = 8
-										intrigue = 7
-										learning = 7
+					custom_tooltip = {
+						text = OUTSIDERSUMMONED
+						hidden_tooltip = {
+							random_list = {
+								1 = {
+									create_character = {
+										age = 300
+										female = random
+										trait = creature_genie
+										random_traits = yes
+										religion = ten_thousand_gods
+										culture = jann
+										dynasty = none
+										immortal_age = 30
 									}
-									trait = creature_genie
-									random_traits = yes
-									female = random
-									religion = primordial
-									culture = dao
-									dynasty = none
-									immortal_age = 30
 								}
-							}
-							1 = {
-								create_character = {
-									age = 500
-									attributes = {
-										diplomacy = 8
-										martial = 6
-										stewardship = 7
-										intrigue = 7
-										learning = 7
+								1 = {
+									create_character = {
+										age = 500
+										attributes = {
+											diplomacy = 6
+											martial = 7
+											stewardship = 8
+											intrigue = 7
+											learning = 7
+										}
+										trait = creature_genie
+										random_traits = yes
+										female = random
+										religion = primordial
+										culture = dao
+										dynasty = none
+										immortal_age = 30
 									}
-									trait = creature_genie
-									random_traits = yes
-									female = random
-									religion = primordial
-									culture = djinn
-									dynasty = none
-									immortal_age = 30
 								}
-							}
-							1 = {
-								create_character = {
-									age = 500
-									attributes = {
-										diplomacy = 7
-										martial = 8
-										stewardship = 7
-										intrigue = 7
-										learning = 6
+								1 = {
+									create_character = {
+										age = 500
+										attributes = {
+											diplomacy = 8
+											martial = 6
+											stewardship = 7
+											intrigue = 7
+											learning = 7
+										}
+										trait = creature_genie
+										random_traits = yes
+										female = random
+										religion = primordial
+										culture = djinn
+										dynasty = none
+										immortal_age = 30
 									}
-									trait = creature_genie
-									random_traits = yes
-									female = random
-									religion = primordial
-									culture = efreet
-									dynasty = none
-									immortal_age = 30
 								}
-							}
-							1 = {
-								create_character = {
-									age = 500
-									attributes = {
-										diplomacy = 7
-										martial = 7
-										stewardship = 6
-										intrigue = 8
-										learning = 7
+								1 = {
+									create_character = {
+										age = 500
+										attributes = {
+											diplomacy = 7
+											martial = 8
+											stewardship = 7
+											intrigue = 7
+											learning = 6
+										}
+										trait = creature_genie
+										random_traits = yes
+										female = random
+										religion = primordial
+										culture = efreet
+										dynasty = none
+										immortal_age = 30
 									}
-									trait = creature_genie
-									random_traits = yes
-									female = random
-									religion = primordial
-									culture = marid
-									dynasty = none
-									immortal_age = 30
+								}
+								1 = {
+									create_character = {
+										age = 500
+										attributes = {
+											diplomacy = 7
+											martial = 7
+											stewardship = 6
+											intrigue = 8
+											learning = 7
+										}
+										trait = creature_genie
+										random_traits = yes
+										female = random
+										religion = primordial
+										culture = marid
+										dynasty = none
+										immortal_age = 30
+									}
 								}
 							}
-						}
-						new_character = {
-							opinion = {
-								modifier = planar_binding_mod
-								who = ROOT
-								years = 10
+							new_character = {
+								opinion = {
+									modifier = planar_binding_mod
+									who = ROOT
+									years = 10
+								}
+								character_event = { id = spellaux.43 years = 20 }
 							}
-							character_event = { id = spellaux.43 years = 20 }
 						}
 					}
 				}
@@ -4134,6 +4214,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				NOT = { has_artifact = wiz_familiar_artf }
 				custom_tooltip = {
 					text = HAS7SPELLPOINTS
@@ -4153,21 +4234,27 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_find_familiar_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -7 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
+				if = {
+					limit = {
+						wild_magic_recovery = yes
+					}
+					hidden_tooltip = {
+						if = {
+							limit = {
+								trait = origin_wild_magic
+							}
+							random = {
+								chance = 5
+								character_event = { id = spellaux.4 }
+								break = yes
+							}
 						}
 					}
+					add_artifact = wiz_familiar_artf
 				}
-				add_artifact = wiz_familiar_artf
 			}
 			ai_will_do = {
 				factor = 0.5
@@ -4201,6 +4288,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = SPELL_ON_COOLDOWN
 					hidden_tooltip = {
@@ -4216,28 +4304,33 @@ decisions = {
 				set_character_flag = spell_nahals_reckless_dweomer_cooldown
 				#set_character_flag = spell_clone_cooldown
 				#hidden_tooltip = { change_variable = { which = sorcspellpoints value = -30 } }
-				hidden_tooltip = {
+				hidden_tooltip = { # 
 					if = {
 						limit = {
 							trait = origin_wild_magic
 						}
 						random = {
 							chance = 50
-							character_event = { id = spellaux.4 }
-							break = yes
+							set_character_flag = dweomer_surge
+							wild_magic_surge_effect = yes
 						}
 					}
 				}
-				hidden_tooltip = {
-					random_list = {
-						10 = {
-							change_variable = { which = sorcspellpoints value = 5 }
-						}
-						5 = {
-							change_variable = { which = sorcspellpoints value = 10 }
-						}
-						1 = {
-							change_variable = { which = sorcspellpoints value = 15 }
+				if = {
+					limit = {
+						wild_magic_recovery = yes
+					}
+					hidden_tooltip = {
+						random_list = {
+							10 = {
+								change_variable = { which = sorcspellpoints value = 5 }
+							}
+							5 = {
+								change_variable = { which = sorcspellpoints value = 10 }
+							}
+							1 = {
+								change_variable = { which = sorcspellpoints value = 15 }
+							}
 						}
 					}
 				}
@@ -4267,6 +4360,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				in_command = yes
 				custom_tooltip = {
 					text = HAS5SPELLPOINTS
@@ -4287,23 +4381,17 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_rage_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -5 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				add_character_modifier = {
-					modifier = spell_rage_mod
-					years = 2
+					add_character_modifier = {
+						modifier = spell_rage_mod
+						years = 2
+					}
 				}
 			}
 			ai_will_do = {
@@ -4366,6 +4454,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
 					hidden_tooltip = {
@@ -4391,122 +4480,128 @@ decisions = {
 				NOT = { has_character_modifier = burn_path_mod }
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_phantasmal_force_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } }
 				if = {
 					limit = {
-						OR = {
-							trait = sorcerer
-							trait = trained_sorcerer
-						}
+						wild_magic_recovery = yes
 					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_objects
-								troops = {
-									animated_objects = { 150 150 }
+					if = {
+						limit = {
+							OR = {
+								trait = sorcerer
+								trait = trained_sorcerer
+							}
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_objects
+									troops = {
+										animated_objects = { 150 150 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = journeyman_sorcerer
-							trait = expert_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = journeyman_sorcerer
+								trait = expert_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_objects
-								troops = {
-									animated_objects = { 300 300 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_objects
+									troops = {
+										animated_objects = { 300 300 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						OR = {
-							trait = master_sorcerer
-							trait = renowned_sorcerer
+					else_if = {
+						limit = {
+							OR = {
+								trait = master_sorcerer
+								trait = renowned_sorcerer
+							}
 						}
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_objects
-								troops = {
-									animated_objects = { 450 450 }
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_objects
+									troops = {
+										animated_objects = { 450 450 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
-				}
-				else_if = {
-					limit = {
-						trait = legendary_sorcerer
-					}
-					location = {
-						ROOT = {
-							spawn_unit = {
-								province = PREV
-								home = PREV
-								owner = ROOT
-								leader = ROOT
-								earmark = sorc_objects
-								troops = {
-									animated_objects = { 600 600 }
+					else_if = {
+						limit = {
+							trait = legendary_sorcerer
+						}
+						location = {
+							ROOT = {
+								spawn_unit = {
+									province = PREV
+									home = PREV
+									owner = ROOT
+									leader = ROOT
+									earmark = sorc_objects
+									troops = {
+										animated_objects = { 600 600 }
+									}
+									attrition = 0
+									maintenance_multiplier = 0
+									cannot_inherit = yes
+									disband_on_peace = yes
+									can_toggle_looting = no
+									is_looter = no
+									reinforces = no
 								}
-								attrition = 0
-								maintenance_multiplier = 0
-								cannot_inherit = yes
-								disband_on_peace = yes
-								can_toggle_looting = no
-								is_looter = no
-								reinforces = no
 							}
 						}
 					}
+					hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
 				}
-				hidden_tooltip = { character_event = { id = spellaux.27 months = 12 } }
 			}
 			ai_will_do = {
 				factor = 1
@@ -4606,6 +4701,7 @@ decisions = {
 				}
 			}
 			allow = {
+				wild_magic_recovery = yes
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -4637,56 +4733,49 @@ decisions = {
 				is_incapable = no
 			}
 			effect = {
+				wild_magic_surge_effect = yes
 				set_character_flag = spell_planar_binding_cooldown
 				hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } }
-				hidden_tooltip = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
+				if = {
+					limit = {
+						wild_magic_recovery = yes
 					}
-				}
-				custom_tooltip = {
-					text = OUTSIDERSUMMONED
-					hidden_tooltip = {
-						random_list = {
-							1 = {
-								create_character = {
-									age = 1000
-									attributes = {
-										diplomacy = 8
-										martial = 5
-										stewardship = 7
-										intrigue = 4
-										learning = 8
+					custom_tooltip = {
+						text = OUTSIDERSUMMONED
+						hidden_tooltip = {
+							random_list = {
+								1 = {
+									create_character = {
+										age = 1000
+										attributes = {
+											diplomacy = 8
+											martial = 5
+											stewardship = 7
+											intrigue = 4
+											learning = 8
+										}
+										female = random
+										trait = creature_angel
+										random_traits = yes
+										religion = triadic
+										culture = angel
+										dynasty = none
+										immortal_age = 30
 									}
-									female = random
-									trait = creature_angel
-									random_traits = yes
-									religion = triadic
-									culture = angel
-									dynasty = none
-									immortal_age = 30
 								}
 							}
-						}
-						new_character = {
-							opinion = {
-								modifier = planar_binding_mod
-								who = ROOT
-								years = 10
+							new_character = {
+								opinion = {
+									modifier = planar_binding_mod
+									who = ROOT
+									years = 10
+								}
+								character_event = { id = spellaux.43 years = 20 }
 							}
-							character_event = { id = spellaux.43 years = 20 }
 						}
 					}
+					character_event = { id = generalmisc.52 }
 				}
-				character_event = { id = generalmisc.52 }
-
 			}
 			ai_will_do = {
 				factor = 0.05
@@ -5137,6 +5226,7 @@ decisions = {
 			not_casting = yes
 		}
 		allow = {
+			wild_magic_recovery = yes
 			trait = wounded
 			OR = {
 				AND = {
@@ -5170,53 +5260,59 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			if = {
 				limit = {
-					trait = paladin
+					wild_magic_recovery = yes
 				}
-				piety = -80
-			}
-			else_if = {
-				limit = {
-					trait = trained_paladin
+				if = {
+					limit = {
+						trait = paladin
+					}
+					piety = -80
 				}
-				piety = -70
-			}
-			else_if = {
-				limit = {
-					trait = journeyman_paladin
+				else_if = {
+					limit = {
+						trait = trained_paladin
+					}
+					piety = -70
 				}
-				piety = -60
-			}
-			else_if = {
-				limit = {
-					trait = expert_paladin
+				else_if = {
+					limit = {
+						trait = journeyman_paladin
+					}
+					piety = -60
 				}
-				piety = -50
-			}
-			else_if = {
-				limit = {
-					trait = master_paladin
+				else_if = {
+					limit = {
+						trait = expert_paladin
+					}
+					piety = -50
 				}
-				piety = -40
-			}
-			else_if = {
-				limit = {
-					trait = renowned_paladin
+				else_if = {
+					limit = {
+						trait = master_paladin
+					}
+					piety = -40
 				}
-				piety = -30
+				else_if = {
+					limit = {
+						trait = renowned_paladin
+					}
+					piety = -30
+				}
+				else = {
+					piety = -20
+				}
+				remove_trait = wounded
+				remove_character_modifier = badly_bruised
+				remove_character_modifier = black_eye
+				remove_character_modifier = swollen_ankle
+				remove_character_modifier = swollen_wrist
+				remove_character_modifier = sore_muscles
+				remove_character_modifier = cracked_ribs
+				remove_character_modifier = concussion
 			}
-			else = {
-				piety = -20
-			}
-			remove_trait = wounded
-			remove_character_modifier = badly_bruised
-			remove_character_modifier = black_eye
-			remove_character_modifier = swollen_ankle
-			remove_character_modifier = swollen_wrist
-			remove_character_modifier = sore_muscles
-			remove_character_modifier = cracked_ribs
-			remove_character_modifier = concussion
 		}
 		ai_will_do = {
 			factor = 1
@@ -6183,6 +6279,7 @@ decisions = {
 			}
 		}
 		allow = {
+			wild_magic_recovery = yes
 			war = yes
 			custom_tooltip = {
 				text = SUMMONEDCD
@@ -6243,6 +6340,7 @@ decisions = {
 			}
 		}
 		effect = {
+			wild_magic_surge_effect = yes
 			trigger_switch = {
 				on_trigger = trait
 				legendary_druid = {
@@ -6288,11 +6386,16 @@ decisions = {
 					wealth = -200
 				}
 			}
-			add_character_modifier = {
-				name = summoned_cooldown
-				years = 2
+			if = {
+				limit = {
+					wild_magic_recovery = yes
+				}
+				add_character_modifier = {
+					name = summoned_cooldown
+					years = 2
+				}
+				character_event = { id = druidinit.3 }
 			}
-			character_event = { id = druidinit.3 }
 		}
 		ai_will_do = {
 			factor = 0.75
@@ -6605,6 +6708,7 @@ targeted_decisions = {
 		}
 
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			NOR = {
 				trait = creature_angel
 				trait = creature_fiend
@@ -6734,6 +6838,7 @@ targeted_decisions = {
 		}
 
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				trigger_switch = {
 					on_trigger = trait
@@ -6810,13 +6915,17 @@ targeted_decisions = {
 					charm_resistance_check_against_PREV = yes
 				}
 			}
-			
-			opinion = {
-				modifier = charm_person_spell
-				who = FROM
-				years = 1
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				opinion = {
+					modifier = charm_person_spell
+					who = FROM
+					years = 1
+				}
+				repeat_event = { id = spellaux.2 days = 90 }
 			}
-			repeat_event = { id = spellaux.2 days = 90 }
 		}
 	}
 
@@ -6850,6 +6959,7 @@ targeted_decisions = {
 			ai = yes
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			NOR = {
 				trait = creature_angel
 				trait = creature_fiend
@@ -6963,6 +7073,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				trigger_switch = {
 					on_trigger = trait
@@ -7020,8 +7131,13 @@ targeted_decisions = {
 					dominate_resistance_check_against_PREV = yes
 				}
 			}
-			opinion = {
-				modifier = mind_control who = FROM years = 2
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				opinion = {
+					modifier = mind_control who = FROM years = 2
+				}
 			}
 		}
 		ai_will_do = {
@@ -7217,6 +7333,7 @@ targeted_decisions = {
 		}
 
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					AND = {
@@ -7271,6 +7388,7 @@ targeted_decisions = {
 		}
 
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_forget_past_cooldown }
 			FROM = {
 				if = {
@@ -7278,18 +7396,6 @@ targeted_decisions = {
 						z_sorcerer = yes
 					}
 					hidden_tooltip = { change_variable = { which = sorcspellpoints value = -15 } }
-					hidden_tooltip = {
-						if = {
-							limit = {
-								trait = origin_wild_magic
-							}
-							random = {
-								chance = 5
-								character_event = { id = spellaux.4 }
-								break = yes
-							}
-						}
-					}
 				}
 				else_if = {
 					limit = {
@@ -7308,13 +7414,18 @@ targeted_decisions = {
 					spell_resistance_check_against_PREV = yes
 				}
 			}
-			custom_tooltip = {
-				text = REMOVEOPINIONS
-				hidden_tooltip = {
-					remove_friend = FROM
-					remove_lover = FROM
-					remove_rival = FROM
-					remove_all_opinions_to_from = yes
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				custom_tooltip = {
+					text = REMOVEOPINIONS
+					hidden_tooltip = {
+						remove_friend = FROM
+						remove_lover = FROM
+						remove_rival = FROM
+						remove_all_opinions_to_from = yes
+					}
 				}
 			}
 		}
@@ -7352,6 +7463,7 @@ targeted_decisions = {
 		}
 
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			NOR = {
 				trait = creature_angel
 				trait = creature_fiend
@@ -7407,6 +7519,7 @@ targeted_decisions = {
 		}
 
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_charm_person_cooldown }
 			FROM = {
 				if = {
@@ -7444,12 +7557,17 @@ targeted_decisions = {
 					charm_resistance_check_against_PREV = yes
 				}
 			}
-			opinion = {
-				modifier = charm_person_spell
-				who = FROM
-				years = 1
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				opinion = {
+					modifier = charm_person_spell
+					who = FROM
+					years = 1
+				}
+				repeat_event = { id = spellaux.2 days = 90 }
 			}
-			repeat_event = { id = spellaux.2 days = 90 }
 		}
 	}
 
@@ -7475,6 +7593,7 @@ targeted_decisions = {
 			ai = yes
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			NOR = {
 				trait = creature_angel
 				trait = creature_fiend
@@ -7525,6 +7644,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_dominate_person_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
 			hidden_tooltip = {
@@ -7548,9 +7668,13 @@ targeted_decisions = {
 					dominate_resistance_check_against_PREV = yes
 				}
 			}
-			opinion = {
-				modifier = mind_control who = FROM years = 2
-			}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				opinion = {
+					modifier = mind_control who = FROM years = 2
+				}
 		}
 		ai_will_do = {
 			factor = 0.5
@@ -7619,6 +7743,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				custom_tooltip = {
 					text = HAS10SPELLPOINTS
@@ -7651,34 +7776,40 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_remove_disease_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
-					}
-					character_event = { id = spellaux.8 }
-				}
+				magic_restoration_effect = yes
 			}
-			magic_restoration_effect = yes
 		}
 		ai_will_do = {
 			factor = 0.3
@@ -7750,6 +7881,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				custom_tooltip = {
 					text = HAS15SPELLPOINTS
@@ -7780,41 +7912,47 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_remove_disease_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
+				custom_tooltip = {
+					text = ALLDISEASECURED
+					hidden_tooltip = {
+						remove_trait = possessed
+						#Greater restoration clears every disease
+						BR_remove_any_disease = yes
+						#lastly remove incapable
+						remove_trait = incapable
 					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLDISEASECURED
-				hidden_tooltip = {
-					remove_trait = possessed
-					#Greater restoration clears every disease
-					BR_remove_any_disease = yes
-					#lastly remove incapable
-					remove_trait = incapable
 				}
 			}
 		}
@@ -7894,6 +8032,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					AND = {
@@ -7944,6 +8083,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_healing_cooldown }
 			FROM = {
 				if = {
@@ -7962,44 +8102,49 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
+				custom_tooltip = {
+					text = ALLINJURIESCURED
+					hidden_tooltip = {
+						remove_trait = wounded
+						remove_trait = mangled
+						remove_trait = severely_injured
+						remove_character_modifier = badly_bruised
+						remove_character_modifier = black_eye
+						remove_character_modifier = swollen_ankle
+						remove_character_modifier = swollen_wrist
+						remove_character_modifier = sore_muscles
+						remove_character_modifier = cracked_ribs
+						remove_character_modifier = concussion
 					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLINJURIESCURED
-				hidden_tooltip = {
-					remove_trait = wounded
-					remove_trait = mangled
-					remove_trait = severely_injured
-					remove_character_modifier = badly_bruised
-					remove_character_modifier = black_eye
-					remove_character_modifier = swollen_ankle
-					remove_character_modifier = swollen_wrist
-					remove_character_modifier = sore_muscles
-					remove_character_modifier = cracked_ribs
-					remove_character_modifier = concussion
 				}
 			}
 		}
@@ -8076,6 +8221,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				custom_tooltip = {
 					text = HAS30SPELLPOINTS
@@ -8105,66 +8251,72 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_healing_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -30 } } }
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
+						limit = {
+							NOT = { character = FROM }
+						}
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
 						limit = {
 							ai = no
+							character = FROM
 						}
-						repeat_event = { id = spellaux.7 }
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
-					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLREGENERATED
-				hidden_tooltip = {
-					remove_trait = wounded
-					remove_trait = mangled
-					remove_trait = severely_injured
-					remove_trait = disfigured
-					remove_trait = one_legged
-					remove_trait = one_handed
-					remove_trait = eunuch
-					remove_character_modifier = phantom_pain
-					remove_character_modifier = badly_bruised
-					remove_character_modifier = black_eye
-					remove_character_modifier = swollen_ankle
-					remove_character_modifier = swollen_wrist
-					remove_character_modifier = sore_muscles
-					remove_character_modifier = cracked_ribs
-					remove_character_modifier = concussion
-					if = {
-						limit = {
-							trait = creature_beholder
-							OR = {
-								z_wizard = yes
-								z_bard = yes
-								z_warlock = yes
+				custom_tooltip = {
+					text = ALLREGENERATED
+					hidden_tooltip = {
+						remove_trait = wounded
+						remove_trait = mangled
+						remove_trait = severely_injured
+						remove_trait = disfigured
+						remove_trait = one_legged
+						remove_trait = one_handed
+						remove_trait = eunuch
+						remove_character_modifier = phantom_pain
+						remove_character_modifier = badly_bruised
+						remove_character_modifier = black_eye
+						remove_character_modifier = swollen_ankle
+						remove_character_modifier = swollen_wrist
+						remove_character_modifier = sore_muscles
+						remove_character_modifier = cracked_ribs
+						remove_character_modifier = concussion
+						if = {
+							limit = {
+								trait = creature_beholder
+								OR = {
+									z_wizard = yes
+									z_bard = yes
+									z_warlock = yes
+								}
 							}
+							remove_trait = blinded
+							add_trait = one_eyed
 						}
-						remove_trait = blinded
-						add_trait = one_eyed
-					}
-					else = {
-						remove_trait = one_eyed
-						remove_trait = blinded
+						else = {
+							remove_trait = one_eyed
+							remove_trait = blinded
+						}
 					}
 				}
 			}
@@ -8343,6 +8495,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					custom_tooltip = {
@@ -8477,6 +8630,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				set_character_flag = spell_healing_cooldown
 				trigger_switch = {
@@ -8597,44 +8751,49 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
+				custom_tooltip = {
+					text = ALLINJURIESCURED
+					hidden_tooltip = {
+						remove_trait = wounded
+						remove_trait = mangled
+						remove_trait = severely_injured
+						remove_character_modifier = badly_bruised
+						remove_character_modifier = black_eye
+						remove_character_modifier = swollen_ankle
+						remove_character_modifier = swollen_wrist
+						remove_character_modifier = sore_muscles
+						remove_character_modifier = cracked_ribs
+						remove_character_modifier = concussion
 					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLINJURIESCURED
-				hidden_tooltip = {
-					remove_trait = wounded
-					remove_trait = mangled
-					remove_trait = severely_injured
-					remove_character_modifier = badly_bruised
-					remove_character_modifier = black_eye
-					remove_character_modifier = swollen_ankle
-					remove_character_modifier = swollen_wrist
-					remove_character_modifier = sore_muscles
-					remove_character_modifier = cracked_ribs
-					remove_character_modifier = concussion
 				}
 			}
 		}
@@ -8711,6 +8870,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					custom_tooltip = {
@@ -8817,6 +8977,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				set_character_flag = spell_remove_disease_cooldown
 				trigger_switch = {
@@ -8901,32 +9062,37 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
-					}
-					character_event = { id = spellaux.8 }
-				}
+				magic_restoration_effect = yes
 			}
-			magic_restoration_effect = yes
 		}
 		ai_will_do = {
 			factor = 0.1
@@ -9000,6 +9166,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					custom_tooltip = {
@@ -9074,6 +9241,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				set_character_flag = spell_remove_disease_cooldown
 				trigger_switch = {
@@ -9116,39 +9284,44 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							ai = no
+							NOT = { character = FROM }
 						}
-						repeat_event = { id = spellaux.7 }
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
+						limit = {
+							ai = no
+							character = FROM
+						}
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
+				custom_tooltip = {
+					text = ALLDISEASECURED
+					hidden_tooltip = {
+						remove_trait = possessed
+						#Greater restoration clears every disease
+						BR_remove_any_disease = yes
+						#lastly remove incapable
+						remove_trait = incapable
 					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLDISEASECURED
-				hidden_tooltip = {
-					remove_trait = possessed
-					#Greater restoration clears every disease
-					BR_remove_any_disease = yes
-					#lastly remove incapable
-					remove_trait = incapable
 				}
 			}
 		}
@@ -9226,6 +9399,7 @@ targeted_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					custom_tooltip = {
@@ -9285,6 +9459,7 @@ targeted_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				set_character_flag = spell_healing_cooldown
 				trigger_switch = {
@@ -9309,64 +9484,69 @@ targeted_decisions = {
 					}
 				}
 			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						NOT = { character = FROM }
-					}
-					opinion = {
-						modifier = cured_me
-						who = FROM
-						years = 5
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
+						limit = {
+							NOT = { character = FROM }
+						}
+						opinion = {
+							modifier = cured_me
+							who = FROM
+							years = 5
+						}
+						if = {
+							limit = {
+								ai = no
+							}
+							repeat_event = { id = spellaux.7 }
+						}
+					}
+					else_if = {
 						limit = {
 							ai = no
+							character = FROM
 						}
-						repeat_event = { id = spellaux.7 }
+						character_event = { id = spellaux.8 }
 					}
 				}
-				else_if = {
-					limit = {
-						ai = no
-						character = FROM
-					}
-					character_event = { id = spellaux.8 }
-				}
-			}
-			custom_tooltip = {
-				text = ALLREGENERATED
-				hidden_tooltip = {
-					remove_trait = wounded
-					remove_trait = mangled
-					remove_trait = severely_injured
-					remove_trait = disfigured
-					remove_trait = one_legged
-					remove_trait = one_handed
-					remove_trait = eunuch
-					remove_character_modifier = phantom_pain
-					remove_character_modifier = badly_bruised
-					remove_character_modifier = black_eye
-					remove_character_modifier = swollen_ankle
-					remove_character_modifier = swollen_wrist
-					remove_character_modifier = sore_muscles
-					remove_character_modifier = cracked_ribs
-					remove_character_modifier = concussion
-					if = {
-						limit = {
-							trait = creature_beholder
-							OR = {
-								z_wizard = yes
-								z_bard = yes
-								z_warlock = yes
+				custom_tooltip = {
+					text = ALLREGENERATED
+					hidden_tooltip = {
+						remove_trait = wounded
+						remove_trait = mangled
+						remove_trait = severely_injured
+						remove_trait = disfigured
+						remove_trait = one_legged
+						remove_trait = one_handed
+						remove_trait = eunuch
+						remove_character_modifier = phantom_pain
+						remove_character_modifier = badly_bruised
+						remove_character_modifier = black_eye
+						remove_character_modifier = swollen_ankle
+						remove_character_modifier = swollen_wrist
+						remove_character_modifier = sore_muscles
+						remove_character_modifier = cracked_ribs
+						remove_character_modifier = concussion
+						if = {
+							limit = {
+								trait = creature_beholder
+								OR = {
+									z_wizard = yes
+									z_bard = yes
+									z_warlock = yes
+								}
 							}
+							remove_trait = blinded
+							add_trait = one_eyed
 						}
-						remove_trait = blinded
-						add_trait = one_eyed
-					}
-					else = {
-						remove_trait = one_eyed
-						remove_trait = blinded
+						else = {
+							remove_trait = one_eyed
+							remove_trait = blinded
+						}
 					}
 				}
 			}
@@ -9443,6 +9623,7 @@ settlement_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			location = {
 				NOT = { has_province_modifier = spell_fabricate_mod }
 			}
@@ -9478,26 +9659,18 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_fabricate_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
-			hidden_tooltip = {
-				FROM = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
 				}
-			}
-			location = {
-				add_province_modifier = {
-					name = spell_fabricate_mod
-					months = 30
+				location = {
+					add_province_modifier = {
+						name = spell_fabricate_mod
+						months = 30
+					}
 				}
 			}
 		}
@@ -9545,6 +9718,7 @@ settlement_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			ROOT = {
 				has_siege = yes
 				location = { NOT = { has_province_modifier = spell_wall_of_stone_mod } }
@@ -9581,26 +9755,18 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_wall_of_stone_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -10 } } }
-			hidden_tooltip = {
-				FROM = {
-					if = {
-						limit = {
-							trait = origin_wild_magic
-						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
 				}
-			}
-			location = {
-				add_province_modifier = {
-					name = spell_wall_of_stone_mod
-					years = 2
+				location = {
+					add_province_modifier = {
+						name = spell_wall_of_stone_mod
+						years = 2
+					}
 				}
 			}
 		}
@@ -9648,6 +9814,7 @@ settlement_decisions = {
 			location = { NOT = { has_disease = yes } }
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
@@ -9687,62 +9854,54 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_blight_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
-			hidden_tooltip = {
-				FROM = {
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							trait = origin_wild_magic
+							location = {
+								holder_scope = {
+									ai = no
+								}
+							}
 						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
-					}
-				}
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
 						location = {
 							holder_scope = {
-								ai = no
+								opinion = {
+									modifier = cast_spell_on_me
+									who = FROM
+									years = 1
+								}
+								repeat_event = { id = spellaux.39 }
 							}
-						}
-					}
-					location = {
-						holder_scope = {
-							opinion = {
-								modifier = cast_spell_on_me
-								who = FROM
-								years = 1
-							}
-							repeat_event = { id = spellaux.39 }
 						}
 					}
 				}
-			}
-			location = {
-				random_list = {
-					1 = {
-						spawn_disease = tuberculosis
-					}
-					1 = {
-						spawn_disease = typhoid_fever
-					}
-					1 = {
-						spawn_disease = typhus
-					}
-					1 = {
-						spawn_disease = measles
-					}
-					1 = {
-						spawn_disease = small_pox
-					}
-					1 = {
-						spawn_disease = syphilis
+				location = {
+					random_list = {
+						1 = {
+							spawn_disease = tuberculosis
+						}
+						1 = {
+							spawn_disease = typhoid_fever
+						}
+						1 = {
+							spawn_disease = typhus
+						}
+						1 = {
+							spawn_disease = measles
+						}
+						1 = {
+							spawn_disease = small_pox
+						}
+						1 = {
+							spawn_disease = syphilis
+						}
 					}
 				}
 			}
@@ -9855,6 +10014,7 @@ settlement_decisions = {
 			}
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
@@ -9901,133 +10061,96 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_controlweather_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
-			hidden_tooltip = {
-				FROM = {
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
+				}
+				hidden_tooltip = {
 					if = {
 						limit = {
-							trait = origin_wild_magic
+							location = {
+								holder_scope = {
+									ai = no
+								}
+							}
 						}
-						random = {
-							chance = 5
-							character_event = { id = spellaux.4 }
-							break = yes
-						}
-					}
-				}
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
 						location = {
 							holder_scope = {
-								ai = no
+								opinion = {
+									modifier = cast_spell_on_me
+									who = FROM
+									years = 1
+								}
+								repeat_event = { id = spellaux.41 }
 							}
 						}
 					}
-					location = {
-						holder_scope = {
-							opinion = {
-								modifier = cast_spell_on_me
-								who = FROM
-								years = 1
+				}
+				hidden_tooltip = {
+					if = {
+						limit = {
+							location = {
+								holder_scope = {
+									NOT = {
+										character = FROM
+									}
+								}
 							}
-							repeat_event = { id = spellaux.41 }
 						}
+						#Insert Control Weather CB here
 					}
 				}
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						location = {
-							holder_scope = {
-								NOT = {
+				location = {
+					if = {
+						limit = {
+							location = {
+								holder_scope = {
 									character = FROM
 								}
 							}
 						}
-					}
-					#Insert Control Weather CB here
-				}
-			}
-			location = {
-				if = {
-					limit = {
-						location = {
-							holder_scope = {
-								character = FROM
-							}
+						add_province_modifier = {
+							name = africa_light_rain
+							months = 18
 						}
 					}
-					add_province_modifier = {
-						name = africa_light_rain
-						months = 18
-					}
-                }
-				if = {
-					limit = {
-						location = {
-							holder_scope = {
-								NOT = {
-									character = FROM
+					if = {
+						limit = {
+							location = {
+								holder_scope = {
+									NOT = {
+										character = FROM
+									}
+								}
+							}
+						}
+						random_list = {
+							1 = {
+								add_province_modifier = {
+									name = africa_heavy_rain
+									months = 6
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought_risk
+									months = 18
+								}
+							}
+							1 = {
+								add_province_modifier = {
+									name = africa_drought
+									months = 12
 								}
 							}
 						}
 					}
-					random_list = {
-						1 = {
-							add_province_modifier = {
-								name = africa_heavy_rain
-								months = 6
-							}
-						}
-						1 = {
-							add_province_modifier = {
-								name = africa_drought_risk
-								months = 18
-							}
-						}
-						1 = {
-							add_province_modifier = {
-								name = africa_drought
-								months = 12
-							}
-						}
-					}
+
+
 				}
-
-
-			}
-			any_neighbor_independent_ruler = {
-				any_realm_province = {
-					random_list = {
-						1 = {
-							add_province_modifier = {
-								name = africa_heavy_rain
-								months = 6
-							}
-						}
-						1 = {
-							add_province_modifier = {
-								name = africa_drought_risk
-								months = 18
-							}
-						}
-						1 = {
-							add_province_modifier = {
-								name = africa_drought
-								months = 12
-							}
-						}
-					}
-				}
-				#Insert Control Weather CB here
-
-			}
-			random = {
-				chance = 50
 				any_neighbor_independent_ruler = {
 					any_realm_province = {
 						random_list = {
@@ -10052,9 +10175,37 @@ settlement_decisions = {
 						}
 					}
 					#Insert Control Weather CB here
+
+				}
+				random = {
+					chance = 50
+					any_neighbor_independent_ruler = {
+						any_realm_province = {
+							random_list = {
+								1 = {
+									add_province_modifier = {
+										name = africa_heavy_rain
+										months = 6
+									}
+								}
+								1 = {
+									add_province_modifier = {
+										name = africa_drought_risk
+										months = 18
+									}
+								}
+								1 = {
+									add_province_modifier = {
+										name = africa_drought
+										months = 12
+									}
+								}
+							}
+						}
+						#Insert Control Weather CB here
+					}
 				}
 			}
-
 
 		}
 		ai_will_do = {
@@ -10158,6 +10309,7 @@ settlement_decisions = {
 		}
 		allow = {
 			FROM = {
+				FROM = { wild_magic_recovery = yes }
 				custom_tooltip = {
 					text = HAS20SPELLPOINTS
 					hidden_tooltip = {
@@ -10188,61 +10340,66 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = { set_character_flag = spell_remove_disease_cooldown }
 			FROM = { hidden_tooltip = { change_variable = { which = sorcspellpoints value = -20 } } }
-
-			random_list = {
-				1 = {
-					location = {
-						reduce_disease = -0.99 # maybe this will fix the display bug?
-					}
-					hidden_tooltip = {
-						if = {
-							limit = {
-								location = {
-									holder_scope = {
-										NOT = { character = FROM }
-									}
-								}
-							}
-							location = {
-								holder_scope = {
-									opinion = {
-										modifier = cured_my_lands
-										who = FROM
-										years = 5
-									}
-									if = {
-										limit = {
-											ai = no
-										}
-										repeat_event = { id = spellaux.9 }
-									}
-								}
-							}
-						}
-						else_if = {
-							limit = {
-								location = {
-									holder_scope = {
-										ai = no
-										character = FROM
-									}
-								}
-							}
-							location = {
-								FROM = { character_event = { id = spellaux.10 } }
-							}
-						}
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
 				}
-				1 = {
-					FROM = {
-						if = {
-							limit = {
-								ai = no
+				random_list = {
+					1 = {
+						location = {
+							reduce_disease = -0.99 # maybe this will fix the display bug?
+						}
+						hidden_tooltip = {
+							if = {
+								limit = {
+									location = {
+										holder_scope = {
+											NOT = { character = FROM }
+										}
+									}
+								}
+								location = {
+									holder_scope = {
+										opinion = {
+											modifier = cured_my_lands
+											who = FROM
+											years = 5
+										}
+										if = {
+											limit = {
+												ai = no
+											}
+											repeat_event = { id = spellaux.9 }
+										}
+									}
+								}
 							}
-							character_event = { id = spellaux.11 }
+							else_if = {
+								limit = {
+									location = {
+										holder_scope = {
+											ai = no
+											character = FROM
+										}
+									}
+								}
+								location = {
+									FROM = { character_event = { id = spellaux.10 } }
+								}
+							}
+						}
+					}
+					1 = {
+						FROM = {
+							if = {
+								limit = {
+									ai = no
+								}
+								character_event = { id = spellaux.11 }
+							}
 						}
 					}
 				}
@@ -10405,6 +10562,7 @@ settlement_decisions = {
 			location = { has_disease = yes }
 		}
 		allow = {
+			FROM = { wild_magic_recovery = yes }
 			FROM = {
 				OR = {
 					custom_tooltip = {
@@ -10491,6 +10649,7 @@ settlement_decisions = {
 			}
 		}
 		effect = {
+			FROM = { wild_magic_surge_effect = yes }
 			FROM = {
 				set_character_flag = spell_remove_disease_cooldown
 				trigger_switch = {
@@ -10545,46 +10704,50 @@ settlement_decisions = {
 					}
 				}
 			}
-
-			location = {
-				reduce_disease = -0.99 # maybe this will fix the display bug?
-			}
-			hidden_tooltip = {
-				if = {
-					limit = {
-						location = {
-							holder_scope = {
-								NOT = { character = FROM }
-							}
-						}
-					}
-					location = {
-						holder_scope = {
-							opinion = {
-								modifier = cured_my_lands
-								who = FROM
-								years = 5
-							}
-							if = {
-								limit = {
-									ai = no
-								}
-								repeat_event = { id = spellaux.9 }
-							}
-						}
-					}
+			if = {
+				limit = {
+					FROM = { wild_magic_recovery = yes }
 				}
-				else_if = {
-					limit = {
+				location = {
+					reduce_disease = -0.99 # maybe this will fix the display bug?
+				}
+				hidden_tooltip = {
+					if = {
+						limit = {
+							location = {
+								holder_scope = {
+									NOT = { character = FROM }
+								}
+							}
+						}
 						location = {
 							holder_scope = {
-								ai = no
-								character = FROM
+								opinion = {
+									modifier = cured_my_lands
+									who = FROM
+									years = 5
+								}
+								if = {
+									limit = {
+										ai = no
+									}
+									repeat_event = { id = spellaux.9 }
+								}
 							}
 						}
 					}
-					location = {
-						FROM = { character_event = { id = spellaux.10 } }
+					else_if = {
+						limit = {
+							location = {
+								holder_scope = {
+									ai = no
+									character = FROM
+								}
+							}
+						}
+						location = {
+							FROM = { character_event = { id = spellaux.10 } }
+						}
 					}
 				}
 			}
