@@ -6603,85 +6603,92 @@ character_event = {
 							}
 
 							# Moralizers against fat
-							AND = {
-								ROOT = { check_variable = { which = physique_variable value >= 7 } }
-								OR = { 
+							trigger_if = {
+								limit = {
+									ROOT = {
+										check_variable = {
+											which = physique_variable
+											value >= 7
+										}
+									}
+								}
+
+								OR = {
 									trait = zealous
 									trait = temperate
 									trait = theologian
 									is_theocracy = yes
 								}
 							}
-							AND = { #Moralizers against thin
-								ROOT = { check_variable = { which = physique_variable value < -7 } }
-								OR = { 
+							trigger_else_if = { # Moralizers against thin
+								limit = {
+									ROOT = {
+										check_variable = {
+											which = physique_variable
+											value < -7
+										}
+									}
+								}
+
+								OR = {
 									trait = gluttonous
 									trait = duelist
 									trait = hunter
 									trait = hedonist
 								}
 							}
-							trait = kind 	#Genuine care
-							opinion = { 	#Genuine care
-								who = ROOT value = 20 
-							}
 						}
 					}
-					any_lover = { #Only doing it because he cares
-						is_inaccessible_trigger = no
+
+					any_lover = { # Only doing it because he cares
+						block_general_event_trigger = no
 						is_within_diplo_range = ROOT
-						NOT = { trait = incapable } 
-						prisoner = no
-						age = 16
 					}
-					any_friend = { #Only doing it because he cares
-						is_inaccessible_trigger = no
+
+					any_friend = { # Only doing it because he cares
+						block_general_event_trigger = no
 						is_within_diplo_range = ROOT
-						NOT = { trait = incapable } 
-						prisoner = no
-						age = 16
 					}
 				}
 			}
-			#...Or has ill intent.
-			AND = { 
-				is_ill_trigger = no  	#Respectable, average person.
+
+			#...or has ill intent
+			AND = {
+				# Respectable, average person
+				is_ill = no
 				has_negative_congenital_trigger = no
-				NOT = { trait = possessed } 
-				NOT = { trait = lunatic } 
-				NOT = { age = 50 } 
-				prestige = 0
-				OR = { 
-					AND = {
-						is_female = yes
-						ROOT = { is_female = yes }
-					} 
-					AND = {
-						is_female = no
-						ROOT = { is_female = no }
-					}
+				practical_age < 50
+				prestige >= 0
+
+				check_variable = { which = physique_variable value >= -10 }
+				check_variable = { which = physique_variable value < 10 }
+
+				NOR = {
+					trait = possessed
+					trait = lunatic
 				}
-				check_variable = { which = physique_variable value = -10 } 
-				NOT = { check_variable = { which = physique_variable value = 10 } } 
-				any_close_relative = { 
-					is_inaccessible_trigger = no
-					NOT = { trait = incapable } 
-					NOT = { trait = kind } 
-					NOT = { is_lover = ROOT }
-					NOT = { is_friend = ROOT } 
-					prisoner = no
-					age = 16
-					OR = { 
+
+				any_close_relative = {
+					same_sex = ROOT
+					block_general_event_trigger = no
+
+					OR = {
 						trait = deceitful
-						trait = envious 
+						trait = envious
 						trait = cruel
 						trait = schemer
-						is_rival = ROOT 
-						NOT = { 
-							opinion = { 
-								who = ROOT value = 20 
-							}
+						is_rival = ROOT
+
+						opinion = {
+							who = ROOT
+							value < 20
 						}
+					}
+
+					NOR = {
+						trait = kind
+						is_lover = ROOT
+						is_friend = ROOT
 					}
 				}
 			}
@@ -6690,656 +6697,770 @@ character_event = {
 
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-			NOT = { age = 25 }
+			practical_age < 25
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
-			age = 45
+			practical_age >= 45
 		}
-		modifier = { 
+
+		mult_modifier = {
 			factor = 0.5
 			trait = paranoid
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.75
 			trait = trusting
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.25
-			prestige = 500
+			prestige >= 500
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.25
-			wealth = 250
+			wealth >= 250
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
 			is_married = yes
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.75
-			num_of_lovers = 1
+			num_of_lovers >= 1
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.75
-			num_of_friends = 1
+			num_of_friends >= 1
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			is_tribal = yes
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.75
 			is_nomadic = yes
 		}
 	}
 
-	immediate = { 
-		random_list = { 
-			50 = { #First determine if it's good advice...
-				modifier = {
-					factor = 0
-					NOT = { 
-						OR = { 
-							check_variable = { which = physique_variable value = 7 } 
-							NOT = { check_variable = { which = physique_variable value = -7 } } 
-						}
-						OR = { 
-							any_spouse = { 
-								is_within_diplo_range = ROOT
-								is_inaccessible_trigger = no
-								NOT = { trait = incapable } 
-								prisoner = no
-								age = 16
-								OR = { 
-									AND = { #Moralizers against fat
-										ROOT = { check_variable = { which = physique_variable value = 7 } } 
-										OR = { 
-											trait = zealous
-											trait = temperate
-											trait = theologian
-											is_theocracy = yes
-										}
-									}
-									AND = { #Moralizers against thin
-										ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-										OR = { 
-											trait = gluttonous
-											trait = duelist
-											trait = hunter
-											trait = hedonist
-										}
-									}
-									trait = kind 	#Genuine care
-									opinion = { 	#Genuine care
-										who = ROOT value = 20 
-									}
+	immediate = {
+		random_list = {
+			50 = { # First determine if it's good advice...
+				trigger = {
+					OR = {
+						check_variable = { which = physique_variable value >= 7 }
+						check_variable = { which = physique_variable value < -7 }
+					}
+
+					OR = {
+						any_close_relative = {
+							block_general_event_trigger = no
+							is_within_diplo_range = ROOT
+
+							OR = {
+								trait = kind # Genuine care
+
+								opinion = { # Genuine care
+									who = ROOT
+									value >= 20
 								}
-							}
-							any_lover = { #Only doing it because he cares
-								is_inaccessible_trigger = no
-								age = 16
-								NOT = { trait = incapable } 
-								prisoner = no
-							}
-							any_friend = { #Only doing it because he cares
-								is_inaccessible_trigger = no
-								age = 16
-								NOT = { trait = incapable } 
-								prisoner = no
-							}
-							any_close_relative = { 
-								is_within_diplo_range = ROOT
-								is_inaccessible_trigger = no
-								NOT = { trait = incapable } 
-								age = 16
-								prisoner = no
-								OR = { 
-									AND = { #Moralizers against fat
-										ROOT = { check_variable = { which = physique_variable value = 7 } } 
-										OR = { 
-											trait = zealous
-											trait = temperate
-											trait = theologian
-											is_theocracy = yes
+
+								# Moralizers against fat
+								trigger_if = {
+									limit = {
+										ROOT = {
+											check_variable = {
+												which = physique_variable
+												value >= 7
 											}
 										}
-									AND = { #Moralizers against thin
-										ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-										OR = { 
-											trait = gluttonous
-											trait = duelist
-											trait = hunter
-											trait = hedonist
+									}
+
+									OR = {
+										trait = zealous
+										trait = temperate
+										trait = theologian
+										is_theocracy = yes
+									}
+								}
+								trigger_else_if = { # Moralizers against thin
+									limit = {
+										ROOT = {
+											check_variable = {
+												which = physique_variable
+												value < -7
+											}
 										}
 									}
-									trait = kind 	#Genuine care
-									opinion = { 	#Genuine care
-										who = ROOT value = 20 
+
+									OR = {
+										trait = gluttonous
+										trait = duelist
+										trait = hunter
+										trait = hedonist
 									}
 								}
 							}
+						}
+
+						any_lover = { # Only doing it because he cares
+							block_general_event_trigger = no
+							is_within_diplo_range = ROOT
+						}
+
+						any_friend = { # Only doing it because he cares
+							block_general_event_trigger = no
+							is_within_diplo_range = ROOT
 						}
 					}
 				}
-				random_list = { #Now determine who gets the event of the possible existing people.
+
+				random_list = { # Now determine who gets the event of the possible existing people
 					25 = {
-						modifier = {
-							factor = 0
-							NOT = { 
-								any_spouse = { 
-									is_within_diplo_range = ROOT
-									is_inaccessible_trigger = no
-									NOT = { trait = incapable } 
-									prisoner = no
-									age = 16
-									OR = { 
-										AND = { #Moralizers against fat
-											ROOT = { check_variable = { which = physique_variable value = 7 } } 
-											OR = { 
-												trait = zealous
-												trait = temperate
-												trait = theologian
-												is_theocracy = yes
+						trigger = {
+							any_spouse = {
+								block_general_event_trigger = no
+								is_within_diplo_range = ROOT
+
+								OR = {
+									trait = kind # Genuine care
+
+									opinion = { # Genuine care
+										who = ROOT
+										value >= 20
+									}
+
+									# Moralizers against fat
+									trigger_if = {
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value >= 7
+												}
 											}
 										}
-										AND = { #Moralizers against thin
-											ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-											OR = { 
-												trait = gluttonous
-												trait = duelist
-												trait = hunter
-												trait = hedonist
+
+										OR = {
+											trait = zealous
+											trait = temperate
+											trait = theologian
+											is_theocracy = yes
+										}
+									}
+									trigger_else_if = { # Moralizers against thin
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value < -7
+												}
 											}
 										}
-										trait = kind 	#Genuine care
-										opinion = { 	#Genuine care
-											who = ROOT value = 20 
+
+										OR = {
+											trait = gluttonous
+											trait = duelist
+											trait = hunter
+											trait = hedonist
 										}
 									}
 								}
 							}
 						}
+
 						random_spouse = {
 							limit = {
+								block_general_event_trigger = no
 								is_within_diplo_range = ROOT
-								is_inaccessible_trigger = no
-								NOT = { trait = incapable } 
-								prisoner = no
-								age = 16
-								OR = { 
-									AND = { #Moralizers against fat
-										ROOT = { check_variable = { which = physique_variable value = 7 } } 
-										OR = { 
+
+								OR = {
+									trait = kind # Genuine care
+
+									opinion = { # Genuine care
+										who = ROOT
+										value >= 20
+									}
+
+									# Moralizers against fat
+									trigger_if = {
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value >= 7
+												}
+											}
+										}
+
+										OR = {
 											trait = zealous
 											trait = temperate
 											trait = theologian
 											is_theocracy = yes
 										}
 									}
-									AND = { #Moralizers against thin
-										ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-										OR = { 
+									trigger_else_if = { # Moralizers against thin
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value < -7
+												}
+											}
+										}
+
+										OR = {
 											trait = gluttonous
 											trait = duelist
 											trait = hunter
 											trait = hedonist
 										}
 									}
-									trait = kind 	#Genuine care
-									opinion = { 	#Genuine care
-										who = ROOT value = 20 
-									}
 								}
 							}
-							character_event = { id = HFP.20650 } #Spouse is worried.
+
+							character_event = { id = HFP.20650 } # Spouse is worried
 						}
-					} 
+					}
+
 					25 = {
-						modifier = {
-							factor = 0
-							NOT = { 
-								any_close_relative = { 
-									is_within_diplo_range = ROOT
-									is_inaccessible_trigger = no
-									NOT = { trait = incapable } 
-									prisoner = no
-									age = 16
-									OR = { 
-										AND = { #Moralizers against fat
-											ROOT = { check_variable = { which = physique_variable value = 7 } } 
-											OR = { 
-												trait = zealous
-												trait = temperate
-												trait = theologian
-												is_theocracy = yes
+						trigger = {
+							any_close_relative = {
+								block_general_event_trigger = no
+								is_within_diplo_range = ROOT
+
+								OR = {
+									trait = kind # Genuine care
+
+									opinion = { # Genuine care
+										who = ROOT
+										value >= 20
+									}
+
+									# Moralizers against fat
+									trigger_if = {
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value >= 7
+												}
 											}
 										}
-										AND = { #Moralizers against thin
-											ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-											OR = { 
-												trait = gluttonous
-												trait = duelist
-												trait = hunter
-												trait = hedonist
+
+										OR = {
+											trait = zealous
+											trait = temperate
+											trait = theologian
+											is_theocracy = yes
+										}
+									}
+									trigger_else_if = { # Moralizers against thin
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value < -7
+												}
 											}
 										}
-										trait = kind 	#Genuine care
-										opinion = { 	#Genuine care
-											who = ROOT value = 20 
+
+										OR = {
+											trait = gluttonous
+											trait = duelist
+											trait = hunter
+											trait = hedonist
 										}
 									}
 								}
 							}
 						}
+
 						random_close_relative = {
 							limit = {
+								block_general_event_trigger = no
 								is_within_diplo_range = ROOT
-								is_inaccessible_trigger = no
-								NOT = { trait = incapable } 
-								prisoner = no
-								age = 16
-								OR = { 
-									AND = { #Moralizers against fat
-										ROOT = { check_variable = { which = physique_variable value = 7 } } 
-										OR = { 
+
+								OR = {
+									trait = kind # Genuine care
+
+									opinion = { # Genuine care
+										who = ROOT
+										value >= 20
+									}
+
+									# Moralizers against fat
+									trigger_if = {
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value >= 7
+												}
+											}
+										}
+
+										OR = {
 											trait = zealous
 											trait = temperate
 											trait = theologian
 											is_theocracy = yes
 										}
 									}
-									AND = { #Moralizers against thin
-										ROOT = { NOT = { check_variable = { which = physique_variable value = -7 } } } 
-										OR = { 
+									trigger_else_if = { # Moralizers against thin
+										limit = {
+											ROOT = {
+												check_variable = {
+													which = physique_variable
+													value < -7
+												}
+											}
+										}
+
+										OR = {
 											trait = gluttonous
 											trait = duelist
 											trait = hunter
 											trait = hedonist
 										}
 									}
-									trait = kind 	#Genuine care
-									opinion = { 	#Genuine care
-										who = ROOT value = 20 
-									}
 								}
 							}
-							character_event = { id = HFP.20650 } #Relative is worried.
+
+							character_event = { id = HFP.20650 } # Relative is worried
 						}
 					}
+
 					25 = {
-						modifier = {
-							factor = 0
-							NOT = {
-								any_lover = { 
-									is_inaccessible_trigger = no
-									age = 16
-									NOT = { trait = incapable } 
-									prisoner = no
-								}
-							}
+						trigger = {
+							any_lover = { block_general_event_trigger = no }
 						}
+
 						random_lover = {
-							limit = { 
-								is_inaccessible_trigger = no
-								age = 16
-								NOT = { trait = incapable } 
-								prisoner = no
-							}
-							character_event = { id = HFP.20650 } #Lover is worried.
+							limit = { block_general_event_trigger = no }
+
+							character_event = { id = HFP.20650 } # Lover is worried
 						}
 					}
+
 					25 = {
-						modifier = {
-							factor = 0
-							NOT = {
-								any_friend = { 
-									is_inaccessible_trigger = no
-									age = 16
-									NOT = { trait = incapable } 
-									prisoner = no
-								}
-							}
+						trigger = {
+							any_friend = { block_general_event_trigger = no }
 						}
+
 						random_friend = {
-							limit = { 
-								is_inaccessible_trigger = no
-								age = 16
-								NOT = { trait = incapable } 
-								prisoner = no
-							}
-							character_event = { id = HFP.20650 } #Friend is worried.
+							limit = { block_general_event_trigger = no }
+
+							character_event = { id = HFP.20650 } # Friend is worried
 						}
 					}
 				}
-			} 
-			50 = { #...Or bad advice.
-				modifier = {
-					factor = 0
-					NOT = { 
-						is_ill_trigger = no  	#Respectable, average person.
-						has_negative_congenital_trigger = no
-						NOT = { trait = possessed } 
-						NOT = { trait = lunatic } 
-						NOT = { age = 50 } 
-						prestige = 0
-						check_variable = { which = physique_variable value = -10 } 
-						NOT = { check_variable = { which = physique_variable value = 10 } } 
-						any_close_relative = { 
-							is_inaccessible_trigger = no
-							NOT = { trait = incapable } 
-							NOT = { trait = kind } 
-							NOT = { is_lover = ROOT }
-							NOT = { is_friend = ROOT } 
-							OR = { 
-								AND = {
-									is_female = yes
-									ROOT = { is_female = yes }
-								} 
-								AND = {
-									is_female = no
-									ROOT = { is_female = no }
-								}
-							} 
-							prisoner = no
-							age = 16
-							OR = { 
-								trait = deceitful
-								trait = envious 
-								trait = cruel
-								trait = schemer
-								is_rival = ROOT 
-								NOT = { 
-									opinion = { 
-										who = ROOT value = 20 
-									}
-								}
-							}
-						}
+			}
+
+			50 = { #...or bad advice
+				trigger = {
+					# Respectable, average person
+					is_ill = no
+					has_negative_congenital_trigger = no
+					practical_age < 50
+					prestige >= 0
+
+					check_variable = { which = physique_variable value >= -10 }
+					check_variable = { which = physique_variable value < 10 }
+
+					NOR = {
+						trait = possessed
+						trait = lunatic
 					}
-				} 
-				random_close_relative = { 
-					limit = { 
-						is_inaccessible_trigger = no
-						NOT = { trait = incapable } 
-						NOT = { trait = kind } 
-						NOT = { is_lover = ROOT }
-						NOT = { is_friend = ROOT } 
-						prisoner = no
-						age = 16
-						OR = { 
-							AND = {
-								is_female = yes
-								ROOT = { is_female = yes }
-							} 
-							AND = {
-								is_female = no
-								ROOT = { is_female = no }
-							}
-						}
-						OR = { 
+
+					any_close_relative = {
+						same_sex = ROOT
+						block_general_event_trigger = no
+
+						OR = {
 							trait = deceitful
-							trait = envious 
+							trait = envious
 							trait = cruel
 							trait = schemer
-							is_rival = ROOT 
-							NOT = { 
-								opinion = { 
-									who = ROOT value = 20 
-								}
+							is_rival = ROOT
+
+							opinion = {
+								who = ROOT
+								value < 20
 							}
 						}
+
+						NOR = {
+							trait = kind
+							is_lover = ROOT
+							is_friend = ROOT
+						}
 					}
-					character_event = { id = HFP.20651 } #Relative is jealous.
+				}
+
+				random_close_relative = {
+					limit = {
+						same_sex = ROOT
+						block_general_event_trigger = no
+
+						OR = {
+							trait = deceitful
+							trait = envious
+							trait = cruel
+							trait = schemer
+							is_rival = ROOT
+
+							opinion = {
+								who = ROOT
+								value < 20
+							}
+						}
+
+						NOR = {
+							trait = kind
+							is_lover = ROOT
+							is_friend = ROOT
+						}
+					}
+
+					character_event = { id = HFP.20651 } # Relative is jealous
 				}
 			}
 		}
 	}
 }
 
-#Genuinely concerned character: what to do?
+# Genuinely concerned character: what to do?
 character_event = {
 	id = HFP.20650
+
 	desc = {
 		text = EVTDESCAHFP20650
-		trigger = { 
-			FROM = { 
-				check_variable = { which = physique_variable value = 7 } 
+		picture = GFX_evt_fancy_feast
+		trigger = {
+			FROM = {
+				check_variable = { which = physique_variable value >= 7 }
 				is_female = no
 			}
 		}
-		picture = GFX_evt_fancy_feast
 	}
 	desc = {
 		text = EVTDESCBHFP20650
-		trigger = { 
-			FROM = { 
-				check_variable = { which = physique_variable value = 7 } 
+		picture = GFX_evt_brothel
+		trigger = {
+			FROM = {
+				check_variable = { which = physique_variable value >= 7 }
 				is_female = yes
 			}
 		}
-		picture = GFX_evt_brothel
 	}
 	desc = {
 		text = EVTDESCCHFP20650
-		trigger = { 
-			FROM = { 
-				NOT = { check_variable = { which = physique_variable value = -7 } } 
+		picture = GFX_evt_library
+		trigger = {
+			FROM = {
+				check_variable = { which = physique_variable value < -7 }
 				is_female = no
 			}
 		}
-		picture = GFX_evt_library
 	}
 	desc = {
 		text = EVTDESCDHFP20650
-		trigger = { 
-			FROM = { 
-				NOT = { check_variable = { which = physique_variable value = -7 } } 
+		picture = GFX_evt_princess_byzantine
+		trigger = {
+			FROM = {
+				check_variable = { which = physique_variable value < -7 }
 				is_female = yes
 			}
 		}
-		picture = GFX_evt_princess_byzantine
 	}
-	picture = GFX_evt_fancy_feast
 
 	is_triggered_only = yes
 
-	option = { #Suggest to eat less (+10).
+	option = { # Suggest to eat less (+10)
 		name = EVTOPTAHFP20650
-		custom_tooltip = { text = tooltip_20650_A }
-		trigger = { 
-			FROM = { check_variable = { which = physique_variable value = 5 } } 
+
+		trigger = {
+			FROM = { check_variable = { which = physique_variable value >= 5 } }
 		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20652 days = 10 } } }
-		ai_chance = { 
-			factor = 25 
-			modifier = {
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20652
+				days = 10
+				tooltip = tooltip_20650_A
+			}
+		}
+
+		ai_chance = {
+			factor = 25
+
+			mult_modifier = {
 				factor = 1.75
-				OR = { 
+
+				OR = {
 					trait = zealous
 					trait = theologian
 					is_theocracy = yes
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				is_weak_non_congenital_trigger = yes
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = temperate
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = diligent
 			}
-			modifier = {
-				factor = 1.5
-				trait = is_malnourished
-			}
-			modifier = {
-				factor = 1.5
-				trait = duelist
-			}
-			modifier = {
-				factor = 1.5
-				trait = hunter
-			}
-			modifier = {
-				factor = 1.5
-				trait = kind
-			}
-			modifier = {
-				factor = 1.5
-				trait = honest
-			}
-		}
-	}
-	option = { #Suggest to eat less (-10).
-		name = EVTOPTBHFP20650
-		custom_tooltip = { text = tooltip_20650_B }
-		trigger = { 
-			FROM = { NOT = { check_variable = { which = physique_variable value = -5 } } }
-		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20652 days = 10 } } }
-		ai_chance = { 
-			factor = 25 
-			modifier = {
-				factor = 1.75
-				OR = { 
-					trait = zealous
-					trait = theologian
-					is_theocracy = yes
-				}
-			}
-			modifier = {
-				factor = 1.5
-				is_weak_non_congenital_trigger = yes
-			}
-			modifier = {
-				factor = 1.5
-				trait = temperate
-			}
-			modifier = {
-				factor = 1.5
-				trait = diligent
-			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = is_malnourished
 			}
 
-		}
-	}
-	option = { #Suggest to eat more (+10).
-		name = EVTOPTCHFP20650
-		custom_tooltip = { text = tooltip_20650_C }
-		trigger = { 
-			FROM = { check_variable = { which = physique_variable value = 5 } }
-		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20653 days = 10 } } }
-		ai_chance = { 
-			factor = 25 
-			modifier = {
-				factor = 1.75
-				trait = hedonist
-			}
-			modifier = {
-				factor = 1.5
-				trait = sturdy
-			}
-			modifier = {
-				factor = 1.5
-				trait = robust
-			}
-			modifier = {
-				factor = 1.5
-				trait = gluttonous
-			}
-			modifier = {
-				factor = 1.5
-				trait = drunkard
-			}
-			modifier = {
-				factor = 1.5
-				trait = is_fat
-			}
-		}
-	}
-	option = { #Suggest to eat more (-10).
-		name = EVTOPTDHFP20650
-		custom_tooltip = { text = tooltip_20650_D }
-		trigger = { 
-			FROM = { NOT = { check_variable = { which = physique_variable value = -5 } } } 
-		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20653 days = 10 } } }
-		ai_chance = { 
-			factor = 25 
-			modifier = {
-				factor = 1.75
-				trait = hedonist
-			}
-			modifier = {
-				factor = 1.5
-				trait = sturdy
-			}
-			modifier = {
-				factor = 1.5
-				trait = robust
-			}
-			modifier = {
-				factor = 1.5
-				trait = gluttonous
-			}
-			modifier = {
-				factor = 1.5
-				trait = drunkard
-			}
-			modifier = {
-				factor = 1.5
-				trait = is_fat
-			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = duelist
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = hunter
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = kind
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = honest
 			}
 		}
 	}
-	option = { #Not my business
+
+	option = { # Suggest to eat less (-10)
+		name = EVTOPTBHFP20650
+
+		trigger = {
+			FROM = { check_variable = { which = physique_variable value < -5 } }
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20652
+				days = 10
+				tooltip = tooltip_20650_B
+			}
+		}
+
+		ai_chance = {
+			factor = 25
+
+			mult_modifier = {
+				factor = 1.75
+
+				OR = {
+					trait = zealous
+					trait = theologian
+					is_theocracy = yes
+				}
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_weak_non_congenital_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = temperate
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = diligent
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = is_malnourished
+			}
+		}
+	}
+
+	option = { # Suggest to eat more (+10)
+		name = EVTOPTCHFP20650
+
+		trigger = {
+			FROM = { check_variable = { which = physique_variable value >= 5 } }
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20653
+				days = 10
+				tooltip = tooltip_20650_C
+			}
+		}
+
+		ai_chance = {
+			factor = 25
+
+			mult_modifier = {
+				factor = 1.75
+				trait = hedonist
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = sturdy
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = robust
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = gluttonous
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = drunkard
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = is_fat
+			}
+		}
+	}
+
+	option = { # Suggest to eat more (-10)
+		name = EVTOPTDHFP20650
+
+		trigger = {
+			FROM = { check_variable = { which = physique_variable value < -5 } }
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20653
+				days = 10
+				tooltip = tooltip_20650_D
+			}
+		}
+
+		ai_chance = {
+			factor = 25
+
+			mult_modifier = {
+				factor = 1.75
+				trait = hedonist
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = sturdy
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = robust
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = gluttonous
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = drunkard
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = is_fat
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = duelist
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = hunter
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = honest
+			}
+		}
+	}
+
+	option = { # Not my business
 		name = EVTOPTEHFP20650
-		ai_chance = { 
-			factor = 30 
-			modifier = {
+
+		ai_chance = {
+			factor = 30
+
+			trigger = {
+				NOR = {
+					is_lover = FROM
+					is_friend = FROM
+				}
+			}
+
+			mult_modifier = {
 				factor = 0.75
 				trait = honest
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.75
 				trait = gregarious
 			}
-			modifier = {
-				factor = 0
-				is_lover = FROM
-			}
-			modifier = {
-				factor = 0
-				is_friend = FROM
-			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
 				is_married = FROM
 			}
@@ -7347,7 +7468,7 @@ character_event = {
 	}
 }
 
-#Ill-advising character: what to do?
+# Ill-advising character: what to do?
 character_event = {
 	id = HFP.20651
 	desc = EVTDESCAHFP20651
@@ -7355,89 +7476,127 @@ character_event = {
 
 	is_triggered_only = yes
 
-	option = { #Suggest is fat.
+	option = { # Suggest is fat
 		name = EVTOPTAHFP20651
-		custom_tooltip = { text = tooltip_20651_A }
-		set_character_flag = flag_ill_advisor #For localization
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20652 days = 10 } } }
-		ai_chance = { 
+
+		set_character_flag = flag_ill_advisor # For localization
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20652
+				days = 10
+				tooltip = tooltip_20651_A
+			}
+		}
+
+		ai_chance = {
 			factor = 50
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = is_malnourished
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = gluttonous
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				is_weak_non_congenital_trigger = yes
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = hedonist
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = duelist
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = hunter
 			}
 		}
 	}
-	option = { #Suggest is thin.
+
+	option = { # Suggest is thin
 		name = EVTOPTBHFP20651
-		custom_tooltip = { text = tooltip_20651_B }
-		set_character_flag = flag_ill_advisor #For localization
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20653 days = 10 } } }
-		ai_chance = { 
-			factor = 50 
-			modifier = {
+
+		set_character_flag = flag_ill_advisor # For localization
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20653
+				days = 10
+				tooltip = tooltip_20651_B
+			}
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
 				factor = 1.5
 				trait = is_fat
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = sturdy
 			}
-			modifier = { #Would consider it a downgrade.
+
+			mult_modifier = { # Would consider it a downgrade
 				factor = 1.5
-				OR = { 
+
+				OR = {
 					trait = zealous
 					trait = theologian
 					is_theocracy = yes
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = robust
 			}
-			modifier = { 
+
+			mult_modifier = {
 				factor = 1.5
 				trait = hunter
 			}
-			modifier = { 
+
+			mult_modifier = {
 				factor = 1.5
 				trait = proud
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
 				trait = temperate
 			}
 		}
 	}
-	option = { #Not my business
+	option = { # Not my business
 		name = EVTOPTDHFP20651
-		ai_chance = { 
-			factor = 10 
-			modifier = {
+
+		ai_chance = {
+			factor = 10
+
+			mult_modifier = {
 				factor = 0.75
 				trait = deceitful
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.75
 				trait = cruel
 			}
@@ -7445,288 +7604,432 @@ character_event = {
 	}
 }
 
-#Character encouraged to eat less.
+# Character encouraged to eat less
 character_event = {
 	id = HFP.20652
 	desc = EVTDESCHAFP20652
-
-	trigger = { 
-		FROM = { is_alive = yes } 
-	}
-
 	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
-	option = { #Paranoid
+	trigger = {
+		FROM = { is_alive = yes }
+	}
+
+	option = { # Paranoid
 		name = EVTOPTAHFP20652
-		custom_tooltip = { text = tooltip_20652_A }
-		trigger = { trait = paranoid }
 		tooltip_info = paranoid
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20658 } } }
-		ai_chance = { 
+
+		trigger = { trait = paranoid }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20658
+				tooltip = tooltip_20652_A
+			}
+		}
+
+		ai_chance = {
 			factor = 50
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				NOT = { check_variable = { which = physique_variable value = -7 } } 
+
+				check_variable = {
+					which = physique_variable
+					value < -7
+				}
 			}
 		}
 	}
-	option = { #Trusting
+
+	option = { # Trusting
 		name = EVTOPTBHFP20652
-		custom_tooltip = { text = tooltip_20652_B }
-		lose_weight_medium_effect = yes
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20655 } } }
-		hidden_tooltip = { character_event = { id = HFP.20657  days = 30 } } #Results
-		ai_chance = { 
-			factor = 50
-			modifier = {
-				factor = 1.5
-				check_variable = { which = physique_variable value = 7 } 
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20655
+				tooltip = tooltip_20652_B
 			}
-			modifier = {
+		}
+
+		lose_weight_medium_effect = yes
+
+		character_event = {
+			id = HFP.20657  # Results
+			days = 30
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = physique_variable
+					value >= 7
+				}
+			}
+
+			mult_modifier = {
 				factor = 1.75
 				is_friend = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
 				is_lover = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
 				is_rival = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				is_married = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 8 
+
+				FROM = {
+					intrigue >= 8
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 10 
+
+				FROM = {
+					intrigue >= 10
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 12
+
+				FROM = {
+					intrigue >= 12
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 15
+
+				FROM = {
+					intrigue >= 15
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.25
-				opinion = { who = FROM value = 30 }
+
+				opinion = {
+					who = FROM
+					value >= 30
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.25
-				opinion = { who = FROM value = 50 }
+
+				opinion = {
+					who = FROM
+					value >= 50
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				opinion = { who = FROM value = 70 }
+
+				opinion = {
+					who = FROM
+					value >= 70
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				opinion = { who = FROM value = 90 }
+
+				opinion = {
+					who = FROM
+					value >= 90
+				}
 			}
 		}
 	}
-	option = { #Not trusting
+
+	option = { # Not trusting
 		name = EVTOPTCHFP20652
+
 		trigger = { NOT = { trait = trusting } }
-		custom_tooltip = { text = tooltip_20652_C }
-		random = { 
-			chance = 30
-			if = { 
-				limit = { trait = stressed } 
-				custom_tooltip = { text = tooltip_health_deteriorates }
-				hidden_tooltip = { health = -0.25 }
-			}
-			if = { 
-				limit = { NOT = { trait = stressed } } 
-				add_trait = stressed
-				hidden_tooltip = { character_event = { id = 38282 } }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20660
+				tooltip = tooltip_20652_C
 			}
 		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20660 } } }
-		ai_chance = { 
-			factor = 50
-			modifier = {
-				factor = 1.5
-				NOT = { check_variable = { which = physique_variable value = 7 } } 
+
+		random = {
+			chance = 30
+
+			if = {
+				limit = { trait = stressed }
+
+				custom_tooltip = {
+					text = tooltip_health_deteriorates
+					health = -0.25
+				}
 			}
-			modifier = {
+			else = {
+				add_trait_stressed_effect = yes
+			}
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = physique_variable
+					value < 7
+				}
+			}
+
+			mult_modifier = {
 				factor = 1.75
 				trait = stubborn
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = 0
-					}
+
+				opinion = {
+					who = FROM
+					value < 0
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -40
-					}
+
+				opinion = {
+					who = FROM
+					value < -40
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -60
-					}
+
+				opinion = {
+					who = FROM
+					value < -60
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -80
-					}
+				opinion = {
+					who = FROM
+					value < -80
 				}
 			}
 		}
 	}
 }
 
-#Character encouraged to eat more.
+# Character encouraged to eat more
 character_event = {
 	id = HFP.20653
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCAHFP20653
-		trigger = { 
-			is_female = no
-		}
+		trigger = { is_female = no }
 	}
 	desc = {
 		text = EVTDESCBHFP20653
-		trigger = { 
-			is_female = yes
-		}
+		trigger = { is_female = yes }
 	}
-
-	trigger = { 
-		FROM = { is_alive = yes } 
-	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
-	option = { #Paranoid
+	trigger = {
+		FROM = { is_alive = yes }
+	}
+
+	option = { # Paranoid
 		name = EVTOPTAHFP20653
-		custom_tooltip = { text = tooltip_20653_A }
-		trigger = { trait = paranoid }
 		tooltip_info = paranoid
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20658 } } }
-		ai_chance = { 
+
+		trigger = { trait = paranoid }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20658
+				tooltip = tooltip_20653_A
+			}
+		}
+
+		ai_chance = {
 			factor = 50
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				check_variable = { which = physique_variable value = 10 } 
+
+				check_variable = {
+					which = physique_variable
+					value >= 10
+				}
 			}
 		}
 	}
-	option = { #Trusting
+
+	option = { # Trusting
 		name = EVTOPTBHFP20653
-		custom_tooltip = { text = tooltip_20653_B }
+
 		gain_weight_medium_effect = yes
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20654 } } }
-		hidden_tooltip = { character_event = { id = HFP.20656  days = 30 } } #Results
-		ai_chance = { 
-			factor = 50
-			modifier = {
-				factor = 1.5
-				NOT = { check_variable = { which = physique_variable value = -10 } } 
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20654
+				tooltip = tooltip_20653_B
 			}
-			modifier = {
+		}
+
+		character_event = {
+			id = HFP.20656 # Results
+			days = 30
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = physique_variable
+					value < -10
+				}
+			}
+
+			mult_modifier = {
 				factor = 1.75
 				is_friend = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
 				is_lover = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.25
 				is_rival = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				is_married = FROM
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 8 
+
+				FROM = {
+					intrigue >= 8
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 10 
+
+				FROM = {
+					intrigue >= 10
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 12
+
+				FROM = {
+					intrigue >= 12
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				FROM = { 
-					intrigue = 15
+
+				FROM = {
+					intrigue >= 15
 					has_character_flag = flag_ill_advisor
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.25
-				opinion = { who = FROM value = 30 }
+
+				opinion = {
+					who = FROM
+					value >= 30
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.25
-				opinion = { who = FROM value = 50 }
+
+				opinion = {
+					who = FROM
+					value >= 50
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				opinion = { who = FROM value = 70 }
+
+				opinion = {
+					who = FROM
+					value >= 70
+				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				opinion = { who = FROM value = 90 }
+
+				opinion = {
+					who = FROM
+					value >= 90
+				}
 			}
 		}
 	}
-	option = { #Not trusting
+
+	option = { # Not trusting
 		name = EVTOPTCHFP20653
 		trigger = { NOT = { trait = trusting } }
 		custom_tooltip = { text = tooltip_20653_C }
