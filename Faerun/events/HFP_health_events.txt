@@ -8032,577 +8032,600 @@ character_event = {
 
 	option = { # Not trusting
 		name = EVTOPTCHFP20653
+
 		trigger = { NOT = { trait = trusting } }
-		custom_tooltip = { text = tooltip_20653_C }
-		random = { 
-			chance = 30
-			if = { 
-				limit = { trait = stressed } 
-				custom_tooltip = { text = tooltip_health_deteriorates }
-				hidden_tooltip = { health = -0.25 }
-			}
-			if = { 
-				limit = { NOT = { trait = stressed } } 
-				add_trait = stressed
-				hidden_tooltip = { character_event = { id = 38282 } }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = HFP.20659
+				tooltip = tooltip_20653_C
 			}
 		}
-		hidden_tooltip = { FROM = { character_event = { id = HFP.20659 } } }
-		ai_chance = { 
-			factor = 50
-			modifier = {
-				factor = 1.5
-				check_variable = { which = physique_variable value = 10 } 
+
+		random = {
+			chance = 30
+
+			if = {
+				limit = { trait = stressed }
+
+				custom_tooltip = {
+					text = tooltip_health_deteriorates
+					health = -0.25
+				}
 			}
-			modifier = {
+			else = {
+				add_trait_stressed_effect = yes
+			}
+		}
+
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 1.5
+
+				check_variable = {
+					which = physique_variable
+					value >= 10
+				}
+			}
+
+			mult_modifier = {
 				factor = 1.75
 				trait = stubborn
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = 0
-					}
+
+				opinion = {
+					who = FROM
+					value < 0
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -40
-					}
+
+				opinion = {
+					who = FROM
+					value < -40
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -60
-					}
+
+				opinion = {
+					who = FROM
+					value < -60
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.75
-				NOT = { 
-					opinion = { 
-						who = FROM 
-						value = -80
-					}
+
+				opinion = {
+					who = FROM
+					value < -80
 				}
 			}
 		}
 	}
 }
 
-#Advisor notified: Character is eating more.
+# Advisor notified: Character is eating more
 character_event = {
 	id = HFP.20654
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCHAFP20654
-		trigger = { 
-			FROM = { is_female = no } 
-			NOT = { has_character_flag = flag_ill_advisor } 
+		trigger = {
+			FROM = { is_female = no }
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCHBFP20654
-		trigger = { 
+		trigger = {
 			FROM = { is_female = yes }
-			NOT = { has_character_flag = flag_ill_advisor } 
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCHCFP20654
-		trigger = { 
-			has_character_flag = flag_ill_advisor 
-		}
+		trigger = { has_character_flag = flag_ill_advisor }
 	}
-
-	trigger = { 
-		FROM = { is_alive = yes } 
-	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
-	option = { #Good
+	trigger = {
+		FROM = { is_alive = yes }
+	}
+
+	option = { # Good
 		name = EVTOPTAHFP20654
-		if = { 
-			limit = { 
-				trait = deceitful 
-				has_character_flag = flag_ill_advisor
-			} 
-			random = { 
-				chance = 30
-				change_intrigue = 1
+
+		if = {
+			limit = { has_character_flag = flag_ill_advisor }
+
+			if = {
+				limit = { trait = deceitful }
+
+				random = {
+					chance = 30
+					change_intrigue = 1
+				}
+			}
+			else = {
+				random = {
+					chance = 30
+					add_trait_deceitful_effect = yes
+				}
 			}
 		}
-		if = { 
-			limit = { 
-				NOT = { trait = deceitful } 
-				has_character_flag = flag_ill_advisor
-			} 
-			random = { 
-				chance = 30
-				add_trait = deceitful
-				hidden_tooltip = { character_event = { id = 38255 } }
+		else = {
+			if = {
+				limit = { # Character is getting worse
+					FROM = {
+						check_variable = {
+							which = physique_variable
+							value >= 10
+						}
+					}
+				}
+
+				tiered_prestige_reward_effect = yes
+			}
+			else = { # Character is recovering
+				tiered_piety_reward_effect = yes
 			}
 		}
-		if = { 
-			limit = { 
-				NOT = { has_character_flag = flag_ill_advisor } 
-				FROM = { NOT = { check_variable = { which = physique_variable value = 10 } } } #Character is recovering.
-			} 
-			tiered_piety_reward_effect = yes
-		}
-		if = { 
-			limit = { 
-				NOT = { has_character_flag = flag_ill_advisor } 
-				FROM = { check_variable = { which = physique_variable value = 10 } } #Character is getting worse.
-			} 
-			tiered_prestige_reward_effect = yes
-		}
+
 		clr_character_flag = flag_ill_advisor
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
-#Advisor notified: Character is eating less.
+# Advisor notified: Character is eating less
 character_event = {
 	id = HFP.20655
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCHAFP20655
-		trigger = { 
+		trigger = {
 			FROM = { is_female = no }
-			NOT = { has_character_flag = flag_ill_advisor } 
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCHBFP20655
-		trigger = { 
+		trigger = {
 			FROM = { is_female = yes }
-			NOT = { has_character_flag = flag_ill_advisor } 
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCHCFP20655
-		trigger = { 
-			has_character_flag = flag_ill_advisor 
-		}
+		trigger = { has_character_flag = flag_ill_advisor }
 	}
-
-	trigger = { 
-		FROM = { is_alive = yes } 
-	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
-	option = { #Good
+	trigger = {
+		FROM = { is_alive = yes }
+	}
+
+	option = { # Good
 		name = EVTOPTAHFP20655
-		if = { 
-			limit = { 
-				trait = deceitful 
-				has_character_flag = flag_ill_advisor
-			} 
-			random = { 
-				chance = 30
-				change_intrigue = 1
+
+		if = {
+			limit = { has_character_flag = flag_ill_advisor }
+
+			if = {
+				limit = { trait = deceitful }
+
+				random = {
+					chance = 30
+					change_intrigue = 1
+				}
+			}
+			else = {
+				random = {
+					chance = 30
+					add_trait_deceitful_effect = yes
+				}
 			}
 		}
-		if = { 
-			limit = { 
-				NOT = { trait = deceitful } 
-				has_character_flag = flag_ill_advisor
-			} 
-			random = { 
-				chance = 30
-				add_trait = deceitful
-				hidden_tooltip = { character_event = { id = 38255 } }
+		else = {
+			if = {
+				limit = { # Character is recovering
+					FROM = {
+						check_variable = {
+							which = physique_variable
+							value >= -10
+						}
+					}
+				}
+				tiered_piety_reward_effect = yes
+			}
+			else = { # Character is getting worse
+				tiered_prestige_reward_effect = yes
 			}
 		}
-		if = { 
-			limit = { 
-				NOT = { has_character_flag = flag_ill_advisor } 
-				FROM = { check_variable = { which = physique_variable value = -10 } } #Character is recovering.
-			} 
-			tiered_piety_reward_effect = yes
-		}
-		if = { 
-			limit = { 
-				NOT = { has_character_flag = flag_ill_advisor } 
-				FROM = { NOT = { check_variable = { which = physique_variable value = -10 } } } #Character is getting worse.
-			} 
-			tiered_prestige_reward_effect = yes
-		}
+
 		clr_character_flag = flag_ill_advisor
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
-#Results of character eating more.
+# Results of character eating more
 character_event = {
 	id = HFP.20656
+	picture = GFX_evt_fancy_feast
+
 	desc = {
 		text = EVTDESCHAFP20656
-		trigger = { 
+		trigger = {
 			is_female = no
-			check_variable = { which = physique_variable value = 15 }
+			check_variable = { which = physique_variable value >= 15 }
 		}
 	}
 	desc = {
 		text = EVTDESCHBFP20656
-		trigger = { 
+		trigger = {
 			is_female = yes
-			check_variable = { which = physique_variable value = 15 }
+			check_variable = { which = physique_variable value >= 15 }
 		}
 	}
 	desc = {
 		text = EVTDESCHCFP20656
-		trigger = { 
+		trigger = {
 			is_female = no
-			NOT = { check_variable = { which = physique_variable value = 15 } }
+			check_variable = { which = physique_variable value < 15 }
 		}
 	}
 	desc = {
 		text = EVTDESCHDFP20656
-		trigger = { 
+		trigger = {
 			is_female = yes
-			NOT = { check_variable = { which = physique_variable value = 15 } }
+			check_variable = { which = physique_variable value < 15 }
 		}
 	}
-
-	picture = GFX_evt_fancy_feast
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP20656
-		set_character_flag = flag_primed_physique #No flavor needed.
+
+		set_character_flag = flag_primed_physique # No flavor needed
 		weight_trait_check_effect = yes
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
-#Results of character eating less.
+# Results of character eating less
 character_event = {
 	id = HFP.20657
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCHAFP20657
 		picture = GFX_evt_bad_news
-		trigger = { 
-			NOT = { check_variable = { which = physique_variable value = -15 } }
+		trigger = {
+			check_variable = { which = physique_variable value < -15 }
 		}
 	}
 	desc = {
 		text = EVTDESCHCFP20657
 		picture = GFX_evt_recovery
-		trigger = { 
+		trigger = {
 			is_female = no
-			check_variable = { which = physique_variable value = -15 }
+			check_variable = { which = physique_variable value >= -15 }
 		}
 	}
 	desc = {
 		text = EVTDESCHDFP20657
 		picture = GFX_evt_recovery
-		trigger = { 
+		trigger = {
 			is_female = yes
-			check_variable = { which = physique_variable value = -15 }
+			check_variable = { which = physique_variable value >= -15 }
 		}
 	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP20657
-		set_character_flag = flag_primed_physique #No flavor needed.
+
+		set_character_flag = flag_primed_physique # No flavor needed
 		weight_trait_check_effect = yes
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
-#Advisor: character doesn't trust you.
+# Advisor: character doesn't trust you
 character_event = {
 	id = HFP.20658
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCHAFP20658
-		trigger = { 
-			NOT = { has_character_flag = flag_ill_advisor } 
+		trigger = {
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCHBFP20658
-		trigger = { 
-			has_character_flag = flag_ill_advisor
-		}
+		trigger = { has_character_flag = flag_ill_advisor }
 	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP20658
+
 		clr_character_flag = flag_ill_advisor
-		opinion = { 
+
+		opinion = {
+			name = opinion_offended
 			who = FROM
-			modifier = opinion_offended
 			years = 5
-		} 
-		ai_chance = { 
-			factor = 100
 		}
 	}
 }
 
-
-#Advisor: character doesn't want to eat more.
+# Advisor: character doesn't want to eat more
 character_event = {
 	id = HFP.20659
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCAHFP20659
-		trigger = { 
-			NOT = { has_character_flag = flag_ill_advisor } 
+		trigger = {
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCBHFP20659
-		trigger = { 
-			has_character_flag = flag_ill_advisor
-		}
+		trigger = { has_character_flag = flag_ill_advisor }
 	}
-
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP20659
+
 		clr_character_flag = flag_ill_advisor
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
-#Advisor: character doesn't want to eat less.
+# Advisor: character doesn't want to eat less
 character_event = {
 	id = HFP.20660
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCAHFP20660
-		trigger = { 
-			NOT = { has_character_flag = flag_ill_advisor } 
+		trigger = {
+			NOT = { has_character_flag = flag_ill_advisor }
 		}
 	}
 	desc = {
 		text = EVTDESCBHFP20660
-		trigger = { 
-			has_character_flag = flag_ill_advisor
-		}
+		trigger = { has_character_flag = flag_ill_advisor }
 	}
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTAHFP20660
+
 		clr_character_flag = flag_ill_advisor
-		ai_chance = { 
-			factor = 100
-		}
 	}
 }
 
 
-# Health complications: late life health issues.
+## Health complications: late life health issues
 
-#Character has become obese.
+# Character has become obese
 character_event = {
 	id = HFP.20661
 	desc = EVTDESCAHFP20661
 	picture = GFX_evt_fancy_feast
-	min_age = 40	#Unlikely to happen earlier.
-	capable_only = yes
+
+	is_triggered_only = yes # on_decade_pulse, random_events
+
+	has_character_flag = flag_becoming_obese # Gained in HFP.20647
+	min_age = 40 # Unlikely to happen earlier
+	only_capable = yes
 	prisoner = no
 
-	is_triggered_only = yes
-	
-	trigger = { 
+	trigger = {
 		trait = is_fat 
-		NOT = { has_character_modifier = obese_modifier }
+		has_character_flag = flag_becoming_obese # Gained in HFP.20647
 		check_variable = { which = physique_variable value = 30 }
-		has_character_flag = flag_becoming_obese		#Gained in HFP.20647
-	} 
+		NOT = { has_character_modifier = obese_modifier }
+	}
+
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			has_character_modifier = well_fed
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.5
-		check_variable = { which = physique_variable value = 35 }
+			check_variable = { which = physique_variable value >= 35 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 3
-		check_variable = { which = physique_variable value = 40 }
+			check_variable = { which = physique_variable value >= 40 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-		check_variable = { which = physique_variable value = 50 }
+			check_variable = { which = physique_variable value >= 50 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 7
-		check_variable = { which = physique_variable value = 60 }
+			check_variable = { which = physique_variable value >= 60 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
-		check_variable = { which = physique_variable value = 70 }
+			check_variable = { which = physique_variable value >= 70 }
 		}
 	}
 
-	option = { #Too late to do anything anymore.
-		name = EVTOPTCHFP20661	
+	option = { # Too late to do anything anymore
+		name = EVTOPTCHFP20661
+
 		add_character_modifier = {
 			name = obese_modifier
 			duration = -1
 		}
+
 		clr_character_flag = flag_becoming_obese
-		hidden_tooltip = { 
-			if = { 
-				limit = { check_variable = { which = physique_variable value = 35 } } 
-				health = -0.5
-			}
-			if = { 
-				limit = { check_variable = { which = physique_variable value = 40 } } 
-				health = -0.7
-			}
-			if = { 
-				limit = { check_variable = { which = physique_variable value = 45 } } 
-				health = -0.7
-			}
-			if = { 
-				limit = { check_variable = { which = physique_variable value = 50 } } 
-				health = -1.0
-			}
-			if = { 
-				limit = { check_variable = { which = physique_variable value = 55 } } 
+
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { which = physique_variable value >= 55 } }
 				health = -2.0
 			}
-		} 
+			else_if = {
+				limit = { check_variable = { which = physique_variable value >= 50 } }
+				health = -1.0
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value >= 45 } }
+				health = -0.7
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value >= 40 } }
+				health = -0.7
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value >= 35 } }
+				health = -0.5
+			}
+		}
+
 		gain_weight_small_effect = yes
-		ai_chance = { factor = 30 }
 	}
 }
 
-#Character has become severely underweight.
+# Character has become severely underweight
 character_event = {
 	id = HFP.20662
 	desc = EVTDESCAHFP20662
 	picture = GFX_evt_bad_news
-	min_age = 40	#Unlikely to happen earlier.
-	capable_only = yes
-	prisoner = no 	#Starvation in prison still handled by vanilla events.
 
-	is_triggered_only = yes
-	
-	trigger = { 
+	is_triggered_only = yes # on_decade_pulse, random_events
+
+	has_character_flag = flag_becoming_underweight # Gained in HFP.20648
+	min_age = 40 # Unlikely to happen earlier
+	only_capable = yes
+	prisoner = no # Starvation in prison still handled by vanilla events
+
+	trigger = {
 		trait = is_malnourished
+		check_variable = { which = physique_variable value < -30 }
 		NOT = { has_character_modifier = severely_underweight_modifier }
-		NOT = { check_variable = { which = physique_variable value = -30 } }
-		has_character_flag = flag_becoming_underweight 	#Gained in HFP.20648
-	} 
+	}
+
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+
+		mult_modifier = {
 			factor = 2
 			has_character_modifier = one_year_fasting
 		}
-		modifier = {
-			factor = 2
-			prisoner = yes
-		}
-		modifier = {
+
+	#	mult_modifier = {
+	#		factor = 2
+	#		prisoner = yes
+	#	}
+
+		mult_modifier = {
 			factor = 3
-		NOT = { check_variable = { which = physique_variable value = -35 } }
+			check_variable = { which = physique_variable value < -35 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 5
-		NOT = { check_variable = { which = physique_variable value = -40 } }
+			check_variable = { which = physique_variable value < -40 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
-		NOT = { check_variable = { which = physique_variable value = -45 } }
+			check_variable = { which = physique_variable value < -45 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
-		NOT = { check_variable = { which = physique_variable value = -50 } }
+			check_variable = { which = physique_variable value < -50 }
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 10
-		NOT = { check_variable = { which = physique_variable value = -55 } }
+			check_variable = { which = physique_variable value < -55 }
 		}
 	}
 
-	option = { #Too late now.
+	option = { # Too late now
 		name = EVTOPTAHFP20662
+
 		add_character_modifier = {
 			name = severely_underweight_modifier
 			duration = -1
 		}
+
 		clr_character_flag = flag_becoming_underweight
-		hidden_tooltip = { 
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -30 } } } 
-				health = -0.75
-			}
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -35 } } } 
-				health = -0.75
-			}
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -40 } } } 
-				health = -1.0
-			}
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -45 } } } 
-				health = -1.5
-			}
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -50 } } } 
-				health = -2.0
-			}
-			if = { 
-				limit = { NOT = { check_variable = { which = physique_variable value = -55 } } }
+
+		hidden_effect = {
+			if = {
+				limit = { check_variable = { which = physique_variable value < -55 } }
 				health = -3.0
 			}
-		} 
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -50 } }
+				health = -2.0
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -45 } }
+				health = -1.5
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -40 } }
+				health = -1.0
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -35 } }
+				health = -0.75
+			}
+			else_if = {
+				limit = { check_variable = { which = physique_variable value < -30 } }
+				health = -0.75
+			}
+		}
+
 		lose_weight_small_effect = yes
-		ai_chance = { factor = 30 }
 	}
 }
+
 ######################################
 #### Additional Flavor ####
 
-#Fat ruler becomes proud
+# Fat ruler becomes proud
 character_event = {
 	id = HFP.20663
+	picture = GFX_evt_fancy_feast
+
 	desc = {
 		text = EVTDESCAHFP20663
 		trigger = { is_female = no }
@@ -8611,38 +8634,39 @@ character_event = {
 		text = EVTDESCBHFP20663
 		trigger = { is_female = yes }
 	}
-	picture = GFX_evt_fancy_feast
-
-	trigger = { 
-		trait = is_fat
-		has_fat_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_fat
+		has_fat_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20663
 		tooltip_info = is_fat
-		if = { 
-			limit = { trait = proud } 
-			tiered_prestige_reward_effect = yes
-		} 
-		if = { 
-			limit = { trait = humble } 
+
+		if = {
+			limit = { trait = humble }
 			remove_trait = humble
-		} 
-		if = { 
-			limit = { NOT = { trait = proud } } 
+		}
+		else_if = {
+			limit = { trait = proud }
+			tiered_prestige_reward_effect = yes
+		}
+		else = {
 			add_trait = proud
 		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-#Fat ruler becomes patient
+# Fat ruler becomes patient
 character_event = {
 	id = HFP.20664
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCAHFP20664
 		trigger = { is_female = no }
@@ -8651,38 +8675,39 @@ character_event = {
 		text = EVTDESCBHFP20664
 		trigger = { is_female = yes }
 	}
-	picture = GFX_evt_courtiers_talking
-
-	trigger = { 
-		trait = is_fat
-		has_fat_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_fat
+		has_fat_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20664
 		tooltip_info = is_fat
-		if = { 
-			limit = { trait = proud } 
-			piety = 50
-		} 
-		if = { 
-			limit = { trait = wroth } 
+
+		if = {
+			limit = { trait = wroth }
 			remove_trait = wroth
-		} 
-		if = { 
-			limit = { NOT = { trait = patient } } 
+		}
+		else_if = {
+			limit = { trait = patient }
+			piety = 50
+		}
+		else = {
 			add_trait = patient
 		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-#Fat ruler becomes content
+# Fat ruler becomes content
 character_event = {
 	id = HFP.20665
+	picture = GFX_evt_recovery
+
 	desc = {
 		text = EVTDESCAHFP20665
 		trigger = { is_female = no }
@@ -8691,74 +8716,72 @@ character_event = {
 		text = EVTDESCBHFP20665
 		trigger = { is_female = yes }
 	}
-	picture = GFX_evt_recovery
-
-	trigger = { 
-		trait = is_fat
-		has_fat_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_fat
+		has_fat_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20665
 		tooltip_info = is_fat
-		if = { 
-			limit = { trait = content } 
-			piety = 50
-		} 
-		if = { 
-			limit = { trait = ambitious } 
+
+		if = {
+			limit = { trait = ambitious }
 			remove_trait = ambitious
-		} 
-		if = { 
-			limit = { NOT = { trait = content } } 
+		}
+		else_if = {
+			limit = { trait = content }
+			piety = 50
+		}
+		else = {
 			add_trait = content
 		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-
-#Malnourished ruler becomes humble
+# Malnourished ruler becomes humble
 character_event = {
 	id = HFP.20666
-	desc = {
-		text = EVTDESCAHFP20666
-	}
+	desc = EVTDESCAHFP20666
 	picture = GFX_evt_recovery
-
-	trigger = { 
-		trait = is_malnourished
-		has_malnourished_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_malnourished
+		has_malnourished_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20666
 		tooltip_info = is_malnourished
-		if = { 
-			limit = { trait = humble } 
-			piety = 50
-		} 
-		if = { 
-			limit = { trait = proud } 
+
+		if = {
+			limit = { trait = proud }
 			remove_trait = proud
-		} 
-		if = { 
-			limit = { NOT = { trait = humble } } 
+		}
+		else_if = {
+			limit = { trait = humble }
+			piety = 50
+		}
+		else = {
 			add_trait = humble
 		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-#Malnourished ruler becomes envious
+# Malnourished ruler becomes envious
 character_event = {
 	id = HFP.20667
+	picture = GFX_evt_scandal
+
 	desc = {
 		text = EVTDESCAHFP20667
 		trigger = { is_female = no }
@@ -8767,34 +8790,29 @@ character_event = {
 		text = EVTDESCBHFP20667
 		trigger = { is_female = yes }
 	}
-	picture = GFX_evt_scandal
-
-	trigger = { 
-		trait = is_malnourished
-		has_malnourished_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_malnourished
+		has_malnourished_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20667
 		tooltip_info = is_malnourished
-		if = { 
-			limit = { trait = kind } 
-			remove_trait = kind
-		} 
-		if = { 
-			limit = { NOT = { trait = envious } } 
-			add_trait = envious
-		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		add_trait_partially_silently_envious_effect = yes
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-#Malnourished ruler becomes cruel
+# Malnourished ruler becomes cruel
 character_event = {
 	id = HFP.20668
+	picture = GFX_evt_lunatic
+
 	desc = {
 		text = EVTDESCAHFP20668
 		trigger = { has_character_flag = flag_malnourished_for_paranoid }
@@ -8807,155 +8825,155 @@ character_event = {
 		text = EVTDESCCHFP20668
 		trigger = { has_character_flag = flag_malnourished_for_cannibal }
 	}
-	picture = GFX_evt_lunatic
-
-	trigger = { 
-		trait = is_malnourished
-		has_malnourished_for_flag_trigger = yes #Won't fire if recovered in the meantime due to thirdparty help
-	}
 
 	is_triggered_only = yes
 
-	option = { 
+	trigger = {
+		trait = is_malnourished
+		has_malnourished_for_flag_trigger = yes # Won't fire if recovered in the meantime due to thirdparty help
+	}
+
+	option = {
 		name = EVTOPTAHFP20668
 		tooltip_info = is_malnourished
-		if = { 
-			limit = { trait = kind } 
-			remove_trait = kind
-		} 
-		if = { 
-			limit = { NOT = { trait = cruel } } 
-			add_trait = cruel
-		}
-		#clear_fat_flags_effect = yes
-		ai_chance = { factor = 100 }
+
+		add_trait_partially_silently_cruel_effect = yes
+
+		# clear_fat_flags_effect = yes
 	}
 }
 
-
-#Event for sturdy/feeble teenage, chance to turn it into something else.
-#Chance of triggering in the adolescence event itself.
+## Event for sturdy/frail teenage, chance to turn it into something else
+# Chance of triggering in the adolescence event itself
 character_event = {
 	id = HFP.20669
+	picture = GFX_evt_courtiers_talking
+
 	desc = {
 		text = EVTDESCAHFP20669
-		trigger = { 
+		trigger = {
 			trait = sturdy
 			is_female = no
 		}
 	}
 	desc = {
 		text = EVTDESCBHFP20669
-		trigger = { 
+		trigger = {
 			trait = sturdy
 			is_female = yes
 		}
 	}
 	desc = {
 		text = EVTDESCCHFP20669
-		trigger = { 
+		trigger = {
 			is_weak_non_congenital_trigger = yes
 			is_female = no
 		}
 	}
 	desc = {
 		text = EVTDESCDHFP20669
-		trigger = { 
+		trigger = {
 			is_weak_non_congenital_trigger = yes
 			is_female = yes
 		}
 	}
-	picture = GFX_evt_courtiers_talking
 
 	is_triggered_only = yes
 
-	option = { #Military training is what I need!
+	option = { # Military training is what I need!
 		name = EVTOPTAHFP20669
-		trigger = { 
-			NOR = { 
-				trait = is_fat
-				trait = is_malnourished #Shouldn't be either at this age anyway, but, just to be safe...
-			}
-			OR = { 
+		tooltip_info = combat_rating
+
+		trigger = {
+			combat_rating >= 15
+			has_education_martial_trigger = yes
+
+			OR = {
 				trait = sturdy
 				is_weak_non_congenital_trigger = yes
 			}
-			combat_rating = 15
-			OR = {
-				trait = misguided_warrior
-				trait = tough_soldier 
-				trait = skilled_tactician
-				trait = brilliant_strategist 
+
+			NOR = {
+				trait = is_fat
+				trait = is_malnourished # Shouldn't be either at this age anyway, but, just to be safe...
 			}
 		}
-		tooltip_info = combat_rating
-		custom_tooltip = { text = tooltip_20663_A } 
-		balance_weight_large_effect = yes
-		hidden_tooltip = {
+
+		custom_tooltip = {
+			text = tooltip_20663_A
+
 			random_list = {
-				80 = { #Success - Character stops being sturdy/feeble
-					character_event = { id = HFP.20670 days = 150 random = 150 } 
+				80 = { # Success - Character stops being sturdy/frail
+					character_event = { id = HFP.20670 days = 150 random = 150 }
 				}
-				20 = { #Critical Success - Character becomes brawny
-					character_event = { id = HFP.20671 days = 150 random = 150 } 
+
+				20 = { # Critical Success - Character becomes brawny
+					character_event = { id = HFP.20671 days = 150 random = 150 }
 				}
-			} 
+			}
 		}
-		ai_chance = { 
-			factor = 100
-		}
+
+		balance_weight_large_effect = yes
+
+		ai_chance = { factor = 100 }
 	}
-	option = { #Eat less.
+
+	option = { # Eat less
 		name = EVTOPTBHFP20669
-		trigger = { 
-			trait = sturdy
-		}
-		custom_tooltip = { text = tooltip_20663_B } 
-		balance_weight_large_effect = yes
-		hidden_tooltip = {
+
+		trigger = { trait = sturdy }
+
+		custom_tooltip = {
+			text = tooltip_20663_B
+
 			random_list = {
-				10 = { #Overboard - Character becomes feeble
-					character_event = { id = HFP.20672 days = 150 random = 150 } 
+				10 = { # Overboard - Character becomes frail
+					character_event = { id = HFP.20672 days = 150 random = 150 }
 				}
-				50 = { #Success - Character stops being sturdy
-					character_event = { id = HFP.20673 days = 150 random = 150 } 
+
+				50 = { # Success - Character stops being sturdy
+					character_event = { id = HFP.20673 days = 150 random = 150 }
 				}
-				30 = { #Failure - Character still sturdy
-				}
-			} 
-		} 
-		ai_chance = { 
-			factor = 50
+
+				30 = { } # Failure - Character still sturdy
+			}
 		}
+
+		balance_weight_large_effect = yes
+
+		ai_chance = { factor = 50 }
 	}
-	option = { #Eat more.
+
+	option = { # Eat more
 		name = EVTOPTCHFP20669
-		trigger = { 
-			is_weak_non_congenital_trigger = yes
-		}
-		custom_tooltip = { text = tooltip_20663_C } 
-		balance_weight_large_effect = yes
-		hidden_tooltip = {
+
+		trigger = { is_weak_non_congenital_trigger = yes }
+
+		custom_tooltip = {
+			text = tooltip_20663_C
+
 			random_list = {
-				10 = { #Overboard - Character becomes sturdy
-					character_event = { id = HFP.20674 days = 150 random = 150 } 
+				10 = { # Overboard - Character becomes sturdy
+					character_event = { id = HFP.20674 days = 150 random = 150 }
 				}
-				50 = { #Success - Character stops being feeble
-					character_event = { id = HFP.20675 days = 150 random = 150 } 
+
+				50 = { # Success - Character stops being frail
+					character_event = { id = HFP.20675 days = 150 random = 150 }
 				}
-				30 = { #Failure - Character still feeble
-				}
-			} 
-		} 
-		ai_chance = { 
-			factor = 50
+
+				30 = { } # Failure - Character still frail
+			}
 		}
+
+		balance_weight_large_effect = yes
+
+		ai_chance = { factor = 50 }
 	}
-	option = { #Nothing
+
+	option = { # Nothing
 		name = EVTOPTDHFP20669
-		ai_chance = { 
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
