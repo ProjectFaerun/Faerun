@@ -1,232 +1,118 @@
 # Written by Flavio
 
-namespace=HFP
+namespace = HFP
 
-#Expanded pregnancy events.
+## Expanded pregnancy events
 
-##########################################MISSING REGENT WARNING##################
+########################################## MISSING REGENT WARNING ##################
 
-#Pregnant ruler notified she hasn't appointed a regent.
+# Pregnant ruler notified she hasn't appointed a regent
 character_event = {
 	id = HFP.20400
 	desc = EVTDESCHFP20400
 	picture = GFX_evt_recovery
 
-	ai = no
-	
-	is_triggered_only = yes
+	is_triggered_only = yes # various events in base_birth_events.txt
 
-	option = { 
-		name = EVTOPTBHFP20400		#I know just the guy
-		trigger = { 
-			any_courtier_or_vassal = { #Option only available if you have at least SOMEBODY that doesn't hate you in your court.
-				opinion = {  
-					who = ROOT
-					value = 20
-				} 
-			} 
-			NOR = { #Not if you already have a regent.
-				any_courtier_or_vassal = {  
-					has_minor_title = title_appointed_regent
-				} 
-				any_courtier_or_vassal = {  
-					has_minor_title = title_regent
-				} 
-			} 
+	ai = no
+
+	option = {
+		name = EVTOPTBHFP20400 # I know just the guy
+
+		trigger = {
+			NOR = { # Not if you already have a regent
+				has_assigned_minor_title = title_appointed_regent
+				has_assigned_minor_title = title_regent
+			}
+
+			# Option only available if you have at least SOMEBODY that doesn't hate you in your court
+			any_courtier_or_vassal = {
+				is_adult = yes
+				prisoner = no
+				is_incapable = no
+				has_regent = no
+
+				OR = {
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+
+					is_friend = ROOT
+					is_lover = ROOT
+				}
+			}
 		}
-		set_dynasty_flag = pregnancy_regent_warning
-		#First search for person that both likes you, is trustworthy, and is competent.
-		if = { 
-			limit = { 
-				any_courtier_or_vassal = { 
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 50
-						}
-						is_friend = ROOT
-						is_lover = ROOT
+
+		random_courtier_or_vassal = {
+			show_scope_change = no
+
+			limit = {
+				is_adult = yes
+				prisoner = no
+				is_incapable = no
+				has_regent = no
+
+				OR = {
+					opinion = {
+						who = ROOT
+						value >= 20
 					}
-					NOR = {
-						trait = deceitful
-						trait = ambitious
-					}
-					stewardship = 10
-				} 
-			}
-			random_courtier_or_vassal = {
-				limit = {
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 50
-						}
-						is_friend = ROOT
-						is_lover = ROOT
-					}
-					NOR = {
-						trait = deceitful
-						trait = ambitious
-					}
-					stewardship = 10
+
+					is_friend = ROOT
+					is_lover = ROOT
 				}
-				give_minor_title = title_appointed_regent
 			}
-			break = yes
-		}
-		#Then search for person that likes you and is trustworthy.
-		if = { 
-			limit = { 
-				NOT = { 
-					any_courtier_or_vassal = { 
-						is_adult = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						has_regent = no
-						OR = {
-							opinion = {  
-								who = ROOT
-								value = 50
-							}
-							is_friend = ROOT
-							is_lover = ROOT
-						}
-						NOR = {
-							trait = deceitful
-							trait = ambitious
-						}
-						stewardship = 10
-					} 
+
+			# First search for person who both likes you, is trustworthy, and is competent
+			preferred_limit = {
+				stewardship >= 10
+
+				OR = {
+					opinion = {
+						who = ROOT
+						value >= 50
+					}
+
+					is_friend = ROOT
+					is_lover = ROOT
 				}
-				any_courtier_or_vassal = { 
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 30
-						}
-						is_friend = ROOT
-						is_lover = ROOT
-					}
-					NOR = {
-						trait = deceitful
-						trait = ambitious
-					}
-				} 
-			}
-			random_courtier_or_vassal = {
-				limit = {
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 30
-						}
-						is_friend = ROOT
-						is_lover = ROOT
-					}
-					NOR = {
-						trait = deceitful
-						trait = ambitious
-					}
+
+				NOR = {
+					trait = deceitful
+					trait = ambitious
 				}
-				give_minor_title = title_appointed_regent
 			}
-			break = yes
-		}
-		#Then search for person that likes you.
-		if = { 
-			limit = { 
-				NOR = { 
-					any_courtier_or_vassal = { 
-						is_adult = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						has_regent = no
-						OR = {
-							opinion = {  
-								who = ROOT
-								value = 50
-							}
-							is_friend = ROOT
-							is_lover = ROOT
-						}
-						NOR = {
-							trait = deceitful
-							trait = ambitious
-						}
-						stewardship = 10
+
+			# Then search for person who likes you and is trustworthy
+			preferred_limit = {
+				OR = {
+					opinion = {
+						who = ROOT
+						value >= 30
 					}
-					any_courtier_or_vassal = { 
-						is_adult = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						has_regent = no
-						OR = {
-							opinion = {  
-								who = ROOT
-								value = 30
-							}
-							is_friend = ROOT
-							is_lover = ROOT
-						}
-						NOR = {
-							trait = deceitful
-							trait = ambitious
-						}
-					} 
+
+					is_friend = ROOT
+					is_lover = ROOT
 				}
-				any_courtier_or_vassal = { 
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 20
-						}
-						is_friend = ROOT
-						is_lover = ROOT
-					}
-				} 
-			}
-			random_courtier_or_vassal = {
-				limit = {
-					is_adult = yes
-					prisoner = no
-					NOT = { trait = incapable }
-					has_regent = no
-					OR = {
-						opinion = {  
-							who = ROOT
-							value = 20
-						}
-						is_friend = ROOT
-						is_lover = ROOT
-					}
+
+				NOR = {
+					trait = deceitful
+					trait = ambitious
 				}
-				give_minor_title = title_appointed_regent
 			}
-			break = yes
+
+			# Then search for person that likes you
+
+			give_minor_title = title_appointed_regent
 		}
 	}
-	option = { 
-		name = EVTOPTAHFP20400		#I'll think about it.
+
+	option = {
+		name = EVTOPTAHFP20400 # I'll think about it
+	}
+
+	after = {
 		set_dynasty_flag = pregnancy_regent_warning
 	}
 }
