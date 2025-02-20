@@ -929,48 +929,47 @@ targetted_decisions = {
 	}
 
 	execute_eat = {
-		only_playable = yes
 		filter = court
 		ai_target_filter = court
 		ai_check_interval = 12
 
+		only_playable = yes
+
 		from_potential = {
 			has_dlc = "Reapers"
-			is_playable = yes
+			num_of_prisoners > 0
 			is_adult = yes
 			prisoner = no
-			NOT = { trait = incapable }
+			is_incapable = no
 			OR = {
 				has_character_modifier = cannibal
 				trait = cannibal_trait
-				graphical_culture = dragongfx
+				canibal_race_trigger = yes
 			}
 			OR = {
 				trait = possessed
 				trait = lunatic
-				graphical_culture = dragongfx
+				canibal_race_trigger = yes
 			}
 		}
 
 		potential = {
 			host = { character = FROM }
 			prisoner = yes
-			age = 12
+			age >= 12
 		}
 
 		allow = {
-			NOT = { diplomatic_immunity = yes }
+			prisoner = yes
+			diplomatic_immunity = no
 		}
 
 		ai_will_do = {
 			factor = 1
 			modifier = {
-				factor = 0
+				factor = 2
 				FROM = {
-					graphical_culture = dragongfx
-					is_evil_religion = no
-					NOT = { trait = cannibal_trait }
-					NOT = { has_character_modifier = cannibal }
+					canibal_race_trigger = yes
 				}
 			}
 		}
@@ -983,45 +982,45 @@ targetted_decisions = {
 						is_close_relative = ROOT
 						NOT = { character = FROM }
 					}
+
 					character_event = { id = RIP.11511 days = 1 }
 				}
+				any_lover = {
+					limit = {
+						NAND = {
+							dynasty = ROOT
+							is_close_relative = ROOT
+						}
+					}
+
+					character_event = { id = RIP.11512 days = 1 }
+				}
+				any_friend = {
+					limit = {
+						NAND = {
+							dynasty = ROOT
+							is_close_relative = ROOT
+						}
+						NOT = { is_lover = ROOT }
+					}
+
+					character_event = { id = RIP.11513 days = 1 }
+				}
+				
+
 				FROM = {
 					add_blood_splatter_effect = yes
 					random_list = {
 						50 = { # Nothing happens
-							# modifier = {
-								# factor = 0
-								# OR = {
-									# ROOT = {
-										# immortal = yes
-									# }
-									# AND = {
-										# ROOT = {
-											# controls_religion = yes
-										# }
-										# FROM = { NOT = { religion_group = ROOT } }
-									# }
-								# }
-							# }
+
 						}
 						50 = { # Get sick
-							modifier = {
-								factor = 0
-								OR = {
-									# immortal = yes
-									FROM = { graphical_culture = dragongfx }
-									has_character_flag = demon_child
-									# ROOT = {
-										# immortal = yes
-									# }
-									AND = {
-										ROOT = {
-											controls_religion = yes
-										}
-										FROM = { NOT = { religion_group = ROOT } }
-									}
-								}
+							trigger = {
+								canibal_race_trigger = no
+								NOT = { has_character_flag = demon_child }
+								evilcat_is_disease_immune = no
 							}
+
 							random_list = {
 								50 = { # Food Poisoning
 									if = {
@@ -1074,7 +1073,9 @@ targetted_decisions = {
 					if = {
 						limit = {
 							has_nickname = no
+							canibal_race_trigger = no
 						}
+
 						random_list = {
 							20 = { # Get nickname The Cannibal
 								give_nickname = nick_the_cannibal
@@ -1093,53 +1094,37 @@ targetted_decisions = {
 					}
 				}
 			}
+
 			death = {
 				death_reason = death_execution_eaten
 				killer = FROM
 			}
+
 			save_event_target_as = kinslayer_target
+
 			FROM = {
 				if = {
 					limit = {
-						NOR = {
-							trait = lunatic
-							AND = {
-								graphical_culture = dragongfx
-								is_evil_religion = yes
-								ROOT = { NOT = { graphical_culture = dragongfx } }
-							}
+						canibal_race_trigger = no
+					}
+
+					if = {
+						limit = { NOT = { trait = lunatic } }
+
+						add_trait = lunatic
+					}
+					if = {
+						limit = { NOT = { has_character_modifier = crazy_cannibal } }
+
+						add_character_modifier = {
+							name = crazy_cannibal
+							duration = -1
 						}
 					}
-					add_trait = lunatic
-				}
-				if = {
-					limit = {
-						NOR = {
-							has_character_modifier = crazy_cannibal
-							AND = {
-								graphical_culture = dragongfx
-								is_evil_religion = yes
-								ROOT = { NOT = { graphical_culture = dragongfx } }
-							}
-						}
-					}
-					add_character_modifier = {
-						name = crazy_cannibal
-						duration = -1
-					}
-				}
-				if = {
-					limit = {
-						graphical_culture = dragongfx
-						NOR = {
-							trait = cannibal_trait
-							ROOT = { NOT = { graphical_culture = dragongfx } }
-						}
-					}
-					add_trait = cannibal_trait
+					set_council_malcontent = yes
 				}
 				add_kinslayer_trait_effect = yes
-				set_council_malcontent = yes
+				
 			}
 		}
 	}
