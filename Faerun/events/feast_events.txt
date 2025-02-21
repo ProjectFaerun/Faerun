@@ -9,7 +9,7 @@
 ###################################
 #
 # Designed by Johan Andersson
-# Written by Sara Wendel-Örtqvist
+# Written by Sara Wendel-Ã–rtqvist
 
 ###################################
 #Events before the Feast
@@ -326,26 +326,10 @@ character_event = {
 					has_artifact_flag = cooking
 				}
 			}
+			
 			random_artifact = {
 				limit = {
 					has_artifact_flag = cooking
-					OR = {
-						is_artifact_equipped = yes
-						AND = {
-							artifact_type = the_omnivore #If you're not a cannibal, it's not active, so...
-							PREV = { NOT = { trait = cannibal_trait } }
-						}
-						AND = {
-							artifact_type = the_omnivore #If ROOT already cannibal, someone else should be around to become cannical...
-							PREV = {
-								any_courtier = {
-									NOT = { trait = cannibal_trait }
-									is_adult = yes
-									is_inaccessible_or_incapable_trigger = no
-								}
-							}
-						}
-					}
 					NOT = { artifact_type = gastronomic_tonics } #Not really about food
 				}
 				preferred_limit = {
@@ -364,12 +348,23 @@ character_event = {
 					event_target:book_target = {
 						artifact_type = the_omnivore
 					}
-					trait = cannibal_trait
+					OR = {
+						trait = cannibal_trait
+						cannibal_race_trigger = yes
+					}
+					any_courtier = {
+						is_adult = yes
+						cannibal_race_trigger = no
+						NOT = { trait = cannibal_trait }
+						is_inaccessible_or_incapable_trigger = no
+					}
 				}
+
 				random_courtier = {
 					limit = {
-						NOT = { trait = cannibal_trait }
 						is_adult = yes
+						cannibal_race_trigger = no
+						NOT = { trait = cannibal_trait }
 						is_inaccessible_or_incapable_trigger = no
 					}
 					preferred_limit = {
@@ -387,6 +382,7 @@ character_event = {
 					preferred_limit = {
 						has_education_stewardship_trigger = yes
 					}
+
 					save_event_target_as = potential_cannibal
 				}
 			}
@@ -432,16 +428,27 @@ character_event = {
 					}
 				}
 				if = {
-					limit = { NOT = { trait = cannibal_trait } }
+					limit = { 
+						NOT = { trait = cannibal_trait }
+						cannibal_race_trigger = no
+					}
+
 					custom_tooltip = { text = EVTOPTD72003_cannibal_tt }
 					add_trait = cannibal_trait
 				}
-				else = {
+				else_if = {
+					limit = { 
+						event_target:potential_cannibal = { always = yes } 
+					}
+
 					custom_tooltip = { text = EVTOPTD72003_buddy_cannibal_tt }
 					event_target:potential_cannibal = {
 						show_scope_change = no
 						add_trait = cannibal_trait
 					}
+				}
+				else = {
+					custom_tooltip = { text = EVTOPTD72003_court_cannibal_tt }
 				}
 				set_character_flag = lavishly_food
 				treasury = -10
