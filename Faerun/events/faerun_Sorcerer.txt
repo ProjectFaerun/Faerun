@@ -7,190 +7,28 @@ character_event = {
 	is_triggered_only = yes #on_birth
 	hide_window = yes
 	desc = evilcatlocbugevent
+
 	trigger = {
-		NOT = { olrox_has_specific_sorc_origin = yes }
+		olrox_has_specific_sorc_origin = no
 		NOT = { has_character_flag = psionic_flag }
 	}
+
 	immediate = { assign_sorcerer_trait = yes }
 }
+
 # Child reveals a origin trait, possibly
 long_character_event = {
 	id = FaerunSorcerer.2
 	desc = sorcerer_event_desc1a
 	picture = GFX_evt_plane_limbo_1
-	is_triggered_only = yes #on_yearly_pulse
+	is_triggered_only = yes #on_yearly_childhood_pulse
 	min_age = 10
-	max_age = 15
+
 	trigger = {
 		NOT = { has_character_flag = sorc_originrevealed }
-		evilcat_has_sorc_origin = yes
+		olrox_has_specific_sorc_origin = yes
 	}
-	weight_multiplier = {
-		days = 1
-		modifier = { #give the player a bit more
-			factor = 0.5
-			ai = no
-		}
-		modifier = {
-			factor = 0.75
-			any_owned_bloodline = {
-				has_bloodline_flag = magical_bloodline
-			}
-		}
-		modifier = {
-			factor = 0.5 #certain races more inclined to be sorcerers
-			OR = {
-				trait = planetouched
-			}
-		}
-		modifier = {
-			factor = 0.9
-			any_owned_bloodline = {
-				has_bloodline_flag = bloodline_heroes
-				bloodline_is_active_for = PREV
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				race_has_wild_magic = yes
-				trait = origin_wild_magic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				OR = {
-					race_has_draconic_magic = yes
-					trait = creature_dragonborn
-				}
-				trait = origin_draconic
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				OR = {
-					race_has_aberrant_magic = yes
-					culture = chondathan
-				}
-				trait = origin_aberrant_mind
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				OR = {
-					race_has_divine_magic = yes
-					any_owned_bloodline = {
-						has_bloodline_flag = divine_bloodline
-					}
-				}
-				trait = origin_divine_soul
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				OR = {
-					race_has_shadow_magic = yes
-					any_owned_bloodline = {
-						has_bloodline_flag = bloodline_murderous
-						bloodline_is_active_for = PREV
-					}
-				}
-				trait = origin_shadow
-			}
-		}
-		modifier = {
-			factor = 0.5
-			AND = {
-				race_has_storm_magic = yes
-				trait = origin_storm
-			}
-		}
-		modifier = {
-			factor = 0.75
-			OR = {
-				trait = genius
-				trait = brilliant
-			}
-		}
-		modifier = {
-			factor = 0.85
-			is_smart_trigger = yes
-		}
-		modifier = {
-			factor = 0.9
-			has_fair_trait_trigger = yes
-		}
-		modifier = {
-			factor = 0.85
-			AND = {
-				OR = {
-					trait = ambitious #sorcerers are all about personality
-					trait = willful
-					trait = haughty
-					trait = rowdy
-					trait = greedy
-					trait = proud
-				}
-				trait = origin_draconic
-			}
-		}
-		modifier = {
-			factor = 0.85
-			AND = {
-				OR = {
-					trait = gregarious #sorcerers are all about personality
-					trait = curious
-					trait = playful
-					trait = brave
-				}
-				trait = origin_wild_magic
-			}
-		}
-		modifier = {
-			factor = 0.85
-			AND = {
-				OR = {
-					trait = zealous #sorcerers are all about personality
-					trait = idolizer
-					trait = timid
-					trait = humble
-					trait = content
-					trait = conscientious
-				}
-				trait = origin_divine_soul
-			}
-		}
-		modifier = {
-			factor = 0.85
-			AND = {
-				OR = {
-					trait = cynical #sorcerers are all about personality
-					trait = fussy
-					trait = playful
-					trait = wroth
-				}
-				trait = origin_storm
-			}
-		}
-		modifier = {
-			factor = 0.85
-			AND = {
-				OR = {
-					trait = cynical #sorcerers are all about personality
-					trait = brooding
-					trait = idolizer
-					trait = fussy
-					trait = envious
-					trait = deceitful
-				}
-				trait = origin_shadow
-			}
-		}
-	}
+
 	option = {
 		name = OK
 	}
@@ -238,58 +76,41 @@ character_event = {
 	trigger = {
 		is_save_game = no # First startup of the game
 		z_sorcerer = yes
-		evilcat_has_sorc_origin = no
+		evilcat_has_sorc_origin_or_race = no
 	}
 	
 	immediate = {
+		if = {
+			limit = { NOT = { has_character_flag = sorc_originrevealed } }
+
+			set_character_flag = sorc_originrevealed
+		}
 		random_list = {
 			1 = {
 				add_trait = origin_aberrant_mind
-				set_character_flag = sorc_originrevealed
-				modifier = {
-					factor = 100
-					race_has_aberrant_magic = yes
-				}
-				modifier = {
+				mult_modifier = {
 					factor = 10
-					culture = chondathan
-				}
-			}
-			1 = {
-				add_trait = origin_draconic
-				set_character_flag = sorc_originrevealed
-				modifier = {
-					factor = 100
-					OR = {
-						race_has_draconic_magic = yes
-						trait = creature_dragonborn
+					gfx_culture_scope = {
+						culture = chondathan
 					}
 				}
 			}
 			1 = {
-				add_trait = origin_divine_soul
-				set_character_flag = sorc_originrevealed
-				modifier = {
+				add_trait = origin_draconic
+				mult_modifier = {
 					factor = 100
-					race_has_divine_magic = yes
+					trait = creature_dragonborn
 				}
+			}
+			1 = {
+				add_trait = origin_divine_soul
 			}
 			1 = {
 				add_trait = origin_shadow
-				set_character_flag = sorc_originrevealed
-				modifier = {
-					factor = 100
-					race_has_shadow_magic = yes
-				}
 			}
 			1 = {
 				add_trait = origin_storm
-				set_character_flag = sorc_originrevealed
-				modifier = {
-					factor = 100
-					race_has_storm_magic = yes
-				}
-				modifier = {
+				mult_modifier = {
 					factor = 10
 					OR = {
 						religion = deities_of_fury
@@ -299,12 +120,26 @@ character_event = {
 			}
 			1 = {
 				add_trait = origin_wild_magic
-				set_character_flag = sorc_originrevealed
-				modifier = {
-					factor = 100
-					race_has_wild_magic = yes
-				}
 			}
 		}
+	}
+}
+
+# Reveal sorc origin if hidden
+character_event = {
+	id = FaerunSorcerer.5
+	is_triggered_only = yes # on startup
+	hide_window = yes
+
+	min_age = 14 # children before this age are guaranteed to reveal by themselves
+
+	trigger = {
+		is_save_game = no # First startup of the game
+		olrox_has_specific_sorc_origin = yes
+		NOT = { has_character_flag = sorc_originrevealed }
+	}
+	
+	immediate = {
+		set_character_flag = sorc_originrevealed
 	}
 }

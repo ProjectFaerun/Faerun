@@ -167,22 +167,82 @@ evilcat_is_cultist = { #makes it so higher ranked society members have to be spe
 	society_member_of = cult_of_the_dragon
 }
 
+# char scope
 has_society_landed_title = {
 	OR = {
-		has_landed_title = k_a_brotherhood
-		has_landed_title = d_brotherhood_of_true_flame
+		has_landed_title = e_a_brotherhood
+		has_landed_title = e_brotherhood_of_true_flame
 		has_landed_title = d_victorious_blade
-		has_landed_title = k_zhentarim
-		has_landed_title = k_warlock_knights
+		has_landed_title = e_zhentarim
+		has_landed_title = e_warlock_knights
 		has_landed_title = d_long_death
 		has_landed_title = d_elder_brains
 		has_landed_title = d_purple_dragons
 		has_landed_title = d_sacred_shrike
 		has_landed_title = d_knights_of_samular
 		has_landed_title = d_sun_soul
-		has_landed_title = k_emerald_enclave
-		has_landed_title = d_shadow_druids
-		has_landed_title = d_shadow_thieves
+		has_landed_title = e_emerald_enclave
+		has_landed_title = e_shadow_druids
+		has_landed_title = e_shadow_thieves
+	}
+}
+
+# title scope
+is_society_landed_title_trigger = {
+	persistent_event_target:society_persist = { always = yes }
+}
+
+# char/society scope
+society_has_linked_title_trigger = {
+	trigger_if = {
+		limit = { character = yes }
+
+		is_in_society = yes
+		society = {
+			persistent_event_target:society_title_persist = { always = yes }
+		}
+	}
+	trigger_else = {
+		persistent_event_target:society_title_persist = { always = yes }
+	}
+}
+
+# title scope, PREV is char/society
+is_society_title_matching_society_of_PREV_trigger = {
+	is_society_landed_title_trigger = yes
+	persistent_event_target:society_persist = {
+		society_is_active = yes
+		trigger_if = {
+			limit = { PREVPREV = { character = yes } }
+
+			PREVPREV = { is_in_society = yes }
+			leader = {
+				same_society_as = PREVPREVPREV
+			}
+		}
+		trigger_else = {
+			is_society = PREVPREV
+		}
+	}
+}
+
+# char/society scope
+is_society_matching_PREV_society_title_trigger = {
+	society_has_linked_title_trigger = yes
+	trigger_if = {
+		limit = { character = yes }
+
+		is_in_society = yes
+		society = {
+			persistent_event_target:society_title_persist = {
+				title = PREVPREVPREV
+			}
+		}
+	}
+	trigger_else = {
+		persistent_event_target:society_title_persist = {
+			title = PREVPREV
+		}
 	}
 }
 

@@ -347,3 +347,380 @@ letter_event = {
 		clr_character_flag = society_join_block
     }
 }
+
+character_event = {
+	id = FaerunSocieties.90000
+	title = EVTNAME_FAERUNSOCIETIES.90000
+	picture = GFX_evt_bloodlines
+	border = GFX_event_normal_frame_war
+
+	desc = EVTDESC_FAERUNSOCIETIES.90000
+
+	is_triggered_only = yes
+
+	immediate = {
+		if = {
+			limit = { NOT = { has_character_modifier = recent_duel_timer } }
+
+			add_character_modifier = {
+				modifier = recent_duel_timer
+				hidden = yes
+				months = 3
+			}
+		}
+		FROM = {
+			if = {
+				limit = { NOT = { has_character_modifier = recent_duel_timer } }
+
+				add_character_modifier = {
+					modifier = recent_duel_timer
+					hidden = yes
+					months = 3
+				}
+			}
+		}
+	}
+
+	option = { 
+		name = EVTOPTA_FAERUNSOCIETIES.90000
+
+		ai_chance = {
+			factor = 20
+			modifier = {
+				factor = 2
+				trait = proud
+			}
+			modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTA_HF_10095_TT }
+		
+		if = {
+			limit = { trait = craven }
+
+			random = {
+				chance = 20
+				remove_trait = craven
+			}
+		}
+
+		set_character_flag = is_in_duel
+		set_character_flag = add_duel_xp
+		set_character_flag = society_leadership_duel@event_target:combatant_1
+		
+		event_target:combatant_1 = {
+			set_character_flag = is_in_duel
+			set_character_flag = add_duel_xp
+			set_character_flag = flag_duel_no_draws
+			set_character_flag = society_leadership_duel@event_target:combatant_2
+
+			character_event = { id = FaerunSocieties.90002 }
+		}
+	}
+
+	option = {
+		name = EVTOPTB_FAERUNSOCIETIES.90000
+
+		ai_chance = {
+			factor = 3
+			modifier = {
+				trait = craven
+				factor = 1.5
+			}
+		}
+
+		if = {
+			limit = { trait = craven }
+			
+			add_character_modifier = {
+				modifier = cowardly_ruler
+				years = 10
+				stacking = yes
+			}
+		}
+		else = {
+			add_trait_craven_effect = yes
+			remove_trait_brave_effect = yes
+		}
+		
+		prestige = -50
+
+		add_character_modifier = {
+			modifier = declined_prestige_duel_timer
+			hidden = yes
+			duration = 1095
+		}
+		hidden_tooltip = { remove_character_modifier = recent_duel_timer }
+
+		increase_cowardly_status_effect = yes #tracks duel cowardice
+
+		event_target:combatant_1 = {
+			character_event = { id = FaerunSocieties.90001 }
+		}
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90001
+	picture = GFX_evt_bloodlines
+	border = GFX_event_normal_frame_war
+
+	desc = EVTDESC_FAERUNSOCIETIES.90001
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_FAERUNSOCIETIES.90001
+
+		ROOT = { set_society_grandmaster = yes }
+		clr_character_flag = do_not_disturb
+		event_target:combatant_2 = {
+			clr_character_flag = do_not_disturb
+		}
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90002
+	title = EVTNAME_FAERUNSOCIETIES.90000
+	is_triggered_only = yes
+	picture = GFX_evt_bloodlines
+	border = GFX_event_normal_frame_war
+
+	desc = EVTDESC_FAERUNSOCIETIES.90002
+
+	option = {
+		name = EVTOPTA_WOL_11001
+		ai_chance = {
+			factor = 80
+		}
+
+		if = {
+			limit = { FROM = { NOT = { is_alive = yes } } }
+
+			hidden_effect = {
+				remove_character_modifier = recent_duel_timer
+				clr_duel_flags_effect = yes
+			}
+		}
+		else = {
+			hidden_effect = {
+				reset_duel_timers_effect = yes
+				character_event = { id = HFP.10100 }
+			}
+		}
+	}
+
+	option = { # [INTRIGUE OPTION]
+		name = EVTOPTA_HF_10096
+		trigger = {
+			intrigue >= 12
+			has_dlc = "Holy Fury"
+		}
+		ai_chance = {
+			factor = 20
+			dishonorable_ai_chance_increase_score = yes
+		}
+		tooltip_info = intrigue
+
+		custom_tooltip = { text = EVTOPTA_HF_10096_TT }
+
+		set_character_flag = attacker_using_poison@event_target:combatant_2
+
+		if = {
+			limit = {
+				OR = {
+					FROM = {
+						job_spymaster = {
+							opinion = { who = PREV value = 15 } 
+							intrigue = ROOT 
+						}
+					}
+					FROM = { intrigue = ROOT }
+				}
+			}
+			set_character_flag = poison_can_fail_against@event_target:combatant_2
+		}
+
+		if = { 
+			limit = { FROM = { NOT = { is_alive = yes } } }
+
+			hidden_effect = {
+				remove_character_modifier = recent_duel_timer
+				clr_duel_flags_effect = yes
+			}
+		}
+		else = {
+			hidden_effect = {
+				reset_duel_timers_effect = yes
+				character_event = { id = HFP.10100 }
+			}
+		}
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90003
+	title = EVTNAME_FAERUNSOCIETIES.90000
+	is_triggered_only = yes
+	picture = GFX_evt_bloodlines
+	border = GFX_event_normal_frame_war
+
+	desc = EVTDESC_FAERUNSOCIETIES.90003
+
+	immediate = {
+		clr_character_flag = do_not_disturb
+		clear_flags_with_prefix = society_leadership_duel
+	}
+
+	option = {
+		name = EVTOPTA_FAERUNSOCIETIES.90003
+
+		if = {
+			limit = { is_society_grandmaster = no }
+
+			ROOT = { set_society_grandmaster = yes }
+		}
+
+		if = {
+			limit = {
+				event_target:duel_society_title = { 
+					always = yes
+					NOT = { holder = ROOT }
+				}
+			}
+
+			event_target:duel_society_title = {
+				grant_kingdom_w_adjudication = {
+					target = ROOT
+					type = duel
+				}
+			}
+		}
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90004
+	hide_window = yes
+
+	is_triggered_only = yes # on_new_holder
+
+	trigger = {
+		FROM = {
+			is_society_landed_title_trigger = yes
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				FROM = {
+					is_society_title_matching_society_of_PREV_trigger = no
+				}
+			}
+
+			character_event = {
+				id = FaerunSocieties.90005
+				days = 1
+			}
+		}
+		else_if = {
+			limit = { society_rank < 4 }
+
+			society_rank_up = 4
+		}
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90005
+	is_triggered_only = yes
+	picture = GFX_evt_bloodlines
+	border = GFX_event_normal_frame_diplomacy
+
+	desc = EVTDESC_FAERUNSOCIETIES.90005
+
+	option = {
+		name = EVTOPTA_FAERUNSOCIETIES.90005
+		trigger = {
+			NOT = {
+				any_demesne_title = {
+					is_society_landed_title_trigger = yes
+					NOT = { title = FROMFROM }
+				}
+			}
+			FROMFROM = {
+				persistent_event_target:society_persist = {
+					ROOT = { can_join_society = PREV }
+				}
+			}
+		}
+		ai_chance = {
+			factor = 1
+		}
+
+		FROMFROM = {
+			show_scope_change = no
+			persistent_event_target:society_persist = {
+				show_scope_change = no
+				ROOT = { 
+					show_scope_change = no
+					if = {
+						limit = { is_in_society = yes }
+						
+						leave_society = yes
+					}
+					join_society = PREV 
+					society_rank_up = 4
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_FAERUNSOCIETIES.90005
+		ai_chance = {
+			factor = 1
+
+			mult_modifier = {
+				factor = 0
+
+				FROMFROM = {
+					persistent_event_target:society_persist = {
+						ROOT = { can_join_society = PREV }
+					}
+				}
+			}
+		}
+
+		unsafe_destroy_landed_title = FROMFROM
+	}
+}
+
+character_event = {
+	id = FaerunSocieties.90006 
+	is_triggered_only = yes # on_character_leave_society, on_character_kicked_from_society
+	hide_window = yes
+
+	trigger = {
+		FROM = {
+			society_has_linked_title_trigger = yes
+			persistent_event_target:society_title_persist = {
+				has_holder = yes
+				holder = ROOT
+			}
+		}
+	}
+
+	immediate = {
+		FROM = {
+			persistent_event_target:society_title_persist = {
+				unsafe_destroy_landed_title = THIS
+			}
+		}
+	}
+}
