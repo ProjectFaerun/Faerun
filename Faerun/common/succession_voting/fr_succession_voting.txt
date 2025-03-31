@@ -379,16 +379,6 @@ wychlaran_vote = {
 				religion = ROOT
 			}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -974,14 +964,35 @@ magic_dynastic = {
 		NOT = { character = FROM } #Not the current ruler.
 		FROM = {
 			dynasty = ROOT
-		}
-		FROM = { #Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance.
+
+			trigger_if = {
+				limit = { ROOT_FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				ROOT_FROMFROM = {
+					OR = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+
+						# if a character can be a potential recruit in the society, they can be voted for if other conditions allow it (claim or being a close relative of the ruler)
+						persistent_event_target:society_persist = {
+							ROOT_FROM = {
+								can_join_society = PREV
+							}
+						}
+					}
+				}
+			}
+			trigger_else_if = {
+				limit = { ROOT_FROMFROM = { is_arcane_title_trigger = yes } }
+
+				z_arcane_caster = yes
+			}
+
 			OR = {
 				any_liege = {
 					character = ROOT
 				}
 				is_ruler = no
-				FROMFROM = { holder_scope = { independent = yes } }
+				ROOT_FROMFROM = { holder_scope = { independent = yes } }
 				NOR = {
 					ROOT_FROMFROM = { has_law = out_of_realm_inheritance_law_1 }
 					ROOT_FROMFROM = { has_law = crown_authority_3 }
@@ -1056,16 +1067,6 @@ magic_dynastic = {
 				religion = ROOT
 			}
 			NOR = {
-				# mother = {
-					# is_alive = yes
-					# is_married = ROOT
-					# parent_for_elective_succession_trigger = yes
-				# }
-				# father = {
-					# is_alive = yes
-					# is_married = ROOT
-					# parent_for_elective_succession_trigger = yes
-				# }
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -1574,15 +1575,34 @@ wizard_elective = {
 	candidate_trigger = {
 		NOT = { character = FROM } #Not the current ruler.
 		FROM = {
-			z_arcane_caster = yes
-		}
-		FROM = { #Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance.
+			trigger_if = {
+				limit = { ROOT_FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				ROOT_FROMFROM = {
+					OR = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+
+						# if a character can be a potential recruit in the society, they can be voted for if other conditions allow it (claim or being a close relative of the ruler)
+						persistent_event_target:society_persist = {
+							ROOT_FROM = {
+								can_join_society = PREV
+							}
+						}
+					}
+				}
+			}
+			trigger_else_if = {
+				limit = { ROOT_FROMFROM = { is_arcane_title_trigger = yes } }
+
+				z_arcane_caster = yes
+			}
+
 			OR = {
 				any_liege = {
 					character = ROOT
 				}
 				is_ruler = no
-				FROMFROM = { holder_scope = { independent = yes } }
+				ROOT_FROMFROM = { holder_scope = { independent = yes } }
 				NOR = {
 					ROOT_FROMFROM = { has_law = out_of_realm_inheritance_law_1 }
 					ROOT_FROMFROM = { has_law = crown_authority_3 }
@@ -1599,33 +1619,26 @@ wizard_elective = {
 					FROM = { is_landed = yes higher_real_tier_than = BARON }
 				}
 			}
-			#AND = {
-				# OR = {
-					# FROM = { higher_real_tier_than = COUNT } #Or Duke-tier...
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = KING
-							# higher_real_tier_than = COUNT
-						# }
-						# FROM = { higher_real_tier_than = BARON } #...Or Count-tier under a Duchy...
-					# }
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = DUKE
-						# }
-						# FROM = { is_landed = yes is_ruler = yes } #...Or Baron-tier under a County.
-					# }
-				# }
-				FROM = {
-					OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
-						vassal_of = ROOT
-						AND = {
-							independent = yes
-							any_dejure_liege = { title = ROOT }
-						}
+			FROM = {
+				OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
+					vassal_of = ROOT
+					AND = {
+						independent = yes
+						any_dejure_liege = { title = ROOT }
 					}
 				}
-			#}
+			}
+
+			# if the title is society title, any members of the society is an eligible candidate
+			trigger_if = { 
+				limit = { FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				FROM = {
+					ROOT_FROMFROM = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+					}
+				}
+			}
 		}
 		FROM = {
 			OR = { #Candidate should not be a landless Courtier that is about to inherit a Theocracy or Republic
@@ -1657,16 +1670,6 @@ wizard_elective = {
 				religion = ROOT
 			}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -2043,15 +2046,34 @@ warlock_elective = {
 	candidate_trigger = {
 		NOT = { character = FROM } #Not the current ruler.
 		FROM = {
-			z_arcane_caster = yes
-		}
-		FROM = { #Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance.
+			trigger_if = {
+				limit = { ROOT_FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				ROOT_FROMFROM = {
+					OR = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+
+						# if a character can be a potential recruit in the society, they can be voted for if other conditions allow it (claim or being a close relative of the ruler)
+						persistent_event_target:society_persist = {
+							ROOT_FROM = {
+								can_join_society = PREV
+							}
+						}
+					}
+				}
+			}
+			trigger_else_if = {
+				limit = { ROOT_FROMFROM = { is_arcane_title_trigger = yes } }
+
+				z_arcane_caster = yes
+			}
+
 			OR = {
 				any_liege = {
 					character = ROOT
 				}
 				is_ruler = no
-				FROMFROM = { holder_scope = { independent = yes } }
+				ROOT_FROMFROM = { holder_scope = { independent = yes } }
 				NOR = {
 					ROOT_FROMFROM = { has_law = out_of_realm_inheritance_law_1 }
 					ROOT_FROMFROM = { has_law = crown_authority_3 }
@@ -2068,33 +2090,26 @@ warlock_elective = {
 					FROM = { is_landed = yes higher_real_tier_than = BARON }
 				}
 			}
-			#AND = {
-				# OR = {
-					# FROM = { higher_real_tier_than = COUNT } #Or Duke-tier...
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = KING
-							# higher_real_tier_than = COUNT
-						# }
-						# FROM = { higher_real_tier_than = BARON } #...Or Count-tier under a Duchy...
-					# }
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = DUKE
-						# }
-						# FROM = { is_landed = yes is_ruler = yes } #...Or Baron-tier under a County.
-					# }
-				# }
-				FROM = {
-					OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
-						vassal_of = ROOT
-						AND = {
-							independent = yes
-							any_dejure_liege = { title = ROOT }
-						}
+			FROM = {
+				OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
+					vassal_of = ROOT
+					AND = {
+						independent = yes
+						any_dejure_liege = { title = ROOT }
 					}
 				}
-			#}
+			}
+
+			# if the title is society title, any members of the society is an eligible candidate
+			trigger_if = { 
+				limit = { FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				FROM = {
+					ROOT_FROMFROM = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+					}
+				}
+			}
 		}
 		FROM = {
 			OR = { #Candidate should not be a landless Courtier that is about to inherit a Theocracy or Republic
@@ -2126,16 +2141,6 @@ warlock_elective = {
 				religion = ROOT
 			}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -2493,16 +2498,6 @@ divine_dynastic = {
 			#	religion = ROOT
 			#}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -2991,16 +2986,6 @@ cleric_elective = {
 			#	religion = ROOT
 			#}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -3489,16 +3474,6 @@ monk_elective = {
 			#	religion = ROOT
 			#}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
@@ -3905,14 +3880,35 @@ druid_elective = {
 	#ROOT = Current Title holder, FROM = Candidate, FROMFROM = Title, FROMFROMFROM = Null
 	candidate_trigger = {
 		NOT = { character = FROM } #Not the current ruler.
-		FROM = { #Either the candidate is in the realm, or is landless, or the title is independent, or the realm of the title does NOT have protected inheritance.
-			religion = ROOT
+		FROM = {
+			trigger_if = {
+				limit = { ROOT_FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				ROOT_FROMFROM = {
+					OR = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+
+						# if a character can be a potential recruit in the society, they can be voted for if other conditions allow it (claim or being a close relative of the ruler)
+						persistent_event_target:society_persist = {
+							ROOT_FROM = {
+								can_join_society = PREV
+							}
+						}
+					}
+				}
+			}
+			trigger_else_if = {
+				limit = { ROOT_FROMFROM = { is_druidic_title_trigger = yes } }
+
+				z_druid = yes
+			}
+
 			OR = {
 				any_liege = {
 					character = ROOT
 				}
 				is_ruler = no
-				FROMFROM = { holder_scope = { independent = yes } }
+				ROOT_FROMFROM = { holder_scope = { independent = yes } }
 				NOR = {
 					ROOT_FROMFROM = { has_law = out_of_realm_inheritance_law_1 }
 					ROOT_FROMFROM = { has_law = crown_authority_3 }
@@ -3929,33 +3925,26 @@ druid_elective = {
 					FROM = { is_landed = yes higher_real_tier_than = BARON }
 				}
 			}
-			#AND = {
-				# OR = {
-					# FROM = { higher_real_tier_than = COUNT } #Or Duke-tier...
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = KING
-							# higher_real_tier_than = COUNT
-						# }
-						# FROM = { higher_real_tier_than = BARON } #...Or Count-tier under a Duchy...
-					# }
-					# AND = {
-						# ROOT = {
-							# lower_real_tier_than = DUKE
-						# }
-						# FROM = { is_landed = yes is_ruler = yes } #...Or Baron-tier under a County.
-					# }
-				# }
-				FROM = {
-					OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
-						vassal_of = ROOT
-						AND = {
-							independent = yes
-							any_dejure_liege = { title = ROOT }
-						}
+			FROM = {
+				OR = { #Either defacto direct vassal, or independent ruler who is dejure vassal.
+					vassal_of = ROOT
+					AND = {
+						independent = yes
+						any_dejure_liege = { title = ROOT }
 					}
 				}
-			#}
+			}
+
+			# if the title is society title, any members of the society is an eligible candidate
+			trigger_if = { 
+				limit = { FROMFROM = { is_society_landed_title_trigger = yes } }
+
+				FROM = {
+					ROOT_FROMFROM = {
+						is_society_title_matching_society_of_PREV_trigger = yes
+					}
+				}
+			}
 		}
 		FROM = {
 			OR = { #Candidate should not be a landless Courtier that is about to inherit a Theocracy or Republic
@@ -3978,32 +3967,12 @@ druid_elective = {
 					}
 				}
 			}
-			#OR = { #If the title controls the religion, candidates must be of the same religion.
-			#	ROOT = {
-			#		NOT = {
-			#			controls_religion = yes
-			#		}
-			#	}
-			#	religion = ROOT
-			#}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
-#				trait = eunuch
 				is_ascetic_trigger = yes
 				is_theocracy = yes
-#				is_republic = yes
 				is_merchant_republic = yes
 			}
 		}
@@ -5238,16 +5207,6 @@ nomadic_elective = {
 				religion = ROOT
 			}
 			NOR = {
-				mother = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
-				father = {
-					is_alive = yes
-					is_married = ROOT
-					parent_for_elective_succession_trigger = yes
-				}
 				trait = cat
 				trait = disinherited
 				trait = horse
