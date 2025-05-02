@@ -690,36 +690,12 @@ character_event = {
 				is_occupied = no
 			}
 			owner = {
-				job_treasurer = {
-					character = ROOT
-				}
-				OR = {
-					AND = {
-						NOT = { culture = PREV }
-						NOR = {
-							culture = angel
-							culture = asura
-							culture = celestial_eladrin
-							culture_group = genie_group
-							culture_group = outworlder_group
-							culture_group = draconic_culture_group
-						}
-					}
-					AND = {
-						OR = {
-							culture = angel
-							culture = asura
-							culture = celestial_eladrin
-							culture_group = genie_group
-							culture_group = outworlder_group
-							culture_group = draconic_culture_group
-						}
-						capital_scope = {
-							NOT = { culture = PREVPREV }
-						}
-					}
+				any_demesne_province = {
+					province = PREVPREV
+					province_culture_can_be_changed_by_PREV = yes
 				}
 			}
+			
 			OR = {
 				NOT = { 
 					has_game_rule = {
@@ -727,8 +703,28 @@ character_event = {
 						value = restricted
 					}
 				}
-				any_neighbor_province = { ROOT = { liege = { culture = PREVPREV } } }
-				any_neighbor_province = { port = yes } 
+				any_neighbor_province = { 
+					OR = {
+						port = yes
+	
+						ROOT = { 
+							location = {
+								owner = { 
+									trigger_if = {
+										limit = { culture_group = fiendish_group }
+				
+										PREVPREVPREV = {
+											is_fiendish_culture_trigger = yes
+										}
+									}
+									trigger_else = {
+										culture = PREVPREVPREV
+									}
+								} 
+							}
+						} 
+					}
+				}
 			}
 		}
 	}
@@ -774,6 +770,9 @@ character_event = {
 		
 		prestige = 50
 		hidden_tooltip  = {
+			location = {
+				save_event_target_as = province_to_convert
+			}
 			liege = { character_event = { id = 20205 } }
 		}
 	}
@@ -790,49 +789,9 @@ character_event = {
 	
 	option = {
 		name = EVTOPTA20205
-		FROM = {
-			location = {
-				if = {
-					limit = {
-						ROOT = {
-							NOR = {
-								culture = angel
-								culture = asura
-								culture = celestial_eladrin
-								culture_group = genie_group
-								culture_group = outworlder_group
-								culture_group = draconic_culture_group
-							}
-						}
-					}
-					culture = ROOT
-				}
-				else_if = {
-					limit = {
-						ROOT = {
-							OR = {
-								culture = angel
-								culture = asura
-								culture = celestial_eladrin
-								culture_group = genie_group
-								culture_group = outworlder_group
-								culture_group = draconic_culture_group
-							}
-						}
-					}
-					ROOT = {
-						capital_scope = {
-							culture = PREV
-						}
-					}
-				}
-				# if = {
-					# limit = {
-						# has_province_modifier = nomad_agitation
-					# }
-					# remove_province_modifier = nomad_agitation
-				# }
-			}
+		event_target:province_to_convert = {
+			show_scope_change = no
+			change_province_culture_to_PREV_effect = yes
 		}
 		opinion = {
 			who = FROM
