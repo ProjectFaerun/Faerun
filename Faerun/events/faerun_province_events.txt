@@ -1,0 +1,491 @@
+namespace = frprov
+
+#this is initially for the random events that will arise in provinces with modifiers tied to the spellplague. although this can be expanded
+
+#Single event that rolls for others to happen
+province_event = {
+	id = frprov.1
+	hide_window = yes
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		NOT = {
+			holder_scope = { is_undead = yes }
+		}
+		NOT = {
+			has_province_modifier = undead_province
+		}
+		OR = {
+			AND = {
+				has_province_modifier = flooded_mod
+				NOR = {
+					holder_scope = {
+						is_faerun_aquatic_culture = yes
+					}
+					is_faerun_aquatic_culture = yes
+				}
+			}
+			AND = {
+				has_province_modifier = underchasm
+				NOR = {
+					holder_scope = {
+						is_faerun_subterranean_culture = yes
+					}
+					is_faerun_subterranean_culture = yes
+				}
+			}
+			AND = {
+				has_province_modifier = plaguelands
+				NOR = {
+					holder_scope = {
+						trait = creature_aboleth
+					}
+					culture = aboleth
+				}
+			}
+		}
+	}
+	
+	weight_multiplier = {
+		days = 1
+	}
+	
+	immediate = {
+		random_list = {
+			#Shared block
+			
+			#Flooded only block
+			
+			#Underchasm only block
+			
+			#Plaguelands only block
+			150 = { # Terrain shifts and causes wound
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = { has_province_modifier = plaguelands }
+						holder_scope = {
+							OR = {
+								can_fly = no
+								trait = in_hiding
+								is_pilgrim = yes
+								in_seclusion = yes
+								has_character_modifier = out_traveling
+								trait = is_spelljamming
+								trait = avatar # silly for it to affect an avatar
+								trait = wounded
+								location = {
+									NOT = { province = ROOT }
+								}
+							}
+						}
+					}
+				}
+				modifier = {
+					factor = 0.5
+					holder_scope = { trait = spellscar }
+				}
+				holder_scope = {
+					character_event = { id = frprov.2 }
+				}
+			}
+			1 = { # Disease spawns
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = { has_province_modifier = plaguelands }
+						has_disease = yes
+						NOT = { holder_scope = { religion = blue_flame } }
+					}
+				}
+				modifier = {
+					factor = 0.2
+					OR = {
+						trait = patron_talona
+						trait = patron_moander
+					}
+				}
+				province_event = { id = frprov.3 }
+			}
+			25 = { # Azure Druid
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = { has_province_modifier = plaguelands }
+						NOT = { holder_scope = { religion = blue_flame } }
+						has_province_modifier = recent_revolt
+					}
+				}
+				province_event = { id = frprov.4 }
+			}
+			100 = { # Spellscar
+				modifier = {
+					factor = 0
+					NOT = { has_province_modifier = plaguelands }
+				}
+				modifier = { # separated from the above because it was an easier way to not mess up the logic
+					factor = 0
+					NOT = { # this is a bit of a convoluted way of checking that there is no character that *doesn't* have it
+						any_province_character = {
+							NOT = { trait = spellscar }
+						}
+					}
+				}
+				modifier = {
+					factor = 1.3
+					holder_scope = {
+						religion = blue_flame
+					}
+				}
+				random_province_character = { character_event = { id = frprov.5 } }
+			}
+			1 = { # illnesses cured
+				modifier = {
+					factor = 0
+					NOT = { has_province_modifier = plaguelands }
+				}
+				modifier = {
+					factor = 0
+					NOT = {
+						any_province_character = {
+							is_ill = yes
+						}
+					}
+				}
+				modifier = {
+					factor = 5
+					holder_scope = { religion = blue_flame }
+				}
+				random_province_character = {
+					limit = {
+						is_ill = yes
+					}
+					character_event = { id = frprov.6 }
+				}
+			}
+			3 = { # building warped beyond use
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = { has_province_modifier = plaguelands }
+						holder_scope = { religion = blue_flame }
+						NOT = { any_province_holding = { NOT = { holding_type = tribal } } }
+					}
+				}
+				province_event = { id = frprov.7 }
+			}
+			7 = { # magic artifact becomes mundane
+				modifier = {
+					factor = 0
+					NOT = { has_province_modifier = plaguelands }
+				}
+				modifier = {
+					factor = 0
+					OR = {
+						NOT = {
+							any_province_character = {
+								NOT = { religion = blue_flame }
+							}
+						}
+						NOT = {
+							any_province_character = {
+								any_artifact = {
+									has_artifact_flag = magic
+									NOR = {
+										has_artifact_flag = unique
+										has_artifact_flag = destroyed_on_death
+									}
+								}
+							}
+						}
+					}
+				}
+				random_province_character = {
+					limit = {
+						NOT = { religion = blue_flame }
+						any_artifact = {
+							has_artifact_flag = magic
+							NOR = {
+								has_artifact_flag = unique
+								has_artifact_flag = destroyed_on_death
+							}
+						}
+					}
+					character_event = { id = frprov.8 }
+				}
+			}
+			30 = { # Sharn dreams
+				modifier = {
+					factor = 0
+					NOT = { has_province_modifier = plaguelands }
+					NOT = {
+						any_province_character = {
+							NOR = {
+								religion = blue_flame
+								trait = avatar
+								trait = zealous
+								has_character_flag = sharn_dreams
+							}
+						}
+					}
+				}
+				random_province_character = {
+					limit = {
+						NOR = {
+							religion = blue_flame
+							trait = avatar
+							trait = zealous
+							has_character_flag = sharn_dreams
+						}
+					}
+					set_character_flag = sharn_dreams
+					character_event = { id = frprov.9 }
+				}
+			}
+			45 = { # Plaguelands spread
+				
+			}
+		}
+	}
+}
+
+#Terrain shifts under you
+character_event = {
+	id = frprov.2
+	desc = FRPROV.2.D
+	picture = GFX_evt_bandits
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRPROV.2.O
+		random = {
+			chance = 50
+			modifier = {
+				factor = 0.2
+				OR = {
+					z_barbarian = yes
+					z_ranger = yes
+					z_monk = yes
+				}
+			}
+			add_trait = wounded
+		}
+		prestige = -15
+	}
+}
+
+#Disease spawned
+province_event = {
+	id = frprov.3
+	desc = FRPROV.3.D
+	picture = GFX_evt_illness
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRPROV.3.O
+		spawn_random_disease = yes
+	}
+}
+
+#Azure Druid
+province_event = {
+	id = frprov.4
+	desc = FRPROV.4.D
+	picture = GFX_evt_heretic
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		add_province_modifier = {
+			name = recent_revolt
+			years = 1
+		}
+		create_character = {
+			age = 40
+			attributes = {
+				learning = 6
+			}
+			add_trait = journeyman_druid
+			add_trait = spellscar
+			add_trait = zealous
+			random_traits = yes
+			female = 50
+			religion = blue_flame
+			culture = ROOT
+			dynasty = actually_culture
+		}
+		holder_scope = {
+			new_character = {
+				spawn_unit = {
+					province = ROOT
+					home = ROOT
+					owner = THIS
+					leader = THIS
+					troops = {
+						light_infantry = { 40 40 }
+						archers = { 15 15 }
+						light_cavalry = { 5 5 }
+						heavy_infantry = { 5 5 }
+						mob_troops = { 100 100 }
+					}
+					scaled_by_biggest_garrison = 1.5 # Balance this!
+					attrition = 0
+					maintenance_multiplier = 0
+					reinforces = no
+					disband_on_peace = yes
+					cannot_inherit = yes
+					can_toggle_looting = no
+				}
+				war = {
+					target = PREV
+					casus_belli = heretic_revolt
+					thirdparty_title = ROOT
+				}
+			}
+		}
+	}
+	
+	option = {
+		FRPROV.4.O
+	}
+}
+
+#Spellscar
+character_event = {
+	id = frprov.5
+	desc = FRPROV.5.D
+	picture = GFX_evt_blue_fire_3
+	
+	is_triggered_only = yes
+	
+	option = {
+		trigger = {
+			religion = blue_flame
+		}
+		name = FRPROV.5.O1
+		add_trait = spellscar
+		piety = 25
+	}
+	
+	option = {
+		trigger = {
+			NOT = { religion = blue_flame }
+		}
+		name = FRPROV.5.O2
+		add_trait = spellscar
+		piety = -25
+	}
+}
+
+#Illness cured
+character_event = {
+	id = frprov.6
+	desc = FRPROV.6.D
+	picture = GFX_evt_recovery
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRPROV.6.O
+		if = {
+			limit = {
+				religion = blue_flame
+			}
+			piety = 50
+		}
+		cure_illness = yes
+	}
+}
+
+#Building warped
+province_event = {
+	id = frprov.7
+	desc = FRPROV.7.D
+	picture = GFX_evt_burning_house
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRPROV.7.O
+		random_province_holding = {
+			limit = {
+				NOT = {
+					holding_type = tribal
+				}
+			}
+			destroy_random_building = yes
+		}
+	}
+}
+
+#Magic item disenchanted
+character_event = {
+	id = frprov.8
+	desc = FRPROV.8.D
+	picture = GFX_evt_blue_fire_2
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = FRPROV.8.O
+		prestige = -20
+		random_artifact = {
+			limit = {
+				has_artifact_flag = magic
+				NOR = {
+					has_artifact_flag = unique
+					has_artifact_flag = destroyed_on_death
+					}
+				}
+			}
+			destroy_artifact = THIS
+		}
+	}
+}
+
+#Sharn dreams
+character_event = {
+	id = frprov.9
+	desc = FRPOV.9.D
+	picture = GFX_evt_blue_fire_1
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 5
+				OR = {
+					trait = lunatic
+					trait = cynical
+				}
+			}
+		}
+		name = FRPOV.9.Oa
+		religion = blue_flame
+		remove_trait = cynical
+		random = {
+			chance = 15
+			add_trait = zealous
+		}
+	}
+	
+	option = {
+		ai_will_do = {
+			factor = 7
+			modifier = {
+				factor = 0.4
+				OR = {
+					trait = lunatic
+					trait = cynical
+				}
+			}
+		}
+		name = FRPOV.9.Ob
+		piety = 15
+	}
+}
