@@ -3532,3 +3532,60 @@ setup_rogue_titles_effect = {
 	d_black_watch = { set_title_flag = rogue_title }
 	d_bregan_daerthe = { set_title_flag = rogue_title }
 }
+
+# PREV is a character
+change_province_culture_to_PREV_effect = {
+	if = {
+		limit = { PREV = { trait = creature_fiend } }
+
+		change_province_culture_to_fiendish_effect = yes
+	}
+	else = {
+		culture = PREV
+		if = {
+			limit = { 
+				has_province_modifier = half_fiendish_province_modifier
+				is_half_fiendish_culture_trigger = no
+			}
+
+			remove_province_modifier = half_fiendish_province_modifier
+		}
+	}
+}
+
+# province scope
+change_province_culture_to_fiendish_effect = {
+	if = {
+		limit = { culture_group = orc_group }
+
+		culture = tanarukk
+	}
+	else_if = {
+		limit = { 
+			OR = {
+				culture_group = high_elf_group
+				culture_group = sylvan_elf_group
+				culture_group = eladrin_group
+			}
+		}
+
+		culture = feyri
+	}
+	else_if = {
+		limit = { culture_group = plant_group }
+
+		culture = blight
+	}
+	else = {
+		culture = tiefling
+	}
+
+	if = {
+		limit = { owner = { trait = creature_fiend culture_group = fiendish_group } }
+
+		add_province_modifier = {
+			name = half_fiendish_province_modifier
+			duration = -1
+		}
+	}
+}
