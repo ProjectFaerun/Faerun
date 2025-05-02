@@ -7,7 +7,7 @@
 # Province culture changes
 province_event = {
 	id = 55000
-	desc = "EVTDESC55000"
+	desc = EVTDESC55000
 	picture = GFX_evt_culture_change
 	
 	trigger = {
@@ -15,27 +15,42 @@ province_event = {
 			top_liege = {
 				culture = PREV
 			}
-			NOT = { culture = ROOT }
-			NOR = {
-				culture_group = draconic_culture_group
-				culture_group = celestial_group 
-				culture_group = genie_group
-				culture_group = outworlder_group
-				culture_group = construct_group
-			}
 			religion = ROOT
+			ROOT = {
+				province_culture_can_be_changed_by_PREV = yes
+			}
 		}
 		any_neighbor_province = {
 			has_owner = yes
 			ROOT = {
 				owner = {
-					culture = PREVPREV
+					trigger_if = {
+						limit = { trait = creature_fiend }
+
+						culture_group = fiendish_group
+						PREVPREV = {
+							is_fiendish_culture_trigger = yes
+						}
+					}
+					trigger_else = {
+						culture = PREVPREV
+					}
 				}
 			}
 			owner = {
 				ROOT = {
 					owner = {
-						culture = PREVPREV
+						trigger_if = {
+							limit = { trait = creature_fiend }
+	
+							culture_group = fiendish_group
+							PREVPREV = {
+								is_fiendish_culture_trigger = yes
+							}
+						}
+						trigger_else = {
+							culture = PREVPREV
+						}
 					}
 				}
 			}
@@ -45,22 +60,7 @@ province_event = {
 				has_province_modifier = depopulated_3
 			}
 		}
-		# NOT = { # No flipping back to Norse culture before 1150
-			# AND = {
-				# owner = { culture = norse }
-				# ROOT = {
-					# OR = {
-						# culture = swedish
-						# culture = norwegian
-						# culture = danish
-						# culture = norman
-					# }
-				# }
-				# NOT = {
-					# has_global_flag = norse_culture_flipping
-				# }
-			# }
-		# }
+		NOT = { has_province_modifier = culture_appreciated_modifier }
 	}
 	
 	mean_time_to_happen = {
@@ -247,14 +247,10 @@ province_event = {
 	option = {
 		name = "EVTOPTA55000"
 		owner = {
+			show_scope_change = no
 			ROOT = {
-				culture = PREV
-				# if = {
-					# limit = {
-						# has_province_modifier = nomad_agitation
-					# }
-					# remove_province_modifier = nomad_agitation
-				# }
+				show_scope_change = no
+				change_province_culture_to_PREV_effect = yes
 			}
 		}
 	}
@@ -265,10 +261,18 @@ province_event = {
 				OR = {
 					has_character_modifier = cult_diversity_mod
 					has_character_modifier = total_diversity_mod
+					ai = no
 				}
 			}
 		}
-		owner = { prestige = 50 }
+		owner = { 
+			show_scope_change = no
+			prestige = 50
+		}
+		add_province_modifier = {
+			name = culture_appreciated_modifier
+			years = 25
+		}
 	}
 }
 
@@ -295,16 +299,14 @@ province_event = {
 		}
 		
 		owner = {
-			top_liege = {
-				culture = PREV
-			}
-			NOT = { culture = ROOT }
-			NOR = {
-				culture_group = draconic_culture_group
-				culture_group = celestial_group 
-				culture_group = genie_group
-				culture_group = outworlder_group
-				culture_group = construct_group
+			owner = {
+				top_liege = {
+					culture = PREV
+				}
+				religion = ROOT
+				ROOT = {
+					province_culture_can_be_changed_by_PREV = yes
+				}
 			}
 			capital_scope = {
 				province_id = ROOT
@@ -351,13 +353,33 @@ province_event = {
 				has_owner = yes
 				ROOT = {
 					owner = {
-						culture = PREVPREV
+						trigger_if = {
+							limit = { trait = creature_fiend }
+	
+							culture_group = fiendish_group
+							PREVPREV = {
+								is_fiendish_culture_trigger = yes
+							}
+						}
+						trigger_else = {
+							culture = PREVPREV
+						}
 					}
 				}
 				owner = {
 					ROOT = {
 						owner = {
-							culture = PREVPREV
+							trigger_if = {
+								limit = { trait = creature_fiend }
+		
+								culture_group = fiendish_group
+								PREVPREV = {
+									is_fiendish_culture_trigger = yes
+								}
+							}
+							trigger_else = {
+								culture = PREVPREV
+							}
 						}
 					}
 				}
@@ -369,20 +391,7 @@ province_event = {
 			}
 		}
 		
-		# NOT = { # No flipping back to Norse culture before 1150
-			# AND = {
-				# owner = { culture = norse }
-				# ROOT = {
-					# OR = {
-						# culture = swedish
-						# culture = norwegian
-						# culture = danish
-						# culture = norman
-					# }
-				# }
-				# NOT = {	has_global_flag = norse_culture_flipping }
-			# }
-		# }
+		NOT = { has_province_modifier = culture_appreciated_modifier }
 	}
 	
 	mean_time_to_happen = {
@@ -516,8 +525,11 @@ province_event = {
 	option = {
 		name = "EVTOPTA55001"
 		owner = {
+			show_scope_change = no
 			ROOT = {
-				culture = PREV
+				show_scope_change = no
+				change_province_culture_to_PREV_effect = yes
+
 				if = {
 					limit = {
 						NOT = { religion = PREV }
@@ -551,12 +563,8 @@ character_event = {
 	lacks_dlc = "Rajas of India" # Controlled by Decision: convert_to_local_culture
 	
 	trigger = {
-		NOR = {
-			culture_group = draconic_culture_group
-			culture_group = celestial_group 
-			culture_group = genie_group
-			culture_group = construct_group
-		}
+		unconvertable_culture_trigger = no
+		NOT = { trait = creature_fiend }
 		primary_title = { 
 			NOT = { conquest_culture = ROOT } 
 			NOT = { culture = ROOT }
@@ -622,6 +630,19 @@ character_event = {
 			factor = 2.0
 			capital_scope = {
 				culture_group = ROOT # Same culture group: slower assimilation
+			}
+		}
+		mult_modifier = {
+			factor = 0.2
+
+			culture_group = fiendish_group
+		}
+		mult_modifier = {
+			factor = 0.1
+
+			culture_group = fiendish_group
+			capital_scope = {
+				is_half_fiendish_culture_trigger = yes
 			}
 		}
 	}

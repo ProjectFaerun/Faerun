@@ -157,17 +157,7 @@ olrox_not_immortals_trigger = { #opposite of olrox_all_immortals_trigger, made f
 	custom_tooltip = {
 		text = olrox_not_immortals_trigger_tooltip
 
-		trigger_if = {
-			limit = { age < 2 } # newborn characters can't have immortal_age property, so we use heavy triggers for them to give them time to get it through racial_aging.3 event at the age of 1
-
-			NOR = {
-				BR_long_lived_races = yes
-				faerun_immortal_race_trigger = yes
-			}
-		}
-		trigger_else = {
-			immortal = no
-		}
+		olrox_all_immortals_trigger = no
 	}
 }
 
@@ -230,7 +220,7 @@ is_secretly_undead = {
 		is_undead = no
 	}
 	trigger_else = {
-		always = no
+		hidden_tooltip = { always = no }
 	}
 }
 undead_incompatible_race = { #races that should not become undead
@@ -856,7 +846,14 @@ has_horns = {
 
 # Prevent unwanted diversity changes.
 allow_changing_race = {
-	is_ruler = no
+	OR = {
+		is_ruler = no
+		AND = {
+			real_tier = BARON
+			is_patrician = no
+		}
+	}
+	
 	is_or_was_offmap_power_ruler = no
 	ai = yes
 }
@@ -3426,5 +3423,32 @@ cannibal_race_trigger = {
 		trait = creature_troll
 		trait = creature_sahuagin
 		character = c_1009 # Sebek
+	}
+}
+
+mind_control_immune_trigger = {
+	OR = {
+		trait = creature_angel
+		trait = creature_fiend
+		trait = creature_dragon
+		trait = creature_yikarian
+		race_is_illithid = yes
+		is_known_undead = yes
+		trigger_if = {
+			limit = { num_of_artifacts > 0 }
+
+			any_artifact = {
+				artifact_type = ring_of_mind_shield
+				is_artifact_equipped = yes
+			}
+		}
+		custom_tooltip = {
+			text = hidden_mind_protection_tooltip
+
+			OR = {
+				has_character_flag = secret_dragon
+				is_secretly_undead = yes
+			}
+		}
 	}
 }
