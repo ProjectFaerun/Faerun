@@ -516,21 +516,56 @@ is_zakharan_culture = {
 		culture = jann
 	}
 }
+
+# PREV is character
 province_culture_can_be_changed_by_PREV = {
 	trigger_if = {
 		limit = { PREV = { culture_group = fiendish_group } }
 
 		is_fiendish_culture_trigger = no
 	}
+	trigger_if = {
+		limit = { PREV = { culture_group = draconic_culture_group } }
+
+		is_dragon_friendly_culture_trigger = no
+	}
 	trigger_else = {
-		PREV = { unconvertable_culture_trigger = no }
+		PREV = { can_convert_province_culture_trigger = yes }
 		NOT = { culture = PREV }
 	}
 }
+
+# scope is character, PREV is anything with a culture
+character_culture_can_be_changed_to_PREV = {
+	# Can't change culture from species specific
+	unconvertable_culture_trigger = no
+
+	# Can change culture to species specific ones only if we are of the right species
+	trigger_if = {
+		limit = { PREV = { culture_group = fiendish_group } }
+
+		trait = creature_fiend
+	}
+	trigger_else_if = {
+		limit = { PREV = { culture_group = draconic_culture_group } }
+
+		trait = creature_dragon
+	}
+	trigger_else_if = {
+		limit = { PREV = { culture_group = celestial_group } }
+
+		trait = creature_angel
+	}
+
+	NOR = {
+		culture = PREV
+		PREV = { culture = monster }
+	}
+}
+
+# scope is anything with a culture
 unconvertable_culture_trigger = {
 	OR = {
-		culture_group = draconic_culture_group
-		culture_group = celestial_group
 		culture_group = genie_group
 		culture_group = outworlder_group
 		culture_group = construct_group
@@ -539,11 +574,40 @@ unconvertable_culture_trigger = {
 		trigger_if = {
 			limit = { character = yes }
 
-			trait = creature_fiend
-			culture_group = fiendish_group
+			OR = {
+				AND = {
+					trait = creature_fiend
+					culture_group = fiendish_group
+				}
+				AND = {
+					trait = creature_dragon
+					culture_group = draconic_culture_group
+				}
+				AND = {
+					trait = creature_angel
+					culture_group = celestial_group
+				}
+			}
 		}
 	}
 }
+
+# scope is character
+can_convert_province_culture_trigger = {
+	OR = {
+		unconvertable_culture_trigger = no
+		has_minion_culture_trigger = yes
+	}
+}
+
+# scope is character
+has_minion_culture_trigger = {
+	OR = {
+		culture_group = fiendish_group
+		culture_group = draconic_culture_group
+	}
+}
+
 is_spacer_culture = {
 	OR = {
 		culture = scro
@@ -670,5 +734,18 @@ is_fiendish_culture_trigger = {
 	OR = {
 		culture_group = fiendish_group
 		is_half_fiendish_culture_trigger = yes
+	}
+}
+
+# character or province scope
+is_dragon_friendly_culture_trigger = {
+	OR = {
+		culture = kobold
+		trigger_if = {
+			limit = { NOT = { character = yes } }
+
+			owner = { character = c_131 }
+			culture = fire_giant
+		}
 	}
 }
