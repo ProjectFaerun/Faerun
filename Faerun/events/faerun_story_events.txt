@@ -5846,129 +5846,80 @@ province_event = { # set up
 		clr_global_flag = spellplague_not_happened_yet
 		set_global_flag = spellplague_happened
 		
-		#plunge the Mhair Jungles into the sea and replace them with fish immediately, unless player-held
-		c_moonvales = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_toa = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_mhairling = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_orphar = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_lapaalis = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_zanzazzar = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_bamas = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_oostar = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_coilvines = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_blackvale = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_sesserash = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_lapalgulph = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		#Deep Imaskar is hit
-		c_deep_imaskar = {
-			location = {
-				set_province_flag = spellplague_me
-				spellplague_change_province = yes
-			}
-		}
-		#Glaur Barrens too
-		c_graulthanc = {
-			location = {
-				set_province_flag = spellplague_me
-				spellplague_change_province = yes
-			}
-		}
+		#Checks if Mhair or random
 		if = {
 			limit = {
-				c_69221 = {
-					is_alive = yes
-					is_landed = no
+				has_game_rule = {
+					name = spellplague_start_rule
+					value = mhair
 				}
 			}
-			c_69221 = {
-				add_trait = lich
-				add_trait = creature_dragon
-				add_trait = spellscar
-				remove_trait = creature_human
-				set_graphical_culture = dracolich
-				set_character_flag = undead_court
+			set_global_flag = mhair_spellplague
+			c_mhairhetel = {
+				location = {
+					set_province_flag = plaguelands_spreader_2
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+					set_province_flag = spellplague_origin
+				}
 			}
-			c_graulthanc = {
-				if = {
+			k_mhair = {
+				random_direct_de_jure_vassal_title = {
 					limit = {
-						holder_scope = {
-							ai = yes
-							any_liege = {
-								ai = yes
+						tier = COUNT
+						location = {
+							NOR = { 
+								has_province_flag = flooded_spreader_0
+								has_province_modifier = flooded_mod
+								terrain = hills
+								terrain = mountain
+								terrain = subterranean
+								terrain = desert
 							}
 						}
 					}
-					c_69221 = {
-						grant_title = PREV
-						set_defacto_liege = THIS
+					location = {
+						set_province_flag = flooded_spreader_0
+						set_province_flag = flood_this
+						spellplague_change_province = yes
+						modifier_spreader_effect = yes
+					}
+				}
+				#again
+				random_direct_de_jure_vassal_title = {
+					limit = {
+						tier = COUNT
+						location = {
+							NOR = { 
+								has_province_flag = flooded_spreader_0
+								has_province_modifier = flooded_mod
+								terrain = hills
+								terrain = mountain
+								terrain = subterranean
+								terrain = desert
+							}
+						}
+					}
+					location = {
+						set_province_flag = flooded_spreader_0
+						set_province_flag = flood_this
+						spellplague_change_province = yes
+						modifier_spreader_effect = yes
 					}
 				}
 			}
 		}
-		c_lower_glaur = {
-			location = {
+		else = {
+			random_province = {
+				limit = {
+					is_land = yes
+				}
+				set_province_flag = plaguelands_spreader_0
 				set_province_flag = spellplague_me
 				spellplague_change_province = yes
+				modifier_spreader_effect = yes
+				set_province_flag = spellplague_origin
 			}
 		}
 		
@@ -5977,10 +5928,11 @@ province_event = { # set up
 			narrative_event = { id = frstory.98 }
 		}
 		
-		#Fire the next day
+		#Aftershocks
 		province_event = {
 			id = frstory.99
 			days = 1
+			random = 9
 		}
 	}
 }
@@ -5993,32 +5945,37 @@ narrative_event = {
 	
 	ai = no
 
-	desc = { # if on Mhair
+	desc = { # if near ground zero
 		trigger = {
 			location = {
-				region = mhair_region
+				kingdom = {
+					any_de_jure_vassal_title = {
+						tier = COUNT
+						location = {
+							has_province_flag = spellplague_origin
+						}
+					}
+				}
 			}
 		}
 		text = FRSTORY.98.Da
 	}
-	desc = { # if elsewhere on Toril
+	desc = { # if elsewhere
 		trigger = {
-			location = {
-				NOR = {
-					region = mhair_region
-					region = laerakond_region
+			NOT = {
+				location = {
+					kingdom = {
+						any_de_jure_vassal_title = {
+							tier = COUNT
+							location = {
+								has_province_flag = spellplague_origin
+							}
+						}
+					}
 				}
 			}
 		}
 		text = FRSTORY.98.Db
-	}
-	desc = { # if on Laerakond
-		trigger = {
-			location = {
-				region = laerakond_region
-			}
-		}
-		text = FRSTORY.98.Dc
 	}
 	picture = GFX_evt_blue_fire_3
 	
@@ -6027,9 +5984,13 @@ narrative_event = {
 			text = FRSTORY.98.Oa
 			trigger = {
 				location = {
-					OR = {
-						region = mhair_region
-						region = glaur_region
+					kingdom = {
+						any_de_jure_vassal_title = {
+							tier = COUNT
+							location = {
+								has_province_flag = spellplague_origin
+							}
+						}
 					}
 				}
 			}
@@ -6037,10 +5998,16 @@ narrative_event = {
 		name = {
 			text = FRSTORY.98.Ob
 			trigger = {
-				location = {
-					NOR = {
-						region = mhair_region
-						region = glaur_region
+				NOT = {
+					location = {
+						kingdom = {
+							any_de_jure_vassal_title = {
+								tier = COUNT
+								location = {
+									has_province_flag = spellplague_origin
+								}
+							}
+						}
 					}
 				}
 			}
@@ -6054,217 +6021,381 @@ province_event = {
 	
 	is_triggered_only = yes
 	
-	immediate = {
-		
-		c_saraath = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
+	#Check for Halruaa rule
+	if = {
+		limit = {
+			has_game_rule = {
+				name = spellplague_halruaa_rule
+				value = always
 			}
 		}
-		c_delphin = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_sammaresh = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_abreon = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_makaxar = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_zamazda = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_kinyo = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_kassa_bay = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_aztul = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_guth = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_delselar = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_lhair = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_halaze = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_halagard = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_azuni = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_mithel = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_assundath = {
-			location = {
-				set_province_flag = flood_this
-				spellplague_change_province = yes
-			}
-		}
-		c_yaulazna = {
-			location = {
-				add_province_modifier = {
-					name = earthmote
-					duration = -1
+		k_halruaa = {
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+					location = {
+						port = no
+						NOT = { has_province_modifier = plaguelands }
+					}
 				}
-			}
-		}
-		c_maerzalar = {
-			location = {
+				set_province_flag = plaguelands_spreader_0
+				set_province_flag = spellplague_me
 				spellplague_change_province = yes
+				modifier_spreader_effect = yes
 			}
-		}
-		c_sulaziir = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_ghalagar = {
-			location = {
-				add_province_modifier = {
-					name = plaguelands
-					duration = -1
+			#Again!
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+					location = {
+						port = no
+						NOT = { has_province_modifier = plaguelands }
+					}
 				}
-			}
-		}
-		c_zoundar = {
-			location = {
+				set_province_flag = plaguelands_spreader_0
+				set_province_flag = spellplague_me
 				spellplague_change_province = yes
+				modifier_spreader_effect = yes
 			}
-		}
-		c_halar_hills = {
-			location = {
+			#Flood the coastline
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+					location = {
+						port = yes
+						NOT = { has_province_modifier = flooded_mod }
+					}
+				}
+				set_province_flag = flooded_spreader_0
+				set_province_flag = flood_this
 				spellplague_change_province = yes
+				modifier_spreader_effect = yes
 			}
-		}
-		c_bathme = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_halarahh = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_aluar = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_elchulmarch = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_maeruhal = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_achelar = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_the_nath = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_zzuntal = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_thilzoun = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_talathgard = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		c_edouura = {
-			location = {
-				spellplague_change_province = yes
-			}
-		}
-		
-		#To fire on the 10th of Mirtul
-		province_event = {
-			id = frstory.100
-			days = 10
 		}
 	}
-}
-
-province_event = {
-	id = frstory.100
-	hide_window = yes
+	#Guaranteed random plaguelands spawns
+	#First one
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random_direct_de_jure_vassal_title = {
+			limit = {
+				tier = COUNT
+			}
+			location = {
+				set_province_flag = plaguelands_spreader_0
+				set_province_flag = spellplague_me
+				spellplague_change_province = yes
+				modifier_spreader_effect = yes
+			}
+		}
+	}
+	#Second one
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random_direct_de_jure_vassal_title = {
+			limit = {
+				tier = COUNT
+			}
+			location = {
+				set_province_flag = plaguelands_spreader_0
+				set_province_flag = spellplague_me
+				spellplague_change_province = yes
+				modifier_spreader_effect = yes
+			}
+		}
+	}
+	#Random chance of plaguelands spawns
+	#first
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random = {
+			chance = 33
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = plaguelands_spreader_0
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}
+	}
+	#second
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random = {
+			chance = 33
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = plaguelands_spreader_0
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}
+	}
+	#third
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random = {
+			chance = 33
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = plaguelands_spreader_0
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}
+	}
+	#fourth
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random = {
+			chance = 33
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = plaguelands_spreader_0
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}
+	}
+	#fifth
+	random_landed_title = {
+		limit = {
+			tier = EMPEROR
+			NOT = {
+				any_de_jure_vassal_title = {
+					tier = COUNT
+					location = {
+						has_province_modifier = plaguelands
+					}
+				}
+			}
+		}
+		random = {
+			chance = 33
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = plaguelands_spreader_0
+					set_province_flag = spellplague_me
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}
+	}
 	
-	is_triggered_only = yes
-	
-	immediate = {
-		
+	#Creating the Underchasm
+	if = {
+		limit = {
+			has_game_rule = {
+				name = spellplague_underchasm_rule
+				value = shaar
+			}
+		}
+		e_shaar = {
+			random_direct_de_jure_vassal_title = {
+				limit = {
+					tier = COUNT
+				}
+				location = {
+					set_province_flag = underchasm_spreader_0
+					set_province_flag = underchasm_flag
+					spellplague_change_province = yes
+					modifier_spreader_effect = yes
+				}
+			}
+		}		
+	}
+	else = {
+		random_list = {
+			1 = {
+				e_shaar = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+			1 = {
+				e_anauroch = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+			1 = {
+				k_haunted_lands ={
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+			1 = {
+				k_thay = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+			1 = {
+				k_quoya = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+			1 = {
+				e_pelvuria = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+					}
+				}
+			}
+			1 = {
+				k_tabot = {
+					random_direct_de_jure_vassal_title = {
+						limit = {
+							tier = COUNT
+						}
+						location = {
+							set_province_flag = underchasm_spreader_0
+							set_province_flag = underchasm_flag
+							spellplague_change_province = yes
+							modifier_spreader_effect = yes
+						}
+					}
+				}
+			}
+		}
 	}
 }
