@@ -45,10 +45,10 @@ character_event = {
 			trigger_switch = {
 				on_trigger = num_of_children
 
-				30 = { add_character_modifier = { name = recoveringfromchildbirth years = 50 } fertility = -0.1 }
-				25 = { add_character_modifier = { name = recoveringfromchildbirth years = 40 } fertility = -0.1 }
-				20 = { add_character_modifier = { name = recoveringfromchildbirth years = 30 } fertility = -0.1 }
-				15 = { add_character_modifier = { name = recoveringfromchildbirth years = 20 } fertility = -0.1 }
+				30 = { add_character_modifier = { name = recoveringfromchildbirth years = 50 } }
+				25 = { add_character_modifier = { name = recoveringfromchildbirth years = 40 } }
+				20 = { add_character_modifier = { name = recoveringfromchildbirth years = 30 } }
+				15 = { add_character_modifier = { name = recoveringfromchildbirth years = 20 } }
 				10 = { add_character_modifier = { name = recoveringfromchildbirth years = 15 } }
 				5 = { add_character_modifier = { name = recoveringfromchildbirth years = 10 } }
 				fallback = { add_character_modifier = { name = recoveringfromchildbirth years = 5 } }
@@ -113,13 +113,6 @@ character_event = {
 			else = {
 				add_character_modifier = { name = recoveringfromchildbirth years = 2 }
 			}
-
-			# if we still have positive fertility despite the recovering modifier, lower it
-			if = {
-				limit = { fertility > 0 } 
-
-				fertility = -0.1
-			}
 		}
 	}
 }
@@ -131,17 +124,90 @@ character_event = {
 	is_triggered_only = yes #on_birth
 
 	trigger = {
-		father = {
-			always = yes
-			num_of_children >= 15
-			olrox_all_immortals_trigger = yes
-			fertility > 0
+		OR = {
+			father = {
+				always = yes
+				is_alive = yes
+				num_of_children >= 15
+				olrox_all_immortals_trigger = yes
+				fertility > 0
+			}
+			mother = {
+				always = yes
+				is_alive = yes
+				olrox_all_immortals_trigger = yes
+				trigger_if = {
+					limit = { num_of_children < 25 }
+
+					trigger_if = {
+						limit = { has_character_modifier = recoveringfromchildbirth }
+
+						fertility > -0.65
+					}
+					trigger_else = {
+						fertility > 0.35
+					}
+				}
+				trigger_else = {
+					trigger_if = {
+						limit = { has_character_modifier = recoveringfromchildbirth }
+
+						fertility > -1
+					}
+					trigger_else = {
+						fertility > 0
+					}
+				}
+			}
 		}
 	}
 
 	immediate = {
-		father = {
-			fertility = -0.1
+		if = {
+			limit = {
+				father = {
+					always = yes
+					is_alive = yes
+					num_of_children >= 15
+					olrox_all_immortals_trigger = yes
+					fertility > 0
+				}
+			}
+
+			father = { fertility = -0.1 }
+		}
+		if = {
+			limit = {
+				mother = {
+					always = yes
+					is_alive = yes
+					olrox_all_immortals_trigger = yes
+					trigger_if = {
+						limit = { num_of_children < 25 }
+
+						trigger_if = {
+							limit = { has_character_modifier = recoveringfromchildbirth }
+
+							fertility > -0.65
+						}
+						trigger_else = {
+							fertility > 0.35
+						}
+					}
+					trigger_else = {
+						trigger_if = {
+							limit = { has_character_modifier = recoveringfromchildbirth }
+
+							fertility > -1
+						}
+						trigger_else = {
+							fertility > 0
+						}
+					}
+				}
+			}
+
+			mother = { fertility = -0.1 }
 		}
 	}
 }
