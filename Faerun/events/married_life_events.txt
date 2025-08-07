@@ -185,17 +185,23 @@ character_event = {
 	prisoner = no
 
 	trigger = {
-		OR = {
-			religion = triadic
-			religion = arcane
-			religion = chessic
-			religion = mercantile
-			religion = inventive
-			religion = joyful
-			religion = chauntean_faith
-			religion = martial_faith
-			religion = solar
-			religion = bahamut
+		AND = { 
+			rightful_religious_head_scope = { always = yes }
+			OR = {
+				religion = triadic
+				religion = arcane
+				religion = chessic
+				religion = mercantile
+				religion = inventive
+				religion = joyful
+				religion = chauntean_faith
+				religion = martial_faith
+				religion = solar
+				religion = bahamut
+				religion = qisma
+				religion = pantheist_league
+				religion = muhjari
+			}
 		}
 
 		has_children = yes
@@ -314,164 +320,187 @@ character_event = {
 	}
 }
 
-#Poisoning stepchildren: Marie of Brabant, Sikelgaita
+# Poisoning stepchildren: Marie of Brabant, Sikelgaita
 character_event = {
 	id = 30004
-	desc = "EVTDESC30004"
-	picture = "GFX_evt_shadow"
+	desc = EVTDESC30004
+	picture = GFX_evt_shadow
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
 
 	only_women = yes
-	capable_only = yes
+	only_capable = yes
 	prisoner = no
-
-	is_triggered_only = yes
 
 	trigger = {
 		trait = ambitious
 		trait = envious
-		spouse = {
-			NOT = { trait = incapable }
-			is_female = no
-			prisoner = no
-			is_alive = yes
-			is_abroad = no
-			at_location = ROOT
-			NOT = {
-				tier = king
-			}
-			NOT = {
-				tier = emperor
-			}
-			any_child = {
-				is_primary_heir = yes
-				is_female = no
-			}
+
+		any_child = {
+			is_pretender = yes
 		}
+
 		NOT = {
 			any_child = {
 				is_primary_heir = yes
 			}
 		}
-		any_child = {
-			is_pretender = yes
+
+		spouse = {
+			is_female = no
+			at_location = ROOT
+			lower_real_tier_than = KING
+			is_incapable = no
+			prisoner = no
+			is_abroad = no
+
+			any_child = {
+				is_primary_heir = yes
+				is_female = no
+			}
 		}
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = wroth
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = kind
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30004" #Poison!
+		name = EVTOPTA30004 # Poison!
+
 		pacifists_lose_piety_effect = yes
+
 		spouse = {
+			show_scope_change = no
+
 			random_child = {
+				show_scope_change = no
+
 				limit = {
 					is_primary_heir = yes
 					is_female = no
 				}
+
+				save_event_target_as = poisoned_child
+
 				random_list = {
 					33 = {
 						if = {
-							limit = {
-								NOT = {
-									has_dlc = "Reapers"
-								}
+							limit = { has_dlc = "Reapers" }
+
+							set_character_flag = disease_not_serious
+							add_trait = vomiting
+
+							character_event = {
+								id = RIP.11005
+								days = 10
+								random = 30
 							}
-						add_trait = ill
 						}
-						if = {
-							limit = {
-								has_dlc = "Reapers"
-							}
-						set_character_flag = disease_not_serious
-						add_trait = vomiting
-						character_event = { id = RIP.11005 days = 10 random = 30 }
+						else = {
+							add_trait = ill
 						}
+
 						ROOT = {
+							show_scope_change = no
+
 							random_list = {
-								50 = {
-									prestige = 15
-								}
+								50 = { prestige = 15 }
+
 								25 = {
 									spouse = {
+										show_scope_change = no
+
 										character_event = {
 											id = 30005
 											days = 14
-											tooltip = "EVTTOOLTIP30005"
+											tooltip = EVTTOOLTIP30005
 										}
 									}
 								}
+
 								25 = {
 									character_event = {
 										id = 30006
 										days = 7
-										tooltip = "EVTTOOLTIP30006"
+										tooltip = EVTTOOLTIP30006
 									}
 								}
 							}
 						}
 					}
+
 					33 = {
 						add_trait = infirm
+
 						ROOT = {
+							show_scope_change = no
+
 							random_list = {
-								20 = {
-									prestige = 15
-								}
+								20 = { prestige = 15 }
+
 								40 = {
 									spouse = {
+										show_scope_change = no
+
 										character_event = {
 											id = 30005
 											days = 14
-											tooltip = "EVTTOOLTIP30005"
+											tooltip = EVTTOOLTIP30005
 										}
 									}
 								}
+
 								40 = {
 									character_event = {
 										id = 30006
 										days = 7
-										tooltip = "EVTTOOLTIP30006"
+										tooltip = EVTTOOLTIP30006
 									}
 								}
 							}
 						}
 					}
+
 					33 = {
 						death = {
 							death_reason = death_murder_poison
 							killer = ROOT
 						}
+
 						ROOT = {
+							show_scope_change = no
+
 							random_list = {
-								10 = {
-									prestige = 15
-								}
+								10 = { prestige = 15 }
+
 								45 = {
 									spouse = {
-										character_event = { #Husband accuses spouse of heir's death
+										show_scope_change = no
+
+										character_event = { # Husband accuses spouse of heir's death
 											id = 30007
 											days = 14
-											tooltip = "EVTTOOLTIP30007"
+											tooltip = EVTTOOLTIP30007
 										}
 									}
 								}
+
 								45 = {
-									character_event = { #Courtier accuses spouse of heir's death
+									character_event = { # Courtier accuses spouse of heir's death
 										id = 30008
 										days = 7
-										tooltip = "EVTTOOLTIP30008"
+										tooltip = EVTTOOLTIP30008
 									}
 								}
 							}
@@ -483,39 +512,45 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTB30004" #Don't do anything
+		name = EVTOPTB30004 # Don't do anything
+
 		piety = 20
 	}
 }
 
-#Spouse accuses woman of poisoning primary_heir
+# Spouse accuses woman of poisoning primary_heir
 character_event = {
 	id = 30005
-	desc = "EVTDESC30005"
-	picture = "GFX_evt_shadow"
+	desc = EVTDESC30005
+	picture = GFX_evt_shadow
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30005" #Imprison!
+		name = EVTOPTA30005 # Imprison!
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30009
-				tooltip = "EVTTOOLTIP30009"
-			}
-		}
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
+				tooltip = EVTTOOLTIP30009
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30005" #Execute!
+		name = EVTOPTB30005 # Execute!
+
 		spouse = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
@@ -524,197 +559,66 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTC30005" #Pardon
+		name = EVTOPTC30005 # Pardon
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
-			character_event = { #I was pardoned!
+			show_scope_change = no
+
+			character_event = { # I was pardoned!
 				id = 30010
 				days = 10
-				tooltip = "EVTTOOLTIP3010"
+				tooltip = EVTTOOLTIP3010
 			}
 		}
 	}
 }
 
-#Courtier accuses woman of poisoning primary_heir
+# Courtier accuses woman of poisoning primary_heir
 character_event = {
 	id = 30006
-	desc = "EVTDESC30006"
-	picture = "GFX_evt_shadow"
-
-	is_triggered_only = yes
-
-	option = {
-		name = "EVTOPTA30006" #Snitch
-		random_list = {
-			50 = {
-				random_courtier = {
-					opinion = {
-						modifier = opinion_poisonous_woman
-						who = ROOT
-						years = 5
-					}
-				}
-			}
-			50 = {
-				spouse = {
-					character_event = {
-						id = 30005
-						days = 14
-						tooltip = "EVTTOOLTIP30005"
-					}
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "EVTOPTB30006" #Bribe courtier
-		scaled_wealth = -0.25
-		random_list = {
-			80 = {
-				random_courtier = {
-					opinion = {
-						modifier = opinion_poisonous_woman
-						who = ROOT
-						years = 5
-					}
-				}
-			}
-			20 = {
-				spouse = {
-					character_event = {
-						id = 30005
-						days = 14
-						tooltip = "EVTTOOLTIP30005"
-					}
-				}
-			}
-		}
-	}
-
-	option = {
-		name = "EVTOPTC30006" #Poison courtier
-		pacifists_lose_piety_effect = yes
-		random_list = {
-			50 = {
-				random_courtier = {
-					death = {
-						death_reason = death_murder_unknown_poison
-						killer = ROOT
-					}
-				}
-			}
-			50 = {
-				random_courtier = {
-					add_maimed_trait_effect = yes
-
-					opinion = {
-						modifier = opinion_poisonous_woman
-						who = ROOT
-						years = 5
-					}
-				}
-				spouse = {
-					character_event = {
-						id = 30009
-						days = 14
-						tooltip = "EVTTOOLTIP30009"
-					}
-				}
-			}
-		}
-	}
-}
-
-#Husband accuses spouse of poisoning and murdering primary_heir
-character_event = {
-	id = 30007
-	desc = "EVTDESC30007"
-	picture = "GFX_evt_shadow"
-
-	is_triggered_only = yes
-
-	option = {
-		name = "EVTOPTA30007" #Imprison!
-		spouse = {
-			character_event = {
-				id = 30009
-				tooltip = "EVTTOOLTIP30009"
-			}
-		}
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
-		}
-	}
-
-	option = {
-		name = "EVTOPTB30007" #Execute!
-		spouse = {
-			death = {
-				death_reason = death_execution_beheading
-				killer = ROOT
-			}
-		}
-	}
-
-	option = {
-		name = "EVTOPTC30007" #Pardon
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
-			character_event = { #I was pardoned!
-				id = 30010
-				days = 10
-				tooltip = "EVTTOOLTIP30010"
-			}
-		}
-	}
-}
-
-#Courtier accuses woman of poisoning and murdering primary_heir
-character_event = {
-	id = 30008
-	desc = "EVTDESC30008"
-	picture = "GFX_evt_emissary"
+	desc = EVTDESC30006
+	picture = GFX_evt_shadow
 
 	is_triggered_only = yes
 
 	immediate = {
 		random_courtier = {
+			limit = {
+				NOT = { character = event_target:poisoned_child }
+			}
+
+			preferred_limit = { is_female = no }
+
 			save_event_target_as = target_courtier
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30006" #Snitch
+		name = EVTOPTA30006 # Snitch
+
 		random_list = {
 			50 = {
-				event_target:target_courtier = {
-					opinion = {
-						modifier = opinion_poisonous_woman
-						who = ROOT
-						years = 5
-					}
+				reverse_opinion = {
+					name = opinion_poisonous_woman
+					who = event_target:target_courtier
+					years = 5
 				}
 			}
+
 			50 = {
 				spouse = {
+					show_scope_change = no
+
 					character_event = {
 						id = 30005
 						days = 14
-						tooltip = "EVTTOOLTIP30005"
+						tooltip = EVTTOOLTIP30005
 					}
 				}
 			}
@@ -722,24 +626,30 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTB30006" #Bribe courtier
-		scaled_wealth = -0.25
+		name = EVTOPTB30006 # Bribe courtier
+
+		transfer_scaled_wealth = {
+			to = event_target:target_courtier
+			value = 0.25
+		}
+
 		random_list = {
-			70 = {
-				event_target:target_courtier = {
-					opinion = {
-						modifier = opinion_poisonous_woman
-						who = ROOT
-						years = 5
-					}
+			80 = {
+				reverse_opinion = {
+					name = opinion_poisonous_woman
+					who = event_target:target_courtier
+					years = 5
 				}
 			}
-			30 = {
+
+			20 = {
 				spouse = {
+					show_scope_change = no
+
 					character_event = {
 						id = 30005
 						days = 14
-						tooltip = "EVTTOOLTIP30005"
+						tooltip = EVTTOOLTIP30005
 					}
 				}
 			}
@@ -747,48 +657,42 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTC30006" #Poison courtier
+		name = EVTOPTC30006 # Poison courtier
+
 		pacifists_lose_piety_effect = yes
+
 		random_list = {
 			50 = {
 				event_target:target_courtier = {
+					show_scope_change = no
+
 					death = {
 						death_reason = death_murder_unknown_poison
 						killer = ROOT
 					}
 				}
 			}
+
 			50 = {
 				event_target:target_courtier = {
-					if = {
-						limit = {
-							NOT = {
-								has_dlc = "Reapers"
-							}
-						}
-						add_trait = ill
-						hidden_tooltip = { character_event = { id = 38290 } }
-					}
-					if = {
-						limit = {
-							has_dlc = "Reapers"
-						}
-						add_trait = abdominal_pain
-						set_character_flag = disease_not_serious
-						hidden_tooltip = { character_event = { id = RIP.11010 days = 10 random = 30 } }
-					}
+					show_scope_change = no
+
+					add_maimed_trait_effect = yes
 
 					opinion = {
-						modifier = opinion_poisonous_woman
+						name = opinion_poisonous_woman
 						who = ROOT
 						years = 5
 					}
 				}
+
 				spouse = {
+					show_scope_change = no
+
 					character_event = {
-						id = 30011
+						id = 30009
 						days = 14
-						tooltip = "EVTTOOLTIP30011"
+						tooltip = EVTTOOLTIP30009
 					}
 				}
 			}
@@ -796,11 +700,203 @@ character_event = {
 	}
 }
 
-#Poisonous woman is imprisoned
+# Husband accuses spouse of poisoning and murdering primary_heir
+character_event = {
+	id = 30007
+	desc = EVTDESC30007
+	picture = GFX_evt_shadow
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA30007 # Imprison!
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
+		spouse = {
+			show_scope_change = no
+
+			character_event = {
+				id = 30009
+				tooltip = EVTTOOLTIP30009
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB30007 # Execute!
+
+		spouse = {
+			show_scope_change = no
+
+			death = {
+				death_reason = death_execution_beheading
+				killer = ROOT
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTC30007 # Pardon
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
+		spouse = {
+			show_scope_change = no
+
+			character_event = { # I was pardoned!
+				id = 30010
+				days = 10
+				tooltip = EVTTOOLTIP30010
+			}
+		}
+	}
+}
+
+# Courtier accuses woman of poisoning and murdering primary_heir
+character_event = {
+	id = 30008
+	desc = EVTDESC30008
+	picture = GFX_evt_emissary
+
+	is_triggered_only = yes
+
+	immediate = {
+		random_courtier = {
+			preferred_limit = { is_female = no }
+			save_event_target_as = target_courtier
+		}
+	}
+
+	option = {
+		name = EVTOPTA30006 # Snitch
+
+		random_list = {
+			50 = {
+				reverse_opinion = {
+					name = opinion_poisonous_woman
+					who = event_target:target_courtier
+					years = 5
+				}
+			}
+
+			50 = {
+				spouse = {
+					show_scope_change = no
+
+					character_event = {
+						id = 30005
+						days = 14
+						tooltip = EVTTOOLTIP30005
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB30006 # Bribe courtier
+
+		transfer_scaled_wealth = {
+			to = event_target:target_courtier
+			value = 0.25
+		}
+
+		random_list = {
+			70 = {
+				reverse_opinion = {
+					name = opinion_poisonous_woman
+					who = event_target:target_courtier
+					years = 5
+				}
+			}
+
+			30 = {
+				spouse = {
+					show_scope_change = no
+
+					character_event = {
+						id = 30005
+						days = 14
+						tooltip = EVTTOOLTIP30005
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTC30006 # Poison courtier
+
+		pacifists_lose_piety_effect = yes
+
+		random_list = {
+			50 = {
+				event_target:target_courtier = {
+					show_scope_change = no
+
+					death = {
+						death_reason = death_murder_unknown_poison
+						killer = ROOT
+					}
+				}
+			}
+
+			50 = {
+				event_target:target_courtier = {
+					show_scope_change = no
+
+					if = {
+						limit = { has_dlc = "Reapers" }
+
+						add_trait = abdominal_pain
+						set_character_flag = disease_not_serious
+
+						character_event = {
+							id = RIP.11010
+							days = 10
+							random = 30
+						}
+					}
+
+					else = {
+						add_trait_ill_effect = yes
+					}
+
+					opinion = {
+						name = opinion_poisonous_woman
+						who = ROOT
+						years = 5
+					}
+				}
+
+				spouse = {
+					show_scope_change = no
+
+					character_event = {
+						id = 30011
+						days = 14
+						tooltip = EVTTOOLTIP30011
+					}
+				}
+			}
+		}
+	}
+}
+
+# Poisonous woman is imprisoned
 character_event = {
 	id = 30009
-	desc = "EVTDESC30009"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30009
+	picture = GFX_evt_into_the_dungeon
 
 	is_triggered_only = yes
 
@@ -809,161 +905,217 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTA30009" #This is not how it should end!
+		name = EVTOPTA30009 # This is not how it should end!
 	}
 }
 
-#Poisonous woman is pardoned
+# Poisonous woman is pardoned
 character_event = {
 	id = 30010
-	desc = "EVTDESC30010"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30010
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30010"
+		name = EVTOPTA30010
+
 		prestige = -15
 		piety = -10
 	}
 }
 
-#Spouse accuses woman of poisoning primary_heir and courtier
+# Spouse accuses woman of poisoning primary_heir and courtier
 character_event = {
 	id = 30011
-	desc = "EVTDESC30011"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30011
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30011" #Imprison!
-		ai_chance = { factor = 50 }
+		name = EVTOPTA30011 # Imprison!
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
+		}
+
 		FROM = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30009
-				tooltip = "EVTTOOLTIP30009"
+				tooltip = EVTTOOLTIP30009
 			}
 		}
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
-		}
+
+		ai_chance = { factor = 50 }
 	}
 
 	option = {
-		name = "EVTOPTB30011" #Execute!
-		ai_chance = { factor = 20 }
+		name = EVTOPTB30011 # Execute!
+
 		FROM = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
 			}
 		}
+
+		ai_chance = { factor = 20 }
 	}
 
 	option = {
-		name = "EVTOPTC30011" #Pardon
-		ai_chance = { factor = 30 }
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
+		name = EVTOPTC30011 # Pardon
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
 		}
+
 		FROM = {
-			character_event = { #I was pardoned!
+			show_scope_change = no
+
+			character_event = { # I was pardoned!
 				id = 30010
 				days = 10
-				tooltip = "EVTTOOLTIP3010"
+				tooltip = EVTTOOLTIP3010
 			}
 		}
+
+		ai_chance = { factor = 30 }
 	}
 }
 
-#Accuses spouse of poisoning primary heir (unrelated to previous events)
+# Moved from childhood_personality_traits_events.txt
+
+# Nobody believes me! - removed, no text and no event that triggers this
+# character_event = {
+#	id = 30013
+#	desc = EVTDESC30013
+#	picture = GFX_evt_child_bully
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = EVTOPTA30013
+#
+#		prestige = -50
+#	}
+# }
+
+# Spouse is kicked out and the heir takes over - removed, no text and no event that triggers this
+# character_event = {
+#	id = 30014
+#	desc = EVTDESC30014
+#	picture = GFX_evt_scandal
+#
+#	is_triggered_only = yes
+#
+#	option = {
+#		name = EVTOPTA30014
+#
+#		banish = yes
+#	}
+#
+#	option = {
+#		name = EVTOPTB30014
+#
+#		prestige = -1000
+#	}
+# }
+
+# Accuses spouse of poisoning primary heir (unrelated to previous events)
 character_event = {
 	id = 30020
-	desc = "EVTDESC30020"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30020
+	picture = GFX_evt_quarrel
 
-	min_age = 20
-	capable_only = yes
-	prisoner = no
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	only_rulers = yes
 	only_men = yes
 	is_married = yes
+	min_age = 20
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
+		OR = {
+			trait = paranoid
+			trait = cynical
+			trait = wroth
+		}
+
 		any_child = {
 			is_primary_heir = yes
 			is_female = no
-			NOT = {
-				age = 16
-			}
+			is_adult = no
+
 			OR = {
 				is_ill = yes
 				is_maimed_trigger = yes
 				trait = infirm
 			}
 		}
-		OR = {
-			trait = paranoid
-			trait = cynical
-			trait = wroth
-		}
+
 		spouse = {
-			NOT = { trait = incapable }
-			is_landed = no
-			prisoner = no
-			is_alive = yes
 			OR = {
 				trait = diligent
 				trait = deceitful
 				trait = ambitious
 			}
+
+			is_incapable = no
+			is_landed = no
+			prisoner = no
 		}
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = paranoid
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = trusting
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30020" #Imprison!
+		name = EVTOPTA30020 # Imprison!
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30009
-				tooltip = "EVTTOOLTIP30009"
+				tooltip = EVTTOOLTIP30009
 			}
 		}
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30020" #Execute!
+		name = EVTOPTB30020 # Execute!
+
 		spouse = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
@@ -972,92 +1124,101 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTC30020" #Pardon
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
+		name = EVTOPTC30020 # Pardon
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
 		}
+
 		spouse = {
-			character_event = { #I was pardoned!
+			show_scope_change = no
+
+			character_event = { # I was pardoned!
 				id = 30010
 				days = 10
-				tooltip = "EVTTOOLTIP3010"
+				tooltip = EVTTOOLTIP3010
 			}
 		}
 	}
 }
 
-#Spouse accuses spouse of poisoning her/him
+# Spouse accuses spouse of poisoning her/him
 character_event = {
 	id = 30021
-	desc = "EVTDESC30021"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30021
+	picture = GFX_evt_quarrel
 
-	min_age = 20
-	capable_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	only_rulers = yes
-	prisoner = no
 	is_married = yes
-
-	is_triggered_only = yes
+	min_age = 20
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
-		spouse = {
-			NOT = { trait = incapable }
-			is_ruler = no
-			prisoner = no
-			is_alive = yes
-			is_abroad = no
-			at_location = ROOT
-			NOT = {
-				opinion = { who = ROOT value = -30 }
-			}
-		}
 		OR = {
 			is_ill = yes
 			trait = infirm
 			trait = syphilitic
 			trait = paranoid
 		}
+
+		spouse = {
+			opinion = {
+				who = ROOT
+				value < -30
+			}
+
+			at_location = ROOT
+			is_incapable = no
+			is_ruler = no
+			prisoner = no
+			is_abroad = no
+		}
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = cynical
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = trusting
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30021" #Imprison!
+		name = EVTOPTA30021 # Imprison!
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30009
-				tooltip = "EVTTOOLTIP30009"
+				tooltip = EVTTOOLTIP30009
 			}
 		}
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_poisonous_woman
-				who = ROOT
-				years = 5
-			}
+
+		opinion = {
+			name = opinion_poisonous_woman
+			who = spouse
+			years = 5
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30021" #Execute!
+		name = EVTOPTB30021 # Execute!
+
 		spouse = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_beheading
 				killer = ROOT
@@ -1066,24 +1227,26 @@ character_event = {
 	}
 
 	option = {
-		name = "EVTOPTC30021" #Pardon
-		spouse = {
-			reverse_opinion = {
-				modifier = opinion_betrayed
-				who = ROOT
-			}
+		name = EVTOPTC30021 # Pardon
+
+		opinion = {
+			name = opinion_betrayed
+			who = spouse
 		}
+
 		spouse = {
-			character_event = { #I was pardoned!
+			show_scope_change = no
+
+			character_event = { # I was pardoned!
 				id = 30010
 				days = 10
-				tooltip = "EVTTOOLTIP3010"
+				tooltip = EVTTOOLTIP3010
 			}
 		}
 	}
 }
 
-#Homosexual spouse
+# Homosexual spouse
 character_event = {
 	id = 30025
 	desc = "EVTDESC30025"
