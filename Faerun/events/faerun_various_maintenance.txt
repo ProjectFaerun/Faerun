@@ -3472,32 +3472,48 @@ character_event = {
 		FROM = {
 			has_special_succession_trigger = yes
 
-			# if the title is linked to society we're in or eligible for, we should keep the title regardless
-			trigger_if = {
-				limit = { is_society_landed_title_trigger = yes }
+			OR = {
+				# if the title is linked to society we're in or eligible for, we should keep the title regardless
+				trigger_if = {
+					limit = { is_society_landed_title_trigger = yes }
 
-				persistent_event_target:society_persist = {
-					ROOT = { 
-						NOR = {
-							society_member_of = PREV
-							can_join_society = PREV
+					persistent_event_target:society_persist = {
+						ROOT = { 
+							NOR = {
+								society_member_of = PREV
+								can_join_society = PREV
+							}
 						}
 					}
 				}
+				trigger_else_if = {
+					limit = { is_arcane_title_trigger = yes }
+		
+					ROOT = { z_arcane_caster = no }
+				}
+				trigger_else_if = {
+					limit = { FROM = { is_druidic_title_trigger = yes } }
+		
+					ROOT = { z_druid = no }
+				}
+				trigger_else = {
+					always = no
+				}
 			}
-			trigger_else_if = {
-				limit = { is_arcane_title_trigger = yes }
-	
-				ROOT = { z_arcane_caster = no }
+		}
+	}
+	fail_trigger_effect = {
+		# check if the ruler is landless and destroy the title in this case to give actually landed society member a chance to recreate it
+		# need to check after a day passes, as right now is_landed trigger may return false even if the char is about to inherit a bunch of provinces
+		if = {
+			limit = {
+				FROM = {
+					has_special_succession_trigger = yes
+					is_society_landed_title_trigger = yes
+				}
 			}
-			trigger_else_if = {
-				limit = { FROM = { is_druidic_title_trigger = yes } }
-	
-				ROOT = { z_druid = no }
-			}
-			trigger_else = {
-				always = no
-			}
+
+			character_event = { id = frmaint.71 days = 1 } 
 		}
 	}
 	
@@ -3631,4 +3647,17 @@ character_event = {
 	option = {
 		name = OK
 	}
-} 
+}
+
+# destroy FROMFROM title if landless
+character_event = {
+	id = frmaint.71
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = { is_landed = no }
+
+	immediate = {
+		unsafe_destroy_landed_title = FROMFROM
+	}
+}
