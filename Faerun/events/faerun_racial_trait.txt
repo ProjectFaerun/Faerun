@@ -1,7 +1,7 @@
 namespace = character_trait
 
 character_event = {
-	id = character_trait.1
+	id = character_trait.0
 	hide_window = yes
 
 	is_triggered_only = yes
@@ -15,6 +15,35 @@ character_event = {
 			has_character_flag = faerun_generated
 		}
 	}
+
+	immediate = {
+		# on_action events seemingly have fixed random seed, which breaks species randomization, we need cycle setup to enforce it
+		if = {
+			limit = { check_variable = { which = global_char_spawn_seed value >= 50 } }
+
+			set_variable = { which = global_char_spawn_seed value = 0 }
+		}
+		change_variable = { which = global_char_spawn_seed value = 1 }
+
+		set_variable = { which = local_loop_counter which = global_char_spawn_seed }
+		while = {
+			limit = { check_variable = { which = local_loop_counter value > 0 } }
+
+			subtract_variable = { which = local_loop_counter value = 1 }
+			if = {
+				limit = { check_variable = { which = local_loop_counter value <= 0 } }
+
+				character_event = { id = character_trait.1 }
+			}
+		}
+	}
+}
+
+character_event = {
+	id = character_trait.1
+	hide_window = yes
+
+	is_triggered_only = yes
 
 	immediate = {
 		# Fix noculture generated characters.
@@ -1132,9 +1161,6 @@ character_event = {
 				add_trait = creature_outsider
 			}
 			empyreangfx = { # Empyreans
-				add_trait = creature_outsider
-			}
-			earthprimordialgfx = { # Primordials of earth
 				add_trait = creature_outsider
 			}
 			fireprimordialgfx = { # Primordials of fire
