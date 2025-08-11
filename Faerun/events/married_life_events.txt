@@ -1249,15 +1249,16 @@ character_event = {
 # Homosexual spouse
 character_event = {
 	id = 30025
-	desc = "EVTDESC30025"
-	picture = "GFX_evt_bad_news"
+	desc = EVTDESC30025
+	picture = GFX_evt_bad_news
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
 
 	only_women = yes
+	is_married = yes
 	min_age = 20
-	capable_only = yes
+	only_capable = yes
 	prisoner = no
-
-	is_triggered_only = yes
 
 	trigger = {
 		OR = {
@@ -1266,67 +1267,69 @@ character_event = {
 			trait = elusive_shadow
 			trait = intricate_webweaver
 		}
+
 		any_child = {
-			OR = {
-				mother = {
-					character = ROOT
-				}
-				father = {
-					character = ROOT
-				}
-			}
 			OR = {
 				is_primary_heir = yes
 				is_pretender = yes
 			}
 		}
+
 		spouse = {
-			NOT = { trait = incapable }
 			trait = homosexual
-			prisoner = no
-			is_alive = yes
-			is_abroad = no
 			at_location = ROOT
+			is_incapable = no
+			prisoner = no
+			is_abroad = no
 		}
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = charismatic_negotiator
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = content
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30025"
-		ai_chance = { factor = 100 }
+		name = EVTOPTA30025
+
 		piety = 15
+
+		ai_chance = { factor = 100 }
 	}
 
 	option = {
-		name = "EVTOPTB30025"
+		name = EVTOPTB30025
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30026
 				days = 14
-				tooltip = "EVTTOOLTIP30026"
+				tooltip = EVTTOOLTIP30026
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC30025"
+		name = EVTOPTC30025
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30027
 				days = 14
-				tooltip = "EVTTOOLTIP30027"
+				tooltip = EVTTOOLTIP30027
 			}
 		}
 	}
@@ -1335,22 +1338,26 @@ character_event = {
 # Spouse spreads evil rumors
 character_event = {
 	id = 30026
-	desc = "EVTDESC30026"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30026
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30026"
+		name = EVTOPTA30026
+
+		opinion = {
+			name = opinion_betrayed
+			who = FROM
+			years = 3
+		}
+
 		FROM = {
-			reverse_opinion = {
-				modifier = opinion_betrayed
-				who = ROOT
-				years = 3
-			}
+			show_scope_change = no
+
 			character_event = {
 				id = 30029
-				tooltip = "EVTTOOLTIP30029"
+				tooltip = EVTTOOLTIP30029
 			}
 		}
 	}
@@ -1359,53 +1366,64 @@ character_event = {
 # Spouse asks husband/wife to spend more time
 character_event = {
 	id = 30027
-	desc = "EVTDESC30027"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30027
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30027" #Yes
+		name = EVTOPTA30027 # Yes
+
+		FROM = {
+			show_scope_change = no
+
+			custom_tooltip = { text = EVTTOOLTIPA30028 }
+			set_character_flag = spouse_said_yes
+		}
+
 		ai_chance = {
 			factor = 60
 
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = {
-					reverse_opinion = { who = ROOT value = 20 }
+
+				opinion = {
+					who = FROM
+					value >= 20
 				}
-			}
-		}
-		FROM = {
-			set_character_flag = spouse_said_yes
-			character_event = {
-				id = 30028
-				days = 14
-				tooltip = "EVTTOOLTIPA30028"
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30027" #No
+		name = EVTOPTB30027 # No
+
+		FROM = {
+			show_scope_change = no
+
+			custom_tooltip = { text = EVTTOOLTIPB30028 }
+			set_character_flag = spouse_said_no
+		}
+
 		ai_chance = {
 			factor = 40
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
-				FROM = {
-					NOT = {
-						reverse_opinion = { who = ROOT value = 20 }
-					}
+
+				opinion = {
+					who = FROM
+					value < 20
 				}
 			}
 		}
+	}
+
+	after = {
 		FROM = {
-			set_character_flag = spouse_said_no
 			character_event = {
 				id = 30028
 				days = 14
-				tooltip = "EVTTOOLTIPB30028"
 			}
 		}
 	}
@@ -1414,466 +1432,487 @@ character_event = {
 # Spouse gets answer
 character_event = {
 	id = 30028
-	desc = "EVTDESC30028"
-	picture = "GFX_evt_bad_news"
+	desc = EVTDESC30028
+	picture = GFX_evt_bad_news
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30028"
-		trigger = {
-			has_character_flag = spouse_said_yes
-		}
-		FROM = {
-			reverse_opinion = {
-				modifier = opinion_delighted
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTA30028
+
+		trigger = { has_character_flag = spouse_said_yes }
+
+		opinion = {
+			name = opinion_delighted
+			who = FROM
+			years = 2
 		}
 	}
+
 	option = {
-		name = "EVTOPTB30028"
-		trigger = {
-			has_character_flag = spouse_said_no
-		}
-		FROM = {
-			reverse_opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTB30028
+
+		trigger = { has_character_flag = spouse_said_no }
+
+		opinion = {
+			name = opinion_disappointed
+			who = FROM
+			years = 2
 		}
 	}
 }
 
-#Spouse chastisies spouse about rumors
+# Spouse chastises spouse about rumors
 character_event = {
 	id = 30029
-	desc = "EVTDESC30029"
-	picture = "GFX_evt_bad_news"
+	desc = EVTDESC30029
+	picture = GFX_evt_bad_news
 
 	is_triggered_only = yes
 
-	immediate = {
-		hidden_tooltip = {
-			FROM = {
-				remove_opinion = {
-					modifier = opinion_betrayed
-					who = ROOT
-				}
-			}
-		}
-	}
+	ai = no
 
 	option = {
-		name = "EVTOPTA30029"
-		FROM = {
-			opinion = {
-				modifier = opinion_betrayed
-				who = ROOT
+		name = EVTOPTA30029
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_betrayed
+				who = FROM
 				years = 3
 			}
 		}
 	}
 }
 
-#Spouse in prison: spouse is trying to free her/him
+# Spouse in prison: spouse is trying to free her/him
 character_event = {
 	id = 30030
-	desc = "EVTDESC30030"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30030
+	picture = GFX_evt_into_the_dungeon
 
-	min_age = 20
-	capable_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
 	prisoner = yes
 	is_married = yes
-
-	is_triggered_only = yes
+	min_age = 20
+	only_capable = yes
 
 	trigger = {
 		any_spouse = {
-			reverse_opinion = { who = ROOT value = 20 }
-			opinion = { who = ROOT value = 20 }
+			at_location = ROOT # TODO: Event not firing. This condition might be why
+
+			reverse_opinion = {
+				who = ROOT
+				value >= 20
+			}
+
+			opinion = {
+				who = ROOT
+				value >= 20
+			}
+
 			prisoner = no
-			is_alive = yes
 			is_abroad = no
-			at_location = ROOT
-			NOR = {
-				trait = incapable
-				host = { character = PREV }
+			is_incapable = no
+
+			ROOT = {
+				host = {
+					NOT = { character = PREVPREV }
+				}
 			}
 		}
+
 		NOT = { has_character_flag = prisoner_spouse }
 	}
 
 	weight_multiplier = {
-		days = 20
+		factor = 20
 	}
 
 	immediate = {
-		set_character_flag = prisoner_spouse #see if we can remove this
+		set_character_flag = prisoner_spouse # see if we can remove this
 		save_event_target_as = prisoner_spouse
+
 		random_spouse = {
 			limit = {
-				reverse_opinion = { who = ROOT value = 20 }
-				opinion = { who = ROOT value = 20 }
+				at_location = ROOT # TODO: Event not firing. This condition might be why
+
+				reverse_opinion = {
+					who = ROOT
+					value >= 20
+				}
+
+				opinion = {
+					who = ROOT
+					value >= 20
+				}
+
 				prisoner = no
-				is_alive = yes
 				is_abroad = no
-				at_location = ROOT
-				NOR = {
-					trait = incapable
-					host = { character = PREV }
+				is_incapable = no
+
+				ROOT = {
+					host = {
+						NOT = { character = PREVPREV }
+					}
 				}
 			}
+
 			save_event_target_as = outside_spouse
 		}
-		host = { save_event_target_as = prisoner_host }
+
+		host = {
+			save_event_target_as = prisoner_host
+		}
 	}
 
 	option = {
-		name = "EVTOPTA30030"
+		name = EVTOPTA30030
+
 		event_target:prisoner_host = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30031
 				days = 5
-				tooltip = "EVTTOOLTIP30031"
+				tooltip = EVTTOOLTIP30031
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30030"
+		name = EVTOPTB30030
+
 		event_target:outside_spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30032
 				days = 4
-				tooltip = "EVTTOOLTIP30032"
+				tooltip = EVTTOOLTIP30032
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTC30030"
-		add_trait = depressed
+		name = EVTOPTC30030
+
+		add_trait_silently_depressed_effect = yes
 	}
 }
 
-#Spouse in prison: host is contacted
+# Spouse in prison: host is contacted
 character_event = {
 	id = 30031
-	desc = "EVTDESC30031"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30031
+	picture = GFX_evt_into_the_dungeon
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30031"
+		name = EVTOPTA30031
+
 		prestige = 10
+
 		custom_tooltip = {
-			text = "EVTTOOLTIP30033"
-			hidden_tooltip = {
-				event_target:outside_spouse = {
-					character_event = {
-						id = 30033
-						days = 5
-					}
+			text = EVTTOOLTIP30033
+
+			event_target:outside_spouse = {
+				character_event = {
+					id = 30033
+					days = 5
 				}
-				event_target:prisoner_spouse = {
-					death = {
-						death_reason = death_execution_beheading
-						killer = ROOT
-					}
+			}
+
+			event_target:prisoner_spouse = {
+				death = {
+					death_reason = death_execution_beheading
+					killer = ROOT
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB30031" #Release her/him
-		ai_chance = { factor = 10 }
-		scaled_wealth = 1.0
+		name = EVTOPTB30031 # Release her/him
+
+		scaled_wealth = 1.0 # TODO: transfer_scaled_wealth?
+
 		event_target:prisoner_spouse = {
-			prisoner = no
+			show_scope_change = no
+
+			imprison = no
+
 			character_event = {
 				id = 30034
 				days = 1
-				tooltip = "EVTTOOLTIP30034"
+				tooltip = EVTTOOLTIP30034
 			}
 		}
+
+		ai_chance = { factor = 10 }
 	}
 
 	option = {
-		name = "EVTOPTC30031" #Throw her/him into the dungeon
-		ai_chance = { factor = 80 }
+		name = EVTOPTC30031 # Throw her/him into the dungeon
+
 		event_target:outside_spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30035
 				days = 1
-				tooltip = "EVTTOOLTIP30035"
+				tooltip = EVTTOOLTIP30035
 			}
 		}
+
+		ai_chance = { factor = 80 }
 	}
 
 	option = {
-		name = "EVTOPTD30031" #Warn spouse about freeing prisoner spouse
-		ai_chance = { factor = 10 }
+		name = EVTOPTD30031 # Warn spouse about freeing prisoner spouse
+
 		event_target:outside_spouse = {
+			show_scope_change = no
+
 			letter_event = {
 				id = 30036
 				days = 1
-				tooltip = "EVTTOOLTIP30036"
+				tooltip = EVTTOOLTIP30036
 			}
 		}
+
+		ai_chance = { factor = 10 }
 	}
 }
 
-#Spouse to spouse prisoner: Save me!
+# Spouse to spouse prisoner: Save me!
 character_event = {
 	id = 30032
-	desc = "EVTDESC30032"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30032
+	picture = GFX_evt_into_the_dungeon
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30032"
-		if = {
-			limit = { NOT = { trait = berserker } }
-			add_trait = craven
-		}
+		name = EVTOPTA30032
+
+		add_trait_fully_craven_effect = yes
 	}
+
 	option = {
-		name = "EVTOPTB30032"
+		name = EVTOPTB30032
+
 		event_target:prisoner_host = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30037
 				days = 2
-				tooltip = "EVTTOOLTIPA30037"
+				tooltip = EVTTOOLTIPA30037
 			}
 		}
 	}
 }
 
-#Spouse is dead!
+# Spouse is dead!
 character_event = {
 	id = 30033
-	desc = "EVTDESC30033"
-	picture = "GFX_evt_bad_news"
+	desc = EVTDESC30033
+	picture = GFX_evt_bad_news
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30033"
-		add_trait = depressed
-		event_target:prisoner_host = {
-			reverse_opinion = {
-				modifier = opinion_dishonorable_scum
-				who = ROOT
-			}
-		}
+		name = EVTOPTA30033
+
+		add_trait_silently_depressed_effect = yes
 	}
+
 	option = {
-		name = "EVTOPTB30033"
-		add_trait = wroth
-		event_target:prisoner_host = {
-			reverse_opinion = {
-				modifier = opinion_dishonorable_scum
-				who = ROOT
-			}
-		}
+		name = EVTOPTB30033
+
+		add_trait_fully_silently_wroth_effect = yes
 	}
+
 	option = {
-		name = "EVTOPTC30033"
-		add_trait = envious
-		event_target:prisoner_host = {
-			reverse_opinion = {
-				modifier = opinion_dishonorable_scum
-				who = ROOT
-			}
+		name = EVTOPTC30033
+
+		add_trait_fully_silently_envious_effect = yes
+	}
+
+	after = {
+		opinion = {
+			name = opinion_dishonorable_scum
+			who = event_target:prisoner_host
 		}
 	}
 }
 
-#Spouse is free!
+# Spouse is free!
 character_event = {
 	id = 30034
-	desc = "EVTDESC30034"
-	picture = "GFX_evt_lovers"
+	desc = EVTDESC30034
+	picture = GFX_evt_lovers
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30034"
-		event_target:prisoner_host = {
-			reverse_opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 1
-			}
+		name = EVTOPTA30034
+
+		opinion = {
+			name = opinion_grateful
+			who = event_target:prisoner_host
+			years = 5
 		}
 	}
 }
 
-#Spouse is thrown into dungeon!
+# Spouse is thrown into dungeon!
 character_event = {
 	id = 30035
-	desc = "EVTDESC30035"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30035
+	picture = GFX_evt_into_the_dungeon
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30035"
+		name = EVTOPTA30035
+
 		add_character_modifier = {
 			name = the_dungeon
-			duration = 365
+			years = 1
 		}
 	}
 }
 
-#Spouse is warned about consequences of freeing prisoner spouse
+# Spouse is warned about consequences of freeing prisoner spouse
 letter_event = {
 	id = 30036
-	desc = "EVTDESC30036"
+	desc = EVTDESC30036
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30036"
+		name = EVTOPTA30036
+
 		prestige = -10
-		if = {
-			limit = { NOT = { trait = berserker } }
-			add_trait = craven
-		}
+
+		add_trait_fully_silently_craven_effect = yes
 	}
 
 	option = {
-		name = "EVTOPTB30036"
+		name = EVTOPTB30036
+
 		event_target:prisoner_host = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30037
 				days = 1
-				tooltip = "EVTTOOLTIPB30037"
+				tooltip = EVTTOOLTIPB30037
 			}
 		}
 	}
 }
 
-#Host: is asked to release prisoner spouse
+# Host: is asked to release prisoner spouse
 character_event = {
 	id = 30037
-	desc = "EVTDESC30037"
-	picture = "GFX_evt_into_the_dungeon"
+	desc = EVTDESC30037
+	picture = GFX_evt_into_the_dungeon
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30037" #Fine!
+		name = EVTOPTA30037 # Fine!
+
 		event_target:prisoner_spouse = {
-			prisoner = no
+			show_scope_change = no
+
+			imprison = no
+
 			character_event = {
 				id = 30034
-				tooltip = "EVTTOOLTIP30034"
+				tooltip = EVTTOOLTIP30034
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30037"
+		name = EVTOPTB30037
+
 		event_target:prisoner_spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30035
-				tooltip = "EVTTOOLTIP30035"
+				tooltip = EVTTOOLTIP30035
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC30037"
+		name = EVTOPTC30037
+
 		event_target:prisoner_spouse = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_execution_hanging
 				killer = ROOT
 			}
 		}
+
 		event_target:outside_spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30033
-				tooltip = "EVTTOOLTIP30033"
+				tooltip = EVTTOOLTIP30033
 			}
 		}
 	}
 }
 
-#Annoying courtier
+# Annoying courtier - start
 character_event = {
-	id = 30040
-	desc = "EVTDESC30040"
-	picture = "GFX_evt_council"
-	border = GFX_event_normal_frame_intrigue
+	id = 30039
 
-	only_women = yes
-	capable_only = yes
-	prisoner = no
+	is_triggered_only = yes # on_yearly_pulse, random_events
+	hide_window = yes
+
+	only_playable = yes
+	only_men = yes
 	is_married = yes
-
-	is_triggered_only = yes
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
-		NOT = { demesne_size = 1 }
-		NOT = { trait = humble }
-		NOT = { trait = kind }
+		is_landed = no
+		is_councillor = no
+		is_abroad = no
+		NOT = { has_character_flag = had_annoying_event }
+
 		spouse = {
-			NOT = { has_character_flag = had_annoying_event }
-			NOT = { trait = incapable }
-			prisoner = no
-			is_alive = yes
-			higher_tier_than = BARON
-			is_councillor = no
-			is_abroad = no
 			at_location = ROOT
-			any_courtier = {
-				is_councillor = yes
-				NOT = { character = ROOT }
-				NOT = { opinion = { who = ROOT  value = 30 } }
-				OR = {
-					trait = envious
-					trait = wroth
-					trait = paranoid
-					trait = deceitful
-					trait = arbitrary
-					trait = ambitious
-				}
+			is_landed = no
+			is_incapable = no
+			prisoner = no
+
+			NOR = {
+				trait = humble
+				trait = kind
 			}
-		}
-	}
 
-	weight_multiplier = {
-		days = 1
+			ROOT = {
+				any_voter = {
+					opinion = {
+						who = PREVPREV
+						value < 30
+					}
 
-		modifier = {
-			factor = 2
-			trait = wroth
-		}
-
-		modifier = {
-			factor = 1.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 1.25
-			trait = cruel
-		}
-	}
-
-	immediate = {
-		spouse = {
-			set_character_flag = had_annoying_event
-			random_courtier = {
-				limit = {
-					is_councillor = yes
-					NOT = { character = ROOT }
-					NOT = { opinion = { who = ROOT  value = 30 } }
 					OR = {
 						trait = envious
 						trait = wroth
@@ -1882,167 +1921,243 @@ character_event = {
 						trait = arbitrary
 						trait = ambitious
 					}
+
+					NOT = { character = PREVPREV }
 				}
-				save_event_target_as = annoying_courtier
 			}
 		}
 	}
 
-	option = {
-		name = "EVTOPTA30040"
-		trigger = {
-			NOT = { personality_traits = 5 }
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+			spouse = { trait = wroth }
 		}
-		add_trait = humble
+
+		mult_modifier = {
+			factor = 1.5
+			spouse = { trait = ambitious }
+		}
+
+		mult_modifier = {
+			factor = 1.25
+			spouse = { trait = cruel }
+		}
+	}
+
+	immediate = {
+		set_character_flag = had_annoying_event
+
+		spouse = {
+			ROOT = {
+				random_voter = {
+					limit = {
+						opinion = {
+							who = PREVPREV
+							value < 30
+						}
+
+						OR = {
+							trait = envious
+							trait = wroth
+							trait = paranoid
+							trait = deceitful
+							trait = arbitrary
+							trait = ambitious
+						}
+
+						NOT = { character = PREVPREV }
+					}
+
+					save_event_target_as = annoying_courtier
+				}
+			}
+
+			character_event = { id = 30040 }
+		}
+	}
+}
+
+# Annoying courtier
+character_event = {
+	id = 30040
+	desc = EVTDESC30040
+	picture = GFX_evt_council
+	border = GFX_event_normal_frame_intrigue
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	option = {
+		name = EVTOPTA30040
+
+		trigger = { personality_traits < 5 }
+
+		add_trait_fully_silently_humble_effect = yes
 	}
 
 	option = {
-		name = "EVTOPTB30040"
+		name = EVTOPTB30040
+
+		spouse = {
+			show_scope_change = no
+
+			character_event = {
+				id = 30041
+				tooltip = EVTTOOLTIP30040
+			}
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 5
 				trait = ambitious
 			}
 		}
-		spouse = {
-			character_event = {
-				id = 30041
-				tooltip = "EVTTOOLTIP30040"
-			}
-		}
 	}
 
 	option = {
-		name = "EVTOPTC30040"
-		event_target:annoying_courtier = {
-			opinion = {
-				modifier = opinion_mocked
-				who = ROOT
-				years = 5
-			}
+		name = EVTOPTC30040
+
+		reverse_opinion = {
+			name = opinion_mocked
+			who = event_target:annoying_courtier
+			years = 5
 		}
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 30042
 				days = 5
-				tooltip = "EVTTOOLTIP30042"
+				tooltip = EVTTOOLTIP30042
 			}
 		}
 	}
 }
 
-#Spouse might fire chancellor, etc
+# Spouse might fire chancellor, etc
 character_event = {
 	id = 30041
-	desc = "EVTDESC30041"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30041
+	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30041"
+		name = EVTOPTA30041
+
 		event_target:annoying_courtier = {
+			show_scope_change = no
+
 			opinion = {
-				modifier = opinion_fired_from_council
+				name = opinion_fired_from_council
 				who = ROOT
 				years = 5
 			}
+
 			remove_title = job_treasurer
 			remove_title = job_chancellor
 			remove_title = job_marshal
 			remove_title = job_spymaster
 			remove_title = job_spiritual
 		}
-		FROM = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = FROM
+			years = 2
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30041"
-		FROM = {
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTB30041
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = FROM
+			years = 2
 		}
 	}
 }
 
-#Spouse hears about punishment
+# Spouse hears about punishment
 character_event = {
 	id = 30042
-	desc = "EVTDESC30042"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30042
+	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30042"
-		event_target:annoying_courtier = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTA30042
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = event_target:annoying_courtier
+			years = 2
 		}
-		spouse = {
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = spouse
+			years = 2
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30042"
-		spouse = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTB30042
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = spouse
+			years = 2
 		}
-		event_target:annoying_courtier = {
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:annoying_courtier
+			years = 2
 		}
 	}
 }
 
-#Push courtier into river?
+# Push courtier into river?
 character_event = {
 	id = 30045
-	desc = "EVTDESC30045"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30045
+	picture = GFX_evt_quarrel
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
 
 	only_women = yes
-	capable_only = yes
-	prisoner = no
 	is_married = yes
-
-	is_triggered_only = yes
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
+		OR = {
+			trait = wroth
+			trait = envious
+			trait = arbitrary
+		}
+
+		is_inaccessible_trigger = no
+
 		spouse = {
-			NOT = { trait = incapable }
+			is_incapable = no
 			prisoner = no
-			is_alive = yes
+
 			any_courtier = {
-				is_female = no
 				is_councillor = yes
+				is_female = no
+
 				OR = {
 					trait = gregarious
 					trait = paranoid
@@ -2051,20 +2166,15 @@ character_event = {
 				}
 			}
 		}
-		OR = {
-			trait = wroth
-			trait = envious
-			trait = arbitrary
-		}
-		NOT = { is_inaccessible_trigger = yes }
 	}
 
 	immediate = {
 		spouse = {
 			random_courtier = {
 				limit = {
-					is_female = no
 					is_councillor = yes
+					is_female = no
+
 					OR = {
 						trait = gregarious
 						trait = paranoid
@@ -2072,468 +2182,462 @@ character_event = {
 						trait = zealous
 					}
 				}
+
 				save_event_target_as = chosen_courtier
 			}
 		}
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = shy
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = gregarious
 		}
 	}
 
 	option = {
-		name = "EVTOPTA30045"
+		name = EVTOPTA30045
+
 		random_list = {
 			20 = {
 				character_event = {
 					id = 30046
-					tooltip = "EVTTOOLTIP30046"
+					tooltip = EVTTOOLTIP30046
 				}
 			}
+
 			80 = {
 				character_event = {
 					id = 30047
-					tooltip = "EVTTOOLTIP30047"
+					tooltip = EVTTOOLTIP30047
 				}
 			}
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30045"
-		event_target:chosen_courtier = {
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 2
-			}
+		name = EVTOPTB30045
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:chosen_courtier
+			years = 2
 		}
 	}
 
 	option = {
-		name = "EVTOPTC30045"
+		name = EVTOPTC30045
+
 		piety = 10
 	}
 }
 
-#Courtier drowns
+# Courtier drowns
 character_event = {
 	id = 30046
-	desc = "EVTDESC30046"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30046
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30046"
+		name = EVTOPTA30046
+
 		event_target:chosen_courtier = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_murder_unknown_drowning
 				killer = ROOT
 			}
 		}
-		spouse = {
-			opinion = {
-				modifier = opinion_shocked
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_shocked
+			who = spouse
+			years = 2
 		}
+
 		add_character_modifier = {
 			name = the_apologetic
-			duration = 365
+			years = 1
 		}
 	}
 
 	option = {
-		name = "EVTOPTB30046"
+		name = EVTOPTB30046
+
 		event_target:chosen_courtier = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_murder_unknown_drowning
 				killer = ROOT
 			}
 		}
-		spouse = {
-			opinion = {
-				modifier = opinion_shocked
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_shocked
+			who = spouse
+			years = 2
 		}
+
 		add_character_modifier = {
 			name = the_sincere
-			duration = 365
+			years = 1
 		}
 	}
 
 	option = {
-		name = "EVTOPTC30046"
+		name = EVTOPTC30046
+
 		event_target:chosen_courtier = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_murder_unknown_drowning
 				killer = ROOT
 			}
 		}
-		spouse = {
-			opinion = {
-				modifier = opinion_shocked
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_shocked
+			who = spouse
+			years = 2
 		}
+
 		add_character_modifier = {
 			name = the_regretful
-			duration = 365
+			years = 1
 		}
 	}
+
 	option = {
-		name = "EVTOPTD30046"
+		name = EVTOPTD30046
+
 		event_target:chosen_courtier = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_murder_unknown_drowning
 				killer = ROOT
 			}
 		}
-		spouse = {
-			opinion = {
-				modifier = opinion_shocked
-				who = ROOT
-				years = 2
-			}
+
+		reverse_opinion = {
+			name = opinion_shocked
+			who = spouse
+			years = 2
 		}
+
 		add_character_modifier = {
 			name = the_cruel
-			duration = 365
+			years = 1
 		}
 	}
 }
 
-#Courtier survives
+# Courtier survives
 character_event = {
 	id = 30047
-	desc = "EVTDESC30047"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30047
+	picture = GFX_evt_quarrel
 
 	is_triggered_only = yes
 
 	option = {
-		name = "EVTOPTA30047"
+		name = EVTOPTA30047
+
 		piety = -10
 	}
 }
 
-#Give spouse a gift: jewellery
+# Give spouse a gift: jewellery
 character_event = {
 	id = 30050
-	desc = "EVTDESC30050"
-	picture = "GFX_evt_quarrel"
+	desc = EVTDESC30050
+	picture = GFX_evt_quarrel
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_yearly_pulse, random_events
 
-	capable_only = yes
 	only_men = yes
-	prisoner = no
+	is_married = yes
 	min_age = 20
+	only_capable = yes
+	prisoner = no
 
 	trigger = {
-		spouse = {
-			NOT = { trait = incapable }
-			is_alive = yes
+		wealth >= 50
+		NOT = { has_plot = plot_kill_spouse }
+
+		any_spouse = {
+			opinion = {
+				who = ROOT
+				value < 50
+			}
+
+			at_location = ROOT
+			is_incapable = no
 			is_abroad = no
 			prisoner = no
-			at_location = ROOT
-			NOT = {
-				opinion = { who = ROOT value = 50 }
-			}
 		}
-		treasury = 50
 	}
 
 	weight_multiplier = {
-		days = 1
+		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = kind
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = greedy
 		}
-		modifier = {
+
+		mult_modifier = {
 			factor = 0.5
 			trait = wroth
 		}
 	}
 
-	option = {
-		name = "EVTOPTA30050"
-		treasury = -5
-		spouse = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 1
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTB30050"
-		treasury = -10
-		spouse = {
-			opinion = {
-				modifier = opinion_infatuated
-				who = ROOT
-				years = 1
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTC30050"
-		trigger = {
-			has_lover = no
-			spouse = { has_lover = no }
-		}
-		treasury = -15
-		spouse = {
-			ROOT = { save_event_target_as = new_lover }
-			new_lover_effect = yes
-		}
-	}
-	option = {
-		name = "EVTOPTD30050"
-		prestige = -5
-		spouse = {
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 1
-			}
-		}
-	}
-}
-
-#Give spouse a gift: horse
-character_event = {
-	id = 30051
-	desc = "EVTDESC30051"
-	picture = "GFX_evt_quarrel"
-
-	capable_only = yes
-	prisoner = no
-	min_age = 20
-	war = no
-
-	is_triggered_only = yes
-
-	portrait = event_target:my_spouse
-
-	trigger = {
-		in_command = no
-		any_spouse = {
-			NOT = { trait = incapable }
-			prisoner = no
-			is_alive = yes
-			is_abroad = no
-			at_location = ROOT
-			NOT = {
-				opinion = { who = ROOT value = 50 }
-			}
-		}
-		treasury = 50
-		NOT = {
-			has_plot = plot_kill_spouse
-		}
-	}
 	immediate = {
 		random_spouse = {
 			limit = {
-				NOT = { trait = incapable }
-				prisoner = no
-				is_alive = yes
-				is_abroad = no
-				at_location = ROOT
-				NOT = {
-					opinion = { who = ROOT value = 50 }
+				opinion = {
+					who = ROOT
+					value < 50
 				}
+
+				at_location = ROOT
+				is_incapable = no
+				prisoner = no
+				is_abroad = no
 			}
+
 			save_event_target_as = my_spouse
 		}
 	}
 
-	weight_multiplier = {
-		days = 1
+	option = {
+		name = EVTOPTA30050
 
-		modifier = {
+		wealth = -5
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = event_target:my_spouse
+			years = 1
+		}
+	}
+
+	option = {
+		name = EVTOPTB30050
+
+		wealth = -10
+
+		reverse_opinion = {
+			name = opinion_infatuated
+			who = event_target:my_spouse
+			years = 1
+		}
+	}
+
+	option = {
+		name = EVTOPTC30050
+
+		trigger = {
+			has_lover = no
+			event_target:my_spouse = { has_lover = no }
+		}
+
+		wealth = -15
+		add_lover = event_target:my_spouse
+	}
+
+	option = {
+		name = EVTOPTD30050
+
+		prestige = -5
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:my_spouse
+			years = 1
+		}
+	}
+}
+
+# Give spouse a gift: horse
+character_event = {
+	id = 30051
+	desc = EVTDESC30051
+	picture = GFX_evt_quarrel
+	portrait = event_target:my_spouse
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	is_married = yes
+	min_age = 20
+	only_capable = yes
+	prisoner = no
+	war = no
+	in_command = no
+
+	trigger = {
+		is_inaccessible_trigger = no
+		wealth >= 50
+		NOT = { has_plot = plot_kill_spouse }
+
+		any_spouse = {
+			opinion = {
+				who = ROOT
+				value < 50
+			}
+
+			at_location = ROOT
+			is_incapable = no
+			prisoner = no
+			is_abroad = no
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
 			factor = 2
 			trait = lustful
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = slothful
 		}
 	}
 
-	option = {
-		name = "EVTOPTA30051"
-		treasury = -10
-		event_target:my_spouse = {
-			show_scope_change = no
-			opinion = {
-				modifier = opinion_delighted
-				who = ROOT
-				years = 1
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTB30051"
-		treasury = -15
-		event_target:my_spouse = {
-			show_scope_change = no
-			opinion = {
-				modifier = opinion_budding_romance
-				who = ROOT
-				years = 3
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTC30051"
-		treasury = -20
+	immediate = {
+		random_spouse = {
+			limit = {
+				opinion = {
+					who = ROOT
+					value < 50
+				}
 
-        if = { #if they already like you, you'll likely become lovers...
-            limit = {
-                event_target:my_spouse = {
-                    OR = {
-                        has_opinion_modifier = { who = ROOT modifier = opinion_budding_romance }
-                        has_opinion_modifier = { who = ROOT modifier = opinion_infatuated }
-                        has_character_flag = carried_torch_for@ROOT
-                        has_character_flag = carrying_torch_for@ROOT
-                    }
-                }
-            }
-            event_target:my_spouse = { 
-				save_event_target_as = new_lover 
+				at_location = ROOT
+				is_incapable = no
+				prisoner = no
+				is_abroad = no
 			}
-			new_lover_effect = yes
-        }
-        else = {
-		    reverse_opinion = {
-	            who = event_target:my_spouse
-	            modifier = opinion_infatuated
-	            years = 10
-	        }
-        }
+
+			save_event_target_as = my_spouse
+		}
+	}
+
+	option = {
+		name = EVTOPTA30051
+
+		wealth = -10
+
+		reverse_opinion = {
+			name = opinion_delighted
+			who = event_target:my_spouse
+			years = 1
+		}
+	}
+
+	option = {
+		name = EVTOPTB30051
+
+		wealth = -15
+
+		reverse_opinion = {
+			name = opinion_budding_romance
+			who = event_target:my_spouse
+			years = 3
+		}
+	}
+
+	option = {
+		name = EVTOPTC30051
 
 		trigger = {
 			has_lover = no
 			event_target:my_spouse = { has_lover = no }
 		}
+
+		wealth = -20
+
+		event_target:my_spouse = {
+			show_scope_change = no
+
+			if = { # if they already like you, you'll likely become lovers...
+				limit = {
+					OR = {
+						has_opinion_modifier = {
+							name = opinion_budding_romance
+							who = ROOT
+						}
+
+						has_opinion_modifier = {
+							name = opinion_infatuated
+							who = ROOT
+						}
+
+						has_character_flag = carried_torch_for@ROOT
+						has_character_flag = carrying_torch_for@ROOT
+					}
+				}
+
+				add_lover = ROOT
+			}
+			else = {
+				opinion = {
+					name = opinion_infatuated
+					who = ROOT
+					years = 10
+				}
+			}
+		}
 	}
 
 	option = {
+		name = EVTOPTE30051
 		tooltip_info_custom = REASON_IS_A_HORSE
-		name = "EVTOPTE30051"
-		event_target:my_spouse = { 
-			save_event_target_as = new_lover 
-		}
-		new_lover_effect = yes
+
 		trigger = {
 			graphical_culture = horsegfx
 			has_lover = no
 			event_target:my_spouse = { has_lover = no }
 		}
+
+		add_lover = event_target:my_spouse
 	}
 
 	option = {
-		name = "EVTOPTD30051"
-		event_target:my_spouse = {
-			show_scope_change = no
-			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 3
-			}
+		name = EVTOPTD30051
+
+		reverse_opinion = {
+			name = opinion_disappointed
+			who = event_target:my_spouse
+			years = 3
 		}
 	}
 }
 
-#Give spouse a gift: falcon
+# Give spouse a gift: falcon
 character_event = {
 	id = 30052
-	picture = "GFX_evt_falconing"
-	min_age = 20
-	prisoner = no
-	capable_only = yes
-
-	is_triggered_only = yes
-
+	picture = GFX_evt_falconing
 	portrait = event_target:my_spouse
-
-	trigger = {
-		any_spouse = {
-			NOT = { trait = incapable }
-			prisoner = no
-			is_alive = yes
-			is_abroad = no
-			at_location = ROOT
-			NOT = {
-				opinion = { who = ROOT value = 50 }
-			}
-			NOT = {
-				trait = craven
-			}
-		}
-		treasury = 70
-		NOT = {
-			has_plot = plot_kill_spouse
-		}
-	}
-	immediate = {
-		random_spouse = {
-			limit = {
-				NOT = { trait = incapable }
-				prisoner = no
-				is_alive = yes
-				is_abroad = no
-				at_location = ROOT
-				NOT = {
-					opinion = { who = ROOT value = 50 }
-				}
-				NOT = {
-					trait = craven
-				}
-			}
-			save_event_target_as = my_spouse
-		}
-	}
-
-	weight_multiplier = {
-		days = 1
-
-		modifier = {
-			factor = 2
-			trait = charitable
-		}
-
-		modifier = {
-			factor = 0.5
-			trait = wroth
-		}
-	}
 
 	desc = {
 		text = EVTDESC30052
@@ -2553,6 +2657,51 @@ character_event = {
 					trait = lunatic
 				}
 			}
+		}
+	}
+
+	is_triggered_only = yes # on_yearly_pulse, random_events
+
+	is_married = yes
+	min_age = 20
+	prisoner = no
+	only_capable = yes
+
+	trigger = {
+		wealth >= 70
+
+		NOT = {
+			has_plot = plot_kill_spouse
+		}
+
+		any_spouse = {
+			opinion = {
+				who = ROOT
+				value < 50
+			}
+
+			NOT = {
+				trait = craven
+			}
+
+			at_location = ROOT
+			is_incapable = no
+			prisoner = no
+			is_abroad = no
+		}
+	}
+
+	weight_multiplier = {
+		days = 1
+
+		modifier = {
+			factor = 2
+			trait = charitable
+		}
+
+		modifier = {
+			factor = 0.5
+			trait = wroth
 		}
 	}
 
