@@ -756,7 +756,10 @@ smite_evil_cb = {
 		FROM = {
 			OR = {
 				is_evil_religion = yes
-				trait = creature_fiend
+				AND ={
+					trait = creature_fiend
+					olrox_is_good_religion_trigger = no # to catch anomalous fiends and spare them
+				}
 				has_character_modifier = true_villain_modifier
 				has_character_modifier = undead_realm_lord
 
@@ -801,7 +804,10 @@ smite_evil_cb = {
 		FROM = {
 			OR = {
 				is_evil_religion = yes
-				trait = creature_fiend
+				AND ={
+					trait = creature_fiend
+					olrox_is_good_religion_trigger = no # to catch anomalous fiends and spare them
+				}
 				has_character_modifier = true_villain_modifier
 				has_character_modifier = undead_realm_lord
 				has_character_modifier = fr_nomad_conquerer_modifier
@@ -906,6 +912,75 @@ smite_evil_cb = {
 
 					capital_holding = {
 						refill_holding_levy = yes
+					}
+					primary_title = {
+						if = {
+							limit = {
+								PREV = {
+									is_nomadic = no
+									NOT = { government = celestial_bureaucracy }
+								}
+								OR = {
+									has_law = revoke_title_law_0
+									has_law = revoke_title_law_1
+								}
+							}
+							add_law = revoke_title_law_2
+						}
+					}
+					any_demesne_province = {
+						religion = PREV
+					}
+					any_realm_character = {
+						limit = {
+							ai = yes
+							OR = {
+								AND = {
+									trait = creature_fiend
+									olrox_is_good_religion_trigger = no # to catch anomalous fiends and spare them
+								}
+								trait = undead
+							}
+						}
+						death = {
+							death_reason = death_execution
+							killer = PREV
+						}
+					}
+					any_realm_character = {
+						limit = {
+							ai = yes
+							is_landed = no
+							AND = {
+								OR = {
+									trait = vampire
+									trait = vampire_spawn
+								}
+								evilcat_is_vampire_visible = yes
+							}
+							trait = lich
+						}
+						banish = yes
+					}
+					any_vassal = {
+						limit = {
+							ai = yes
+							OR = {
+								is_evil_religion = yes
+								AND ={
+									trait = creature_fiend
+									olrox_is_good_religion_trigger = no # to catch anomalous fiends and spare them
+								}
+								has_character_modifier = true_villain_modifier
+								has_character_modifier = undead_realm_lord
+								has_character_modifier = fr_nomad_conquerer_modifier
+								has_character_modifier = known_satanist
+								ROOT = {
+									is_religious_enemy_of_PREV_trigger = yes
+								}
+							}
+						}
+						imprison = PREV
 					}
 				}
 			}
