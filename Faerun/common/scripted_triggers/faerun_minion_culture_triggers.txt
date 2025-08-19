@@ -1,0 +1,213 @@
+has_minion_culture_province_modifier_trigger = {
+	OR = {
+		has_province_modifier = minion_culture_dragon_modifier
+		has_province_modifier = minion_culture_fiend_modifier
+		has_province_modifier = minion_culture_celestial_modifier
+	}
+}
+
+# scope is character
+has_minion_culture_trigger = {
+	OR = {
+		AND = {
+			culture_group = fiendish_group
+			trait = creature_fiend
+		}
+		AND = {
+			culture_group = draconic_culture_group
+			trait = creature_dragon
+		}
+		AND = {
+			culture_group = celestial_group
+			trait = creature_angel
+		}
+	}
+}
+
+half_breed_master_culture_trigger = {
+	OR = {
+		AND = {
+			culture_group = fiendish_group
+			NOT = { trait = creature_fiend }
+		}
+		AND = {
+			culture_group = draconic_culture_group
+			NOT = { trait = creature_dragon }
+		}
+		AND = {
+			culture_group = celestial_group
+			NOT = { trait = creature_angel }
+		}
+	}
+}
+
+# Scope is character, PREV is anything with culture
+is_master_for_PREV_trigger = {
+	trigger_if = {
+		limit = { trait = creature_fiend }
+
+		PREV = { is_minion_culture_for_fiend_trigger = yes }
+	}
+	trigger_else_if = {
+		limit = { trait = creature_dragon }
+
+		is_master_dragon_for_PREV_trigger = yes
+	}
+	trigger_else_if = {
+		limit = { trait = creature_angel }
+
+		PREV = { is_minion_culture_for_celestial_trigger = yes }
+	}
+	trigger_else = {
+		always = no
+	}
+}
+
+is_minion_culture_for_fiend_trigger = {
+	is_half_fiendish_culture_trigger = yes
+}
+
+# character or province scope
+is_minion_culture_for_celestial_trigger = {
+	OR = {
+		religion_group = good_human_pantheon_group
+		religion_group = qismaite_group
+		religion_group = elven_pantheon_group
+		religion_group = karaturan_group
+		religion = natural
+		religion = dwarven_pantheon
+		religion = gnome_pantheon
+		religion = bahamut
+		religion = ubtao_worship
+		religion = qotal
+		religion = qotal_reformed
+		has_religion_feature = religion_peaceful
+		has_religion_feature = religion_cosmopolitan
+	}
+	NOR = {
+		has_religion_feature = religion_ritual_sacrifice
+		has_religion_feature = religion_feature_orc_evil
+		has_religion_feature = religion_feature_goblin_evil
+		has_religion_feature = religion_feature_jaziri
+		has_religion_feature = religion_adventuring
+		has_religion_feature = religion_relentless
+	}
+}
+
+# character scope
+is_master_dragon_for_PREV_trigger = { 
+	custom_tooltip = {
+		text = IS_MASTER_DRAGON_TP
+
+		OR = {
+			is_innate_master_dragon_for_PREV_trigger = yes
+			persistent_event_target:minion_culture_1_persist = { 
+				always = yes
+				culture = PREVPREV
+			}
+			persistent_event_target:minion_culture_2_persist = { 
+				always = yes
+				culture = PREVPREV
+			}
+			persistent_event_target:minion_culture_3_persist = { 
+				always = yes
+				culture = PREVPREV
+			}
+		}
+	}
+}
+
+# character scope
+is_not_master_dragon_for_PREV_trigger = { 
+	custom_tooltip = {
+		text = IS_NOT_MASTER_DRAGON_TP
+
+		is_master_dragon_for_PREV_trigger = no
+	}
+}
+
+is_innate_master_dragon_for_PREV_trigger = {
+	OR = {
+		culture = kobold
+		culture = lizardfolk
+		culture = firenewt
+		AND = {
+			is_innate_master_for_strixiki_trigger = yes
+			PREV = { culture = strixiki }
+		}
+		AND = {
+			is_innate_master_for_dragonspawn_trigger = yes
+			PREV = { culture = dragonspawn }
+		}
+		AND = {
+			is_innate_master_for_fire_giant_trigger = yes
+			PREV = { culture = fire_giant }
+		}
+		AND = {
+			is_innate_master_for_shield_dwarf_trigger = yes
+			PREV = { culture = shield_dwarf }
+		}
+		AND = {
+			is_innate_master_for_storm_giant_trigger = yes
+			PREV = { culture = storm_giant }
+		}
+		AND = {
+			is_innate_master_for_arctic_dwarf_trigger = yes
+			PREV = { culture = arctic_dwarf }
+		}
+		AND = {
+			is_innate_master_for_chessentan_trigger = yes
+			PREV = { culture = chessentan }
+		}
+	}
+}
+
+is_innate_master_for_strixiki_trigger = {
+	OR = {
+		capital_scope = { region = laerakond_region }
+		custom_tooltip = {
+			text = SPELLPLAGUE_HAPPENED_TP
+
+			has_global_flag = spellplague_happened
+		}
+	}
+}
+
+is_innate_master_for_dragonspawn_trigger = {
+	OR = {
+		religion = tiamat
+		trait = patron_tiamat
+	}
+}
+
+is_innate_master_for_fire_giant_trigger = {
+	trait = bio_klauth
+}
+
+is_innate_master_for_shield_dwarf_trigger = {
+	trait = bio_tamarand
+}
+
+is_innate_master_for_storm_giant_trigger = {
+	trait = bio_tamarand
+}
+
+is_innate_master_for_arctic_dwarf_trigger = {
+	trait = bio_protanther
+}
+
+is_innate_master_for_chessentan_trigger = {
+	OR = {
+		any_owned_bloodline = {
+			founder = { 
+				OR = {
+					trait = bio_tchazzar
+					trait = bio_tiamat_planar
+					trait = bio_tiamat_unther
+				}
+			}
+		}
+		religion = tiamat
+		trait = patron_tiamat
+	}
+}
