@@ -1,0 +1,129 @@
+# PREV is a character
+change_province_culture_to_PREV_effect = {
+	if = {
+		limit = { PREV = { culture_group = fiendish_group } }
+
+		change_province_culture_to_fiendish_effect = yes
+	}
+	else_if = {
+		limit = { PREV = { culture_group = draconic_culture_group } }
+
+		change_province_culture_to_draconic_effect = yes
+	}
+	else = {
+		culture = PREV
+	}
+	refresh_minion_culture_province_modifiers_effect = yes
+}
+
+change_province_culture_to_fiendish_effect = {
+	if = {
+		limit = { culture_group = orc_group }
+
+		culture = tanarukk
+	}
+	else_if = {
+		limit = { 
+			OR = {
+				culture_group = high_elf_group
+				culture_group = sylvan_elf_group
+				culture_group = eladrin_group
+			}
+		}
+
+		culture = feyri
+	}
+	else_if = {
+		limit = { culture_group = dark_elf_group }
+
+		culture = draegloth
+	}
+	else_if = {
+		limit = { culture_group = plant_group }
+
+		culture = blight
+	}
+	else = {
+		culture = tiefling
+	}
+}
+
+change_province_culture_to_draconic_effect = {
+	if = {
+		limit = { owner = { persistent_event_target:minion_culture_primary_persist = { always = yes } } }
+
+		owner = { persistent_event_target:minion_culture_primary_persist = { save_event_target_as = culture_source } }
+		culture = event_target:culture_source
+		clear_event_target = culture_source
+	}
+	else_if = {
+		limit = { owner = { trait = bio_klauth } }
+
+		culture = fire_giant
+	}
+	else_if = {
+		limit = { owner = { any_owned_bloodline = { founder = { trait = bio_tchazzar } } religion = chessic } }
+
+		culture = chessentan
+	}
+	else = {
+		culture = kobold
+	}
+}
+
+remove_minion_culture_province_modifiers_effect = {
+	if = { limit = { has_province_modifier = minion_culture_fiend_modifier } remove_province_modifier = minion_culture_fiend_modifier }
+	if = { limit = { has_province_modifier = minion_culture_dragon_modifier } remove_province_modifier = minion_culture_dragon_modifier }
+	if = { limit = { has_province_modifier = minion_culture_celestial_modifier } remove_province_modifier = minion_culture_celestial_modifier }
+}
+
+add_minion_culture_province_modifiers_effect = {
+	if = {
+		limit = {
+			owner = { 
+				trait = creature_fiend 
+				culture_group = fiendish_group
+			}
+			is_minion_culture_for_fiend_trigger = yes
+		}
+
+		add_province_modifier = {
+			name = minion_culture_fiend_modifier
+			duration = -1
+		}
+	}
+	else_if = {
+		limit = {
+			owner = { 
+				is_master_dragon_for_PREV_trigger = yes
+			}
+		}
+
+		add_province_modifier = {
+			name = minion_culture_dragon_modifier
+			duration = -1
+		}
+	}
+	else_if = {
+		limit = {
+			owner = { 
+				trait = creature_angel
+				culture_group = celestial_group
+				olrox_is_good_religion_trigger = yes
+			}
+			is_minion_culture_for_celestial_trigger = yes
+		}
+
+		add_province_modifier = {
+			name = minion_culture_celestial_modifier
+			duration = -1
+		}
+	}
+}
+
+refresh_minion_culture_province_modifiers_effect = {
+	hidden_effect = {
+		remove_minion_culture_province_modifiers_effect = yes
+		add_minion_culture_province_modifiers_effect = yes
+	}
+}

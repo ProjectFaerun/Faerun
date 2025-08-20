@@ -2575,7 +2575,6 @@ faerun_first_start_effect = {
 	setup_arcane_titles_effect = yes
 	setup_druidic_titles_effect = yes
 	setup_rogue_titles_effect = yes
-	setup_culture_friendly_province_modifiers_effect = yes
 }
 
 clear_monster_province_effect = {
@@ -3577,145 +3576,6 @@ spawn_random_disease = {
 	}
 }
 
-# PREV is a character
-change_province_culture_to_PREV_effect = {
-	if = {
-		limit = { PREV = { culture_group = fiendish_group } }
-
-		change_province_culture_to_fiendish_effect = yes
-	}
-	else_if = {
-		limit = { PREV = { culture_group = draconic_culture_group } }
-
-		change_province_culture_to_draconic_effect = yes
-	}
-	else = {
-		culture = PREV
-		if = {
-			limit = { 
-				has_province_modifier = half_fiendish_province_modifier
-				is_half_fiendish_culture_trigger = no
-			}
-
-			remove_province_modifier = half_fiendish_province_modifier
-		}
-		else_if = {
-			limit = { 
-				has_province_modifier = draconic_province_modifier
-				is_dragon_friendly_culture_trigger = no
-			}
-
-			remove_province_modifier = draconic_province_modifier
-		}
-	}
-}
-
-change_province_culture_to_fiendish_effect = {
-	remove_culture_related_province_modifiers_effect = yes
-	if = {
-		limit = { culture_group = orc_group }
-
-		culture = tanarukk
-	}
-	else_if = {
-		limit = { 
-			OR = {
-				culture_group = high_elf_group
-				culture_group = sylvan_elf_group
-				culture_group = eladrin_group
-			}
-		}
-
-		culture = feyri
-	}
-	else_if = {
-		limit = { culture_group = dark_elf_group }
-
-		culture = draegloth
-	}
-	else_if = {
-		limit = { culture_group = plant_group }
-
-		culture = blight
-	}
-	else = {
-		culture = tiefling
-	}
-
-	if = {
-		limit = { owner = { trait = creature_fiend culture_group = fiendish_group } }
-
-		add_province_modifier = {
-			name = half_fiendish_province_modifier
-			duration = -1
-		}
-	}
-}
-
-change_province_culture_to_draconic_effect = {
-	remove_culture_related_province_modifiers_effect = yes
-	if = {
-		limit = { owner = { trait = bio_klauth } }
-
-		culture = fire_giant
-	}
-	else = {
-		culture = kobold
-	}
-
-	if = {
-		limit = { owner = { trait = creature_dragon culture_group = draconic_culture_group } }
-
-		add_province_modifier = {
-			name = draconic_province_modifier
-			duration = -1
-		}
-	}
-}
-
-remove_culture_related_province_modifiers_effect = {
-	if = { limit = { has_province_modifier = half_fiendish_province_modifier } remove_province_modifier = half_fiendish_province_modifier }
-	if = { limit = { has_province_modifier = draconic_province_modifier } remove_province_modifier = draconic_province_modifier }
-}
-
-setup_culture_friendly_province_modifiers_effect = {
-	any_province = {
-		limit = {
-			has_owner = yes
-			owner = { has_minion_culture_trigger = yes }
-		}
-
-		if = {
-			limit = {
-				owner = { 
-					trait = creature_fiend 
-					culture_group = fiendish_group
-				}
-				is_half_fiendish_culture_trigger = yes
-			}
-
-			add_province_modifier = {
-				name = half_fiendish_province_modifier
-				duration = -1
-			}
-		}
-		else_if = {
-			limit = {
-				owner = { 
-					trait = creature_dragon 
-					culture_group = draconic_culture_group
-				}
-				is_dragon_friendly_culture_trigger = yes
-			}
-
-			add_province_modifier = {
-				name = draconic_province_modifier
-				duration = -1
-			}
-		}
-	}
-}
-
 modifier_spreader_effect = {
 	if = {
 		limit = {
@@ -4049,5 +3909,14 @@ underchasm_effect = {
 			name = underchasm_nerf
 			duration = -1
 		}
+	}
+}
+
+# Bloodline scope
+remove_adopted_bloodline_members_effect = {
+	any_bloodline_member = {
+		limit = { trait = adopted NOT = { is_bloodline_founder_of = PREV } }
+
+		remove_from_bloodline = PREV
 	}
 }
