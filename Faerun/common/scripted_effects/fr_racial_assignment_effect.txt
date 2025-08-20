@@ -3070,3 +3070,184 @@ update_hidden_modifiers = {
 		}
 	}
 }
+
+adjust_edge_case_cultures_effect = {
+	# if the child is a dragon of non-dragon culture, we should put them back into draconic culture if at least one parent has it
+	# mainly intended for dragon + outsider breed
+	if = {
+		limit = { 
+			trait = creature_dragon 
+			NOT = { culture_group = draconic_culture_group }
+			OR = {
+				mother_even_if_dead = { culture_group = draconic_culture_group }
+				father_even_if_dead = { always = yes culture_group = draconic_culture_group }
+				real_father_even_if_dead = { always = yes culture_group = draconic_culture_group }
+			}
+		}
+
+		mother_even_if_dead = { save_event_target_as = evt_mother }
+		father_even_if_dead = { save_event_target_as = evt_father }
+		true_father_even_if_dead = { save_event_target_as = evt_true_father }
+		save_event_target_as = evt_char
+
+		random_list = {
+			50 = {
+				trigger = { mother_even_if_dead = { culture_group = draconic_culture_group } }
+
+				culture = event_target:evt_mother
+			}
+
+			50 = {
+				trigger = { father_even_if_dead = { always = yes culture_group = draconic_culture_group } }
+
+				culture = event_target:evt_father
+			}
+
+			50 = {
+				trigger = { real_father_even_if_dead = { always = yes culture_group = draconic_culture_group } }
+
+				culture = event_target:evt_true_father
+			}
+		}
+	}
+	# if the child is a half-fiend of fiendish culture, we should switch their culture to half-fiendish
+	else_if = {
+		limit = {
+			culture_group = fiendish_group
+			NOT = { trait = creature_fiend }
+		}
+
+		trigger_switch = {
+			on_trigger = trait
+
+			creature_feyri = {
+				culture = feyri
+			}
+			creature_tanarukk = {
+				culture = tanarukk
+			}
+			creature_draegloth = {
+				culture = draegloth
+			}
+			creature_treant = {
+				culture = blight
+			}
+			fallback = {
+				culture = tiefling
+			}
+		}
+	}
+	# if the child is a half-outsider or half-dragon, we should switch their culture to non-outsider non-dragon parent
+	else_if = {
+		limit = {
+			OR = {
+				culture_group = outsider_group
+				culture_group = celestial_group
+				culture_group = fiendish_group
+				culture_group = genie_group
+				culture_group = draconic_culture_group
+			}
+			NOR = {
+				trait = creature_outsider
+				trait = creature_angel
+				trait = creature_fiend
+				trait = creature_genie
+				trait = creature_dragon
+			}
+		}
+
+		mother_even_if_dead = { save_event_target_as = evt_mother }
+		father_even_if_dead = { save_event_target_as = evt_father }
+		true_father_even_if_dead = { save_event_target_as = evt_true_father }
+		save_event_target_as = evt_char
+
+		if = {
+			limit = {
+				event_target:evt_true_father = { 
+					always = yes
+					OR = {
+						trait = creature_outsider
+						trait = creature_angel
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_dragon
+					}
+				}
+				event_target:evt_mother = { 
+					NOR = {
+						trait = creature_outsider
+						trait = creature_angel
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_dragon
+					}
+				}
+			}
+
+			event_target:evt_char = {
+				culture = event_target:evt_mother
+			}
+		}
+		else_if = {
+			limit = {
+				event_target:evt_mother = { 
+					OR = {
+						trait = creature_outsider
+						trait = creature_angel
+						trait = creature_fiend
+						trait = creature_genie
+						trait = creature_dragon
+					}
+				}
+			}
+
+			if = {
+				limit = { 
+					event_target:evt_father = { 
+						always = yes
+						NOR = {
+							trait = creature_outsider
+							trait = creature_angel
+							trait = creature_fiend
+							trait = creature_genie
+							trait = creature_dragon
+							culture_group = outsider_group
+							culture_group = celestial_group
+							culture_group = fiendish_group
+							culture_group = genie_group
+							culture_group = draconic_culture_group
+						}
+					}
+				}
+
+				event_target:evt_char = {
+					culture = event_target:evt_father
+				}
+			}
+			else = {
+				event_target:evt_mother = {
+					if = {
+						limit = { num_of_count_titles >= 1 }
+
+						capital_scope = {
+							event_target:evt_char = {
+								culture = PREV
+							}
+						}
+					}
+					else = {
+						event_target:evt_char = {
+							host = {
+								capital_scope = {
+									event_target:evt_char = {
+										culture = PREV
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
