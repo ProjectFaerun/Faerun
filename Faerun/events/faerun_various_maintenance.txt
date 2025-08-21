@@ -3590,116 +3590,23 @@ character_event = {
 character_event = {
 	id = frmaint.72
 	hide_window = yes
-	is_triggered_only = yes # on_character_convert_religion, on_startup
+	is_triggered_only = yes # on_character_convert_religion, on_startup, on_five_year_pulse
 
 	only_playable = yes
 
 	trigger = {
-		has_minion_culture_trigger = yes
 		num_of_count_titles >= 1
+		OR = {
+			has_minion_culture_trigger = yes
+			any_demesne_province = {
+				has_minion_culture_province_modifier_trigger = yes
+			}
+		}
 		NOT = { has_character_flag = reverting_religion_change }
 	}
 
 	immediate = {
-		if = {
-			limit = { 
-				trait = creature_dragon 
-				OR = {
-					is_save_game = no
-					ai = yes
-				}
-			}
-
-			capital_scope = {
-				culture_scope = {
-					ROOT = {
-						if = {
-							limit = { 
-								is_master_dragon_for_PREV_trigger = no 
-								trigger_if = {
-									limit = {
-										is_save_game = yes
-										ai = yes
-									}
-									
-									prestige >= 1000
-								}
-							}
-
-							if = {
-								limit = {
-									OR = {
-										NOT = { persistent_event_target:minion_culture_1_persist = { always = yes } }
-										NOR = {
-											persistent_event_target:minion_culture_1_persist = { always = yes }
-											persistent_event_target:minion_culture_2_persist = { always = yes }
-											persistent_event_target:minion_culture_3_persist = { always = yes }
-										}
-									}
-								}
-
-								save_persistent_event_target = {
-									name = minion_culture_1_persist
-									scope = PREV
-								}
-							}
-							else_if = {
-								limit = { NOT = { persistent_event_target:minion_culture_2_persist = { always = yes } } }
-
-								save_persistent_event_target = {
-									name = minion_culture_2_persist
-									scope = PREV
-								}
-							}
-							else = {
-								save_persistent_event_target = {
-									name = minion_culture_3_persist
-									scope = PREV
-								}
-							}
-
-							if = {
-								limit = {
-									is_save_game = yes
-									ai = yes
-								}
-
-								prestige = -1000
-							}		
-						}
-					}
-				}
-			}
-
-			if = {
-				limit = { 
-					OR = {
-						NOT = { persistent_event_target:minion_culture_primary_persist = { always = yes } }
-						persistent_event_target:minion_culture_primary_persist = {
-							ROOT = {
-								capital_scope = {
-									NOT = { culture = PREVPREV }
-									ROOT = {
-										is_master_dragon_for_PREV_trigger = yes
-									}
-								}
-							}
-						}
-					}
-				}
-
-				capital_scope = {
-					culture_scope = {
-						ROOT = {
-							save_persistent_event_target = {
-								name = minion_culture_primary_persist
-								scope = PREV
-							}
-						}
-					}
-				}
-			}
-		}
+		minion_culture_maint_dragon_effect = yes
 
 		any_demesne_province = {
 			refresh_minion_culture_province_modifiers_effect = yes

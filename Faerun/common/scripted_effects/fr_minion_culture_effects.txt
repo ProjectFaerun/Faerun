@@ -56,16 +56,6 @@ change_province_culture_to_draconic_effect = {
 		culture = event_target:culture_source
 		clear_event_target = culture_source
 	}
-	else_if = {
-		limit = { owner = { trait = bio_klauth } }
-
-		culture = fire_giant
-	}
-	else_if = {
-		limit = { owner = { any_owned_bloodline = { founder = { trait = bio_tchazzar } } religion = chessic } }
-
-		culture = chessentan
-	}
 	else = {
 		culture = kobold
 	}
@@ -95,6 +85,8 @@ add_minion_culture_province_modifiers_effect = {
 	else_if = {
 		limit = {
 			owner = { 
+				trait = creature_dragon
+				culture_group = draconic_culture_group
 				is_master_dragon_for_PREV_trigger = yes
 			}
 		}
@@ -125,5 +117,152 @@ refresh_minion_culture_province_modifiers_effect = {
 	hidden_effect = {
 		remove_minion_culture_province_modifiers_effect = yes
 		add_minion_culture_province_modifiers_effect = yes
+	}
+}
+
+minion_culture_maint_dragon_effect = {
+	if = {
+		limit = { trait = creature_dragon culture_group = draconic_culture_group }
+
+		if = {
+			limit = { persistent_event_target:minion_culture_primary_persist = { always = yes ROOT = { is_master_dragon_for_PREV_trigger = no } } }
+
+			clear_persistent_event_target = minion_culture_primary_persist
+		}
+
+		if = {
+			limit = { persistent_event_target:minion_culture_1_persist = { always = yes ROOT = { is_innate_master_dragon_for_PREV_trigger = yes } } }
+
+			clear_persistent_event_target = minion_culture_1_persist
+		}
+		if = {
+			limit = { persistent_event_target:minion_culture_2_persist = { always = yes ROOT = { is_innate_master_dragon_for_PREV_trigger = yes } } }
+
+			clear_persistent_event_target = minion_culture_2_persist
+		}
+		if = {
+			limit = { persistent_event_target:minion_culture_3_persist = { always = yes ROOT = { is_innate_master_dragon_for_PREV_trigger = yes } } }
+
+			clear_persistent_event_target = minion_culture_3_persist
+		}
+
+		if = {
+			limit = { 
+				OR = {
+					is_save_game = no
+					ai = yes
+				}
+			}
+
+			capital_scope = {
+				culture_scope = {
+					ROOT = {
+						if = {
+							limit = { 
+								is_master_dragon_for_PREV_trigger = no 
+								trigger_if = {
+									limit = {
+										is_save_game = yes
+										ai = yes
+									}
+									
+									prestige >= 1000
+								}
+							}
+
+							if = {
+								limit = {
+									OR = {
+										NOT = { persistent_event_target:minion_culture_1_persist = { always = yes } }
+										AND = {
+											persistent_event_target:minion_culture_1_persist = { always = yes }
+											persistent_event_target:minion_culture_2_persist = { always = yes }
+											persistent_event_target:minion_culture_3_persist = { always = yes }
+										}
+										NOR = {
+											trait = dragon_adult
+											trait = dragon_ancient
+										}
+									}
+								}
+
+								save_persistent_event_target = {
+									name = minion_culture_1_persist
+									scope = PREV
+								}
+							}
+							else_if = {
+								limit = { 
+									OR = {
+										NOT = { persistent_event_target:minion_culture_2_persist = { always = yes } } 
+										NOT = { trait = dragon_ancient }
+									}
+								}
+
+								save_persistent_event_target = {
+									name = minion_culture_2_persist
+									scope = PREV
+								}
+							}
+							else = {
+								save_persistent_event_target = {
+									name = minion_culture_3_persist
+									scope = PREV
+								}
+							}
+
+							if = {
+								limit = {
+									is_save_game = yes
+									ai = yes
+								}
+
+								prestige = -1000
+							}		
+						}
+					}
+				}
+			}
+
+			if = {
+				limit = {
+					trigger_if = {
+						limit = { persistent_event_target:minion_culture_primary_persist = { always = yes } }
+
+						persistent_event_target:minion_culture_primary_persist = {
+							ROOT = {
+								capital_scope = {
+									NOT = { culture = PREVPREV }
+									ROOT = {
+										is_master_dragon_for_PREV_trigger = yes
+									}
+								}
+							}
+						}
+					}
+					trigger_else = {
+						ROOT = {
+							capital_scope = {
+								ROOT = {
+									is_master_dragon_for_PREV_trigger = yes
+								}
+							}
+						}
+					}
+					
+				}
+
+				capital_scope = {
+					culture_scope = {
+						ROOT = {
+							save_persistent_event_target = {
+								name = minion_culture_primary_persist
+								scope = PREV
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
