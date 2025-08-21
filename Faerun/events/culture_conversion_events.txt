@@ -20,29 +20,25 @@ province_event = {
 				province_culture_can_be_changed_by_PREV = yes
 			}
 		}
+
 		any_neighbor_province = {
 			has_owner = yes
-			ROOT = {
-				owner = {
-					trigger_if = {
-						limit = { trait = creature_fiend }
 
-						culture_group = fiendish_group
-						PREVPREV = {
-							is_fiendish_culture_trigger = yes
-						}
-					}
-					trigger_else = {
-						culture = PREVPREV
-					}
+			trigger_if = {
+				limit = { ROOT = { owner = { trait = creature_dragon } } }
+
+				any_playable_ruler = {
+					ROOT = { owned_by = PREV }
+					is_master_dragon_for_PREV_trigger = yes
 				}
 			}
-			owner = {
+			trigger_else = {
+				# has a neighbor province of eligible culture to act as a source
 				ROOT = {
 					owner = {
 						trigger_if = {
 							limit = { trait = creature_fiend }
-	
+
 							culture_group = fiendish_group
 							PREVPREV = {
 								is_fiendish_culture_trigger = yes
@@ -53,13 +49,33 @@ province_event = {
 						}
 					}
 				}
+				# owner of such province should be eligible too
+				owner = {
+					ROOT = {
+						owner = {
+							trigger_if = {
+								limit = { trait = creature_fiend }
+		
+								culture_group = fiendish_group
+								PREVPREV = {
+									is_fiendish_culture_trigger = yes
+								}
+							}
+							trigger_else = {
+								culture = PREVPREV
+							}
+						}
+					}
+				}
 			}
+			
 			NOR = {
 				has_province_modifier = depopulated_1
 				has_province_modifier = depopulated_2
 				has_province_modifier = depopulated_3
 			}
 		}
+		
 		NOT = { has_province_modifier = culture_appreciated_modifier }
 	}
 	
@@ -351,27 +367,22 @@ province_event = {
 		NOT = { # Exclude provinces covered by event 55000
 			any_neighbor_province = {
 				has_owner = yes
-				ROOT = {
-					owner = {
-						trigger_if = {
-							limit = { trait = creature_fiend }
-	
-							culture_group = fiendish_group
-							PREVPREV = {
-								is_fiendish_culture_trigger = yes
-							}
-						}
-						trigger_else = {
-							culture = PREVPREV
-						}
+
+				trigger_if = {
+					limit = { ROOT = { owner = { trait = creature_dragon } } }
+
+					any_playable_ruler = {
+						ROOT = { owned_by = PREV }
+						is_master_dragon_for_PREV_trigger = yes
 					}
 				}
-				owner = {
+				trigger_else = {
+					# has a neighbor province of eligible culture to act as a source
 					ROOT = {
 						owner = {
 							trigger_if = {
 								limit = { trait = creature_fiend }
-		
+
 								culture_group = fiendish_group
 								PREVPREV = {
 									is_fiendish_culture_trigger = yes
@@ -382,7 +393,26 @@ province_event = {
 							}
 						}
 					}
+					# owner of such province should be eligible too
+					owner = {
+						ROOT = {
+							owner = {
+								trigger_if = {
+									limit = { trait = creature_fiend }
+			
+									culture_group = fiendish_group
+									PREVPREV = {
+										is_fiendish_culture_trigger = yes
+									}
+								}
+								trigger_else = {
+									culture = PREVPREV
+								}
+							}
+						}
+					}
 				}
+				
 				NOR = {
 					has_province_modifier = depopulated_1
 					has_province_modifier = depopulated_2
@@ -616,34 +646,6 @@ character_event = {
 			factor = 2.0
 			capital_scope = {
 				culture_group = ROOT # Same culture group: slower assimilation
-			}
-		}
-		mult_modifier = {
-			factor = 0.2
-
-			OR = {
-				culture_group = fiendish_group
-				culture_group = draconic_culture_group
-			}
-		}
-		mult_modifier = {
-			factor = 0.1
-
-			OR = {
-				AND = {
-					culture_group = fiendish_group
-					capital_scope = {
-						is_minion_culture_for_fiend_trigger = yes
-					}
-				}
-				AND = {
-					culture_group = draconic_culture_group
-					capital_scope = {
-						ROOT = { 
-							is_master_dragon_for_PREV_trigger = yes
-						}
-					}
-				}
 			}
 		}
 	}
