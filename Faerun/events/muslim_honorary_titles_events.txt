@@ -8,373 +8,363 @@
 #
 #################################################
 #
-# Written by Sara Wendel-Örtqvist
+# Written by Sara Wendel-Ã–rtqvist
 
 ### CHIEF QADI ###
-	
-### Woman asks Chief Qadi for a divorce ###
+
+### Woman asks Chief Qadi for a divorce - Setup ###
 character_event = {
-	id = 105000
-	desc = "EVTDESC105000"
-	picture = GFX_evt_quarrel #Placeholder?
-	border = GFX_event_normal_frame_religion
-	
-	only_women = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	is_married = yes
-	
+	id = 104999
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+
 	trigger = {
-		religion_group = qismaite_group
-		NOT = {
-			has_character_modifier = qadi_divorce_timer
-		}
-		NOT = {
-			has_character_flag = qadi_granted_divorce
-		}
-		spouse = {
-			OR = {
-				trait = wroth
-				trait = cruel
-				trait = arbitrary
-				trait = greedy
-				NOT = { reverse_opinion = { who = ROOT value = 0 } }
+		has_assigned_minor_title = title_chief_qadi
+
+		any_courtier_or_vassal = {
+			is_female = yes
+			is_incapable = no
+			prisoner = no
+
+			NOR = {
+				has_character_modifier = qadi_divorce_timer
+				has_character_flag = qadi_granted_divorce
 			}
-			NOT = {
-				has_minor_title = title_chief_qadi
-			}
-		}
-		liege = {
-			OR = {
-				any_courtier = {
-					has_minor_title = title_chief_qadi
+
+			spouse = {
+				OR = {
+					trait = wroth
+					trait = cruel
+					trait = arbitrary
+					trait = greedy
+
+					reverse_opinion = {
+						who = ROOT
+						value < 0
+					}
 				}
-				any_vassal = {
-					has_minor_title = title_chief_qadi
-				}
+
+				NOT = { has_minor_title = title_chief_qadi }
 			}
 		}
 	}
-	
-	mean_time_to_happen = {
-		months = 200
-		
-		modifier = {
-			factor = 5
-			trait = content
-		}
-		modifier = {
-			factor = 0.5
-			trait = honest
-		}
-		modifier = {
-			factor = 2
-			num_of_children = 2
-		}
-		modifier = {
-			factor = 3
-			num_of_children = 4
-		}
-		modifier = {
-			factor = 4
-			num_of_children = 6
-		}
-	}
-	
+
 	immediate = {
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = qadi_divorce_timer
-				duration = 1095
-				hidden = yes
-			}
-		}
-	}
-	
-	option = {
-		name = "EVTOPTA105000"
-		ai_chance = {
-			factor = 40
-		}
-		if = {
+		any_courtier_or_vassal = {
 			limit = {
-				liege = {
-					any_courtier = {
-						has_minor_title = title_chief_qadi
-					}
+				is_female = yes
+				is_incapable = no
+				prisoner = no
+
+				NOR = {
+					has_character_modifier = qadi_divorce_timer
+					has_character_flag = qadi_granted_divorce
 				}
-			}
-			liege = {
-				random_courtier = {
-					limit = {
-						has_minor_title = title_chief_qadi
-					}
-					character_event = {
-						id = 105001
-						days = 1
-						random = 3
-						tooltip = "EVTTOOLTIP105001"
-					}
-				}
-			}
-		}
-		if = {
-			limit = {
-				liege = {
-					NOT = {
-						any_courtier = {
-							has_minor_title = title_chief_qadi
+
+				spouse = {
+					OR = {
+						trait = wroth
+						trait = cruel
+						trait = arbitrary
+						trait = greedy
+
+						reverse_opinion = {
+							who = ROOT
+							value < 0
 						}
 					}
-					any_vassal = {
-						has_minor_title = title_chief_qadi
-					}
+
+					NOT = { has_minor_title = title_chief_qadi }
 				}
 			}
-			liege = {
-				random_vassal = {
-					limit = {
-						has_minor_title = title_chief_qadi
-					}
-					character_event = {
-						id = 105001
-						days = 1
-						random = 3
-						tooltip = "EVTTOOLTIP105001"
-					}
-				}
-			}
-		}
-	}
-	
-	option = {
-		name = "EVTOPTB105000"
-		ai_chance = {
-			factor = 60
-		}
-		if = {
-			limit = {
-				NOT = {
+
+			score_value = { # TODO: check that this works properly
+				value = 100
+
+				mult_modifier = {
+					factor = 0.2
 					trait = content
 				}
-			}
-			add_trait = content
-		}
-		if = {
-			limit = {
-				trait = content
-			}
-			random = {
-				chance = 20
-				add_trait = depressed
-				hidden_tooltip = {
-					character_event = {
-						id = 38288 #Notify Depressed
-					}
+
+				mult_modifier = {
+					factor = 2
+					trait = honest
+				}
+
+				mult_modifier = {
+					factor = 0.5
+					num_of_children >= 2
+				}
+
+				mult_modifier = {
+					factor = 0.33
+					num_of_children >= 4
+				}
+
+				mult_modifier = {
+					factor = 0.25
+					num_of_children >= 6
 				}
 			}
+
+			character_event = { id = 105000 }
 		}
 	}
 }
 
-#Court Qadi is asked by the woman to grant her a divorce
+### Woman asks Chief Qadi for a divorce ###
 character_event = {
-	id = 105001
-	desc = "EVTDESC105001"
-	picture = GFX_evt_quarrel
+	id = 105000
+	desc = EVTDESC105000
+	picture = GFX_evt_quarrel # Placeholder?
 	border = GFX_event_normal_frame_religion
-	
+	portrait = spouse
+
 	is_triggered_only = yes
-	
+
+	immediate = {
+		add_character_modifier = {
+			name = qadi_divorce_timer
+			years = 3
+			hidden = yes
+		}
+	}
+
 	option = {
-		name = "EVTOPTA105001" #Yes
-		ai_chance = {
-			factor = 40
-			
-			modifier = {
-				factor = 4
-				trait = just
+		name = EVTOPTA105000
+
+		liege = {
+			show_scope_change = no
+
+			random_courtier_or_vassal = {
+				show_scope_change = no
+
+				limit = { has_minor_title = title_chief_qadi }
+
+				character_event = {
+					id = 105001
+					days = 1
+					random = 3
+					tooltip = EVTTOOLTIP105001
+				}
 			}
 		}
+
+		ai_chance = { factor = 40 }
+	}
+
+	option = {
+		name = EVTOPTB105000
+
+		if = {
+			limit = { trait = content }
+
+			random = {
+				chance = 20
+				add_trait_depressed_effect = yes
+			}
+		}
+		else = {
+			remove_trait_silently_ambitious_effect = yes
+			add_trait = content
+		}
+
+		ai_chance = { factor = 60 }
+	}
+}
+
+# Court Qadi is asked by the woman to grant her a divorce
+character_event = {
+	id = 105001
+	desc = EVTDESC105001
+	picture = GFX_evt_quarrel
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA105001 # Yes
+
 		FROM = {
+			show_scope_change = no
+
 			character_event = {
 				id = 105002
 				days = 1
 				random = 3
-				tooltip = "EVTTOOLTIP105002"
+				tooltip = EVTTOOLTIP105002
 			}
-			hidden_tooltip = {
-				spouse = {
-					character_event = {
-						id = 105005
-						days = 1
-						random = 3
-					}
+
+			spouse = {
+				character_event = {
+					id = 105005
+					days = 1
+					random = 3
 				}
 			}
 		}
-	}
-	option = {
-		name = "EVTOPTB105001" #No
+
 		ai_chance = {
-			factor = 60
-			
-			modifier = {
-				factor = 2
-				trait = arbitrary
+			factor = 40
+
+			mult_modifier = {
+				factor = 4
+				trait = just
 			}
 		}
+	}
+
+	option = {
+		name = EVTOPTB105001 # No
+
 		FROM = {
+			show_scope_change = no
+
 			character_event = {
 				id = 105003
 				days = 1
 				random = 3
-				tooltip = "EVTTOOLTIP105003"
+				tooltip = EVTTOOLTIP105003
+			}
+		}
+
+		ai_chance = {
+			factor = 60
+
+			mult_modifier = {
+				factor = 2
+				trait = arbitrary
 			}
 		}
 	}
 }
 
-#Woman is granted divorce
+# Woman is granted divorce
 character_event = {
 	id = 105002
-	desc = "EVTDESC105002"
+	desc = EVTDESC105002
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105002"
-		trigger = {
-			is_pregnant = no
+		name = {
+			text = EVTOPTA105002
+			trigger = { is_pregnant = no }
 		}
+		name = {
+			text = EVTOPTB105002 # Pregnant, must wait until child is born
+			trigger = { is_pregnant = yes }
+		}
+
+		set_character_flag = qadi_granted_divorce
+
+		add_character_modifier = {
+			name = iddah_period
+			duration = -1
+		}
+
+		hidden_effect = {
+			remove_character_modifier = qadi_divorce_timer
+		}
+
+		if = {
+			limit = { is_pregnant = no }
+
+			character_event = {
+				id = 105004
+				days = 130 # 4 months and 10 days
+			}
+		}
+
 		ai_chance = {
 			factor = 20
 
-			modifier = {
+			mult_modifier = {
 				factor = 2
 				trait = wroth
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = cruel
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = arbitrary
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = greedy
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
-				spouse = {
-					NOT = { reverse_opinion = { who = ROOT value = 0 } }
+
+				opinion = {
+					who = spouse
+					value < 0
 				}
 			}
 		}
-		set_character_flag = qadi_granted_divorce
-		hidden_tooltip = {
-			remove_character_modifier = qadi_divorce_timer
-		}
-		add_character_modifier = {
-			name = iddah_period
-			duration = -1
-		}
 	}
+
 	option = {
-		name = "EVTOPTB105002"  #Pregnant, must wait until child is born
-		trigger = {
-			is_pregnant = yes
-		}
-		ai_chance = {
-			factor = 20
-			
-			modifier = {
-				factor = 2
-				trait = wroth
-			}
-			modifier = {
-				factor = 2
-				trait = cruel
-			}
-			modifier = {
-				factor = 2
-				trait = arbitrary
-			}
-			modifier = {
-				factor = 2
-				trait = greedy
-			}
-			modifier = {
-				factor = 2
-				spouse = {
-					NOT = { reverse_opinion = { who = ROOT value = 0 } }
-				}
-			}
-		}
-		set_character_flag = qadi_granted_divorce
-		hidden_tooltip = {
-			remove_character_modifier = qadi_divorce_timer
-		}
-		add_character_modifier = {
-			name = iddah_period
-			duration = -1
-		}
-	}
-	option = {
-		name = "EVTOPTC105002" #I have changed my mind
-		ai_chance = {
-			factor = 60
-		}
+		name = EVTOPTC105002 # I have changed my mind
+
 		spouse = {
+			show_scope_change = no
+
 			set_character_flag = reconsidered_divorce
+
 			opinion = {
-				modifier = opinion_glad
+				name = opinion_glad
 				who = ROOT
 				years = 5
 			}
+
 			character_event = {
 				id = 105007
 				days = 1
 				random = 2
-				tooltip = "EVTTOOLTIPB105007"
+				tooltip = EVTTOOLTIPB105007
 			}
 		}
+
+		ai_chance = { factor = 60 }
 	}
 }
 
-#Woman won't get the Chief Qadi's approval
+# Woman won't get the Chief Qadi's approval
 character_event = {
 	id = 105003
-	desc = "EVTDESC105003"
+	desc = EVTDESC105003
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105003"
+		name = EVTOPTA105003
+
 		opinion = {
-			modifier = opinion_very_disappointed
+			name = opinion_very_disappointed
 			who = FROM
 			years = 5
 		}
-		if = {
-			limit = {
-				NOT = {
-					trait = depressed
-				}
-			}
-			add_trait = depressed
-		}
+
+		add_trait_silently_depressed_effect = yes
 	}
 }
 
-#Woman gets divorced
+# Woman gets divorced
 character_event = {
 	id = 105004
 	desc = "EVTDESC105004"

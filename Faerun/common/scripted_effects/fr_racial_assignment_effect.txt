@@ -3148,11 +3148,10 @@ adjust_edge_case_cultures_effect = {
 	else_if = {
 		limit = {
 			OR = {
-				culture_group = outsider_group
-				culture_group = celestial_group
+				unconvertable_culture_trigger = yes
 				culture_group = fiendish_group
-				culture_group = genie_group
 				culture_group = draconic_culture_group
+				culture_group = celestial_group
 			}
 			NOR = {
 				trait = creature_outsider
@@ -3170,24 +3169,16 @@ adjust_edge_case_cultures_effect = {
 
 		if = {
 			limit = {
-				event_target:evt_true_father = { 
-					always = yes
-					OR = {
-						culture_group = outsider_group
-						culture_group = celestial_group
-						culture_group = fiendish_group
-						culture_group = genie_group
-						culture_group = draconic_culture_group
+				OR = {
+					event_target:evt_true_father = { 
+						always = yes
+						unconvertable_culture_trigger = yes
 					}
+					NOT = { event_target:evt_true_father = { always = yes } }
 				}
+				
 				event_target:evt_mother = { 
-					NOR = {
-						culture_group = outsider_group
-						culture_group = celestial_group
-						culture_group = fiendish_group
-						culture_group = genie_group
-						culture_group = draconic_culture_group
-					}
+					unconvertable_culture_trigger = no
 				}
 			}
 
@@ -3198,13 +3189,7 @@ adjust_edge_case_cultures_effect = {
 		else_if = {
 			limit = {
 				event_target:evt_mother = { 
-					OR = {
-						culture_group = outsider_group
-						culture_group = celestial_group
-						culture_group = fiendish_group
-						culture_group = genie_group
-						culture_group = draconic_culture_group
-					}
+					unconvertable_culture_trigger = yes
 				}
 			}
 
@@ -3212,13 +3197,7 @@ adjust_edge_case_cultures_effect = {
 				limit = { 
 					event_target:evt_father = { 
 						always = yes
-						NOR = {
-							culture_group = outsider_group
-							culture_group = celestial_group
-							culture_group = fiendish_group
-							culture_group = genie_group
-							culture_group = draconic_culture_group
-						}
+						unconvertable_culture_trigger = no
 					}
 				}
 
@@ -3229,15 +3208,33 @@ adjust_edge_case_cultures_effect = {
 			else = {
 				event_target:evt_mother = {
 					if = {
-						limit = { num_of_count_titles >= 1 }
+						limit = { 
+							num_of_count_titles >= 1 
+							capital_scope = { unconvertable_culture_trigger = no }
+						}
+
+						capital_scope = { event_target:evt_char = { culture = PREV } }
+					}
+					else_if = {
+						limit = {
+							num_of_count_titles >= 1 
+							capital_scope = { any_neighbor_province = { has_owner = yes unconvertable_culture_trigger = no } }
+						}
 
 						capital_scope = {
-							event_target:evt_char = {
-								culture = PREV
+							random_neighbor_province = {
+								limit = { has_owner = yes unconvertable_culture_trigger = no }
+
+								event_target:evt_char = { culture = PREV }
 							}
 						}
 					}
-					else = {
+					else_if = {
+						limit = { 
+							num_of_count_titles < 1 
+							event_target:evt_char = { host = { capital_scope = { unconvertable_culture_trigger = no } } }
+						}
+
 						event_target:evt_char = {
 							host = {
 								capital_scope = {
@@ -3245,6 +3242,62 @@ adjust_edge_case_cultures_effect = {
 										culture = PREV
 									}
 								}
+							}
+						}
+					}
+					else_if = {
+						limit = { 
+							num_of_count_titles < 1 
+							event_target:evt_char = { host = { capital_scope = { any_neighbor_province = { has_owner = yes unconvertable_culture_trigger = no } } } }
+						}
+
+						event_target:evt_char = {
+							host = {
+								capital_scope = {
+									random_neighbor_province = {
+										limit = { has_owner = yes unconvertable_culture_trigger = no }
+
+										event_target:evt_char = { culture = PREV }
+									}
+								}
+							}
+						}
+					}
+					else = {
+						event_target:evt_char = {
+							random_character = {
+								limit = { 
+									unconvertable_culture_trigger = no 
+									NOR = {
+										trait = creature_outsider
+										trait = creature_angel
+										trait = creature_fiend
+										trait = creature_genie
+										trait = creature_dragon
+									}
+								}
+								preferred_limit = {
+									gfx_culture_scope = { culture = event_target:evt_char }
+									religion = event_target:evt_char
+								}
+								preferred_limit = {
+									gfx_culture_scope = { culture_group = event_target:evt_char }
+									religion = event_target:evt_char
+								}
+								preferred_limit = {
+									gfx_culture_scope = { culture = event_target:evt_char }
+									religion_group = event_target:evt_char
+								}
+								preferred_limit = {
+									gfx_culture_scope = { culture_group = event_target:evt_char }
+									religion_group = event_target:evt_char
+								}
+								preferred_limit = { gfx_culture_scope = { culture = event_target:evt_char } }
+								preferred_limit = { gfx_culture_scope = { culture_group = event_target:evt_char } }
+								preferred_limit = { religion = event_target:evt_char }
+								preferred_limit = { religion_group = event_target:evt_char }
+
+								event_target:evt_char = { culture = PREV }
 							}
 						}
 					}
