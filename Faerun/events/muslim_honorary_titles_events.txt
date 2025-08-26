@@ -367,159 +367,274 @@ character_event = {
 # Woman gets divorced
 character_event = {
 	id = 105004
-	desc = "EVTDESC105004"
+	desc = EVTDESC105004
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
-	only_women = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
+
+	is_triggered_only = yes
+
 	has_character_flag = qadi_granted_divorce
-	
+
 	trigger = {
 		is_pregnant = no
 		has_character_modifier = iddah_period
-		had_character_flag = {
-			flag = qadi_granted_divorce
-			days = 30
-		}
 	}
-	
-	mean_time_to_happen = {
-		days = 1
-	}
-	
+
 	option = {
-		name = "EVTOPTA105004"
+		name = EVTOPTA105004
+
 		remove_character_modifier = iddah_period
 		clr_character_flag = qadi_granted_divorce
-		spouse = {
-			remove_spouse = ROOT
-		}
+		remove_spouse = spouse
 	}
+
 	option = {
-		name = "EVTOPTB105004"
+		name = EVTOPTB105004
+
 		remove_character_modifier = iddah_period
 		clr_character_flag = qadi_granted_divorce
+
 		spouse = {
+			show_scope_change = no
+
 			set_character_flag = reconsidered_divorce
+
 			opinion = {
-				modifier = opinion_glad
+				name = opinion_glad
 				who = ROOT
 				years = 5
 			}
+
 			character_event = {
 				id = 105007
 				days = 1
 				random = 2
-				tooltip = "EVTTOOLTIPB105007"
+				tooltip = EVTTOOLTIPB105007
 			}
 		}
 	}
 }
 
-#Spouse finds out about divorce
+# Spouse finds out about divorce
 character_event = {
 	id = 105005
-	desc = "EVTDESC105005"
+	desc = EVTDESC105005
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105005" #if that's what she wants...
+		name = EVTOPTA105005 # if that's what she wants...
+
 		prestige = -10
 	}
+
 	option = {
-		name = "EVTOPTB105005" #NO! I won't allow it!
+		name = EVTOPTB105005 # NO! I won't allow it!
+
 		spouse = {
+			show_scope_change = no
+
 			character_event = {
 				id = 105006
 				days = 1
 				random = 3
-				tooltip = "EVTTOOLTIP105006"
+				tooltip = EVTTOOLTIP105006
 			}
 		}
 	}
 }
 
-#Woman is asked by spouse to reconsider
+# Woman is asked by spouse to reconsider
 character_event = {
 	id = 105006
-	desc = "EVTDESC105006"
+	desc = EVTDESC105006
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105006" #I want that divorce!
+		name = EVTOPTA105006 # I want that divorce!
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = wants_divorce
+
 			character_event = {
 				id = 105007
 				days = 1
 				random = 3
-				tooltip = "EVTTOOLTIPA105007"
+				tooltip = EVTTOOLTIPA105007
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105006" #Okay
+		name = EVTOPTB105006 # Okay
+
 		remove_character_modifier = iddah_period
 		clr_character_flag = qadi_granted_divorce
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = reconsidered_divorce
+
 			opinion = {
-				modifier = opinion_glad
+				name = opinion_glad
 				who = ROOT
 				years = 5
 			}
+
 			character_event = {
 				id = 105007
 				days = 1
 				random = 3
-				tooltip = "EVTTOOLTIPB105007"
+				tooltip = EVTTOOLTIPB105007
 			}
 		}
 	}
 }
 
-#Spouse: Woman's answer
+# Spouse: Woman's answer
 character_event = {
 	id = 105007
-	desc = "EVTDESC105007"
+	desc = EVTDESC105007
 	picture = GFX_evt_quarrel
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105007"
-		trigger = {
-			has_character_flag = wants_divorce
-		}
+		name = EVTOPTA105007
+
+		trigger = { has_character_flag = wants_divorce }
+
 		clr_character_flag = wants_divorce
+
 		opinion = {
-			modifier = opinion_angry
+			name = opinion_angry
 			who = FROM
 			years = 2
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105007"
-		trigger = {
-			has_character_flag = reconsidered_divorce
-		}
+		name = EVTOPTB105007
+
+		trigger = { has_character_flag = reconsidered_divorce }
+
 		clr_character_flag = reconsidered_divorce
+
 		tooltip = {
 			opinion = {
-				modifier = opinion_glad
+				name = opinion_glad
 				who = FROM
 				years = 5
 			}
+		}
+	}
+}
+
+# Check for muslim mother's divorce on birth
+character_event = {
+	id = 105008
+
+	is_triggered_only = yes # on_birth
+	hide_window = yes
+
+	trigger = {
+		mother = { has_character_flag = qadi_granted_divorce }
+	}
+
+	immediate = {
+		mother = {
+			character_event = {
+				id = 105004
+				days = 2
+			}
+		}
+	}
+}
+
+### Suggest a Chief Qadi - Setup ###
+character_event = {
+	id = 105009
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+
+	trigger = {
+		can_grant_title = title_chief_qadi
+
+		any_courtier_or_vassal = {
+			can_hold_title = title_chief_qadi
+			NOT = { is_rival = ROOT }
+		}
+
+		any_courtier_or_vassal = {
+			religion_group = qismaite_group
+			block_general_event_trigger = no
+			war = no
+			in_command = no
+
+			NOR = {
+				has_character_flag = qadi_suggester
+				has_character_flag = new_qadi_suggester
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = {
+				religion_group = qismaite_group
+				block_general_event_trigger = no
+				war = no
+				in_command = no
+
+				NOR = {
+					has_character_flag = qadi_suggester
+					has_character_flag = new_qadi_suggester
+				}
+
+				trigger_if = {
+					limit = {
+						NOT = { can_hold_title = title_chief_qadi }
+					}
+
+					ROOT = {
+						any_courtier_or_vassal = {
+							can_hold_title = title_chief_qadi
+							NOT = { is_rival = PREVPREV }
+						}
+					}
+				}
+			}
+
+			preferred_limit = {
+				OR = {
+					trait = diligent
+					trait = ambitious
+				}
+			}
+
+			preferred_limit = {
+				NOR = {
+					trait = slothful
+					trait = content
+				}
+			}
+
+			set_character_flag = qadi_suggester
+			character_event = { id = 105010 }
 		}
 	}
 }
@@ -527,485 +642,306 @@ character_event = {
 ### Suggest a Chief Qadi ###
 character_event = {
 	id = 105010
-	desc = "EVTDESC105010"
+	desc = EVTDESC105010
 	picture = GFX_evt_emissary
 	border = GFX_event_normal_frame_religion
-	
-	min_age = 16
-	prisoner = no
-	capable_only = yes
-	war = no
-	
-	trigger = {
-		religion_group = qismaite_group
-		in_command = no
-		independent = no
-		NOT = {
-			has_minor_title = title_chief_qadi
-		}
-		NOT = {
-			has_character_flag = qadi_suggester
-		}
-		NOT = {
-			has_character_flag = new_qadi_suggester
-		}
-		liege = {
-			uses_decadence = yes
-			NOT = {
-				has_character_modifier = suggested_qadi_timer
-			}
-			NOT = {
-				has_character_modifier = suggested_new_qadi_timer
-			}
-			NOT = {
-				character = ROOT
-			}
-			prisoner = no
-			primary_title = {
-				OR = {
-					tier = king
-					tier = emperor
-				}
-			}
-			religion_group = qismaite_group
-			NOT = {
-				any_vassal = {
-					has_minor_title = title_chief_qadi
-				}
-			}
-			NOT = {
-				any_courtier = {
-					has_minor_title = title_chief_qadi
-				}
-			}
-			OR = {
-				any_vassal = {
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-				}
-				any_courtier = {
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-				}
-				ROOT = {
-					is_female = no
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-				}
-			}
-		}
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-		
-		modifier = {
-			factor = 0.5
-			trait = diligent
-		}
-		modifier = {
-			factor = 0.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 2
-			trait = slothful
-		}
-		modifier = {
-			factor = 2
-			trait = content
-		}
-	}
-	
-	immediate = {
-		set_character_flag = qadi_suggester
-		hidden_tooltip = {
-			liege = {
-				add_character_modifier = {
-					name = suggested_qadi_timer
-					duration = 730
-					hidden = yes
-				}
-			}
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105010" #Suggest a courtier
+		name = EVTOPTA105010 # Suggest a courtier
+
 		trigger = {
 			liege = {
 				any_courtier = {
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					NOT = { character = PREV }
-					NOT = { character = ROOT }
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
+					can_hold_title = title_chief_qadi
+					is_ruler = no
+					NOT = { is_rival = ROOT }
 				}
 			}
 		}
+
 		liege = {
 			random_courtier = {
 				limit = {
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					NOT = { character = PREV }
-					NOT = { character = ROOT }
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
+					can_hold_title = title_chief_qadi
+					is_ruler = no
+					NOT = { is_rival = ROOT }
 				}
+
 				save_event_target_as = target_suggested_qadi
-				set_character_flag = suggested_qadi
 			}
+
 			set_character_flag = suggested_qadi_courtier
+
 			character_event = {
 				id = 105011
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105011"
+				tooltip = EVTTOOLTIP105011
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105010" #Suggest yourself
-		trigger = {
-			is_female = no
-			NOT = {
-				has_minor_title = title_chief_qadi
-			}
-			OR = {
-				trait = detached_priest
-				trait = martial_cleric
-				trait = scholarly_theologian
-				trait = mastermind_theologian
-			}
-		}
+		name = EVTOPTB105010 # Suggest yourself
+
+		trigger = { can_hold_title = title_chief_qadi }
+
 		save_event_target_as = target_suggested_qadi
+
 		liege = {
+			show_scope_change = no
+
 			set_character_flag = suggested_qadi_from
+
 			character_event = {
 				id = 105011
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105011"
+				tooltip = EVTTOOLTIP105011
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105010" #Suggest a vassal
+		name = EVTOPTC105010 # Suggest a vassal
+
 		trigger = {
 			liege = {
 				any_vassal = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
+					can_hold_title = title_chief_qadi
+					NOT = { is_rival = ROOT }
 				}
 			}
 		}
+
 		liege = {
 			random_vassal = {
 				limit = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
+					can_hold_title = title_chief_qadi
+					NOT = { is_rival = ROOT }
 				}
+
 				save_event_target_as = target_suggested_qadi
-				set_character_flag = suggested_qadi
 			}
+
 			set_character_flag = suggested_qadi_vassal
+
 			character_event = {
 				id = 105011
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105011"
+				tooltip = EVTTOOLTIP105011
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTD105010" #Do nothing
+		name = EVTOPTD105010 # Do nothing
 	}
 }
 
-#Liege listens to suggestions
+# Liege listens to suggestions
 character_event = {
 	id = 105011
-	desc = "EVTDESC105011"
-	picture = GFX_evt_emissary #Placeholder?
+	desc = EVTDESC105011
+	picture = GFX_evt_emissary # Placeholder?
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTE105011" #OK
-		ai_chance = {
-			factor = 40
-		}
+		name = EVTOPTE105011 # OK
+
 		event_target:target_suggested_qadi = {
+			show_scope_change = no
+
 			give_minor_title = title_chief_qadi
+
 			if = {
-				limit = {
-					FROM = { character = PREV }
-				}
-				character_event = {
-					id = 105014
-					days = 3
-					random = 3
-					tooltip = "EVTTOOLTIPA105014"
-				}
-				break = yes
-			}
-			character_event = {
-				id = 105012
-				days = 3
-				random = 3
-				tooltip = "EVTTOOLTIP105012"
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTF105011" #No
-		ai_chance = {
-			factor = 60
-		}
-		FROM = {
-			if = {
-				limit = { 
-					character = event_target:target_suggested_qadi }
+				limit = { character = FROM }
+
 				opinion = {
-					modifier = opinion_disappointed
+					name = opinion_grateful
 					who = ROOT
 					years = 5
 				}
+
 				character_event = {
 					id = 105014
 					days = 3
 					random = 3
-					tooltip = "EVTTOOLTIPB105014"
+					tooltip = EVTTOOLTIPA105014
 				}
-				break = yes
 			}
-			character_event = {
-				id = 105013
-				days = 3
-				random = 3
-				tooltip = "EVTTOOLTIPA105013"
+			else = {
+				character_event = {
+					id = 105012
+					days = 3
+					random = 3
+					tooltip = EVTTOOLTIP105012
+				}
 			}
 		}
+
+		ai_chance = { factor = 40 }
+	}
+
+	option = {
+		name = EVTOPTF105011 # No
+
+		FROM = {
+			if = {
+				limit = { character = event_target:target_suggested_qadi }
+
+				opinion = {
+					name = opinion_disappointed
+					who = ROOT
+					years = 5
+				}
+
+				character_event = {
+					id = 105014
+					days = 3
+					random = 3
+					tooltip = EVTTOOLTIPB105014
+				}
+			}
+			else = {
+				character_event = {
+					id = 105013
+					days = 3
+					random = 3
+					tooltip = EVTTOOLTIPA105013
+				}
+			}
+		}
+
+		ai_chance = { factor = 60 }
 	}
 }
 
-#Vassal/Courtier gets title thanks to ROOT
+# Vassal/Courtier gets title thanks to ROOT
 character_event = {
 	id = 105012
-	desc = "EVTDESC105012"
-	picture = GFX_evt_emissary #Placeholder?
+	desc = EVTDESC105012
+	picture = GFX_evt_emissary # Placeholder?
 	border = GFX_event_normal_frame_religion
-	
-	show_from_from = yes
-	
+
 	is_triggered_only = yes
-	
+	show_from_from = yes
+
 	option = {
 		name = EVTOPTA105012
+
 		tooltip = {
 			give_minor_title = title_chief_qadi
 		}
+
+		opinion = {
+			name = opinion_grateful
+			who = FROMFROM
+			years = 5
+		}
+
 		FROMFROM = {
-			reverse_opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-				years = 5
-			}
+			show_scope_change = no
+
 			character_event = {
 				id = 105013
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105013"
+				tooltip = EVTTOOLTIPB105013
 			}
 		}
 	}
 }
 
-#ROOT is thanked/dismissed
+# ROOT is thanked/dismissed
 character_event = {
 	id = 105013
 	desc = EVTDESC105013
-	picture = GFX_evt_emissary #Placeholder?
+	picture = GFX_evt_emissary # Placeholder?
 	border = GFX_event_normal_frame_religion
-	
-	show_from_from = yes
-	
+
 	is_triggered_only = yes
-	
+	show_from_from = yes
+
 	option = {
 		name = EVTOPTA105013
+
 		trigger = {
 			event_target:target_suggested_qadi = {
 				has_minor_title = title_chief_qadi
 			}
 		}
+
 		prestige = 15
-		event_target:target_suggested_qadi = {
-			tooltip = {
-				opinion = {
-					modifier = opinion_grateful
-					who = ROOT
-					years = 5
-				}
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_grateful
+				who = event_target:target_suggested_qadi
+				years = 5
 			}
-		}		
+		}
 	}
-	
+
 	option = {
 		name = EVTOPTB105013
+
 		trigger = {
 			event_target:target_suggested_qadi = {
 				NOT = { has_minor_title = title_chief_qadi }
 			}
 		}
+
 		prestige = -5
 	}
 }
 
-#ROOT gains title/is dismissed
+# ROOT gains title/is dismissed
 character_event = {
 	id = 105014
-	desc = "EVTDESC105014"
-	picture = GFX_evt_emissary #Placeholder?
+	desc = EVTDESC105014
+	picture = GFX_evt_emissary # Placeholder?
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105014"
-		trigger = {
-			has_minor_title = title_chief_qadi
-		}
+		name = EVTOPTA105014
+
+		trigger = { has_minor_title = title_chief_qadi }
+
 		tooltip = {
 			give_minor_title = title_chief_qadi
 		}
+
 		prestige = 20
-		opinion = {
-			modifier = opinion_grateful
-			who = FROM
-			years = 5
+
+		tooltip = {
+			opinion = {
+				name = opinion_grateful
+				who = FROM
+				years = 5
+			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105014"
+		name = EVTOPTB105014
+
 		trigger = {
 			NOT = { has_minor_title = title_chief_qadi }
 		}
+
 		prestige = -5
+
 		tooltip = {
 			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = FROM
 				years = 5
 			}
@@ -1013,390 +949,216 @@ character_event = {
 	}
 }
 
-### Suggest a new Chief Qadi ###
+### Suggest a new Chief Qadi - Setup ###
 character_event = {
-	id = 105020
-	desc = "EVTDESC105020"
-	picture = GFX_evt_emissary #Placeholder!
-	border = GFX_event_normal_frame_religion
-	
-	min_age = 16
+	id = 105019
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
 	prisoner = no
-	only_capable = yes
-	war = no
-	
+
 	trigger = {
-		religion_group = qismaite_group
-		in_command = no
-		NOT = {
+		any_vassal = {
 			has_minor_title = title_chief_qadi
+			learning < 15
+
+			OR = {
+				trait = arbitrary
+				trait = slothful
+			}
 		}
-		NOT = {
-			has_character_flag = new_qadi_suggester
+
+		any_courtier_or_vassal = {
+			can_hold_title = title_chief_qadi
+			learning >= 15
+
+			NOR = {
+				trait = arbitrary
+				trait = slothful
+			}
 		}
-		NOT = {
-			has_character_flag = qadi_suggester
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_chief_qadi }
+			save_event_target_as = old_qadi
 		}
-		liege = {
-			uses_decadence = yes
-			prisoner = no
-			primary_title = {
-				OR = {
-					tier = king
-					tier = emperor
+
+		random_courtier_or_vassal = {
+			limit = {
+				religion_group = qismaite_group
+				block_general_event_trigger = no
+				war = no
+				in_command = no
+				NOT = { has_minor_title = title_chief_qadi }
+
+				trigger_if = {
+					limit = {
+						NOT = { can_hold_title = title_chief_qadi }
+					}
+
+					ROOT = {
+						any_courtier_or_vassal = {
+							can_hold_title = title_chief_qadi
+							learning >= 15
+
+							NOR = {
+								trait = arbitrary
+								trait = slothful
+								is_rival = PREVPREV
+							}
+						}
+					}
 				}
 			}
-			religion_group = qismaite_group
-			NOT = {
-				has_character_modifier = suggested_new_qadi_timer
-			}
-			NOT = {
-				has_character_modifier = suggested_qadi_timer
-			}
-			NOT = {
-				character = ROOT
-			}
-			any_vassal = {
-				has_minor_title = title_chief_qadi
-				NOT = {
-					learning = 15
-				}
+
+			preferred_limit = {
 				OR = {
-					trait = arbitrary
+					trait = diligent
+					trait = ambitious
+				}
+			}
+
+			preferred_limit = {
+				NOR = {
+					trait = content
 					trait = slothful
 				}
 			}
-			OR = {
+
+			set_character_flag = new_qadi_suggester
+			character_event = { id = 105020 }
+		}
+	}
+}
+
+### Suggest a new Chief Qadi ###
+character_event = {
+	id = 105020
+	desc = EVTDESC105020
+	picture = GFX_evt_emissary # Placeholder!
+	border = GFX_event_normal_frame_religion
+	portrait = event_target:old_qadi
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA105020 # Suggest a courtier
+
+		trigger = {
+			liege = {
 				any_courtier = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
+					can_hold_title = title_chief_qadi
+					learning >= 15
+					is_ruler = no
+
+					NOR = {
 						trait = arbitrary
-					}
-					NOT = {
 						trait = slothful
+						is_rival = ROOT
 					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-				}
-				any_vassal = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
-						trait = arbitrary
-					}
-					NOT = {
-						trait = slothful
-					}
-				}
-				ROOT = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					is_female = no
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
-						trait = arbitrary
-					}
-					NOT = {
-						trait = slothful
-					}
-					NOT = {
-						trait = content
-					}
-				}
-			}
-		}
-	}
-	
-	mean_time_to_happen = {
-		months = 350
-		
-		modifier = {
-			factor = 0.5
-			trait = diligent
-		}
-		modifier = {
-			factor = 0.5
-			trait = ambitious
-		}
-		modifier = {
-			factor = 2
-			trait = slothful
-		}
-		modifier = {
-			factor = 2
-			trait = content
-		}
-	}
-	
-	immediate = {
-		hidden_tooltip = {
-			liege = { 
-				random_vassal = {
-					limit = { has_minor_title = title_chief_qadi }
-					save_event_target_as = bad_qadi
 				}
 			}
 		}
 
-		set_character_flag = new_qadi_suggester
-		hidden_tooltip = {
-			liege = {
-				add_character_modifier = {
-					name = suggested_new_qadi_timer
-					duration = 730
-					hidden = yes
-				}
-			}
-		}
 		liege = {
-			if = {
-				limit = {
-					any_vassal = {
-						has_minor_title = title_chief_qadi
-					}
-				}
-				random_vassal = {
-					limit = { has_minor_title = title_chief_qadi }
-					save_event_target_as = old_qadi
-					break = yes
-				}
-			}
-			if = {
-				limit = {
-					any_courtier = {
-						has_minor_title = title_chief_qadi
-					}
-				}
-				random_courtier = {
-					limit = { has_minor_title = title_chief_qadi }
-					save_event_target_as = old_qadi
-					break = yes
-				}
-			}
-		}
-	}
-	
-	option = {
-		name = "EVTOPTA105020" #Suggest a courtier
-		trigger = {
-			liege = {
-				any_courtier = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
-						trait = arbitrary
-					}
-					NOT = {
-						trait = slothful
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-				}
-			}
-		}
-		liege = {
+			show_scope_change = no
+
 			random_courtier = {
 				limit = {
-					age = 16
-					religion_group = qismaite_group
-					is_female = no
-					prisoner = no
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
+					can_hold_title = title_chief_qadi
+					learning >= 15
+					is_ruler = no
+
+					NOR = {
 						trait = arbitrary
-					}
-					NOT = {
 						trait = slothful
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
+						is_rival = ROOT
 					}
 				}
+
 				save_event_target_as = target_suggested_qadi
 			}
+
 			character_event = {
 				id = 105021
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105021"
+				tooltip = EVTTOOLTIP105021
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105020" #Suggest yourself
-		trigger = {
-			NOT = {
-				has_minor_title = title_chief_qadi
-			}
-			is_female = no
-			OR = {
-				trait = detached_priest
-				trait = martial_cleric
-				trait = scholarly_theologian
-				trait = mastermind_theologian
-			}
-		}
+		name = EVTOPTB105020 # Suggest yourself
+
+		trigger = { can_hold_title = title_chief_qadi }
+
 		save_event_target_as = target_suggested_qadi
+
 		liege = {
+			show_scope_change = no
+
 			character_event = {
 				id = 105021
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105021"
+				tooltip = EVTTOOLTIP105021
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105020" #Suggest a vassal
+		name = EVTOPTC105020 # Suggest a vassal
+
 		trigger = {
 			liege = {
 				any_vassal = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
+					can_hold_title = title_chief_qadi
+					learning >= 15
+
+					NOR = {
 						trait = arbitrary
-					}
-					NOT = {
 						trait = slothful
+						is_rival = ROOT
 					}
 				}
 			}
 		}
+
 		liege = {
+			show_scope_change = no
+
 			random_vassal = {
 				limit = {
-					NOT = {
-						has_minor_title = title_chief_qadi
-					}
-					age = 16
-					is_female = no
-					religion_group = qismaite_group
-					prisoner = no
-					NOT = {
-						character = ROOT
-					}
-					NOT = {
-						any_rival = {
-							character = ROOT
-						}
-					}
-					OR = {
-						trait = detached_priest
-						trait = martial_cleric
-						trait = scholarly_theologian
-						trait = mastermind_theologian
-					}
-					learning = 15
-					NOT = {
+					can_hold_title = title_chief_qadi
+					learning >= 15
+
+					NOR = {
 						trait = arbitrary
-					}
-					NOT = {
 						trait = slothful
+						is_rival = ROOT
 					}
 				}
+
 				save_event_target_as = target_suggested_qadi
 			}
-		}
-		liege = {
+
 			character_event = {
 				id = 105021
 				days = 2
 				random = 4
-				tooltip = "EVTTOOLTIP105021"
+				tooltip = EVTTOOLTIP105021
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTD105020" #Do nothing
+		name = EVTOPTD105020 # Do nothing
 	}
 }
 
