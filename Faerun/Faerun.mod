@@ -1,5 +1,5 @@
 name = "Faerun"
-path = "mod/Faerun"
+path = "mod/Faerun/Faerun"
 user_dir = "Faerun"
 
 replace_path = "common/landed_titles"
