@@ -2575,6 +2575,13 @@ faerun_first_start_effect = {
 	setup_arcane_titles_effect = yes
 	setup_druidic_titles_effect = yes
 	setup_rogue_titles_effect = yes
+
+	# set duration for replacing the adventurer trait with the former_adventurer
+	any_character = {
+		limit = { trait = adventurer }
+
+		add_trait_adventurer_effect = yes
+	}
 }
 
 clear_monster_province_effect = {
@@ -3665,4 +3672,30 @@ remove_adopted_bloodline_members_effect = {
 
 		remove_from_bloodline = PREV
 	}
+}
+
+add_trait_adventurer_effect = {
+	if = {
+		limit = { NOT = { trait = adventurer } }
+
+		if = { limit = { trait = former_adventurer } remove_trait = former_adventurer }
+		add_trait = adventurer
+	}
+
+	# Set/refresh minimum time before the adventurer trait turns into the former_adventurer trait
+	hidden_effect = {
+		if = { limit = { has_character_modifier = adv_trait_perseverance_modifier } remove_character_modifier = adv_trait_perseverance_modifier }
+
+		if = {
+			limit = { has_character_flag = adv_forever  }
+
+			add_character_modifier = { name = adv_trait_perseverance_modifier hidden = yes duration = -1 }
+		}
+		else = { add_character_modifier = { name = adv_trait_perseverance_modifier hidden = yes years = 5 } }
+	}
+}
+
+add_trait_adventurer_permanent_effect = {
+	set_character_flag = adv_forever
+	add_trait_adventurer_effect = yes
 }
