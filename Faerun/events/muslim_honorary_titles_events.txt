@@ -4267,271 +4267,325 @@ character_event = {
 
 ### COURT MUSICIAN ###
 
+### Court Musician presents a song for the liege/liege's spouse - Setup ###
+character_event = {
+	id = 105074
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+
+	trigger = {
+		higher_real_tier_than = DUKE
+
+		any_courtier_or_vassal = {
+			has_minor_title = title_court_musician
+			religion_group = qismaite_group
+			block_general_event_trigger = no
+			in_command = no
+
+			OR = {
+				diplomacy >= 15
+				trait = poet
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_court_musician }
+
+			save_event_target_as = court_musician
+
+			character_event = { id = 105075 }
+		}
+	}
+}
+
 ### Court Musician presents a song for the liege/liege's spouse ###
 character_event = {
 	id = 105075
-	desc = "EVTDESC105075"
+	desc = EVTDESC105075
 	picture = GFX_evt_spymaster
-	
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	
-	trigger = {
-		religion_group = qismaite_group
-		in_command = no
-		has_minor_title = title_court_musician
-		NOT = {
-			has_character_modifier = musician_song_timer
-		}
-		OR = {
-			trait = poet
-			diplomacy = 15
-		}
-		liege = {
-			religion_group = qismaite_group
-			NOT = {
-				character = ROOT
-			}
-			OR = {
-				tier = king
-				tier = emperor
-			}
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-	}
-	
-	immediate = {
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = musician_song_timer
-				duration = 730
-				hidden = yes
-			}
-			save_event_target_as = court_musician
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105075"
+		name = EVTOPTA105075
+
 		trigger = {
-			is_female = no
+			prefers_men_trigger = no
+
 			liege = {
 				spouse = {
 					is_female = yes
-					is_alive = yes
-					age = 20
-					NOT = {
-						age = 30
-					}
-					NOT = {
-						has_ugly_trait_trigger = yes
-					}
+					age >= 20
+					practical_age < 30
+					has_ugly_trait_trigger = no
 				}
 			}
 		}
+
 		liege = {
+			show_scope_change = no
+
 			spouse = {
+				show_scope_change = no
+
 				character_event = {
 					id = 105076
 					days = 3
 					random = 3
-					tooltip = "EVTTOOLTIP105076"
+					tooltip = EVTTOOLTIP105076
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105075"
+		name = EVTOPTB105075
+
 		liege = {
+			show_scope_change = no
+
 			set_character_flag = musician_song
+
 			character_event = {
 				id = 105077
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPA105077"
+				tooltip = EVTTOOLTIPA105077
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105075"
+		name = EVTOPTC105075
+
 		add_character_modifier = {
 			name = diligent_musician
-			duration = 365
+			years = 1
 		}
 	}
 }
 
-#Liege's spouse: CM gave me song
+# Liege's spouse: CM gave me song
 character_event = {
 	id = 105076
-	desc = "EVTDESC105076"
+	desc = EVTDESC105076
 	picture = GFX_evt_courtiers_talking
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105076"
+		name = EVTOPTA105076
+
+		opinion = {
+			name = opinion_beautiful_song
+			who = FROM
+			years = 5
+		}
+
 		FROM = {
-			reverse_opinion = {
-				modifier = opinion_beautiful_song
-				who = ROOT
-				years = 5
-			}
+			show_scope_change = no
+
 			set_character_flag = wonderful_song
+
 			character_event = {
 				id = 105078
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIP105078"
+				tooltip = EVTTOOLTIP105078
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105076"
+		name = EVTOPTB105076
+
 		spouse = {
+			show_scope_change = no
+
 			set_character_flag = musician_song_spouse
+
 			character_event = {
 				id = 105077
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIP105077"
+				tooltip = EVTTOOLTIP105077
 			}
 		}
 	}
 }
 
-#Liege/spouse: gets the song/spouse got the song
+# Liege/spouse: gets the song/spouse got the song
 character_event = {
 	id = 105077
-	desc = "EVTDESC105077"
+	desc = EVTDESC105077
 	picture = GFX_evt_emissary
-	
-	show_from_from = yes
-	
+
 	is_triggered_only = yes
-	
+	show_from_from = yes
+
 	option = {
-		name = "EVTOPTA105077"
-		trigger = {
-			has_character_flag = musician_song_spouse
-		}
+		name = EVTOPTA105077
+
+		trigger = { has_character_flag = musician_song_spouse }
+
 		clr_character_flag = musician_song_spouse
+
 		tooltip = {
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 0.05
 			}
 		}
+
+		reverse_opinion = {
+			name = opinion_beautiful_song
+			who = spouse
+			years = 2
+		}
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = song_spouse_fine
+
 			character_event = {
 				id = 105078
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105078"
+				tooltip = EVTTOOLTIPB105078
 			}
-		}		
-	}
-	option = {
-		name = "EVTOPTB105077"
-		trigger = {
-			has_character_flag = musician_song_spouse
 		}
+	}
+
+	option = {
+		name = EVTOPTB105077
+
+		trigger = { has_character_flag = musician_song_spouse }
+
 		clr_character_flag = musician_song_spouse
-		FROM = {
-			imprison = ROOT
-		}
-		FROM = {
-			set_character_flag = imprison_musician
-			character_event = {
-				id = 105078
-				days = 3
-				random = 3
-				tooltip = "EVTTOOLTIPC105078"
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTC105077"
-		trigger = {
-			has_character_flag = musician_song		
-		}
-		clr_character_flag = musician_song	
+
 		opinion = {
-			modifier = opinion_beautiful_song
+			name = opinion_seduce_spouse
 			who = FROM
 			years = 5
 		}
+
 		FROM = {
-			set_character_flag = wonderful_song
+			show_scope_change = no
+
+			imprison = ROOT
+			set_character_flag = imprison_musician
+
 			character_event = {
 				id = 105078
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIP105078"
+				tooltip = EVTTOOLTIPC105078
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTC105077
+
+		trigger = { has_character_flag = musician_song }
+
+		clr_character_flag = musician_song
+
+		opinion = {
+			name = opinion_beautiful_song
+			who = FROM
+			years = 5
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			set_character_flag = wonderful_song
+
+			character_event = {
+				id = 105078
+				days = 3
+				random = 3
+				tooltip = EVTTOOLTIP105078
 			}
 		}
 	}
 }
 
-#Court Musician: Liege's Spouse's reaction
+# Court Musician: Liege's Spouse's reaction
 character_event = {
 	id = 105078
-	desc = "EVTDESC105078"
+	desc = EVTDESC105078
 	picture = GFX_evt_courtiers_talking
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105078"
-		trigger = {
-			has_character_flag = wonderful_song
-		}
+		name = EVTOPTA105078
+
+		trigger = { has_character_flag = wonderful_song }
+
 		clr_character_flag = wonderful_song
-		reverse_opinion = {
-			modifier = opinion_beautiful_song
-			who = FROM
-			years = 5
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_beautiful_song
+				who = FROM
+				years = 5
+			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105078"
-		trigger = {
-			has_character_flag = song_spouse_fine
-		}
+		name = EVTOPTB105078
+
+		trigger = { has_character_flag = song_spouse_fine }
+
 		clr_character_flag = song_spouse_fine
+
 		FROM = {
+			show_scope_change = no
+
 			transfer_scaled_wealth = {
 				to = ROOT
 				value = 0.05
 			}
-			spouse = {
-				opinion = {
-					modifier = opinion_beautiful_song
-					who = ROOT
-					years = 2
+
+			tooltip = {
+				spouse = {
+					show_scope_change = no
+
+					opinion = {
+						name = opinion_beautiful_song
+						who = ROOT
+						years = 2
+					}
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105078"
-		trigger = {
-			has_character_flag = imprison_musician
-		}
+		name = EVTOPTC105078
+
+		trigger = { has_character_flag = imprison_musician }
+
 		clr_character_flag = imprison_musician
+
 		tooltip = {
 			imprison = FROM
-		}
-		FROM = {
-			opinion = {
-				modifier = opinion_seduce_spouse
-				who = ROOT
+
+			reverse_opinion = {
+				name = opinion_seduce_spouse
+				who = FROM
 				years = 5
 			}
 		}
@@ -4540,516 +4594,551 @@ character_event = {
 
 ### COURT POET ###
 
+### Court Poet writes poem - Setup ###
+character_event = {
+	id = 105099
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+
+	trigger = {
+		higher_real_tier_than = DUKE
+
+		any_courtier_or_vassal = {
+			has_minor_title = title_court_poet
+			religion_group = qismaite_group
+			block_general_event_trigger = no
+			in_command = no
+
+			OR = {
+				diplomacy >= 15
+				trait = poet
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_court_poet }
+			character_event = { id = 105100 }
+		}
+	}
+}
+
 ### Court Poet writes poem ###
 character_event = {
 	id = 105100
-	desc = "EVTDESC105100"
+	desc = EVTDESC105100
 	picture = GFX_evt_garden
-	
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	
-	trigger = {
-		religion_group = qismaite_group
-		in_command = no
-		has_minor_title = title_court_poet
-		NOT = {
-			has_character_modifier = poet_verse_timer
-		}
-		OR = {
-			trait = poet
-			diplomacy = 15
-		}
-		liege = {
-			religion_group = qismaite_group
-			NOT = {
-				character = ROOT
-			}
-			OR = {
-				tier = king
-				tier = emperor
-			}
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-	}
-	
-	immediate = {
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = poet_verse_timer
-				duration = 730
-				hidden = yes
-			}
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105100"
+		name = EVTOPTA105100
+
 		trigger = {
-			is_female = no
+			prefers_men_trigger = no
+
 			liege = {
 				spouse = {
 					is_female = yes
-					is_alive = yes
-					age = 20
-					NOT = {
-						age = 30
-					}
-					NOT = {
-						has_ugly_trait_trigger = yes
-					}
+					age >= 20
+					practical_age < 30
+					has_ugly_trait_trigger = no
 				}
 			}
 		}
+
 		liege = {
+			show_scope_change = no
+
 			spouse = {
+				show_scope_change = no
+
 				character_event = {
 					id = 105101
 					days = 3
 					random = 3
-					tooltip = "EVTTOOLTIP105101"
+					tooltip = EVTTOOLTIP105101
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105100"
+		name = EVTOPTB105100
+
 		liege = {
+			show_scope_change = no
+
 			set_character_flag = poet_poetry
+
 			character_event = {
 				id = 105102
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPA105102"
+				tooltip = EVTTOOLTIPA105102
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105100"
+		name = EVTOPTC105100
+
 		add_character_modifier = {
 			name = diligent_poet
-			duration = 365
+			years = 1
 		}
 	}
 }
 
-#Liege's spouse: Court Poet gave me a poem
+# Liege's spouse: Court Poet gave me a poem
 character_event = {
 	id = 105101
-	desc = "EVTDESC105101"
+	desc = EVTDESC105101
 	picture = GFX_evt_garden
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105101"
-		FROM = {
-			reverse_opinion = {
-				modifier = opinion_beautiful_poem
-				who = ROOT
+		name = EVTOPTA105101
+
+		tooltip = {
+			opinion = {
+				name = opinion_beautiful_poem
+				who = FROM
 				years = 5
 			}
+		}
+
+		FROM = {
+			show_scope_change = no
+
 			set_character_flag = wonderful_poem
+
 			character_event = {
 				id = 105103
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIP105103"
+				tooltip = EVTTOOLTIP105103
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105101"
+		name = EVTOPTB105101
+
 		spouse = {
+			show_scope_change = no
+
 			set_character_flag = poet_poetry_spouse
+
 			character_event = {
 				id = 105102
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105102"
+				tooltip = EVTTOOLTIPB105102
 			}
 		}
 	}
 }
 
-#Liege/spouse: gets the poem/spouse got the poem
+# Liege/spouse: gets the poem/spouse got the poem
 character_event = {
 	id = 105102
-	desc = "EVTDESC105102"
+	desc = EVTDESC105102
 	picture = GFX_evt_garden
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105102"
-		trigger = {
-			has_character_flag = poet_poetry_spouse
-		}
+		name = EVTOPTA105102
+
+		trigger = { has_character_flag = poet_poetry_spouse }
+
 		clr_character_flag = poet_poetry_spouse
+
 		tooltip = {
 			transfer_scaled_wealth = {
 				to = FROM
 				value = 0.05
 			}
 		}
+
+		tooltip = {
+			spouse = {
+				show_scope_change = no
+
+				opinion = {
+					name = opinion_beautiful_poem
+					who = FROM
+					years = 2
+				}
+			}
+		}
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = poem_spouse_fine
+
 			character_event = {
 				id = 105103
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105103"
+				tooltip = EVTTOOLTIPB105103
 			}
-		}		
-	}
-	option = {
-		name = "EVTOPTB105102"
-		trigger = {
-			has_character_flag = poet_poetry_spouse
 		}
+	}
+
+	option = {
+		name = EVTOPTB105102
+
+		trigger = { has_character_flag = poet_poetry_spouse }
+
 		clr_character_flag = poet_poetry_spouse
-		FROM = {
-			imprison = ROOT
+
+		tooltip = {
+			opinion = {
+				name = opinion_seduce_spouse
+				who = FROM
+				years = 5
+			}
 		}
+
 		FROM = {
+			show_scope_change = no
+
+			imprison = ROOT
 			set_character_flag = imprison_poet
+
 			character_event = {
 				id = 105103
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPC105103"
+				tooltip = EVTTOOLTIPC105103
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105102"
-		trigger = {
-			has_character_flag = poet_poetry		
-		}
+		name = EVTOPTC105102
+
+		trigger = { has_character_flag = poet_poetry }
+
 		clr_character_flag = poet_poetry
-		opinion = {
-			modifier = opinion_beautiful_poem
-			who = FROM
-			years = 5
+
+		tooltip = {
+			opinion = {
+				name = opinion_beautiful_poem
+				who = FROM
+				years = 5
+			}
 		}
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = liege_wonderful_poem
+
 			character_event = {
 				id = 105103
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105103"
+				tooltip = EVTTOOLTIPB105103
 			}
 		}
 	}
 }
 
-#Court Musician: Liege and liege's Spouse's reaction
+# Court Musician: Liege and liege's Spouse's reaction
 character_event = {
 	id = 105103
-	desc = "EVTDESC105103"
+	desc = EVTDESC105103
 	picture = GFX_evt_garden
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105103"
-		trigger = {
-			has_character_flag = wonderful_poem
-		}
+		name = EVTOPTA105103
+
+		trigger = { has_character_flag = wonderful_poem }
+
 		clr_character_flag = wonderful_poem
-		reverse_opinion = {
-			modifier = opinion_beautiful_poem
-			who = FROM
-			years = 5
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_beautiful_poem
+				who = FROM
+				years = 5
+			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105103"
-		trigger = {
-			has_character_flag = poem_spouse_fine
-		}
+		name = EVTOPTB105103
+
+		trigger = { has_character_flag = poem_spouse_fine }
+
 		clr_character_flag = poem_spouse_fine
+
 		FROM = {
+			show_scope_change = no
+
 			transfer_scaled_wealth = {
 				to = ROOT
 				value = 0.05
 			}
+
 			spouse = {
+				show_scope_change = no
+
 				opinion = {
-					modifier = opinion_beautiful_poem
+					name = opinion_beautiful_poem
 					who = ROOT
 					years = 2
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105103"
-		trigger = {
-			has_character_flag = imprison_poet
-		}
+		name = EVTOPTC105103
+
+		trigger = { has_character_flag = imprison_poet }
+
 		clr_character_flag = imprison_poet
+
 		tooltip = {
 			imprison = FROM
 		}
-		FROM = {
-			opinion = {
-				modifier = opinion_seduce_spouse
-				who = ROOT
-				years = 5
-			}
+
+		reverse_opinion = {
+			name = opinion_seduce_spouse
+			who = FROM
+			years = 5
 		}
 	}
+
 	option = {
-		name = "EVTOPTD105103"
-		trigger = {
-			has_character_flag = liege_wonderful_poem
-		}
+		name = EVTOPTD105103
+
+		trigger = { has_character_flag = liege_wonderful_poem }
+
 		clr_character_flag = liege_wonderful_poem
-		tooltip = {
-			opinion = {
-				modifier = opinion_beautiful_poem
-				who = FROM
-				years = 5
-			}
+
+		opinion = {
+			name = opinion_beautiful_poem
+			who = FROM
+			years = 5
 		}
 	}
 }
 
 ### CUPBEARER ###
 
+### Cupbearer: Poison Host - Setup###
+character_event = {
+	id = 105149
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+	in_command = no
+
+	trigger = {
+		any_courtier_or_vassal = {
+			has_minor_title = title_cupbearer
+			block_general_event_trigger = no
+			war = no
+			in_command = no
+			NOT = { has_character_modifier = cupbearer_poison_timer }
+
+			OR = {
+				intrigue >= 15
+				diplomacy >= 15
+				trait = deceitful
+				trait = envious
+			}
+
+			opinion = {
+				who = ROOT
+				value < 0
+			}
+
+			host = {
+				character = ROOT
+				at_location = PREV
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_cupbearer
+				trait = envious
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_cupbearer
+				trait = deceitful
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_cupbearer
+				trait = honest
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_cupbearer
+				trait = charitable
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_cupbearer }
+
+			add_character_modifier = {
+				name = cupbearer_poison_timer
+				years = 5
+				hidden = yes
+			}
+
+			character_event = { id = 105150 }
+		}
+	}
+}
+
 ### Cupbearer: Poison Host ###
 character_event = {
 	id = 105150
-	desc = "EVTDESC105150"
+	desc = EVTDESC105150
 	picture = GFX_evt_courtiers_talking
-	
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	war = no
-	
-	trigger = {
-		in_command = no
-		has_minor_title = title_cupbearer
-		OR = {
-			intrigue = 15
-			diplomacy = 15
-			trait = deceitful
-			trait = envious
-		}
-		NOT = {
-			has_character_modifier = cupbearer_poison_timer
-		}
-		host = {
-			is_liege_of = ROOT
-			in_command = no
-			at_location = ROOT
-			NOT = { reverse_opinion = { who = ROOT value = 0 } }
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-		
-		modifier = {
-			factor = 0.5
-			trait = envious
-		}
-		modifier = {
-			factor = 0.5
-			trait = deceitful
-		}
-		modifier = {
-			factor = 2
-			trait = honest
-		}
-		modifier = {
-			factor = 2
-			trait = charitable
-		}			
-	}
-	
-	immediate = {
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = cupbearer_poison_timer
-				duration = 1825
-				hidden = yes
-			}
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105150"
+		name = EVTOPTA105150
+
 		host = {
+			show_scope_change = no
+
 			if = {
-				limit = {
-					trait = paranoid
-				}
-				random_list = {
-					70 = {
-						set_character_flag = failed_poison
-						character_event = {
-							id = 105151
-							tooltip = "EVTTOOLTIP105151"
-						}
-					}
-					15 = {
-						if = {
-							limit = {
-								NOT = {
-									has_dlc = "Reapers"
-								}
-							}
-						add_trait = ill
-						}
-						if = {
-							limit = {
-								has_dlc = "Reapers"
-							}
-						set_character_flag = disease_not_serious
-						add_trait = vomiting
-						character_event = { id = RIP.11005 days = 10 random = 30 }
-						}
-						hidden_tooltip = {
-							character_event = {
-								id = 38290
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = poison_ill
-								character_event = {
-									id = 105151
-									days = 3
-									random = 3
-								}
-							}
-						}
-					}
-					10 = {
-						add_trait = lunatic
-						hidden_tooltip = {
-							character_event = {
-								id = 38304 #Notify Lunatic
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = poison_lunatic
-								character_event = {
-									id = 105151
-									days = 3
-									random = 3
-								}
-							}
-						}
-					}
-					5 = {
-						death = {
-							death_reason = death_murder_unknown_poison
-							killer = ROOT
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
-						trait = paranoid
-					}
-				}
+				limit = { trait = paranoid }
+
 				random_list = {
 					50 = {
+						mult_modifier = {
+							factor = 1.4 # 70%
+							trait = paranoid
+						}
+
 						set_character_flag = failed_poison
+
 						character_event = {
 							id = 105151
-							tooltip = "EVTTOOLTIP105151"
+							tooltip = EVTTOOLTIP105151
 						}
 					}
+
 					25 = {
-						if = {
-							limit = {
-								NOT = {
-									has_dlc = "Reapers"
-								}
-							}
-						add_trait = ill
+						mult_modifier = {
+							factor = 0.6 # 15%
+							trait = paranoid
 						}
+
 						if = {
-							limit = {
-								has_dlc = "Reapers"
-							}
-						set_character_flag = disease_not_serious
-						add_trait = vomiting
-						character_event = { id = RIP.11005 days = 10 random = 30 }
-						}
-						hidden_tooltip = {
+							limit = { has_dlc = "Reapers" }
+
+							set_character_flag = disease_not_serious
+							add_trait = vomiting
+
 							character_event = {
-								id = 38290
+								id = RIP.11005
+								days = 10
+								random = 30
 							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
+						}
+						else = {
+							add_trait_ill_effect = yes
+						}
+
+						if = {
+							limit = {
+								OR = {
+									intrigue >= 15
+
+									job_spymaster = {
+										intrigue >= 15
 									}
 								}
-								set_character_flag = poison_ill
-								character_event = {
-									id = 105151
-									days = 3
-									random = 3
-								}
+							}
+
+							set_character_flag = poison_ill
+
+							character_event = {
+								id = 105151
+								days = 3
+								random = 3
 							}
 						}
 					}
+
 					20 = {
-						add_trait = lunatic
-						hidden_tooltip = {
-							character_event = {
-								id = 38304 #Notify Lunatic
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
+						mult_modifier = {
+							factor = 0.5 # 10%
+							trait = paranoid
+						}
+
+						add_trait_lunatic_effect = yes
+
+						if = {
+							limit = {
+								OR = {
+									intrigue >= 15
+
+									job_spymaster = {
+										intrigue >= 15
 									}
 								}
-								set_character_flag = poison_lunatic
-								character_event = {
-									id = 105151
-									days = 3
-									random = 3
-								}
+							}
+
+							set_character_flag = poison_lunatic
+
+							character_event = {
+								id = 105151
+								days = 3
+								random = 3
 							}
 						}
 					}
+
 					5 = {
 						death = {
 							death_reason = death_murder_unknown_poison
@@ -5060,175 +5149,148 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105150"
-		if = {
-			limit = {
-				trait = deceitful
-			}
-			remove_trait = deceitful
-		}
-		if = {
-			limit = {
-				trait = envious
-			}
-			remove_trait = envious
-		}
+		name = EVTOPTB105150
+
+		remove_trait_silently_deceitful_effect = yes
+		remove_trait_silently_envious_effect = yes
 	}
 }
 
-#Host finds out/is poisoned
+# Host finds out/is poisoned
 character_event = {
 	id = 105151
-	desc = "EVTDESC105151"
+	desc = EVTDESC105151
 	picture = GFX_evt_spymaster
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105151"
-		trigger = {
-			has_character_flag = poison_lunatic
+		name = {
+			text = EVTOPTA105151
+			trigger = { has_character_flag = poison_lunatic }
 		}
+		name = {
+			text = EVTOPTB105151
+			trigger = { has_character_flag = failed_poison }
+		}
+		name = {
+			text = EVTOPTC105151
+			trigger = { has_character_flag = poison_ill }
+		}
+
+		FROM = {
+			show_scope_change = no
+
+			imprison = ROOT
+
+			tooltip = {
+				remove_title = title_cupbearer
+
+				reverse_opinion = {
+					name = opinion_poisoner
+					who = ROOT
+					years = 5
+				}
+			}
+
+			character_event = { id = 105152 }
+		}
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			poison_lunatic = {
+				FROM = {
+					show_scope_change = no
+
+					custom_tooltip = { text = EVTTOOLTIPA105152 }
+					set_character_flag = lunatic_imprison
+				}
+			}
+
+			failed_poison = {
+				FROM = {
+					show_scope_change = no
+
+					custom_tooltip = { text = EVTTOOLTIPB105152 }
+					set_character_flag = failed_imprison
+				}
+			}
+
+			ill_poison = {
+				FROM = {
+					show_scope_change = no
+
+					custom_tooltip = { text = EVTTOOLTIPC105152 }
+					set_character_flag = ill_imprison
+				}
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = EVTOPTD105151
+			trigger = { has_character_flag = poison_lunatic }
+		}
+		name = {
+			text = EVTOPTE105151
+			trigger = { has_character_flag = failed_poison }
+		}
+		name = {
+			text = EVTOPTF105151
+			trigger = { has_character_flag = poison_ill }
+		}
+
+		FROM = {
+			show_scope_change = no
+			death = { death_reason = death_execution }
+		}
+	}
+
+	after = {
 		clr_character_flag = poison_lunatic
-		FROM = {
-			imprison = ROOT
-			set_character_flag = lunatic_imprison
-			tooltip = {
-				remove_title = title_cupbearer
-			}
-			character_event = {
-				id = 105152
-				tooltip = "EVTTOOLTIPA105152"
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTB105151"
-		trigger = {
-			has_character_flag = failed_poison
-		}
 		clr_character_flag = failed_poison
-		FROM = {
-			imprison = ROOT
-			set_character_flag = failed_imprison
-			tooltip = {
-				remove_title = title_cupbearer
-			}
-			character_event = {
-				id = 105152
-				tooltip = "EVTTOOLTIPB105152"
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTC105151"
-		trigger = {
-			has_character_flag = poison_ill
-		}
 		clr_character_flag = poison_ill
-		FROM = {
-			imprison = ROOT
-			set_character_flag = ill_imprison
-			tooltip = {
-				remove_title = title_cupbearer
-			}
-			character_event = {
-				id = 105152
-				tooltip = "EVTTOOLTIPC105152"
-			}
-		}
-	}
-	option = {
-		name = "EVTOPTD105151"
-		trigger = {
-			has_character_flag = poison_lunatic
-		}
-		clr_character_flag = poison_lunatic
-		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
-	}
-	option = {
-		name = "EVTOPTE105151"
-		trigger = {
-			has_character_flag = failed_poison
-		}
-		clr_character_flag = failed_poison
-		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
-	}
-	option = {
-		name = "EVTOPTF105151"
-		trigger = {
-			has_character_flag = poison_ill
-		}
-		clr_character_flag = poison_ill
-		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
 	}
 }
 
-#Cupbearer is imprisoned
+# Cupbearer is imprisoned
 character_event = {
 	id = 105152
-	desc = "EVTDESC105152"
+	desc = EVTDESC105152
 	picture = GFX_evt_into_the_dungeon
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105152"
-		trigger = {
-			has_character_flag = ill_imprison
+		name = {
+			text = EVTOPTA105152
+			trigger = { has_character_flag = ill_imprison }
 		}
+		name = {
+			text = EVTOPTB105152
+			trigger = { has_character_flag = failed_imprison }
+		}
+		name = {
+			text = EVTOPTC105152
+			trigger = { has_character_flag = lunatic_imprison }
+		}
+
 		clr_character_flag = ill_imprison
-		tooltip = {
-			imprison = FROM
-		}
-		remove_title = title_cupbearer
-		reverse_opinion = {
-			modifier = opinion_poisoner
-			who = FROM
-			years = 5
-		}
-	}
-	option = {
-		name = "EVTOPTB105152"
-		trigger = {
-			has_character_flag = failed_imprison
-		}
 		clr_character_flag = failed_imprison
-		tooltip = {
-			imprison = FROM
-		}
-		remove_title = title_cupbearer
-		reverse_opinion = {
-			modifier = opinion_poisoner
-			who = FROM
-			years = 5
-		}
-	}
-	option = {
-		name = "EVTOPTC105152"
-		trigger = {
-			has_character_flag = lunatic_imprison
-		}
 		clr_character_flag = lunatic_imprison
+
 		tooltip = {
 			imprison = FROM
 		}
+
 		remove_title = title_cupbearer
+
 		reverse_opinion = {
-			modifier = opinion_poisoner
+			name = opinion_poisoner
 			who = FROM
 			years = 5
 		}
@@ -5237,308 +5299,374 @@ character_event = {
 
 ### CHIEF ARCHITECT ###
 
+### Chief Architect: Suggest improvements to castle - Setup ###
+character_event = {
+	id = 105199
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+	in_command = no
+
+	trigger = {
+		scaled_wealth = 2
+
+		any_courtier_or_vassal = {
+			has_minor_title = title_chief_architect
+			religion_group = qismaite_group
+			block_general_event_trigger = no
+			in_command = no
+			at_location = ROOT
+
+			NOR = {
+				has_character_modifier = architect_improvement_timer
+				has_character_modifier = diligent_architect
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_chief_architect
+				trait = envious
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_chief_architect
+				trait = deceitful
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_chief_architect
+				trait = honest
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_chief_architect
+				trait = charitable
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_chief_architect }
+			character_event = { id = 105200 }
+		}
+	}
+}
+
 ### Chief Architect: Suggest improvements to castle ###
 character_event = {
 	id = 105200
-	desc = "EVTDESC105200"
+	desc = EVTDESC105200
 	picture = GFX_evt_castle_construction
-	
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	
-	trigger = {
-		religion_group = qismaite_group
-		in_command = no
-		has_minor_title = title_chief_architect
-		NOT = {
-			has_character_modifier = architect_improvement_timer
-		}
-		NOT = {
-			has_character_modifier = diligent_architect
-		}
-		liege = {
-			at_location = ROOT
-			scaled_wealth = 2
-			in_command = no
-			NOT = {
-				character = ROOT
-			}
-			religion_group = qismaite_group
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-		
-		modifier = {
-			factor = 0.5
-			trait = envious
-		}
-		modifier = {
-			factor = 0.5
-			trait = deceitful
-		}
-		modifier = {
-			factor = 2
-			trait = honest
-		}
-		modifier = {
-			factor = 2
-			trait = charitable
-		}			
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105200"
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = architect_improvement_timer
-				duration = 1825
-				hidden = yes
-			}
+		name = EVTOPTA105200
+
+		add_character_modifier = {
+			name = architect_improvement_timer
+			years = 5
+			hidden = yes
 		}
+
 		liege = {
+			show_scope_change = no
+
 			character_event = {
 				id = 105201
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIP105201"
+				tooltip = EVTTOOLTIP105201
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105200"
+		name = EVTOPTB105200
+
 		add_character_modifier = {
 			name = diligent_architect
-			duration = 365
+			years = 1
 		}
 	}
 }
 
-#Liege: CA asks if improvements is OK
+# Liege: CA asks if improvements is OK
 character_event = {
 	id = 105201
-	desc = "EVTDESC105201"
+	desc = EVTDESC105201
 	picture = GFX_evt_castle_construction
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105201" #Yes
-		transfer_scaled_wealth = {
-			to = FROM
-			value = 0.25
-		}
+		name = EVTOPTA105201 # Yes
+
 		FROM = {
+			show_scope_change = no
+
+			transfer_scaled_wealth = {
+				from = ROOT
+				value = 0.25
+			}
+
 			opinion = {
-				modifier = opinion_glad
+				name = opinion_glad
 				who = ROOT
 				years = 5
 			}
+
 			set_character_flag = all_improvements
+
 			character_event = {
 				id = 105202
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPA105202"
+				tooltip = EVTTOOLTIPA105202
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105201" #No
+		name = EVTOPTB105201 # No
+
 		FROM = {
+			show_scope_change = no
+
 			set_character_flag = no_improvement
+
 			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = ROOT
 				years = 5
 			}
+
 			character_event = {
 				id = 105202
 				days = 3
 				random = 3
-				tooltip = "EVTTOOLTIPB105202"
+				tooltip = EVTTOOLTIPB105202
 			}
 		}
 	}
 }
 
-#Chief Architect: Keep the money or not?/no money
+# Chief Architect: Keep the money or not?/no money
 character_event = {
 	id = 105202
-	desc = "EVTDESC105202"
+	desc = EVTDESC105202
 	picture = GFX_evt_castle_construction
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105202"
-		trigger = {
-			has_character_flag = no_improvement
-		}
+		name = EVTOPTA105202
+
+		trigger = { has_character_flag = no_improvement }
+
 		clr_character_flag = no_improvement
+
 		tooltip = {
 			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = FROM
 				years = 5
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105202" #Keep it!
-		trigger = {
-			has_character_flag = all_improvements
-		}
+		name = EVTOPTB105202 # Keep it!
+
+		trigger = { has_character_flag = all_improvements }
+
 		clr_character_flag = all_improvements
-		FROM = {
-			transfer_scaled_wealth = {
-				to = ROOT
-				value = 0.25
-			}
+
+		transfer_scaled_wealth = {
+			from = FROM
+			value = 0.25
 		}
-		hidden_tooltip = {
+
+		FROM = {
 			if = {
 				limit = {
-					FROM = {
-						OR = {
-							intrigue = 20
-							job_spymaster = {
-								intrigue = 20
-							}
+					OR = {
+						intrigue >= 20
+
+						job_spymaster = {
+							intrigue >= 20
 						}
 					}
 				}
-				random = {
-					chance = 50
-					FROM = {
-						character_event = {
-							id = 105203
-							days = 180
-							random = 2
-						}
-					}
+			}
+
+			random = {
+				chance = 50
+
+				character_event = {
+					id = 105203
+					months = 6
+					random = 2
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105202" #Do something useful with it
-		trigger = {
-			has_character_flag = all_improvements
-		}
+		name = EVTOPTC105202 # Do something useful with it
+
+		trigger = { has_character_flag = all_improvements }
+
 		liege = {
+			show_scope_change = no
+
 			random_realm_province = {
+				show_scope_change = no
+
+				limit = { held_under_PREV = yes }
+
 				add_province_modifier = {
 					name = architect_improvements
-					duration = 730
+					years = 2
 				}
 			}
 		}
 	}
 }
 
-#Liege: No sign of improvements
+# Liege: No sign of improvements
 character_event = {
 	id = 105203
-	desc = "EVTDESC105203"
+	desc = EVTDESC105203
 	picture = GFX_evt_spymaster
-	
+
 	is_triggered_only = yes
-	
+
 	trigger = {
-		is_alive = yes
 		FROM = {
 			is_alive = yes
 		}
 	}
-	
+
 	option = {
-		name = "EVTOPTA105203" #Imprison CA
+		name = EVTOPTA105203 # Imprison CA
+
 		FROM = {
+			show_scope_change = no
+
 			imprison = ROOT
 			remove_title = title_chief_architect
-			hidden_tooltip = {
-				set_character_flag = imprisoned_architect
-				character_event = {
-					id = 105204
-				}
-			}
+
+			set_character_flag = imprisoned_architect
+			character_event = { id = 105204 }
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105203" #Banish CA
+		name = EVTOPTB105203 # Banish CA
+
 		FROM = {
+			show_scope_change = no
+
 			banish = yes
 			remove_title = title_chief_architect
-			hidden_tooltip = {
-				set_character_flag = banished_architect
-				character_event = {
-					id = 105204
-				}
-			}
+			set_character_flag = banished_architect
+			character_event = { id = 105204 }
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105203" #Make him pay
+		name = EVTOPTC105203 # Make him pay
+
 		FROM = {
+			show_scope_change = no
+
 			clear_wealth = yes
 			remove_title = title_chief_architect
-			hidden_tooltip = {
-				set_character_flag = poor_architect
-				character_event = {
-					id = 105204
-				}
-			}
+			set_character_flag = poor_architect
+			character_event = { id = 105204 }
 		}
 	}
+
 	option = {
-		name = "EVTOPTD105203"
+		name = EVTOPTD105203
+
 		random_realm_province = {
+			show_scope_change = no
+
+			limit = { held_under_PREV = yes }
+
 			add_province_modifier = {
 				name = architect_improvements
-				duration = 365
+				years = 1
 			}
 		}
 	}
 }
 
-#Chief Architect is imprisoned/banished/robbed of all wealth
+# Chief Architect is imprisoned/banished/robbed of all wealth
 character_event = {
 	id = 105204
-	desc = "EVTDESC105204"
+	desc = EVTDESC105204
 	picture = GFX_evt_spymaster
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105204"
-		trigger = {
-			has_character_flag = imprisoned_architect
-		}
+		name = EVTOPTA105204
+
+		trigger = { has_character_flag = imprisoned_architect }
+
 		clr_character_flag = imprisoned_architect
+
 		tooltip = {
 			imprison = FROM
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105204"
-		trigger = {
-			has_character_flag = banished_architect
-		}
+		name = EVTOPTB105204
+
+		trigger = { has_character_flag = banished_architect }
+
 		clr_character_flag = banished_architect
+
 		tooltip = {
 			banish = yes
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105204"
-		trigger = {
-			has_character_flag = poor_architect
-		}
+		name = EVTOPTC105204
+
+		trigger = { has_character_flag = poor_architect }
+
 		clr_character_flag = poor_architect
+
 		tooltip = {
 			clear_wealth = yes
 		}
