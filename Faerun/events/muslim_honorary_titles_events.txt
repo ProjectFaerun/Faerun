@@ -5675,426 +5675,412 @@ character_event = {
 
 ### FOOD TASTER ###
 
+### Food Taster: Poison host - Setup ###
+character_event = {
+	id = 105249
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, muslim_sultan_honorary_titles
+	hide_window = yes
+
+	only_playable = yes
+	religion_group = qismaite_group
+	prisoner = no
+	in_command = no
+
+	trigger = {
+		any_courtier_or_vassal = {
+			has_minor_title = title_food_taster
+			block_general_event_trigger = no
+			war = no
+			in_command = no
+			NOT = { has_character_modifier = food_taster_poison_timer }
+
+			OR = {
+				intrigue >= 15
+				diplomacy >= 15
+				trait = deceitful
+				trait = envious
+			}
+
+			opinion = {
+				who = ROOT
+				value < 0
+			}
+
+			host = {
+				character = ROOT
+				at_location = PREV
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = envious
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = deceitful
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = paranoid
+			}
+		}
+
+		mult_modifier = {
+			factor = 2
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = cynical
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = honest
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = charitable
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = trusting
+			}
+		}
+
+		mult_modifier = {
+			factor = 0.5
+
+			any_courtier_or_vassal = {
+				has_minor_title = title_food_taster
+				trait = zealous
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier_or_vassal = {
+			limit = { has_minor_title = title_food_taster }
+
+			add_character_modifier = {
+				name = food_taster_poison_timer
+				years = 5
+				hidden = yes
+			}
+
+			character_event = { id = 105250 }
+		}
+	}
+}
+
 ### Food Taster: Poison host ###
 character_event = {
 	id = 105250
-	desc = "EVTDESC105250"
+	desc = EVTDESC105250
 	picture = GFX_evt_courtiers_talking
-	
-	min_age = 16
-	prisoner = no
-	war = no
-	
-	trigger = {
-		in_command = no
-		has_minor_title = title_food_taster
-		OR = {
-			intrigue = 15
-			diplomacy = 15
-			trait = deceitful
-			trait = envious
-		}
-		NOT = {
-			has_character_modifier = food_taster_poison_timer
-		}
-		host = {
-			is_liege_of = ROOT
-			in_command = no
-			at_location = ROOT
-			NOT = { reverse_opinion = { who = ROOT value = 0 } }
-		}
-		NOT = { is_inaccessible_trigger = yes }
-	}
-	
-	mean_time_to_happen = {
-		months = 250
-		
-		modifier = {
-			factor = 0.5
-			trait = cynical
-		}
-		modifier = {
-			factor = 0.5
-			trait = envious
-		}
-		modifier = {
-			factor = 0.5
-			trait = paranoid
-		}
-		modifier = {
-			factor = 0.5
-			trait = deceitful
-		}
-		modifier = {
-			factor = 2
-			trait = honest
-		}
-		modifier = {
-			factor = 2
-			trait = charitable
-		}	
-		modifier = {
-			factor = 2
-			trait = trusting
-		}	
-		modifier = {
-			factor = 2
-			trait = zealous
-		}			
-	}
-	
-	immediate = {
-		hidden_tooltip = {
-			add_character_modifier = {
-				name = food_taster_poison_timer
-				duration = 1825
-				hidden = yes
-			}
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
-		name = "EVTOPTA105250"
+		name = EVTOPTA105250
+
 		host = {
-			if = {
-				limit = {
-					trait = paranoid
-				}
-				random_list = {
-					70 = {
-						set_character_flag = poison_failed
-						character_event = {
-							id = 105251
-							tooltip = "EVTTOOLTIP105251"
-						}
-					}
-					15 = {
-						if = {
-							limit = {
-								NOT = {
-									has_dlc = "Reapers"
-								}
-							}
-						add_trait = ill
-						}
-						if = {
-							limit = {
-								has_dlc = "Reapers"
-							}
-						set_character_flag = disease_not_serious
-						add_trait = vomiting
-						character_event = { id = RIP.11005 days = 10 random = 30 }
-						}
-						hidden_tooltip = {
-							character_event = {
-								id = 38290
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = ill_poison
-								character_event = {
-									id = 105251
-									days = 3
-									random = 3
-								}
-							}
-						}
-					}
-					10 = {
-						add_trait = lunatic
-						hidden_tooltip = {
-							character_event = {
-								id = 38304 #Notify Lunatic
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = lunatic_poison
-								character_event = {
-									id = 105251
-									days = 3
-									random = 3
-								}
-							}
-						}
-					}
-					5 = {
-						death = {
-							death_reason = death_murder_unknown_poison
-							killer = ROOT
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					NOT = {
+			show_scope_change = no
+
+			random_list = {
+				50 = {
+					mult_modifier = {
+						factor = 1.4 # 70%
 						trait = paranoid
 					}
-				}
-				random_list = {
-					50 = {
-						set_character_flag = poison_failed
-						character_event = {
-							id = 105251
-							tooltip = "EVTTOOLTIP105251"
-						}
+
+					set_character_flag = poison_failed
+
+					character_event = {
+						id = 105251
+						tooltip = EVTTOOLTIP105251
 					}
-					25 = {
-						if = {
-							limit = {
-								NOT = {
-									has_dlc = "Reapers"
-								}
-							}
-						add_trait = ill
-						}
-						if = {
-							limit = {
-								has_dlc = "Reapers"
-							}
+				}
+
+				25 = {
+					mult_modifier = {
+						factor = 0.6 # 15%
+						trait = paranoid
+					}
+
+					if = {
+						limit = { has_dlc = "Reapers" }
+
 						set_character_flag = disease_not_serious
 						add_trait = vomiting
-						character_event = { id = RIP.11005 days = 10 random = 30 }
-						}
-						hidden_tooltip = {
-							character_event = {
-								id = 38290
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = ill_poison
-								character_event = {
-									id = 105251
-									days = 3
-									random = 3
-								}
-							}
+
+						character_event = {
+							id = RIP.11005
+							days = 10
+							random = 30
 						}
 					}
-					20 = {
-						add_trait = lunatic
-						hidden_tooltip = {
-							character_event = {
-								id = 38304 #Notify Lunatic
-							}
-							if = {
-								limit = {
-									OR = {
-										intrigue = 15
-										job_spymaster = {
-											intrigue = 15
-										}
-									}
-								}
-								set_character_flag = lunatic_poison
-								character_event = {
-									id = 105251
-									days = 3
-									random = 3
+					else = {
+						add_trait_ill_effect = yes
+					}
+
+					if = {
+						limit = {
+							OR = {
+								intrigue >= 15
+
+								job_spymaster = {
+									intrigue >= 15
 								}
 							}
+						}
+
+						set_character_flag = ill_poison
+
+						character_event = {
+							id = 105251
+							days = 3
+							random = 3
 						}
 					}
-					5 = {
-						death = {
-							death_reason = death_murder_unknown_poison
-							killer = ROOT
+				}
+
+				20 = {
+					mult_modifier = {
+						factor = 0.5 # 10%
+						trait = paranoid
+					}
+
+					add_trait_lunatic_effect = yes
+
+					if = {
+						limit = {
+							OR = {
+								intrigue >= 15
+
+								job_spymaster = {
+									intrigue >= 15
+								}
+							}
 						}
+
+						set_character_flag = lunatic_poison
+
+						character_event = {
+							id = 105251
+							days = 3
+							random = 3
+						}
+					}
+				}
+
+				5 = {
+					death = {
+						death_reason = death_murder_unknown_poison
+						killer = ROOT
 					}
 				}
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105250"
-		if = {
-			limit = {
-				trait = deceitful
-			}
-			remove_trait = deceitful
-		}
-		if = {
-			limit = {
-				trait = envious
-			}
-			remove_trait = envious
-		}
+		name = EVTOPTB105250
+
+		remove_trait_silently_deceitful_effect = yes
+		remove_trait_silently_envious_effect = yes
 	}
 }
 
-#Host finds out/is poisoned
+# Host finds out/is poisoned
 character_event = {
 	id = 105251
-	desc = "EVTDESC105251"
+	desc = EVTDESC105251
 	picture = GFX_evt_spymaster
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105151"
-		trigger = {
-			has_character_flag = lunatic_poison
-		}
+		name = EVTOPTA105151
+
+		trigger = { has_character_flag = lunatic_poison }
+
 		clr_character_flag = lunatic_poison
+
 		FROM = {
+			show_scope_change = no
+
 			imprison = ROOT
 			set_character_flag = imprison_lunatic
+
 			tooltip = {
 				remove_title = title_food_taster
+
+				reverse_opinion = {
+					name = opinion_poisoner
+					who = ROOT
+					years = 5
+				}
 			}
+
 			character_event = {
 				id = 105253
-				tooltip = "EVTTOOLTIPA105253"
+				tooltip = EVTTOOLTIPA105253
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTB105151"
-		trigger = {
-			has_character_flag = poison_failed
-		}
+		name = EVTOPTB105151
+
+		trigger = { has_character_flag = poison_failed }
+
 		clr_character_flag = poison_failed
+
 		FROM = {
+			show_scope_change = no
+
 			imprison = ROOT
 			set_character_flag = imprison_failed_poison
+
 			tooltip = {
 				remove_title = title_food_taster
+
+				reverse_opinion = {
+					name = opinion_poisoner
+					who = ROOT
+					years = 5
+				}
 			}
+
 			character_event = {
 				id = 105253
-				tooltip = "EVTTOOLTIPB105253"
+				tooltip = EVTTOOLTIPB105253
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTC105151"
-		trigger = {
-			has_character_flag = ill_poison
-		}
+		name = EVTOPTC105151
+
+		trigger = { has_character_flag = ill_poison }
+
 		clr_character_flag = ill_poison
+
 		FROM = {
+			show_scope_change = no
+
 			imprison = ROOT
 			set_character_flag = imprison_ill
+
 			tooltip = {
 				remove_title = title_food_taster
+
+				reverse_opinion = {
+					name = opinion_poisoner
+					who = ROOT
+					years = 5
+				}
 			}
+
 			character_event = {
 				id = 105253
-				tooltip = "EVTTOOLTIPC105253"
+				tooltip = EVTTOOLTIPC105253
 			}
 		}
 	}
+
 	option = {
-		name = "EVTOPTD105251"
-		trigger = {
-			has_character_flag = lunatic_poison
+		name = {
+			text = EVTOPTD105251
+			trigger = { has_character_flag = lunatic_poison }
 		}
+		name = {
+			text = EVTOPTE105151
+			trigger = { has_character_flag = poison_failed }
+		}
+		name = {
+			text = EVTOPTF105151
+			trigger = { has_character_flag = ill_poison }
+		}
+
 		clr_character_flag = lunatic_poison
-		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
-	}
-	option = {
-		name = "EVTOPTE105151"
-		trigger = {
-			has_character_flag = poison_failed
-		}
 		clr_character_flag = poison_failed
-		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
-	}
-	option = {
-		name = "EVTOPTF105151"
-		trigger = {
-			has_character_flag = ill_poison
-		}
 		clr_character_flag = ill_poison
+
 		FROM = {
-			death = {
-				death_reason = death_execution
-			}
-		}		
+			show_scope_change = no
+			death = { death_reason = death_execution }
+		}
 	}
 }
 
-#Cupbearer is imprisoned
+# Cupbearer is imprisoned
 character_event = {
 	id = 105253
-	desc = "EVTDESC105253"
+	desc = EVTDESC105253
 	picture = GFX_evt_into_the_dungeon
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
-		name = "EVTOPTA105253"
-		trigger = {
-			has_character_flag = imprison_ill
+		name = {
+			text = EVTOPTA105253
+			trigger = { has_character_flag = imprison_ill }
 		}
+		name = {
+			text = EVTOPTB105253
+			trigger = { has_character_flag = imprison_failed_poison }
+		}
+		name = {
+			text = EVTOPTC105253
+			trigger = { has_character_flag = imprison_lunatic }
+		}
+
 		clr_character_flag = imprison_ill
-		tooltip = {
-			imprison = FROM
-		}
-		remove_title = title_food_taster
-		reverse_opinion = {
-			modifier = opinion_poisoner
-			who = FROM
-			years = 5
-		}
-	}
-	option = {
-		name = "EVTOPTB105253"
-		trigger = {
-			has_character_flag = imprison_failed_poison
-		}
 		clr_character_flag = imprison_failed_poison
-		tooltip = {
-			imprison = FROM
-		}
-		remove_title = title_food_taster
-		reverse_opinion = {
-			modifier = opinion_poisoner
-			who = FROM
-			years = 5
-		}
-	}
-	option = {
-		name = "EVTOPTC105253"
-		trigger = {
-			has_character_flag = imprison_lunatic
-		}
 		clr_character_flag = imprison_lunatic
+
 		tooltip = {
 			imprison = FROM
 		}
+
 		remove_title = title_food_taster
+
 		reverse_opinion = {
-			modifier = opinion_poisoner
+			name = opinion_poisoner
 			who = FROM
 			years = 5
 		}
