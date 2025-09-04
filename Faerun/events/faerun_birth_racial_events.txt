@@ -5271,3 +5271,235 @@ character_event = {
 		cancel_pregnancy = yes
 	}
 }
+
+# Invalidate AIs non-compatible marriages and sending an event to players informing them of non-compatibility
+character_event = {
+	id = racialbirth.3
+	hide_window = yes 
+	is_triggered_only = yes # on_marriage
+
+	trigger = {
+		new_character = { 
+			FROM = { 
+				is_genetically_compatible_with_PREV = no
+				NOT = { has_character_flag = marriage_cancelled }
+			} 
+		}
+	}
+
+	immediate = {
+		FROM = { save_event_target_as = first_spouse }
+		ROOT = { save_event_target_as = first_spouses_liege }
+		new_character = { 
+			save_event_target_as = second_spouse
+			liege = { save_event_target_as = second_spouses_liege }
+		}
+
+		# if only AIs involved, just break the marriage and move on
+		if = {
+			limit = {
+				event_target:first_spouse = { ai = yes }
+				event_target:first_spouses_liege = { ai = yes }
+				event_target:second_spouse = { ai = yes }
+				event_target:second_spouses_liege = { ai = yes }
+			}
+
+			event_target:first_spouse = { set_character_flag = marriage_cancelled }
+			event_target:second_spouse = { set_character_flag = marriage_cancelled }
+
+			event_target:first_spouse = { 
+				# at this moment characters aren't married yet, we need to wait a day
+				character_event = { id = racialbirth.4 days = 1 } 
+			} 
+		}
+		else = {
+			any_player = {
+				limit = {
+					OR = {
+						character = event_target:first_spouse
+						character = event_target:first_spouses_liege
+						character = event_target:second_spouse
+						character = event_target:second_spouses_liege
+					}
+					NOR = {
+						has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+						has_character_flag = informed_about_bad_marriage_of_@event_target:second_spouse
+					}
+				}
+
+				if = {
+					limit = { character = event_target:first_spouse }
+
+					event_target:second_spouse = { save_event_target_as = players_spouse }
+				}
+				else_if = {
+					limit = { character = event_target:second_spouse }
+
+					event_target:first_spouse = { save_event_target_as = players_spouse }
+				}
+				else = {
+					event_target:first_spouse = { set_character_flag = marriage_cancelled }
+					event_target:second_spouse = { set_character_flag = marriage_cancelled }
+				}
+
+				set_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+				character_event = { id = racialbirth.4 days = 1 }
+			}
+		}
+	}
+}
+
+character_event = {
+	id = racialbirth.4
+	desc = {
+		trigger = { NOT = { event_target:players_spouse = { always = yes } } }
+
+		text = EVTDESC_CASE1_RACIALBIRTH.4
+	}
+	desc = {
+		trigger = { event_target:players_spouse = { always = yes } }
+
+		text = EVTDESC_CASE2_RACIALBIRTH.4
+	}
+	picture = GFX_evt_marriage
+
+	notification = yes
+	
+	is_triggered_only = yes
+
+	trigger = { event_target:first_spouse = { is_married = event_target:second_spouse } }
+
+	immediate = {
+		if = {
+			limit = {
+				event_target:first_spouse = { ai = yes is_married = event_target:second_spouse }
+				event_target:second_spouse = { ai = yes }
+			}
+
+			event_target:first_spouse = { remove_spouse = event_target:second_spouse }
+		}
+	}
+
+	option = {
+		name = OK
+	}
+}
+
+# Invalidate AIs non-compatible betrothals and sending an event to players informing them of non-compatibility
+character_event = {
+	id = racialbirth.5
+	hide_window = yes 
+	is_triggered_only = yes # on_betrothal 
+
+	trigger = {
+		new_character = { 
+			FROM = { 
+				is_genetically_compatible_with_PREV = no
+				NOT = { has_character_flag = betrothal_cancelled }
+			} 
+		}
+		NOT = { new_character = { has_character_flag = betrothal_cancelled } }
+	}
+
+	immediate = {
+		FROM = { save_event_target_as = first_spouse }
+		ROOT = { save_event_target_as = first_spouses_liege }
+		new_character = { 
+			save_event_target_as = second_spouse
+			liege = { save_event_target_as = second_spouses_liege }
+		}
+
+		# if only AIs involved, just break the betrothal and move on
+		if = {
+			limit = {
+				event_target:first_spouse = { ai = yes }
+				event_target:first_spouses_liege = { ai = yes }
+				event_target:second_spouse = { ai = yes }
+				event_target:second_spouses_liege = { ai = yes }
+			}
+
+			event_target:first_spouse = { set_character_flag = betrothal_cancelled }
+			event_target:second_spouse = { set_character_flag = betrothal_cancelled }
+
+			event_target:first_spouse = { 
+				# at this moment characters aren't betrothed yet, we need to wait a day
+				character_event = { id = racialbirth.6 days = 1 } 
+			} 
+		}
+		else = {
+			any_player = {
+				limit = {
+					OR = {
+						character = event_target:first_spouse
+						character = event_target:first_spouses_liege
+						character = event_target:second_spouse
+						character = event_target:second_spouses_liege
+					}
+					NOR = {
+						has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+						has_character_flag = informed_about_bad_marriage_of_@event_target:second_spouse
+					}
+				}
+
+				if = {
+					limit = { character = event_target:first_spouse }
+
+					event_target:second_spouse = { save_event_target_as = players_spouse }
+				}
+				else_if = {
+					limit = { character = event_target:second_spouse }
+
+					event_target:first_spouse = { save_event_target_as = players_spouse }
+				}
+				else = {
+					event_target:first_spouse = { set_character_flag = betrothal_cancelled }
+					event_target:second_spouse = { set_character_flag = betrothal_cancelled }
+				}
+
+				set_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+				character_event = { id = racialbirth.6 days = 1 }
+			}
+		}
+	}
+}
+
+character_event = {
+	id = racialbirth.6
+	desc = {
+		trigger = { NOT = { event_target:players_spouse = { always = yes } } }
+
+		text = EVTDESC_CASE1_RACIALBIRTH.6
+	}
+	desc = {
+		trigger = { event_target:players_spouse = { always = yes } }
+
+		text = EVTDESC_CASE2_RACIALBIRTH.6
+	}
+	picture = GFX_evt_marriage
+
+	notification = yes
+	
+	is_triggered_only = yes
+
+	trigger = { event_target:first_spouse = { is_betrothed = yes } }
+
+	immediate = {
+		if = {
+			limit = {
+				event_target:first_spouse = { ai = yes is_betrothed = yes }
+				event_target:second_spouse = { ai = yes }
+			}
+
+			event_target:first_spouse = { break_betrothal = event_target:second_spouse }
+		}
+
+		event_target:first_spouse = { clr_character_flag = betrothal_cancelled }
+		event_target:second_spouse = { clr_character_flag = betrothal_cancelled }
+		clr_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+		clr_character_flag = informed_about_bad_marriage_of_@event_target:second_spouse
+	}
+
+	option = {
+		name = OK
+	}
+}
