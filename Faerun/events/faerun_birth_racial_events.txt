@@ -5309,7 +5309,7 @@ character_event = {
 		ROOT = { save_event_target_as = first_spouses_liege }
 		new_character = { 
 			save_event_target_as = second_spouse
-			liege = { save_event_target_as = second_spouses_liege }
+			employer = { save_event_target_as = second_spouses_liege }
 		}
 
 		# if only AIs involved, just break the marriage and move on
@@ -5342,19 +5342,30 @@ character_event = {
 			event_target:first_spouse = { set_character_flag = marriage_cancelled }
 			event_target:second_spouse = { set_character_flag = marriage_cancelled }
 
-			event_target:first_spouse = { 
-				# at this moment characters aren't married yet, we need to wait a day
-				character_event = { id = racialbirth.4 days = 1 } 
-			} 
+			# at this moment characters aren't married yet, we need to wait a day
+			# fire the event for all at once in case someone dies
+			event_target:first_spouse = { character_event = { id = racialbirth.4 days = 1 } }
+			event_target:second_spouse = { character_event = { id = racialbirth.4 days = 1 } }
 		}
 		else = {
 			any_player = {
 				limit = {
 					OR = {
 						character = event_target:first_spouse
-						character = event_target:first_spouses_liege
 						character = event_target:second_spouse
-						character = event_target:second_spouses_liege
+
+						# Don't do anything for player controlled employers if one of the spouses is another player
+						trigger_if = {
+							limit = {
+								OR = {
+									character = event_target:first_spouses_liege
+									character = event_target:second_spouses_liege
+								}
+							}
+
+							event_target:first_spouse = { ai = yes }
+							event_target:second_spouse = { ai = yes }
+						}
 					}
 					NOR = {
 						has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
@@ -5378,7 +5389,24 @@ character_event = {
 				}
 
 				set_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+				# fire the event for all at once in case someone dies
 				character_event = { id = racialbirth.4 days = 1 }
+				clear_event_target = players_spouse
+				event_target:first_spouse = { 
+					if = { 
+						limit = { NOT = { character = PREV } } 
+
+						character_event = { id = racialbirth.4 days = 1 }
+					}
+				}
+				event_target:second_spouse = { 
+					if = { 
+						limit = { NOT = { character = PREV } } 
+						
+						character_event = { id = racialbirth.4 days = 1 }
+					}
+				}
+				
 			}
 		}
 	}
@@ -5402,7 +5430,12 @@ character_event = {
 	
 	is_triggered_only = yes
 
-	trigger = { event_target:first_spouse = { is_married = event_target:second_spouse } }
+	trigger = { 
+		OR = {
+			event_target:first_spouse = { is_married = event_target:second_spouse }
+			has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse # need to inform involved players in any case
+		}
+	}
 
 	immediate = {
 		if = {
@@ -5449,7 +5482,7 @@ character_event = {
 		ROOT = { save_event_target_as = first_spouses_liege }
 		new_character = { 
 			save_event_target_as = second_spouse
-			liege = { save_event_target_as = second_spouses_liege }
+			employer = { save_event_target_as = second_spouses_liege }
 		}
 
 		# if only AIs involved, just break the betrothal and move on
@@ -5464,19 +5497,30 @@ character_event = {
 			event_target:first_spouse = { set_character_flag = betrothal_cancelled }
 			event_target:second_spouse = { set_character_flag = betrothal_cancelled }
 
-			event_target:first_spouse = { 
-				# at this moment characters aren't betrothed yet, we need to wait a day
-				character_event = { id = racialbirth.6 days = 1 } 
-			} 
+			# at this moment characters aren't betrothed yet, we need to wait a day
+			# fire the event for all at once in case someone dies
+			event_target:first_spouse = { character_event = { id = racialbirth.6 days = 1 } }
+			event_target:second_spouse = { character_event = { id = racialbirth.6 days = 1 } }
 		}
 		else = {
 			any_player = {
 				limit = {
 					OR = {
 						character = event_target:first_spouse
-						character = event_target:first_spouses_liege
 						character = event_target:second_spouse
-						character = event_target:second_spouses_liege
+
+						# Don't do anything for player controlled employers if one of the spouses is another player
+						trigger_if = {
+							limit = {
+								OR = {
+									character = event_target:first_spouses_liege
+									character = event_target:second_spouses_liege
+								}
+							}
+
+							event_target:first_spouse = { ai = yes }
+							event_target:second_spouse = { ai = yes }
+						}
 					}
 					NOR = {
 						has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
@@ -5500,7 +5544,24 @@ character_event = {
 				}
 
 				set_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse
+
+				# fire the event for all at once in case someone dies
 				character_event = { id = racialbirth.6 days = 1 }
+				clear_event_target = players_spouse
+				event_target:first_spouse = { 
+					if = { 
+						limit = { NOT = { character = PREV } } 
+
+						character_event = { id = racialbirth.6 days = 1 }
+					}
+				}
+				event_target:second_spouse = { 
+					if = { 
+						limit = { NOT = { character = PREV } } 
+						
+						character_event = { id = racialbirth.6 days = 1 }
+					}
+				}
 			}
 		}
 	}
@@ -5524,12 +5585,17 @@ character_event = {
 	
 	is_triggered_only = yes
 
-	trigger = { event_target:first_spouse = { is_betrothed = yes } }
+	trigger = { 
+		OR = {
+			event_target:first_spouse = { betrothed = { character = event_target:second_spouse } } 
+			has_character_flag = informed_about_bad_marriage_of_@event_target:first_spouse # need to inform involved players in any case
+		}
+	}
 
 	immediate = {
 		if = {
 			limit = {
-				event_target:first_spouse = { ai = yes is_betrothed = yes }
+				event_target:first_spouse = { ai = yes betrothed = { character = event_target:second_spouse } }
 				event_target:second_spouse = { ai = yes }
 			}
 
