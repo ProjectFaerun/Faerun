@@ -5116,12 +5116,54 @@ character_event = {
 		# Fix any undead graphics getting through.
 		if = {
 			limit = { has_undead_portrait = yes }
+
 			if = {
 				limit = { trait = creature_human }
 				human_racial = yes
 			}
 			else = {
-				set_graphical_culture = ROOT
+				remove_all_race_traits = yes
+				if = {
+					limit = { mother_even_if_dead = { has_undead_portrait = no } }
+
+					mother_even_if_dead = {
+						ROOT = { copy_race_of_prev = yes }
+					}
+				}
+				else_if = {
+					limit = { any_close_relative = { has_undead_portrait = no } }
+
+					random_close_relative = {
+						limit = { has_undead_portrait = no }
+						preferred_limit = { is_grandparent_of = PREV }
+						preferred_limit = { is_ancestor_of = PREV }
+
+						ROOT = { copy_race_of_prev = yes }
+					}
+				}
+				else_if = {
+					limit = { any_dynasty_member_even_if_dead = { has_undead_portrait = no } }
+
+					random_dynasty_member_even_if_dead = {
+						limit = { has_undead_portrait = no }
+						preferred_limit = { is_grandparent_of = PREV }
+						preferred_limit = { is_ancestor_of = PREV }
+
+						ROOT = { copy_race_of_prev = yes }
+					}
+				}
+				else = {
+					random_character = {
+						limit = { 
+							has_undead_portrait = no
+							is_true_outsider = no
+							is_dragon = no
+							is_infertile_race = no
+						}
+
+						ROOT = { copy_race_of_prev = yes }
+					}
+				}
 			}
 		}
 
