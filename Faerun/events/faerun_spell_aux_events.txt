@@ -700,25 +700,22 @@ character_event = {
 
 character_event = { #dragonbreath for AI
 	id = spellaux.42
-	picture = GFX_evt_blood_war_1
-	desc = SPELLAUX.42
+	hide_window = yes
 	is_triggered_only = yes
 
 	only_capable = yes
 	min_age = 16
 	ai = yes
-	war = yes
-
 
 	trigger = {
+		trait = creature_dragon
 		OR = {
-			AND = { #breath weapon
-				trait = creature_dragon
-				OR = {
-					NOT = { has_character_flag = breath_weapon_cooldown }
-					had_character_flag = { flag = breath_weapon_cooldown months = 1 }
-				}
-			}
+			NOT = { has_character_flag = breath_weapon_cooldown }
+			had_character_flag = { flag = breath_weapon_cooldown months >= 1 }
+		}
+		FROMFROM = {
+			always = yes
+			character = yes
 		}
 		NOR = {
 			trait = wounded
@@ -742,19 +739,9 @@ character_event = { #dragonbreath for AI
 		}
 	}
 
-	option = { #breath weapon
-		name = spellaux.42.breath.weapon
-		trigger = {
-			AND = {
-				trait = creature_dragon
-				age = 16
-				OR = {
-					NOT = { has_character_flag = breath_weapon_cooldown }
-					had_character_flag = { flag = breath_weapon_cooldown months = 1 }
-				}
-			}
-		}
+	immediate = {
 		set_character_flag = breath_weapon_cooldown
+
 		hidden_tooltip = {
 			combat = {
 				enemy = {
@@ -764,111 +751,12 @@ character_event = { #dragonbreath for AI
 				}
 			}
 		}
-		any_current_enemy = {
-			random_realm_character = {
-				limit = {
-					at_location = ROOT
-					in_command = yes
-					prisoner = no
-				}
-				if = {
-					limit = {
-						ROOT = {
-							age = 16
-							NOT = { age = 26 }
-						}
-					}
-					troops = -0.02
-				}
 
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 26
-							NOT = { age = 51 }
-						}
-					}
-					troops = -0.04
-				}
+		FROMFROM = {
+			any_army = {
+				limit = { location = { ROOT = { at_location = PREV } } }
 
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 51
-							NOT = { age = 101 }
-						}
-					}
-					troops = -0.06
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 101
-							NOT = { age = 201 }
-						}
-					}
-					troops = -0.08
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 201
-							NOT = { age = 401 }
-						}
-					}
-					troops = -0.1
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 401
-							NOT = { age = 601 }
-						}
-					}
-					troops = -0.12
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 601
-							NOT = { age = 801 }
-						}
-					}
-					troops = -0.14
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 801
-							NOT = { age = 1001 }
-						}
-					}
-					troops = -0.16
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 1001
-							NOT = { age = 1201 }
-						}
-					}
-					troops = -0.18
-				}
-
-				else_if = {
-					limit = {
-						ROOT = {
-							age = 1201
-						}
-					}
-					troops = -0.2
-				}
+				ROOT = { dragon_breath_on_PREV_effect = yes }
 			}
 		}
 	}
