@@ -552,23 +552,32 @@ character_event = {
     id = HRP.5
     hide_window = yes
     is_triggered_only = yes
-    trigger = {
-    	persistent_event_target:prep_invader_target = { NOT = { war_with = ROOT } }
-    	persistent_event_target:prep_invader_target = { independent = yes }
-    	#persistent_event_target:prep_invader_target = { any_realm_title = { is_valid_viking_invasion_target = PREV } }
-			persistent_event_target:prep_invader_target = {
-				OR = {
-					tier = EMPEROR
-					tier = KING
-					tier = DUKE
-				}
-				any_demesne_title = {
-					higher_tier_than = COUNT
-					controls_religion = no
-				}
+
+	trigger = {
+		persistent_event_target:prep_invader_target = {
+			NOT = { war_with = ROOT }
+			independent = yes
+			# any_realm_title = { is_valid_viking_invasion_target = PREV }
+			OR = {
+				tier = EMPEROR
+				tier = KING
+				tier = DUKE
 			}
-			persistent_event_target:prep_invader_target = { has_opinion_modifier = { who = ROOT name = preparing_to_invade_me } }
-    }
+			any_demesne_title = {
+				higher_tier_than = COUNT
+				controls_religion = no
+			}
+			has_opinion_modifier = { who = ROOT name = preparing_to_invade_me }
+			OR = {
+				trait = cruel
+				trait = impaler
+				is_evil_religion = yes
+				has_character_modifier = true_villain_modifier
+				has_character_modifier = undead_realm_lord
+				has_character_modifier = known_satanist
+			}
+		}
+	}
 
     fail_trigger_effect = {
     	character_event = { id = HRP.15 }
@@ -1224,6 +1233,22 @@ narrative_event = { # Prepared Invasion Abort Notification
         }
         text = HRP_desc.17f
     }
+	desc = {
+		trigger = {
+			persistent_event_target:prep_invader_target = {
+				NOR = {
+					trait = cruel
+					trait = impaler
+					is_evil_religion = yes
+					has_character_modifier = true_villain_modifier
+					has_character_modifier = undead_realm_lord
+					has_character_modifier = known_satanist
+				}
+			}
+		}
+		text = HRP_desc.17d
+	}
+
     border = GFX_event_narrative_frame_war
     is_triggered_only = yes
 
@@ -1251,23 +1276,6 @@ narrative_event = { # Prepared Invasion Abort Notification
 		}
 		prestige = -200
 	}
-}
-
-# Transfers prepared invasion eligibility on death
-character_event = {
-	id = HRP.18
-	hide_window = yes
-    is_triggered_only = yes
-    has_character_flag = prep_inv_target
-    only_independent = yes
-
-    immediate = {
-    	current_heir = { save_event_target_as = prepared_invasion_target_heir set_character_flag = prep_inv_target }
-    	any_opinion_modifier_target = {
-    		limit = { reverse_has_opinion_modifier = { who = PREV modifier = preparing_to_invade_me } }
-    		save_persistent_event_target = { name = prep_invader_target scope = event_target:prepared_invasion_target_heir }
-    	}
-    }
 }
 
 #Unlanded AI High Harper asks ruler to depose tyrant

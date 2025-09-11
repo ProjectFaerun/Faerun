@@ -24,15 +24,24 @@ bid_for_independence = {
 	can_use = {
 		# Attacker
 		ROOT = {
-			de_facto_liege = FROM
+			vassal_of = FROM
 			higher_real_tier_than = BARON
 			mercenary = no
 
-			OR = {
-				ai = yes
-				is_feudal = yes
-				is_tribal = yes
-				higher_real_tier_than = COUNT
+			trigger_if = {
+				limit = { is_patrician = yes }
+
+				# No independence factions in merchant republics
+				is_merchant_republic = yes
+
+				# Can no longer be a merchant republic when becoming
+				# a direct vassal of another merchant republic
+				liege = {
+					trigger_if = {
+						limit = { independent = no }
+						liege_before_war = { is_merchant_republic = no }
+					}
+				}
 			}
 
 			# trigger_if = {
@@ -48,6 +57,7 @@ bid_for_independence = {
 		# Defender
 		FROM = {
 			in_revolt = no
+			higher_real_tier_than = ROOT
 
 			NOT = { # isn't attacking liege with one of these CBs
 				any_war = {
@@ -62,11 +72,6 @@ bid_for_independence = {
 				}
 			}
 
-			any_demesne_title = {
-				NOT = { lower_real_tier_than = ROOT }
-				temporary = no
-			}
-
 			# No above liege is revolting
 			liege_before_war = {
 				in_revolt = no
@@ -74,25 +79,38 @@ bid_for_independence = {
 				liege_before_war = {
 					in_revolt = no
 				}
-			}
-
-			# No independence factions in merchant republics
-			trigger_if = {
-				limit = { is_patrician = yes }
-				liege = { is_merchant_republic = no }
 			}
 		}
 	}
 
 	is_valid = {
+		# Attacker
+		ROOT = {
+			liege_before_war = {
+				character = FROM
+			}
+
+			trigger_if = {
+				limit = { is_patrician = yes }
+
+				# No independence factions in merchant republics
+				is_merchant_republic = yes
+
+				# Can no longer be a merchant republic when becoming
+				# a direct vassal of another merchant republic
+				liege_before_war = {
+					trigger_if = {
+						limit = { independent = no }
+						liege_before_war = { is_merchant_republic = no }
+					}
+				}
+			}
+		}
+
 		# Defender
 		FROM = {
 			in_revolt = no
-
-			any_demesne_title = {
-				NOT = { lower_tier_than = ROOT }
-				temporary = no
-			}
+			higher_real_tier_than = ROOT
 
 			# No above liege is revolting
 			liege_before_war = {
@@ -101,12 +119,6 @@ bid_for_independence = {
 				liege_before_war = {
 					in_revolt = no
 				}
-			}
-
-			# No independence factions in merchant republics
-			trigger_if = {
-				limit = { is_patrician = yes }
-				liege = { is_merchant_republic = no }
 			}
 		}
 	}
