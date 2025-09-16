@@ -120,6 +120,7 @@ character_event = {
 			}
 		}
 
+		# Random World only - dealing with randomly generated family
 		if = {
 			limit = {
 				OR = {
@@ -129,12 +130,67 @@ character_event = {
 			}
 
 			if = {
+				limit = { 
+					OR = {
+						true_father_even_if_dead = { always = yes is_infertile_race = yes }
+						mother_even_if_dead = { always = yes is_infertile_race = yes }
+					}
+					is_adult = no
+				}
+
+				set_father = 0
+				set_mother = 0
+
+				random_playable_ruler = {
+					limit = { 
+						evilcat_is_human_cultured = yes 
+						gfx_culture_scope = { evilcat_is_human_cultured = yes }
+					}
+
+					ROOT = { 
+						set_graphical_culture = PREV 
+						culture = PREV
+						religion = PREV
+						move_character = PREV
+					}
+				}
+
+				character_event = { id = character_trait.1 }
+				break = yes
+			}
+
+			if = {
 				limit = {
 					true_father_even_if_dead = { always = yes }
 					mother_even_if_dead = { always = yes }
 				}
 
-				simulate_on_birth_on_action_effect = yes
+				if = {
+					limit = {
+						OR = {
+							true_father_even_if_dead = { always = yes is_infertile_race = yes }
+							mother_even_if_dead = { always = yes is_infertile_race = yes }
+						}
+					}
+
+					if = {
+						limit = { true_father_even_if_dead = { is_ruler = yes } }
+
+						set_mother = 0
+						true_father_even_if_dead = {
+							ROOT = { faerun_created_character_traits = yes }
+						}
+					}
+					else = {
+						set_father = 0
+						mother_even_if_dead = {
+							ROOT = { faerun_created_character_traits = yes }
+						}
+					}
+				}
+				else = {
+					simulate_on_birth_on_action_effect = yes
+				}
 			}
 			else_if = {
 				limit = { true_father_even_if_dead = { always = yes } }
