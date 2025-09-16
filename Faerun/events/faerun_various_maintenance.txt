@@ -3437,7 +3437,9 @@ character_event = {
 				}
 			}
 
-			character_event = { id = frmaint.71 days = 1 } 
+			FROM = { save_event_target_as = title_to_destroy }
+			
+			c_waterdeep = { location = { province_event = { id = frmaint.71 days = 1 } } }
 		}
 	}
 	
@@ -3573,16 +3575,20 @@ character_event = {
 	}
 }
 
-# destroy FROMFROM title if landless
-character_event = {
+# destroy event_target:title_to_destroy title if the owner is landless
+province_event = {
 	id = frmaint.71
 	hide_window = yes
 	is_triggered_only = yes
 
-	trigger = { is_landed = no }
+	trigger = {
+		event_target:title_to_destroy = {
+			owner = { is_landed = no }
+		}
+	}
 
 	immediate = {
-		unsafe_destroy_landed_title = FROMFROM
+		unsafe_destroy_landed_title = event_target:title_to_destroy
 	}
 }
 
@@ -3610,6 +3616,34 @@ character_event = {
 
 		any_demesne_province = {
 			refresh_minion_culture_province_modifiers_effect = yes
+		}
+	}
+}
+
+# Temperary Landless title maintenance
+# Do nothing while owner wages any war; remove the landless property otherwise
+province_event = {
+	id = frmaint.73
+	hide_window = yes
+	is_triggered_only = yes
+
+	trigger = {
+		event_target:temp_landless_title = {
+			has_holder = yes
+			owner = { war = yes }
+		}
+	}
+	fail_trigger_effect = {
+		set_title_landless = {
+			title = event_target:temp_landless_title
+			status = no
+		}
+	}
+
+	immediate = {
+		repeat_event = {
+			id = frmaint.73
+			days = 1
 		}
 	}
 }
