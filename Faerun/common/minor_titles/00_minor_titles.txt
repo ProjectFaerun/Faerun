@@ -1362,26 +1362,35 @@ title_patrician_heir = {
 	}
 
 	allowed_to_hold = {
-		OR = {
-			male_patrician_trigger = yes
-			female_patrician_trigger = yes
-		}
+		dynasty = FROM
+		is_ruler = no
+		has_inheritance_blocker = no
+		NOT = { trait = bastard }
 
-		custom_tooltip = {
-			text = court_physician_tooltip_2
+		hidden_trigger = {
+			# Enforce gender succession law
+			FROM = {
+				family_palace = {
+					trigger_if = {
+						limit = { ROOT = { is_female = no } }
 
-			OR = {
-				male_can_hold_minor_title_trigger = yes
-				female_can_hold_minor_title_trigger = yes
+						NOT = { has_law = enatic_succession }
+
+						trigger_if = {
+							limit = { has_law = enatic_cognatic_succession }
+							current_heir = { same_sex = ROOT }
+						}
+					}
+					trigger_else = {
+						NOT = { has_law = agnatic_succession }
+
+						trigger_if = {
+							limit = { has_law = cognatic_succession }
+							current_heir = { same_sex = ROOT }
+						}
+					}
+				}
 			}
-		}
-
-		NOR = {
-			is_landed = yes
-			trait = bastard
-			trait = monk
-			trait = eunuch
-			is_theocracy = yes
 		}
 	}
 
