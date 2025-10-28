@@ -103,28 +103,25 @@ character_event = {
 	}
 }
 
-# Toggle creature traits to get long-lived races to grow out of childhood and later into old age.
+# Toggle creature traits to get long-lived races to grow into old age.
 character_event = {
 	id = racial_aging.3
 	hide_window = yes
-	is_triggered_only = yes # on_adulthood and yearly pulse
+	is_triggered_only = yes # on_decade_pulse
 	#max_age = 256 # Integer overflow
 
 	trigger = {
-		olrox_all_immortals_trigger = yes
-		practical_age < 100 # There is no point in ageing the portrait if already old
+		immortal = yes
+		practical_age < 200 # There is no point in ageing the portrait if already old
 		OR = {
-			age < 25
+			age < 30
 			has_character_flag = racial_aging0
 			has_character_flag = racial_aging1
 
 			trigger_if = {
 				limit = {
-					# on_yearly_pulse sometimes may not trigger on a character's specfic age, so we need at least two years for it to be guaranteed
-					OR = {
-						age == 40
-						age == 41
-					}
+					age >= 40
+					age < 50
 				}
 
 				NOR = {
@@ -145,7 +142,7 @@ character_event = {
 			}
 			subtract_variable = {
 				which = local_age_to_add
-				value = 100
+				value = 200
 			}
 			set_variable = {
 				which = local_age_to_subtract
@@ -201,39 +198,146 @@ character_event = {
 	}
 }
 
-# getting rid of child portraits on the start of the game
+# Correcting the portrait age on the start of the game
 character_event = {
 	id = racial_aging.5
 	hide_window = yes
 	is_triggered_only = yes # on_startup
 
-	min_age = 256
-
-	trigger = {
-		is_save_game = no
-		immortal_age < 16
-	}
+	min_age = 50
 
 	immediate = {
-		export_to_variable = {
-			which = local_age_to_add
-			value = age
+		character_event = { id = racial_aging.6 }
+
+		if = {
+			limit = { immortal = yes }
+			character_event = { id = racial_aging.0 }
+			if = {
+				limit = { has_character_flag = racial_aging0 }
+				character_event = { id = racial_aging.3 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						practical_age < 16
+						NOR = {
+							trait = immortal
+							trait = longevity
+							trait = avatar
+							evilcat_is_chosen = yes
+						}
+					}
+				}
+				export_to_variable = {
+					which = local_age_to_add
+					value = age
+				}
+				subtract_variable = {
+					which = local_age_to_add
+					value = 40
+				}
+				set_variable = {
+					which = local_age_to_subtract
+					which = local_age_to_add
+				}
+				multiply_variable = {
+					which = local_age_to_subtract
+					value = -1
+				}
+				
+				add_age = local_age_to_subtract # setting char's real age to 40
+				refresh_immortal_age_effect = yes # setting immortal_age to 40
+				add_age = local_age_to_add # setting real age back
+			}
 		}
-		subtract_variable = {
-			which = local_age_to_add
-			value = 40
+	}
+}
+
+# Assign a lifespan trait.
+character_event = {
+	id = racial_aging.6
+	hide_window = yes
+	is_triggered_only = yes
+	min_age = 16
+
+	immediate = {
+		if = {
+			limit = {
+				faerun_immortal_race_trigger = yes
+			}
+			add_trait = lifespan_ageless
 		}
-		set_variable = {
-			which = local_age_to_subtract
-			which = local_age_to_add
+		else_if = {
+			limit = {
+				is_race_lifespan_1000_trigger = yes
+			}
+			add_trait = lifespan_1000
 		}
-		multiply_variable = {
-			which = local_age_to_subtract
-			value = -1
+		else_if = {
+			limit = {
+				is_race_lifespan_800_trigger = yes
+			}
+			add_trait = lifespan_800
 		}
-		
-		add_age = local_age_to_subtract # setting char's real age to 40
-		refresh_immortal_age_effect = yes # setting immortal_age to 40
-		add_age = local_age_to_add # setting real age back
+		else_if = {
+			limit = {
+				is_race_lifespan_600_trigger = yes
+			}
+			add_trait = lifespan_600
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_500_trigger = yes
+			}
+			add_trait = lifespan_500
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_400_trigger = yes
+			}
+			add_trait = lifespan_400
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_350_trigger = yes
+			}
+			add_trait = lifespan_350
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_300_trigger = yes
+			}
+			add_trait = lifespan_300
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_250_trigger = yes
+			}
+			add_trait = lifespan_250
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_200_trigger = yes
+			}
+			add_trait = lifespan_200
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_180_trigger = yes
+			}
+			add_trait = lifespan_180
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_160_trigger = yes
+			}
+			add_trait = lifespan_160
+		}
+		else_if = {
+			limit = {
+				is_race_lifespan_150_trigger = yes
+			}
+			add_trait = lifespan_150
+		}
 	}
 }
