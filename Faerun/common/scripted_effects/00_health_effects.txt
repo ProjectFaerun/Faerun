@@ -2250,139 +2250,145 @@ lose_weight_large_effect = {
 
 # Doesn't change the variable, only checks if the character has the correct trait assigned.
 weight_trait_check_effect = {
-	# Debilitating effects are gained by special events, usually later in life (40s), but they can be cleared up if the character's variable goes back towards 0 again.
 	if = {
-		limit = {
-			has_character_modifier = obese_modifier
-
-			check_variable = {
-				which = physique_variable
-				value < 30
-			}
+		limit = { 
+			can_change_weight_trigger = yes
 		}
 
-		remove_character_modifier = obese_modifier
-	}
-	else_if = {
-		limit = {
-			has_character_modifier = severely_underweight_modifier
-
-			check_variable = {
-				which = physique_variable
-				value >= -30
-			}
-		}
-		remove_character_modifier = severely_underweight_modifier
-	}
-
-	# Handle traits
-	if = {
-		limit = { trait = is_fat }
-
+		# Debilitating effects are gained by special events, usually later in life (40s), but they can be cleared up if the character's variable goes back towards 0 again.
 		if = {
 			limit = {
-				check_variable = {
-					which = physique_variable
-					value < 15
-				}
+				has_character_modifier = obese_modifier
 
 				check_variable = {
 					which = physique_variable
-					value >= -15
+					value < 30
 				}
 			}
 
-			remove_trait = is_fat
-
-			hidden_effect = {
-				remove_weight_modifier_effect = yes
-				character_event = { id = HFP.20601 } # Notification: I am no longer fat
-			}
+			remove_character_modifier = obese_modifier
 		}
 		else_if = {
 			limit = {
+				has_character_modifier = severely_underweight_modifier
+
 				check_variable = {
 					which = physique_variable
-					value < -15
+					value >= -30
 				}
 			}
-
-			remove_trait = is_fat
-			add_trait = is_malnourished
-
-			hidden_effect = {
-				remove_weight_modifier_effect = yes
-				character_event = { id = HFP.20602 } # Notification: I am malnourished
-			}
+			remove_character_modifier = severely_underweight_modifier
 		}
-	}
-	else_if = {
-		limit = { trait = is_malnourished }
 
+		# Handle traits
 		if = {
-			limit = {
-				check_variable = {
-					which = physique_variable
-					value < 15
+			limit = { trait = is_fat }
+
+			if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value < 15
+					}
+
+					check_variable = {
+						which = physique_variable
+						value >= -15
+					}
 				}
 
-				check_variable = {
-					which = physique_variable
-					value >= -15
+				remove_trait = is_fat
+
+				hidden_effect = {
+					remove_weight_modifier_effect = yes
+					character_event = { id = HFP.20601 } # Notification: I am no longer fat
 				}
 			}
+			else_if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value < -15
+					}
+				}
 
-			remove_trait = is_malnourished
+				remove_trait = is_fat
+				add_trait = is_malnourished
 
-			hidden_effect = {
-				remove_weight_modifier_effect = yes
-				character_event = { id = HFP.20603 } # Notification: I am no longer malnourished
+				hidden_effect = {
+					remove_weight_modifier_effect = yes
+					character_event = { id = HFP.20602 } # Notification: I am malnourished
+				}
 			}
 		}
-
 		else_if = {
-			limit = {
-				check_variable = {
-					which = physique_variable
-					value >= 15
+			limit = { trait = is_malnourished }
+
+			if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value < 15
+					}
+
+					check_variable = {
+						which = physique_variable
+						value >= -15
+					}
+				}
+
+				remove_trait = is_malnourished
+
+				hidden_effect = {
+					remove_weight_modifier_effect = yes
+					character_event = { id = HFP.20603 } # Notification: I am no longer malnourished
 				}
 			}
 
-			remove_trait = is_malnourished
-			add_trait = is_fat
+			else_if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value >= 15
+					}
+				}
 
-			hidden_effect = {
-				remove_weight_modifier_effect = yes
+				remove_trait = is_malnourished
+				add_trait = is_fat
+
+				hidden_effect = {
+					remove_weight_modifier_effect = yes
+					character_event = { id = HFP.20600 } # Notification: I am fat
+				}
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value >= 15
+					}
+				}
+
+				# First time try to fire a special event if character meets any of the conditions, otherwise simply notify
+				weight_flavor_conditions_effect = yes
+				add_trait = is_fat
 				character_event = { id = HFP.20600 } # Notification: I am fat
 			}
-		}
-	}
-	else = {
-		if = {
-			limit = {
-				check_variable = {
-					which = physique_variable
-					value >= 15
+			else_if = {
+				limit = {
+					check_variable = {
+						which = physique_variable
+						value < -15
+					}
 				}
-			}
 
-			# First time try to fire a special event if character meets any of the conditions, otherwise simply notify
-			weight_flavor_conditions_effect = yes
-			add_trait = is_fat
-			character_event = { id = HFP.20600 } # Notification: I am fat
-		}
-		else_if = {
-			limit = {
-				check_variable = {
-					which = physique_variable
-					value < -15
-				}
+				# First time try to fire a special event if character meets any of the conditions, otherwise simply notify
+				weight_flavor_conditions_effect = yes
+				add_trait = is_malnourished
+				character_event = { id = HFP.20602 } # Notification: I am malnourished
 			}
-
-			# First time try to fire a special event if character meets any of the conditions, otherwise simply notify
-			weight_flavor_conditions_effect = yes
-			add_trait = is_malnourished
-			character_event = { id = HFP.20602 } # Notification: I am malnourished
 		}
 	}
 }
@@ -2695,6 +2701,7 @@ weight_flavor_conditions_effect = {
 			prisoner = no
 			is_inaccessible_trigger = no
 			has_fat_for_flag_trigger = no # Can happen only once
+			can_change_weight_trigger = yes
 
 			NOR = {
 				trait = is_fat
@@ -2760,6 +2767,7 @@ weight_flavor_conditions_effect = {
 			prisoner = no
 			is_inaccessible_trigger = no
 			has_malnourished_for_flag_trigger = no # Can happen only once
+			can_change_weight_trigger = yes
 
 			NOR = {
 				trait = is_malnourished
