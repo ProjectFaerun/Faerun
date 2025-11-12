@@ -377,64 +377,56 @@ character_event = {
 		}
 	}
 
-	#Sacrifice prisoner
+	# Sacrifice prisoner
 	option = {
 		name = EVTOPTB_TOG_7001
+
+		trigger = {
+			event_target:human_sacrifice_prisoner = { always = yes }
+		}
+
 		custom_tooltip = { text = EVTOPTB_TOG_7001_TOOLTIP }
 
 		piety = 60
-		
-		ai_chance = {
-			factor = 80
-			
-			modifier = {
-				factor = 2
-				trait = cruel
-			}
-			modifier = {
-				factor = 2
-				trait = arbitrary
-			}
-		}
-
-		trigger = { 
-			event_target:human_sacrifice_prisoner = { always = yes }
-		}
 
 		set_character_flag = ancestors_human
 
 		event_target:human_sacrifice_prisoner = {
 			show_scope_change = no
-			death = { death_reason = death_sacrificed_ancestors killer = ROOT }
+
+			death = {
+				death_reason = death_sacrificed_ancestors
+				killer = ROOT
+			}
+
+			save_event_target_as = kinslayer_target
+			save_event_target_as = portrait_target
 		}
 
-		event_target:human_sacrifice_prisoner = { save_event_target_as = kinslayer_target }
 		add_kinslayer_trait_effect = yes
 
-		event_target:human_sacrifice_prisoner = { save_event_target_as = portrait_target }
-
-		hidden_tooltip = { character_event = { id = TOG.7002 days = 3 } }
-	}
-
-	#Sacrifice courtier
-	option = {
-		name = EVTOPTE_TOG_7001
-		custom_tooltip = { text = EVTOPTE_TOG_7001_TOOLTIP }
-
-		piety = 60
-		
 		ai_chance = {
 			factor = 80
-			
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = cruel
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = arbitrary
 			}
 		}
+	}
+
+	# Sacrifice courtier
+	option = {
+		name = EVTOPTE_TOG_7001
+
+		custom_tooltip = { text = EVTOPTE_TOG_7001_TOOLTIP }
+
+		piety = 60
 
 		trigger = {
 			NOT = { event_target:human_sacrifice_prisoner = { always = yes } }
@@ -443,64 +435,90 @@ character_event = {
 
 		set_character_flag = ancestors_human
 
-		event_target:human_sacrifice_courtier = { death = { death_reason = death_sacrificed_ancestors killer = ROOT } }
+		event_target:human_sacrifice_courtier = {
+			show_scope_change = no
 
-		event_target:human_sacrifice_courtier = { save_event_target_as = kinslayer_target }
+			death = {
+				death_reason = death_sacrificed_ancestors
+				killer = ROOT
+			}
+
+			save_event_target_as = kinslayer_target
+			save_event_target_as = portrait_target
+		}
+
 		add_kinslayer_trait_effect = yes
-		
-		event_target:human_sacrifice_courtier = { save_event_target_as = portrait_target }
 
-		hidden_tooltip = { character_event = { id = TOG.7002 days = 3 } }
+		ai_chance = {
+			factor = 80
+
+			mult_modifier = {
+				factor = 2
+				trait = cruel
+			}
+
+			mult_modifier = {
+				factor = 2
+				trait = arbitrary
+			}
+		}
 	}
 
-	#Great feast Sacrifice
+	# Great feast Sacrifice
 	option = {
 		name = EVTOPTC_TOG_7001
+
 		custom_tooltip = { text = EVTOPTC_TOG_7001_TOOLTIP }
 
 		piety = 40
-		
+
+		scaled_wealth = {
+			value = -1
+			min = -25
+		}
+
+		set_character_flag = ancestors_feast
+
 		ai_chance = {
 			factor = 10
-			
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
 				NOT = { trait = greedy }
 			}
 		}
-		
-		scaled_wealth = { value = -1 min = -25 }
-
-		hidden_tooltip = { character_event = { id = TOG.7002 days = 3 } }
-
-		set_character_flag = ancestors_feast
 	}
 
-	#Minor Sacrifice
+	# Minor Sacrifice
 	option = {
 		name = EVTOPTD_TOG_7001
+
 		custom_tooltip = { text = EVTOPTD_TOG_7001_TOOLTIP }
 
 		piety = 10
-		
+
+		wealth = -5
+		set_character_flag = ancestors_carving
+
 		ai_chance = {
 			factor = 10
-			
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				trait = greedy
 			}
 		}
-		
-		treasury = -5
+	}
 
-		hidden_tooltip = { character_event = { id = TOG.7002 days = 3 } }
-
-		set_character_flag = ancestors_carving
+	after = {
+		character_event = {
+			id = TOG.7002
+			days = 3
+		}
 	}
 }
 
-#End of Sacrifice
+# End of Sacrifice
 character_event = {
 	id = TOG.7002
 	border = GFX_event_normal_frame_religion
@@ -508,22 +526,22 @@ character_event = {
 	portrait = event_target:portrait_target
 
 	desc = {
-		trigger = { has_character_flag = ancestors_limb }
 		text = EVTDESC_TOG_7002_limb
 		picture = GFX_evt_torture
+		trigger = { has_character_flag = ancestors_limb }
 	}
 	desc = {
-		trigger = { has_character_flag = ancestors_human }
 		text = EVTDESC_TOG_7002_human
 		picture = GFX_evt_torture
+		trigger = { has_character_flag = ancestors_human }
 	}
 	desc = {
-		trigger = { has_character_flag = ancestors_feast }
 		text = EVTDESC_TOG_7002_feast
+		trigger = { has_character_flag = ancestors_feast }
 	}
 	desc = {
-		trigger = { has_character_flag = ancestors_carving }
 		text = EVTDESC_TOG_7002_carving
+		trigger = { has_character_flag = ancestors_carving }
 	}
 
 	is_triggered_only = yes
@@ -533,25 +551,17 @@ character_event = {
 
 		clr_character_flag = do_not_disturb
 
-		#REMOVES LIMBS
-		if = {
-			limit = { has_character_flag = ancestors_eye }
-			add_trait = one_eyed
-		}
-		if = {
-			limit = { has_character_flag = ancestors_leg }
-			add_trait = one_legged
-		}
-		if = {
-			limit = { has_character_flag = ancestors_hand }
-			add_trait = one_handed
-		}
-		if = {
-			limit = { has_character_flag = ancestors_maimed }
-			add_trait = maimed
+		# REMOVES LIMBS
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			ancestors_eye    = { add_trait = one_eyed }
+			ancestors_leg    = { add_trait = one_legged }
+			ancestors_hand   = { add_trait = one_handed }
+			ancestors_maimed = { add_trait = maimed }
 		}
 
-		if = { 
+		if = {
 			limit = {
 				OR = {
 					has_character_flag = ancestors_leg
@@ -559,6 +569,7 @@ character_event = {
 					has_character_flag = ancestors_eye
 				}
 			}
+
 			add_trait = severely_injured
 			resolve_severely_injured_effect = yes
 		}
@@ -568,501 +579,530 @@ character_event = {
 		clr_character_flag = ancestors_eye
 		clr_character_flag = ancestors_maimed
 
+		# OUTCOMES
+		hidden_effect = {
+			# Health
+			if = {
+				limit = { has_character_flag = ancestors_health }
 
-		#OUTCOMES
+				# Limb
+				if = {
+					limit = { has_character_flag = ancestors_limb }
 
-		#Health
-		if = { 
-			limit = { has_character_flag = ancestors_health }
-			
+					hidden_effect = {
+						random_list = {
+							10 = {
+								character_event = {
+									id = TOG.7010 # Remove disease/blessing of health
+									days = 30
+								}
+							}
 
-			#Limb
-			if = { 
-				limit = { has_character_flag = ancestors_limb }
+							15 = {
+								trigger = { is_strong_trigger = no }
 
-				hidden_tooltip = {
-					random_list = { 
-						10 = { character_event = { id = TOG.7010 days = 30 } } #Remove disease/blessing of health
+								character_event = {
+									id = TOG.7011 # Robust
+									days = 300
+								}
+							}
+
+							30 = {
+								character_event = {
+									id = TOG.7012 # Health bonus
+									days = 200
+								}
+							}
+
+							5 = {
+								character_event = {
+									id = TOG.7013 # Illness
+									days = 150
+								}
+							}
+
+							35 = { } # Nothing
+						}
+					}
+				}
+
+				# Human Sacrifice
+				else_if = {
+					limit = { has_character_flag = ancestors_human }
+
+					hidden_effect = {
+						random_list = {
+							5 = {
+								character_event = {
+									id = TOG.7010 # Remove disease/blessing of health
+									days = 30
+								}
+							}
+
+							10 = {
+								trigger = { is_strong_trigger = no }
+
+								character_event = {
+									id = TOG.7011 # Robust
+									days = 300
+								}
+							}
+
+							30 = {
+								character_event = {
+									id = TOG.7012 # Health bonus
+									days = 200
+								}
+							}
+
+							5 = {
+								character_event = {
+									id = TOG.7013 # Illness
+									days = 150
+								}
+							}
+
+							30 = { } # Nothing
+						}
+					}
+				}
+
+				# Big gift
+				else_if = {
+					limit = { has_character_flag = ancestors_feast }
+
+					hidden_effect = {
+						random_list = {
+							1 = {
+								character_event = {
+									id = TOG.7010 # Remove disease/blessing of health
+									days = 30
+								}
+							}
+
+							1 = {
+								trigger = { is_strong_trigger = no }
+
+								character_event = {
+									id = TOG.7011 # Robust
+									days = 300
+								}
+							}
+
+							50 = {
+								character_event = {
+									id = TOG.7012 # Health bonus
+									days = 200
+								}
+							}
+
+							10 = {
+								character_event = {
+									id = TOG.7013 # Illness
+									days = 150
+								}
+							}
+
+							50 = { } # Nothing
+						}
+					}
+				}
+
+				# Small gift
+				else = {
+					hidden_effect = {
+						random_list = {
+							1 = {
+								character_event = {
+									id = TOG.7010 # Remove disease/blessing of health
+									days = 30
+								}
+							}
+
+							1 = {
+								trigger = { is_strong_trigger = no }
+
+								character_event = {
+									id = TOG.7011 # Robust
+									days = 300
+								}
+							}
+
+							15 = {
+								character_event = {
+									id = TOG.7012 # Health bonus
+									days = 200
+								}
+							}
+
+							15 = {
+								character_event = {
+									id = TOG.7013 # Illness
+									days = 150
+								}
+							}
+
+							20 = { } # Nothing
+						}
+					}
+				}
+			}
+
+			# Relationships
+			else_if = {
+				limit = { has_character_flag = ancestors_relationships }
+
+				clr_character_flag = ancestors_relationships
+
+				# Limb
+				if = {
+					limit = { has_character_flag = ancestors_limb }
+
+					random_list = {
+						10 = { character_event = { id = TOG.7024 days = 350 } } # Good with people
+						15 = { character_event = { id = TOG.7020 days = 100 } } # Lover
+						15 = { character_event = { id = TOG.7021 days = 150 } } # Friend
+						10 = { character_event = { id = TOG.7022 days = 300 } } # Diplomacy bonus
+						10 = { character_event = { id = TOG.7025 days = 100 } } # Cat
+						 5 = { character_event = { id = TOG.7023 days = 150 } } # Rival
+						35 = { } #Nothing
+					}
+				}
+
+				# Human Sacrifice
+				else_if = {
+					limit = { has_character_flag = ancestors_human }
+
+					random_list = {
+						 5 = { character_event = { id = TOG.7024 days = 350 } } # Good with people
+						15 = { character_event = { id = TOG.7020 days = 100 } } # Lover
+						15 = { character_event = { id = TOG.7021 days = 150 } } # Friend
+						10 = { character_event = { id = TOG.7022 days = 300 } } # Diplomacy bonus
+						10 = { character_event = { id = TOG.7025 days = 100 } } # Cat
+						 5 = { character_event = { id = TOG.7023 days = 150 } } # Rival
+						35 = { } # Nothing
+					}
+				}
+
+				# Big gift
+				else_if = {
+					limit = { has_character_flag = ancestors_feast }
+
+					random_list = {
+						 1 = { character_event = { id = TOG.7024 days = 350 } } # Good with people
+						15 = { character_event = { id = TOG.7020 days = 100 } } # Lover
+						15 = { character_event = { id = TOG.7021 days = 150 } } # Friend
+						20 = { character_event = { id = TOG.7022 days = 300 } } # Diplomacy bonus
+						15 = { character_event = { id = TOG.7025 days = 100 } } # Cat
+						10 = { character_event = { id = TOG.7023 days = 150 } } # Rival
+						35 = { } # Nothing
+					}
+				}
+
+				# Small gift
+				else = {
+					random_list = {
+						 1 = { character_event = { id = TOG.7024 days = 300 } } # Good with people
+						 5 = { character_event = { id = TOG.7020 days = 100 } } # Lover
+						 5 = { character_event = { id = TOG.7021 days = 150 } } # Friend
+						10 = { character_event = { id = TOG.7022 days = 300 } } # Diplomacy bonus
+						20 = { character_event = { id = TOG.7025 days = 100 } } # Cat
+						20 = { character_event = { id = TOG.7023 days = 150 } } # Rival
+						35 = { } # Nothing
+					}
+				}
+			}
+
+			# War
+			else_if = {
+				limit = { has_character_flag = ancestors_war }
+
+				clr_character_flag = ancestors_war
+
+				# Limb
+				if = {
+					limit = { has_character_flag = ancestors_limb }
+
+					random_list = {
+						15 = { character_event = { id = TOG.7035 days = 150 } } # Increased levy
+						25 = { character_event = { id = TOG.7034 days = 100 } } # War tech
+						25 = { character_event = { id = TOG.7030 days = 100 } } # Commander
 						15 = {
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-						 	character_event = { id = TOG.7011 days = 300 } 
+							trigger = { is_strong_trigger = no } # Robust
+							character_event = { id = TOG.7011 days = 360 }
 						}
-						30 = { character_event = { id = TOG.7012 days = 200 } } #Health bonus
-						5 = { character_event = { id = TOG.7013 days = 150 } } #Illness
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Human Sacrifice
-			if = { 
-				limit = { has_character_flag = ancestors_human }
-
-				hidden_tooltip = {
-					random_list = { 
-						5 = { character_event = { id = TOG.7010 days = 30 } } #Remove disease/blessing of health
 						10 = {
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-						 	character_event = { id = TOG.7011 days = 300 } 
-						}
-						30 = { character_event = { id = TOG.7012 days = 200 } } #Health bonus
-						5 = { character_event = { id = TOG.7013 days = 150 } } #Illness
-						30 = { } #Nothing
-					}
-				}
-			}
-			#Big gift
-			if = { 
-				limit = { has_character_flag = ancestors_feast }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { character_event = { id = TOG.7010 days = 30 } } #Remove disease/blessing of health
-						1 = {
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-						 	character_event = { id = TOG.7011 days = 300 } 
-						}
-						50 = { character_event = { id = TOG.7012 days = 200 } } #Health bonus
-						10 = { character_event = { id = TOG.7013 days = 150 } } #Illness
-						50 = { } #Nothing
-					}
-				}
-			}
-			#Small gift
-			if = { 
-				limit = { has_character_flag = ancestors_carving }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { character_event = { id = TOG.7010 days = 30 } } #Remove disease/blessing of health
-						1 = {
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-						 	character_event = { id = TOG.7011 days = 300 } 
-						}
-						15 = { character_event = { id = TOG.7012 days = 200 } } #Health bonus
-						15 = { character_event = { id = TOG.7013 days = 150 } } #Illness
-						20 = { } #Nothing
-					}
-				}
-			}	
-		}
-
-		#Relationships
-		if = { 
-			limit = { has_character_flag = ancestors_relationships }
-			clr_character_flag = ancestors_relationships
-
-			#Limb
-			if = { 
-				limit = { has_character_flag = ancestors_limb }
-
-				hidden_tooltip = {
-					random_list = { 
-						10 = { character_event = { id = TOG.7024 days = 350 } } #Good with people
-						15 = { character_event = { id = TOG.7020 days = 100 } } #Lover
-						15 = { character_event = { id = TOG.7021 days = 150 } } #Friend
-						10 = { character_event = { id = TOG.7022 days = 300 } } #Diplomacy bonus
-						10 = { character_event = { id = TOG.7025 days = 100 } } #Cat
-						5 = { character_event = { id = TOG.7023 days = 150 } } #Rival
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Human Sacrifice
-			if = { 
-				limit = { has_character_flag = ancestors_human }
-
-				hidden_tooltip = {
-					random_list = { 
-						5 = { character_event = { id = TOG.7024 days = 350 } } #Good with people
-						15 = { character_event = { id = TOG.7020 days = 100 } } #Lover
-						15 = { character_event = { id = TOG.7021 days = 150 } } #Friend
-						10 = { character_event = { id = TOG.7022 days = 300 } } #Diplomacy bonus
-						10 = { character_event = { id = TOG.7025 days = 100 } } #Cat
-						5 = { character_event = { id = TOG.7023 days = 150 } } #Rival
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Big gift
-			if = { 
-				limit = { has_character_flag = ancestors_feast }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { character_event = { id = TOG.7024 days = 350 } } #Good with people
-						15 = { character_event = { id = TOG.7020 days = 100 } } #Lover
-						15 = { character_event = { id = TOG.7021 days = 150 } } #Friend
-						20 = { character_event = { id = TOG.7022 days = 300 } } #Diplomacy bonus
-						15 = { character_event = { id = TOG.7025 days = 100 } } #Cat
-						10 = { character_event = { id = TOG.7023 days = 150 } } #Rival
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Small gift
-			if = { 
-				limit = { has_character_flag = ancestors_carving }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { character_event = { id = TOG.7024 days = 300 } } #Good with people
-						5 = { character_event = { id = TOG.7020 days = 100 } } #Lover
-						5 = { character_event = { id = TOG.7021 days = 150 } } #Friend
-						10 = { character_event = { id = TOG.7022 days = 300 } } #Diplomacy bonus
-						20 = { character_event = { id = TOG.7025 days = 100 } } #Cat
-						20 = { character_event = { id = TOG.7023 days = 150 } } #Rival
-						35 = { } #Nothing
-					}
-				}
-			}	
-		}
-
-		#War
-		if = { 
-			limit = { has_character_flag = ancestors_war }
-			clr_character_flag = ancestors_war
-			
-			#Limb
-			if = { 
-				limit = { has_character_flag = ancestors_limb }
-
-				hidden_tooltip = {
-					random_list = { 
-						15 = { character_event = { id = TOG.7035 days = 150 } } #Increased levy
-						25 = { character_event = { id = TOG.7034 days = 100 } } #War tech
-						25 = { character_event = { id = TOG.7030 days = 100 } } #Commander
-						15 = { 				
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-							character_event = { id = TOG.7011 days = 360 } 
-						}
-						10 = { 
-							modifier = { factor = 0 can_have_more_leadership_traits = no } #Leadership trait
+							trigger = { can_have_more_leadership_traits = yes } # Leadership trait
 							character_event = { id = TOG.7032 days = 360 }
 						}
-						5 = { character_event = { id = TOG.7033 days = 100 } } #Maimed
-						35 = { } #Nothing
+						 5 = { character_event = { id = TOG.7033 days = 100 } } # Maimed
+						35 = { } # Nothing
 					}
 				}
-			}
-			#Human Sacrifice
-			if = { 
-				limit = { has_character_flag = ancestors_human }
 
-				hidden_tooltip = {
-					random_list = { 
-						10 = { character_event = { id = TOG.7035 days = 150 } } #Increased levy
-						20 = { character_event = { id = TOG.7034 days = 100 } } #War tech
-						20 = { character_event = { id = TOG.7030 days = 100 } } #Commander
-						10 = { 				
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-							character_event = { id = TOG.7011 days = 360 } 
+				# Human Sacrifice
+				else_if = {
+					limit = { has_character_flag = ancestors_human }
+
+					random_list = {
+						10 = { character_event = { id = TOG.7035 days = 150 } } # Increased levy
+						20 = { character_event = { id = TOG.7034 days = 100 } } # War tech
+						20 = { character_event = { id = TOG.7030 days = 100 } } # Commander
+						10 = {
+							trigger = { is_strong_trigger = no } # Robust
+							character_event = { id = TOG.7011 days = 360 }
 						}
-						10 = { 
-							modifier = { factor = 0 can_have_more_leadership_traits = no } #Leadership trait
+						10 = {
+							trigger = { can_have_more_leadership_traits = yes } # Leadership trait
 							character_event = { id = TOG.7032 days = 360 }
 						}
-						5 = { character_event = { id = TOG.7033 days = 100 } } #Maimed
-						35 = { } #Nothing
+						5 = { character_event = { id = TOG.7033 days = 100 } } # Maimed
+						35 = { } # Nothing
 					}
 				}
-			}
-			#Big gift
-			if = { 
-				limit = { has_character_flag = ancestors_feast }
 
-				hidden_tooltip = {
-					random_list = { 
-						5 = { character_event = { id = TOG.7035 days = 150 } } #Increased levy
-						10 = { character_event = { id = TOG.7034 days = 100 } } #War tech
-						10 = { character_event = { id = TOG.7030 days = 100 } } #Commander
-						5 = { 				
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-							character_event = { id = TOG.7011 days = 360 } 
+				# Big gift
+				else_if = {
+					limit = { has_character_flag = ancestors_feast }
+
+					random_list = {
+						 5 = { character_event = { id = TOG.7035 days = 150 } } # Increased levy
+						10 = { character_event = { id = TOG.7034 days = 100 } } # War tech
+						10 = { character_event = { id = TOG.7030 days = 100 } } # Commander
+						 5 = {
+							trigger = { is_strong_trigger = no } # Robust
+							character_event = { id = TOG.7011 days = 360 }
 						}
-						20 = { 
-							modifier = { factor = 0 can_have_more_leadership_traits = no } #Leadership trait
+						20 = {
+							trigger = { can_have_more_leadership_traits = yes } # Leadership trait
 							character_event = { id = TOG.7032 days = 360 }
 						}
-						10 = { character_event = { id = TOG.7033 days = 100 } } #Maimed
+						10 = { character_event = { id = TOG.7033 days = 100 } } # Maimed
 						35 = { } #Nothing
 					}
 				}
-			}
-			#Small gift
-			if = { 
-				limit = { has_character_flag = ancestors_carving }
 
-				hidden_tooltip = {
-					random_list = { 
-						1 = { character_event = { id = TOG.7035 days = 150 } } #Increased levy
-						5 = { character_event = { id = TOG.7034 days = 100 } } #War tech
-						5 = { character_event = { id = TOG.7030 days = 100 } } #Commander
-						5 = { 				
-							modifier = { factor = 0 is_strong_trigger = yes } #Robust
-							character_event = { id = TOG.7011 days = 360 } 
+				# Small gift
+				else = {
+					random_list = {
+						 1 = { character_event = { id = TOG.7035 days = 150 } } # Increased levy
+						 5 = { character_event = { id = TOG.7034 days = 100 } } # War tech
+						 5 = { character_event = { id = TOG.7030 days = 100 } } # Commander
+						 5 = {
+							trigger = { is_strong_trigger = no } # Robust
+							character_event = { id = TOG.7011 days = 360 }
 						}
-						15 = { 
-							modifier = { factor = 0 can_have_more_leadership_traits = no } #Leadership trait
+						15 = {
+							trigger = { can_have_more_leadership_traits = yes } # Leadership trait
 							character_event = { id = TOG.7032 days = 360 }
 						}
-						15 = { character_event = { id = TOG.7033 days = 100 } } #Maimed
-						35 = { } #Nothing
-					}
-				}
-			}	
-		}
-
-		#Prosperity
-		if = { 
-			limit = { has_character_flag = ancestors_prosperity }
-			
-			#Limb
-			if = { 
-				limit = { has_character_flag = ancestors_limb }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { 
-							if = {
-								limit = {
-									capital_scope = {
-										NOR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7040 days = 500 } #Increase prosperity level
-							}
-							if = {
-								limit = {
-									capital_scope = {
-										OR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7044 days = 500 } #Decrease depopulation level
-							}	 
-						} 
-						15 = { character_event = { id = TOG.7041 days = 100 } } #Economy tech points
-						10 = { character_event = { id = TOG.7042 days = 200 } } #Stewardship bonus
-						5 = { character_event = { id = TOG.7043 days = 300 } } #Less tax
-						20 = { } #Nothing
+						15 = { character_event = { id = TOG.7033 days = 100 } } # Maimed
+						35 = { } # Nothing
 					}
 				}
 			}
-			#Human Sacrifice
-			if = { 
-				limit = { has_character_flag = ancestors_human }
 
-				hidden_tooltip = {
-					random_list = { 
-						5 = { 
+			# Prosperity
+			if = {
+				limit = { has_character_flag = ancestors_prosperity }
+
+				# Limb
+				if = {
+					limit = { has_character_flag = ancestors_limb }
+
+					random_list = {
+						10 = {
 							if = {
 								limit = {
 									capital_scope = {
-										NOR = { 
+										OR = {
 											has_province_modifier = depopulated_1
 											has_province_modifier = depopulated_2
 											has_province_modifier = depopulated_3
 										}
 									}
 								}
-								character_event = { id = TOG.7040 days = 500 } #Increase prosperity level
+								character_event = { id = TOG.7044 days = 500 } # Decrease depopulation level
 							}
+							else = {
+								character_event = { id = TOG.7040 days = 500 } # Increase prosperity level
+							}
+						}
+						15 = { character_event = { id = TOG.7041 days = 100 } } # Economy tech points
+						10 = { character_event = { id = TOG.7042 days = 200 } } # Stewardship bonus
+						 5 = { character_event = { id = TOG.7043 days = 300 } } # Less tax
+						20 = { } # Nothing
+					}
+				}
+
+				# Human Sacrifice
+				else_if = {
+					limit = { has_character_flag = ancestors_human }
+
+					random_list = {
+						 5 = {
 							if = {
 								limit = {
 									capital_scope = {
-										OR = { 
+										OR = {
 											has_province_modifier = depopulated_1
 											has_province_modifier = depopulated_2
 											has_province_modifier = depopulated_3
 										}
 									}
 								}
-								character_event = { id = TOG.7044 days = 500 } #Decrease depopulation level
-							}	 
+								character_event = { id = TOG.7044 days = 500 } # Decrease depopulation level
+							}
+							else = {
+								character_event = { id = TOG.7040 days = 500 } # Increase prosperity level
+							}
 						}
-						15 = { character_event = { id = TOG.7041 days = 100 } } #Economy tech points
-						15 = { character_event = { id = TOG.7042 days = 200 } } #Stewardship bonus
-						5 = { character_event = { id = TOG.7043 days = 300 } } #Less tax
-						35 = { } #Nothing
+						15 = { character_event = { id = TOG.7041 days = 100 } } # Economy tech points
+						15 = { character_event = { id = TOG.7042 days = 200 } } # Stewardship bonus
+						 5 = { character_event = { id = TOG.7043 days = 300 } } # Less tax
+						35 = { } # Nothing
+					}
+				}
+
+				# Big gift
+				else_if = {
+					limit = { has_character_flag = ancestors_feast }
+
+					random_list = {
+						 5 = {
+							if = {
+								limit = {
+									capital_scope = {
+										OR = {
+											has_province_modifier = depopulated_1
+											has_province_modifier = depopulated_2
+											has_province_modifier = depopulated_3
+										}
+									}
+								}
+								character_event = { id = TOG.7044 days = 500 } # Decrease depopulation level
+							}
+							else = {
+								character_event = { id = TOG.7040 days = 500 } # Increase prosperity level
+							}
+						}
+						15 = { character_event = { id = TOG.7041 days = 100 } } # Economy tech points
+						15 = { character_event = { id = TOG.7042 days = 200 } } # Stewardship bonus
+						10 = { character_event = { id = TOG.7043 days = 300 } } # Less tax
+						35 = { } # Nothing
+					}
+				}
+
+				# Small gift
+				else = {
+					random_list = {
+						 1 = {
+							if = {
+								limit = {
+									capital_scope = {
+										OR = {
+											has_province_modifier = depopulated_1
+											has_province_modifier = depopulated_2
+											has_province_modifier = depopulated_3
+										}
+									}
+								}
+								character_event = { id = TOG.7044 days = 500 } # Decrease depopulation level
+							}
+							else = {
+								character_event = { id = TOG.7040 days = 500 } # Increase prosperity level
+							}
+						}
+						 5 = { character_event = { id = TOG.7041 days = 100 } } # Economy tech points
+						10 = { character_event = { id = TOG.7042 days = 200 } } # Stewardship bonus
+						10 = { character_event = { id = TOG.7043 days = 300 } } # Less tax
+						20 = { } # Nothing
 					}
 				}
 			}
-			#Big gift
-			if = { 
-				limit = { has_character_flag = ancestors_feast }
 
-				hidden_tooltip = {
-					random_list = { 
-						5 = { 
-							if = {
-								limit = {
-									capital_scope = {
-										NOR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7040 days = 500 } #Increase prosperity level
-							}
-							if = {
-								limit = {
-									capital_scope = {
-										OR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7044 days = 500 } #Decrease depopulation level
-							}	 
-						}
-						15 = { character_event = { id = TOG.7041 days = 100 } } #Economy tech points
-						15 = { character_event = { id = TOG.7042 days = 200 } } #Stewardship bonus
-						10 = { character_event = { id = TOG.7043 days = 300 } } #Less tax
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Small gift
-			if = { 
-				limit = { has_character_flag = ancestors_carving }
+			# Wisdom
+			else = {
+				# Limb
+				if = {
+					limit = { has_character_flag = ancestors_limb }
 
-				hidden_tooltip = {
-					random_list = { 
-						1 = { 
-							if = {
-								limit = {
-									capital_scope = {
-										NOR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7040 days = 500 } #Increase prosperity level
-							}
-							if = {
-								limit = {
-									capital_scope = {
-										OR = { 
-											has_province_modifier = depopulated_1
-											has_province_modifier = depopulated_2
-											has_province_modifier = depopulated_3
-										}
-									}
-								}
-								character_event = { id = TOG.7044 days = 500 } #Decrease depopulation level
-							}	 
-						}
-						5 = { character_event = { id = TOG.7041 days = 100 } } #Economy tech points
-						10 = { character_event = { id = TOG.7042 days = 200 } } #Stewardship bonus
-						10 = { character_event = { id = TOG.7043 days = 300 } } #Less tax
-						20 = { } #Nothing
-					}
-				}
-			}	
-		}
-
-		#Wisdom
-		if = { 
-			limit = { has_character_flag = ancestors_wisdom }
-			
-			#Limb
-			if = { 
-				limit = { has_character_flag = ancestors_limb }
-
-				hidden_tooltip = {
-					random_list = { 
-						10 = { 
-							modifier = { factor = 0 is_smart_trigger = yes } #Shrewd
+					random_list = {
+						10 = {
+							trigger = { is_smart_trigger = no } # Shrewd
 							character_event = { id = TOG.7050 days = 400 }
 						}
-						15 = { character_event = { id = TOG.7051 days = 200 } } #Wise woman
-						15 = { character_event = { id = TOG.7054 days = 300 } } #Owl
-						5 = { character_event = { id = TOG.7052 days = 300 } } #Learning bonus
-						3 = { 
-							modifier = { factor = 0 is_dumb_trigger = yes } #Dull
-							character_event = { id = TOG.7053 days = 200 } 
+						15 = { character_event = { id = TOG.7051 days = 200 } } # Wise woman
+						15 = { character_event = { id = TOG.7054 days = 300 } } # Owl
+						 5 = { character_event = { id = TOG.7052 days = 300 } } # Learning bonus
+						 3 = {
+							trigger = { is_dumb_trigger = no } # Dull
+							character_event = { id = TOG.7053 days = 200 }
 						}
-						20 = { } #Nothing
+						20 = { } # Nothing
 					}
 				}
-			}
-			#Human Sacrifice
-			if = { 
-				limit = { has_character_flag = ancestors_human }
 
-				hidden_tooltip = {
-					random_list = { 
-						5 = { 
-							modifier = { factor = 0 is_smart_trigger = yes } #Shrewd
+				# Human Sacrifice
+				else_if = {
+					limit = { has_character_flag = ancestors_human }
+
+					random_list = {
+						 5 = {
+							trigger = { is_smart_trigger = no } # Shrewd
 							character_event = { id = TOG.7050 days = 400 }
 						}
-						15 = { character_event = { id = TOG.7051 days = 200 } } #Wise woman
-						15 = { character_event = { id = TOG.7054 days = 300 } } #Owl
-						10 = { character_event = { id = TOG.7052 days = 300 } } #Learning bonus
-						5 = { 
-							modifier = { factor = 0 is_dumb_trigger = yes } #Dull
-							character_event = { id = TOG.7053 days = 200 } 
+						15 = { character_event = { id = TOG.7051 days = 200 } } # Wise woman
+						15 = { character_event = { id = TOG.7054 days = 300 } } # Owl
+						10 = { character_event = { id = TOG.7052 days = 300 } } # Learning bonus
+						 5 = {
+							trigger = { is_dumb_trigger = no } # Dull
+							character_event = { id = TOG.7053 days = 200 }
+						}
+						35 = { } # Nothing
+					}
+				}
+
+				# Big gift
+				else_if = {
+					limit = { has_character_flag = ancestors_feast }
+
+					random_list = {
+						 1 = {
+							trigger = { is_smart_trigger = no } # Shrewd
+							character_event = { id = TOG.7050 days = 400 }
+						}
+						15 = { character_event = { id = TOG.7051 days = 200 } } # Wise woman
+						15 = { character_event = { id = TOG.7054 days = 300 } } # Owl
+						20 = { character_event = { id = TOG.7052 days = 300 } } # Learning bonus
+						10 = {
+							trigger = { is_dumb_trigger = no } # Dull
+							character_event = { id = TOG.7053 days = 200 }
 						}
 						35 = { } #Nothing
 					}
 				}
-			}
-			#Big gift
-			if = { 
-				limit = { has_character_flag = ancestors_feast }
 
-				hidden_tooltip = {
-					random_list = { 
-						1 = { 
-							modifier = { factor = 0 is_smart_trigger = yes } #Shrewd
+				# Small gift
+				else = {
+					random_list = {
+						 1 = {
+							trigger = { is_smart_trigger = no } # Shrewd
 							character_event = { id = TOG.7050 days = 400 }
 						}
-						15 = { character_event = { id = TOG.7051 days = 200 } } #Wise woman
-						15 = { character_event = { id = TOG.7054 days = 300 } } #Owl
-						20 = { character_event = { id = TOG.7052 days = 300 } } #Learning bonus
-						10 = { 
-							modifier = { factor = 0 is_dumb_trigger = yes } #Dull
-							character_event = { id = TOG.7053 days = 200 } 
+						 5 = { character_event = { id = TOG.7051 days = 200 } } # Wise woman
+						 5 = { character_event = { id = TOG.7054 days = 300 } } # Owl
+						10 = { character_event = { id = TOG.7052 days = 300 } } # Learning bonus
+						10 = {
+							trigger = { is_dumb_trigger = no } # Dull
+							character_event = { id = TOG.7053 days = 200 }
 						}
-						35 = { } #Nothing
-					}
-				}
-			}
-			#Small gift
-			if = { 
-				limit = { has_character_flag = ancestors_carving }
-
-				hidden_tooltip = {
-					random_list = { 
-						1 = { 
-							modifier = { factor = 0 is_smart_trigger = yes } #Shrewd
-							character_event = { id = TOG.7050 days = 400 }
-						}
-						5 = { character_event = { id = TOG.7051 days = 200 } } #Wise woman
-						5 = { character_event = { id = TOG.7054 days = 300 } } #Owl
-						10 = { character_event = { id = TOG.7052 days = 300 } } #Learning bonus
-						10 = { 
-							modifier = { factor = 0 is_dumb_trigger = yes } #Dull
-							character_event = { id = TOG.7053 days = 200 } 
-						}
-						20 = { } #Nothing
+						20 = { } # Nothing
 					}
 				}
 			}
 		}
+
 		clr_character_flag = ancestors_health
 		clr_character_flag = ancestors_relationships
 		clr_character_flag = ancestors_war
@@ -1075,32 +1115,27 @@ character_event = {
 	}
 }
 
-#HEALTH OUTCOMES
+# HEALTH OUTCOMES
 
-#Get healed or blessing of health?
+# Get healed or blessing of health?
 character_event = {
 	id = TOG.7010
-	
+
 	is_triggered_only = yes
 	hide_window = yes
 
 	option = {
 		if = {
-			limit = { 
-				has_disease_trigger = no
-			}
-			character_event = { id = TOG.7014 }
-		}
-		if = {
-			limit = { 
-				has_disease_trigger = yes
-			}
+			limit = { is_ill = yes }
 			character_event = { id = TOG.7016 }
+		}
+		else = {
+			character_event = { id = TOG.7014 }
 		}
 	}
 }
 
-#Blessing of health
+# Blessing of health
 character_event = {
 	id = TOG.7014
 	desc = EVTDESC_TOG_7014
@@ -1111,7 +1146,9 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_7014
+
 		set_character_flag = old_gods_blessing
+
 		add_character_modifier = {
 			name = blessing_of_health
 			duration = -1
@@ -1119,7 +1156,7 @@ character_event = {
 	}
 }
 
-#Blessing of health healing illness
+# Blessing of health healing illness
 character_event = {
 	id = TOG.7015
 	desc = EVTDESC_TOG_7015
@@ -1128,28 +1165,19 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		has_disease_trigger = yes
-	}
+	trigger = { is_ill = yes }
 
 	option = {
 		name = EVTOPTA_TOG_7015
-		remove_disease_trait_effect = yes	
-		remove_character_modifier = blessing_of_health
 
-		if = {
-			limit = { trait = cynical }
-			remove_trait = cynical
-		}
-		if = {
-			limit = { NOT = { trait = zealous } }
-			add_trait = zealous
-		}
+		remove_disease_trait_effect = yes
+		remove_character_modifier = blessing_of_health
+		add_trait_partially_silently_zealous_effect = yes
 		clr_character_flag = old_gods_blessing
 	}
 }
 
-#Healing illness
+# Healing illness
 character_event = {
 	id = TOG.7016
 	desc = EVTDESC_TOG_7016
@@ -1160,12 +1188,13 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_7016
-		remove_disease_trait_effect = yes	
+
+		remove_disease_trait_effect = yes
 	}
 }
 
 
-#Robust
+# Robust
 character_event = {
 	id = TOG.7011
 	desc = EVTDESC_TOG_7011
@@ -1182,6 +1211,7 @@ character_event = {
 
 			upgrade_strong_congenital_trait_effect = yes
 		}
+
 		if = {
 			limit = { is_strong_non_congenital_trait_upgradeable_trigger = yes }
 
@@ -1190,7 +1220,7 @@ character_event = {
 	}
 }
 
-#Small health bonus
+# Small health bonus
 character_event = {
 	id = TOG.7012
 	desc = EVTDESC_TOG_7012
@@ -1201,6 +1231,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_7012
+
 		add_character_modifier = {
 			name = invigorated
 			years = 10
@@ -1208,140 +1239,139 @@ character_event = {
 	}
 }
 
-#Illness
+# Illness
 character_event = {
 	id = TOG.7013
+	desc = EVTDESC_TOG_7013
+	picture = GFX_evt_doctor_tending_to_sick
 	border = GFX_event_normal_frame_religion
-	picture = GFX_evt_illness
-
-	desc = {
-		trigger = { has_dlc = "Reapers" }
-		text = EVTDESC_TOG_7013
-		picture = GFX_evt_doctor_tending_to_sick
-	}
-	desc = {
-		trigger = { NOT = { has_dlc = "Reapers" } }
-		text = EVTDESC_TOG_7013
-		picture = GFX_evt_illness
-	}
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_TOG_7013
-		hidden_tooltip = { character_event = { id = 6063 days = 20 } }
+
+		character_event = {
+			id = 6063 # base_health_events.txt
+			days = 20
+		}
 	}
 }
 
+# RELATIONSHIPS
 
-#RELATIONSHIPS
-
-#Lover
+# Lover
 character_event = {
 	id = TOG.7020
 	desc = EVTDESC_TOG_7020
-	border = GFX_event_normal_frame_diplomacy
 	picture = GFX_evt_lovers
+	border = GFX_event_normal_frame_diplomacy
 
 	is_triggered_only = yes
 
 	immediate = {
-		#Targets male lover
+		# Targets male lover
 		if = {
 			limit = { prefers_men_trigger = yes }
 
-			#Grabs random courtier
+			# Grabs random courtier
 			if = {
 				limit = {
 					any_courtier = {
-						is_adult = yes
 						is_female = no
-						NOT = { is_lover = ROOT }
-						NOT = { is_close_relative = ROOT }
 						ai = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						is_alive = yes
+						block_general_event_trigger = no
+
+						NOR = {
+							is_lover = ROOT
+							is_close_relative = ROOT
+						}
 					}
 				}
 
 				random_courtier = {
-					limit = { 
-						is_adult = yes
+					limit = {
 						is_female = no
-						NOT = { is_lover = ROOT }
-						NOT = { is_close_relative = ROOT }
 						ai = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						is_alive = yes
+						block_general_event_trigger = no
+
+						NOR = {
+							is_lover = ROOT
+							is_close_relative = ROOT
+						}
 					}
+
 					save_event_target_as = ancestors_lover
+					save_event_target_as = sex_partner
 				}
 			}
 
-			#Or creates a new one
+			# Or creates a new one
 			else = {
 				create_character = {
 					female = no
 					random_traits = yes
 					dynasty = none
 				}
+
 				new_character = {
 					save_event_target_as = ancestors_lover
+					save_event_target_as = sex_partner
 				}
 			}
 		}
 
-		#Targets female lover
-		if = {
-			limit = { prefers_men_trigger = no }
-
-			#Grabs random courtier
+		# Targets female lover
+		else = {
+			# Grabs random courtier
 			if = {
 				limit = {
 					any_courtier = {
-						is_adult = yes
 						is_female = yes
-						NOT = { is_lover = ROOT }
-						NOT = { is_close_relative = ROOT }
 						ai = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						is_alive = yes
+						block_general_event_trigger = no
+
+						NOR = {
+							is_lover = ROOT
+							is_close_relative = ROOT
+						}
 					}
 				}
 
 				random_courtier = {
-					limit = { 
-						is_adult = yes
+					limit = {
 						is_female = yes
-						NOT = { is_lover = ROOT }
-						NOT = { is_close_relative = ROOT }
 						ai = yes
-						prisoner = no
-						NOT = { trait = incapable }
-						is_alive = yes
+						block_general_event_trigger = no
+
+						NOR = {
+							is_lover = ROOT
+							is_close_relative = ROOT
+						}
 					}
+
 					save_event_target_as = ancestors_lover
+					save_event_target_as = sex_partner
 				}
 			}
 
-			#Or creates a new one
+			# Or creates a new one
 			else = {
 				create_character = {
 					female = yes
 					random_traits = yes
 					dynasty = none
 				}
+
 				new_character = {
 					save_event_target_as = ancestors_lover
+					save_event_target_as = sex_partner
 				}
 			}
 		}
 	}
 
-	#Confess
+	# Confess
 	option = {
 		name = EVTOPTA_TOG_7020
 
@@ -1350,59 +1380,29 @@ character_event = {
 		}
 		new_lover_effect = yes
 
-		#Makes lover bisexual if both are same sex
-		hidden_tooltip = {
+		hidden_effect = {
+			# Makes lover homosexual if both are same sex
 			if = {
-				limit = { event_target:ancestors_lover = { same_sex = ROOT } }
+				limit = { same_sex = event_target:ancestors_lover }
 				event_target:ancestors_lover = { add_trait = bisexual }
 			}
 
-			if = {
-				limit = {
-  					ROOT = { 
-						is_female = no 
-						fertility = 0.25
-					}
-  					event_target:ancestors_lover = {
-						is_female = yes 
-						fertility = 0.25
-					}
-				}
-				random = {
-					chance = 50 
-					impregnate = event_target:ancestors_lover
-				}
-			}
-			if = {
-				limit = {
- 					ROOT = {
-						is_female = yes 
-						fertility = 0.25
-					}
-  					event_target:ancestors_lover = { 
-						is_female = no 
-						fertility = 0.25
-					} 
-				}
-				random = {
-					chance = 50 
-					event_target:ancestors_lover = { impregnate = ROOT }
-				}
+			# Impregnate if of different sex
+			else = {
+				unprotected_sex_effect_event_target = yes
 			}
 		}
 	}
 
-	#Or don't
+	# Or don't
 	option = {
 		name = EVTOPTB_TOG_7020
-		
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
-#Friend
+# Friend
 character_event = {
 	id = TOG.7021
 	desc = EVTDESC_TOG_7021
@@ -1412,64 +1412,63 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		#Target a friend
+		# Target a friend
 		if = {
 			limit = {
 				any_courtier = {
+					is_inaccessible_or_incapable_trigger = no
+
 					NOR = {
 						is_friend = ROOT
 						is_rival = ROOT
 						is_lover = ROOT
-						prisoner = yes
-						trait = incapable
-						is_inaccessible_trigger = yes
-						is_alive = no
 					}
 				}
 			}
 
 			random_courtier = {
 				limit = {
+					is_inaccessible_or_incapable_trigger = no
+
 					NOR = {
 						is_friend = ROOT
 						is_rival = ROOT
 						is_lover = ROOT
-						prisoner = yes
-						trait = incapable
-						is_inaccessible_trigger = yes
-						is_alive = no
 					}
-				} 
+				}
+
 				save_event_target_as = ancestors_friend
 			}
 		}
 
-		#Or create new one
+		# Or create new one
 		else = {
 			create_character = {
 				random_traits = yes
 				dynasty = random
 			}
+
 			new_character = {
 				save_event_target_as = ancestors_friend
 			}
 		}
 	}
 
-	#Make friend
+	# Make friend
 	option = {
 		name = EVTOPTA_TOG_7021
+
 		add_friend = event_target:ancestors_friend
 	}
+
 	option = {
 		name = EVTOPTB_TOG_7021
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
-#Small diplomacy bonus
+# Small diplomacy bonus
 character_event = {
 	id = TOG.7022
 	desc = EVTDESC_TOG_7022
@@ -1488,7 +1487,7 @@ character_event = {
 	}
 }
 
-#Rival
+# Rival
 character_event = {
 	id = TOG.7023
 	desc = EVTDESC_TOG_7023
@@ -1498,44 +1497,42 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		#Target a rival
+		# Target a rival
 		if = {
 			limit = {
 				any_courtier = {
+					is_inaccessible_or_incapable_trigger = no
+
 					NOR = {
 						is_friend = ROOT
 						is_rival = ROOT
 						is_lover = ROOT
-						prisoner = yes
-						trait = incapable
-						is_inaccessible_trigger = yes
-						is_alive = no
 					}
 				}
 			}
 
 			random_courtier = {
 				limit = {
+					is_inaccessible_or_incapable_trigger = no
+
 					NOR = {
 						is_friend = ROOT
 						is_rival = ROOT
 						is_lover = ROOT
-						prisoner = yes
-						trait = incapable
-						is_inaccessible_trigger = yes
-						is_alive = no
 					}
-				} 
+				}
+
 				save_event_target_as = ancestors_rival
 			}
 		}
 
-		#Or create new one
+		# Or create new one
 		else = {
 			create_character = {
 				random_traits = yes
 				dynasty = random
 			}
+
 			new_character = {
 				save_event_target_as = ancestors_rival
 			}
@@ -1544,11 +1541,12 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_7023
+
 		add_rival = event_target:ancestors_rival
 	}
 }
 
-#Good with people
+# Good with people
 character_event = {
 	id = TOG.7024
 	desc = EVTDESC_TOG_7024
@@ -1559,6 +1557,7 @@ character_event = {
 
 	option = {
 		name = EVTOPTA_TOG_7024
+
 		add_character_modifier = {
 			name = respected_by_the_people
 			duration = -1
@@ -1566,61 +1565,48 @@ character_event = {
 	}
 }
 
-#Get a cat
+# Get a cat
 character_event = {
 	id = TOG.7025
+	desc = EVTDESC_TOG_7025
+	picture = GFX_evt_cat
 	border = GFX_event_normal_frame_diplomacy
-	picture = GFX_evt_recovery
-
-	desc = {
-		trigger = { has_dlc = "Reapers" }
-		text = EVTDESC_TOG_7025
-		picture = GFX_evt_cat
-	}
-	desc = {
-		trigger = { NOT = { has_dlc = "Reapers" } } 
-		text = EVTDESC_TOG_7025
-		picture = GFX_evt_recovery
-	}
-
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_TOG_7025
+
 		add_cat_effect = yes
 	}
 
 	option = {
 		name = EVTOPTB_TOG_7025
-		
-		ai_chance = {
-			factor = 0
-		}
-		
+
 		add_character_modifier = {
 			name = bad_person
 			years = 1
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
+# WAR
 
-#WAR
-
-#Brilliant commander appears
+# Brilliant commander appears
 character_event = {
 	id = TOG.7030
 	desc = EVTDESC_TOG_7030
-	border = GFX_event_normal_frame_war
 	picture = GFX_evt_melee
+	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
 	immediate = {
-		if = { 
+		if = {
 			limit = {
-				OR = { 
+				OR = {
 					has_law = status_of_women_3
 					has_law = status_of_women_4
 					has_game_rule = {
@@ -1635,11 +1621,12 @@ character_event = {
 				female = yes
 				age = 35
 				random_traits = yes
-				trait = strong
-				trait = brave
-				trait = brilliant_strategist
-				trait = holy_warrior
+				add_trait = strong
+				add_trait = brave
+				add_trait = brilliant_strategist
+				add_trait = holy_warrior
 			}
+
 			new_character = {
 				remove_trait = feeble
 				remove_trait = weak
@@ -1666,11 +1653,12 @@ character_event = {
 				female = no
 				age = 35
 				random_traits = yes
-				trait = strong
-				trait = brave
-				trait = brilliant_strategist
-				trait = holy_warrior
+				add_trait = strong
+				add_trait = brave
+				add_trait = brilliant_strategist
+				add_trait = holy_warrior
 			}
+
 			new_character = {
 				remove_trait = feeble
 				remove_trait = weak
@@ -1686,19 +1674,17 @@ character_event = {
 	option = {
 		name = EVTOPTA_TOG_7030
 
-		event_target:ancestors_commander = {
-			opinion = {
-				modifier = opinion_loyal_servant
-				who = ROOT
-				months = 120
-			}
+		reverse_opinion = {
+			name = opinion_loyal_servant
+			who = event_target:ancestors_commander
+			years = 100
 		}
 	}
 }
 
-#Robust is TOG.7011
+# Robust is TOG.7011
 
-#Random leadership trait
+# Random leadership trait
 character_event = {
 	id = TOG.7032
 	desc = EVTDESC_TOG_7032
