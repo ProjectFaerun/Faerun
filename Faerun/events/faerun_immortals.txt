@@ -10,11 +10,45 @@ character_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		NOT = { has_character_modifier = recent_duel_timer }
 		OR = {
 			trait = vampire
 			trait = vampire_spawn
 		}
+		location = { has_owner = yes } # not commanding troops in sea
+		trigger_if = {
+			limit = {
+				OR = {
+					is_landed = yes
+					is_patrician = yes
+				}
+			}
+
+			capital_scope = { has_province_modifier = vampire_hunters_prov_modifier }
+		}
+		trigger_else_if = {
+			limit = { 
+				is_ruler = no
+				liege = {
+					OR = {
+						is_landed = yes
+						is_patrician = yes
+					}
+					OR = {
+						trait = vampire
+						trait = vampire_spawn
+					}
+				}
+			}
+
+			liege = { capital_scope = { has_province_modifier = vampire_hunters_prov_modifier } }
+		}
+		trigger_else = { 
+			OR = {
+				has_character_modifier = known_vamp_modifier
+				location = { has_province_modifier = vampire_hunters_prov_modifier }
+			}
+		}
+
 		OR = {
 			NOT = { has_character_flag = vampire_hunter_spawned }
 			had_character_flag = {
@@ -22,7 +56,8 @@ character_event = {
 				years > 5
 			}
 		}
-		location = { has_owner = yes } # not commanding troops in sea
+		NOT = { has_character_modifier = recent_duel_timer }
+		is_inaccessible_or_incapable_trigger = no
 	}
 	
 	weight_multiplier = {
@@ -49,6 +84,18 @@ character_event = {
 			intrigue >= 15
 		}
 		mult_modifier = {
+			factor = 0.5 # stacks with the above
+			intrigue >= 20
+		}
+		mult_modifier = {
+			factor = 0.5 # stacks with the above
+			intrigue >= 25
+		}
+		mult_modifier = {
+			factor = 0.5 # stacks with the above
+			intrigue >= 30
+		}
+		mult_modifier = {
 			factor = 2
 			intrigue < 6
 		}
@@ -66,7 +113,7 @@ character_event = {
 	option = {
 		trigger = {
 			is_ruler = yes
-			wealth = 50
+			wealth > 0
 		}
 		name = FRIMMORTAL.1.Oa
 		ai_chance = {
@@ -96,6 +143,10 @@ character_event = {
 					mult_modifier = {
 						factor = 1.5
 						intrigue >= 25
+					}
+					mult_modifier = {
+						factor = 1.5
+						intrigue >= 30
 					}
 					hidden_tooltip = {
 						character_event = { id = frimmortal.2 days = 10 }
@@ -268,7 +319,91 @@ character_event = {
             }
 			set_character_flag = is_in_duel
 			set_character_flag = add_duel_xp
+			character_event = { id = frimmortal.4 days = 2 }
 		}
 		character_event = { id = HFP.10100 }
+	}
+}
+
+character_event = {
+	id = frimmortal.4
+	hide_window = yes
+	
+	is_triggered_only = yes
+
+	trigger = {
+		is_alive = yes
+	}
+	
+	immediate = {
+		leave_court_and_die_effect = yes
+	}
+}
+
+character_event = {
+	id = frimmortal.5
+	desc = EVTDESC_FRIMMORTAL.5
+	picture = GFX_evt_bad_news
+	notification = yes
+	
+	is_triggered_only = yes
+
+	only_playable = yes
+
+	trigger = {
+		OR = {
+			trait = vampire
+			trait = vampire_spawn
+		}
+		wealth < 0
+		OR = {
+			is_landed = yes
+			is_patrician = yes
+		}
+		capital_scope = {
+			NOT = { has_province_modifier = vampire_hunters_prov_modifier }
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+			wealth < -50
+		}
+		mult_modifier = {
+			factor = 2
+			wealth < -100
+		}
+		mult_modifier = {
+			factor = 2
+			wealth < -150
+		}
+		mult_modifier = {
+			factor = 2
+			wealth < -200
+		}
+		mult_modifier = {
+			factor = 2
+			wealth < -300
+		}
+		mult_modifier = {
+			factor = 2
+			wealth < -500
+		}
+	}
+	
+	immediate = {
+		capital_scope = {
+			add_province_modifier = {
+				name = vampire_hunters_prov_modifier
+				years = 10
+			}
+		}
+	}
+
+	option = {
+		name = UNFORTUNATE
 	}
 }

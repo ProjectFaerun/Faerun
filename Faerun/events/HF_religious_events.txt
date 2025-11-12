@@ -1807,290 +1807,314 @@ character_event = {
 #On Conversion event to clear up gender laws when needed.
 character_event = {
 	id = HF.23034
+
+	is_triggered_only = yes
 	hide_window = yes
 
+	only_rulers = yes
+
 	trigger = {
-		ROOT = {
-			OR = {
-				has_religion_feature = religion_patriarchal
-				has_religion_feature = religion_equal
-				has_religion_feature = religion_matriarchal
-			}
+		OR = {
+			has_religion_feature = religion_equal
+			has_religion_feature = religion_feature_earthmother
+			has_religion_feature = religion_feature_yuir
+			has_religion_feature = religion_patriarchal
+			has_religion_feature = religion_matriarchal
 		}
 		NOT = { has_character_flag = reverting_religion_change }
 	}
-	is_triggered_only = yes
 
 	immediate = {
 		if = {
 			limit = {
-				ROOT = {
-					has_religion_feature = religion_matriarchal
-					NOR = {
-						#is_merchant_republic = yes
-						is_republic = yes
-					}
+				has_religion_feature = religion_matriarchal
+
+				FROM = {
+					NOT = { has_religion_feature = religion_matriarchal }
 				}
 			}
-			ROOT = {
-				any_demesne_title = {
-					add_law = {
-						law = enatic_succession
-						cooldown = no
-						opinion_effect = no
+
+			if = { # Only apply opinion modifiers if important titles change gender succession law
+				limit = {
+					any_demesne_title = {
+						OR = {
+							is_primary_holder_title_tier = yes
+							higher_real_tier_than = DUKE
+						}
+
+						NOT = { has_law = enatic_succession }
 					}
-					add_law = {
-						law = status_of_women_4
-						cooldown = no
-						opinion_effect = no
+				}
+
+				if = {
+					limit = {
+						FROM = {
+							has_religion_feature = religion_patriarchal
+						}
 					}
-					if = {
-						limit = {
-							ROOT = {
-								NOT = { has_law = succ_byzantine_elective }
-								OR = {
-									is_feudal = yes
-									is_tribal = yes
-									is_nomadic = yes
-								}
+
+					any_close_relative = {
+						if = {
+							limit = { is_female = no }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+								multiplier = 2
 							}
 						}
-						add_law = {
-							law = succ_turkish_succession
-							cooldown = no
-							opinion_effect = no
-						}
-					}
-				}
-				recalc_succession = yes
-			}
-		}
-		if = {
-			limit = {
-				ROOT = { has_religion_feature = religion_patriarchal }
-			}
-			ROOT = {
-				any_demesne_title = {
-					add_law = {
-						law = agnatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-					add_law = {
-						law = status_of_women_0
-						cooldown = no
-						opinion_effect = no
-					}
-					if = {
-						limit = {
-							ROOT = {
-								NOT = { has_law = succ_byzantine_elective }
-								OR = {
-									is_feudal = yes
-									is_tribal = yes
-									is_nomadic = yes
-								}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+								multiplier = 2
 							}
 						}
-						add_law = {
-							law = succ_turkish_succession
-							cooldown = no
-							opinion_effect = no
+					}
+				}
+				else = {
+					any_close_relative = {
+						if = {
+							limit = { is_female = no }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+							}
 						}
 					}
 				}
-				recalc_succession = yes
 			}
+
+			primary_title = {
+				add_law = {
+					law = status_of_women_4
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			any_demesne_title = {
+				limit = {
+					succ_law_title = { is_law_potential = enatic_succession }
+				}
+
+				add_law = {
+					law = enatic_succession
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			recalc_succession = yes
 		}
-		if = {
+		else_if = {
 			limit = {
-				ROOT = {
+				has_religion_feature = religion_patriarchal
+
+				FROM = {
+					NOT = { has_religion_feature = religion_patriarchal }
+				}
+			}
+
+			if = { # Only apply opinion modifiers if important titles change gender succession law
+				limit = {
+					any_demesne_title = {
+						OR = {
+							is_primary_holder_title_tier = yes
+							higher_real_tier_than = DUKE
+						}
+
+						NOT = { has_law = agnatic_succession }
+					}
+				}
+
+				if = {
+					limit = {
+						FROM = {
+							has_religion_feature = religion_matriarchal
+						}
+					}
+
+					any_close_relative = {
+						if = {
+							limit = { is_female = yes }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+								multiplier = 2
+							}
+						}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+								multiplier = 2
+							}
+						}
+					}
+				}
+				else = {
+					any_close_relative = {
+						if = {
+							limit = { is_female = yes }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+					}
+				}
+			}
+
+			primary_title = {
+				add_law = {
+					law = status_of_women_0
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			any_demesne_title = {
+				limit = {
+					succ_law_title = { is_law_potential = agnatic_succession }
+				}
+
+				add_law = {
+					law = agnatic_succession
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			recalc_succession = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
 					has_religion_feature = religion_equal
+					has_religion_feature = religion_feature_earthmother
+					has_religion_feature = religion_feature_yuir
+				}
+
+				FROM = {
 					NOR = {
-						#is_merchant_republic = yes
-						is_republic = yes
-					}
-				}
-			}
-			ROOT = {
-				any_demesne_title = {
-					add_law = {
-						law = true_cognatic_succession
-						cooldown = no
-						opinion_effect = no
-					}
-					add_law = {
-						law = status_of_women_4
-						cooldown = no
-						opinion_effect = no
-					}
-				}
-				recalc_succession = yes
-			}
-		}
-		ROOT = {
-			if = {
-				limit = {
-					FROM = {
-						NOR = {
-							has_religion_feature = religion_equal
-							has_religion_feature = religion_patriarchal
-							has_religion_feature = religion_matriarchal
-						}
-					}
-					ROOT = { has_religion_feature = religion_matriarchal }
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = {
-						NOR = {
-							has_religion_feature = religion_equal
-							has_religion_feature = religion_matriarchal
-							has_religion_feature = religion_patriarchal
-						}
-					}
-					ROOT = { has_religion_feature = religion_patriarchal }
-				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = { has_religion_feature = religion_patriarchal }
-					ROOT = {
-						OR = {
-							has_religion_feature = religion_equal
-							has_religion_feature = religion_matriarchal
-						}
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = { has_religion_feature = religion_matriarchal }
-					ROOT = {
-						OR = {
-							has_religion_feature = religion_equal
-							has_religion_feature = religion_patriarchal
-						}
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
-					}
-				}
-			}
-			if = {
-				limit = {
-					FROM = {
 						has_religion_feature = religion_equal
-					}
-					ROOT = {
-						has_religion_feature = religion_patriarchal
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
+						has_religion_feature = religion_feature_earthmother
+						has_religion_feature = religion_feature_yuir
 					}
 				}
 			}
-			if = {
+
+			if = { # Only apply opinion modifiers if important titles change gender succession law
 				limit = {
-					FROM = {
-						has_religion_feature = religion_equal
-					}
-					ROOT = {
-						has_religion_feature = religion_matriarchal
-					}
-				}
-				any_close_relative = {
-					limit = { is_female = no }
-					opinion = {
-						who = ROOT
-						modifier = bad_succ_law_change
-						years = 100
+					any_demesne_title = {
+						OR = {
+							is_primary_holder_title_tier = yes
+							higher_real_tier_than = DUKE
+						}
+
+						NOT = { has_law = true_cognatic_succession }
 					}
 				}
-				any_close_relative = {
-					limit = { is_female = yes }
-					opinion = {
-						who = ROOT
-						modifier = good_succ_law_change
-						years = 100
+
+				if = {
+					limit = {
+						FROM = {
+							has_religion_feature = religion_patriarchal
+						}
+					}
+
+					any_close_relative = {
+						if = {
+							limit = { is_female = no }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						FROM = {
+							has_religion_feature = religion_matriarchal
+						}
+					}
+
+					any_close_relative = {
+						if = {
+							limit = { is_female = yes }
+
+							opinion = {
+								name = bad_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
+						else = {
+							opinion = {
+								name = good_succ_law_change
+								who = ROOT
+								years = 100
+							}
+						}
 					}
 				}
 			}
+
+			primary_title = {
+				add_law = {
+					law = status_of_women_4
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			any_demesne_title = {
+				limit = {
+					succ_law_title = { is_law_potential = true_cognatic_succession }
+				}
+
+				add_law = {
+					law = true_cognatic_succession
+					cooldown = no
+					opinion_effect = no
+				}
+			}
+
+			recalc_succession = yes
 		}
 	}
 }
@@ -2232,7 +2256,6 @@ character_event = {
 
 	trigger = {
 		is_save_game = no
-		has_landed_title = c_waterdeep
 	}
 	immediate = {
 		if = {
@@ -3689,15 +3712,7 @@ character_event = {
 				trigger = {
 					FROM = {
 						owner = {
-							OR = {
-								primary_title = { has_law = status_of_women_4 }
-								has_game_rule = {
-									name = gender
-									value = all
-								}
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_equal
-							}
+							gender_equality_trigger = yes
 						}
 					}
 				}
@@ -12236,6 +12251,7 @@ character_event = {
 	hide_window = yes
 
 	is_triggered_only = yes
+	only_rulers = yes
 
 	trigger = {
 		OR = {
