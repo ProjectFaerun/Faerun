@@ -18,56 +18,71 @@ character_event = {
 			}
 		}
 		total_years_played >= 10 #no invasions right away
+		any_independent_ruler = {
+			realm_size >= 50
+			num_of_count_titles_in_realm >= 20
+			higher_real_tier_than = COUNT
+			NOT = { culture = monster }
+		}
+		year > 30
+	}
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
+
+			any_independent_ruler = {
+				realm_size >= 150
+				num_of_count_titles_in_realm >= 60
+			}
+		}
+		mult_modifier = {
+			factor = 2
+			
+			any_independent_ruler = {
+				realm_size >= 250
+				num_of_count_titles_in_realm >= 100
+			}
+		}
 	}
 
 	immediate = {
 		random_independent_ruler = {
 			limit = {
-				higher_real_tier_than = COUNT
-				NOT = { culture = monster }
 				realm_size >= 50
 				num_of_count_titles_in_realm >= 20
+				higher_real_tier_than = COUNT
+				NOT = { culture = monster }
 			}
-			random = {
-				chance = 10
-				save_event_target_as = target_ruler
-				primary_title = {
-					save_event_target_as = target_title
-				}
-				random_realm_province = {
-					preferred_limit = {
-						is_capital = no
-						is_island = no
-					}
-					preferred_limit = {
-						is_island = no
-					}
-					preferred_limit = {
-						is_capital = no
-					}
-					save_event_target_as = invasion_province
-				}
-				character_event = { id = ALWAR.2 }
+			preferred_limit = {
+				realm_size >= 250
+				num_of_count_titles_in_realm >= 100
+			}
+			preferred_limit = {
+				realm_size >= 150
+				num_of_count_titles_in_realm >= 60
+			}
 
-				mult_modifier = {
-					factor = 0.5
-					real_tier = DUKE
-				}
-				mult_modifier = {
-					factor = 1.25
-					real_tier = EMPEROR
-				}
-				mult_modifier = {
-					factor = 2
-					realm_size >= 150
-					num_of_count_titles_in_realm >= 60
-				}
-				mult_modifier = {
-					factor = 2
-					realm_size >= 250
-					num_of_count_titles_in_realm >= 100
-				}
+			save_event_target_as = target_ruler
+			primary_title = {
+				save_event_target_as = target_title
 			}
+			random_realm_province = {
+				preferred_limit = {
+					is_capital = no
+					is_island = no
+				}
+				preferred_limit = {
+					is_island = no
+				}
+				preferred_limit = {
+					is_capital = no
+				}
+
+				save_event_target_as = invasion_province
+			}
+			character_event = { id = ALWAR.2 }
 		}
 	}
 }
@@ -1967,19 +1982,17 @@ character_event = {
 
 			#Scro
 			1 = {
-				modifier = {
-					factor = 0
-					NOT = {
-						event_target:target_ruler = {
-							OR = {
-								culture_group = high_elf_group
-								culture_group = sylvan_elf_group
-								culture_group = dark_elf_group
-								culture_group = eladrin_group
-							}
+				trigger = {
+					event_target:target_ruler = {
+						OR = {
+							culture_group = high_elf_group
+							culture_group = sylvan_elf_group
+							culture_group = dark_elf_group
+							culture_group = eladrin_group
 						}
 					}
 				}
+
 				create_character = { #Scro Commander
 					culture = scro
 					religion = orc_pantheon
@@ -2049,21 +2062,17 @@ character_event = {
 
 			#Eldest
 			10 = {
-				modifier = {
-					NOR = {
-						has_global_flag = eldest_spawned
-						event_target:target_ruler = {
-								any_realm_province = {
-									port = yes
-								}
-								NOR = {
-									trait = creature_aboleth
-									trait = patron_elder_evil
-								}
-							}
+				trigger = {
+					NOT = { has_global_flag = eldest_spawned }
+					event_target:target_ruler = {
+						any_realm_province = {
+							port = yes
+						}
+						NOR = {
+							trait = creature_aboleth
+							trait = patron_elder_evil
 						}
 					}
-					factor = 0
 				}
 				create_character = {
 					historical = yes
@@ -2094,7 +2103,7 @@ character_event = {
 					#trait = bio_eldest
 					age = 1370
 					immortal_age = 30
-					flag = ai_flag_refuse_conversion
+					flag = immune_to_conversion
 				}
 				new_character = {
 					wealth = 1000
@@ -2106,15 +2115,20 @@ character_event = {
 			}
 			#Archdevils
 			10 = {
-				modifier = {
-					event_target:target_ruler = { is_evil_religion = yes }
-					NOT = { event_target:target_ruler = { religion = abyssal_cult } }
-					NOT = { event_target:target_ruler = { culture = tanarri } }
-					factor = 0
+				trigger = {
+					event_target:target_ruler = { 
+						OR = {
+							is_evil_religion = no
+							religion = abyssal_cult
+							culture = tanarri
+						}
+					}
 				}
+
 				random_list = {
 					10 = { # Bel
-						modifier = { has_global_flag = bel_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = bel_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2163,8 +2177,15 @@ character_event = {
 						}
 					}
 					5 = { # Tiamat
-						modifier = { has_global_flag = tiamat_spawned factor = 0 }
-						modifier = { any_character = { has_character_flag = is_tiamat } factor = 0 }
+						trigger = { 
+							NOR = { 
+								has_global_flag = tiamat_spawned 
+								any_character = { 
+									has_character_flag = is_tiamat
+								}
+							}
+						}
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2220,8 +2241,11 @@ character_event = {
 						}
 					}
 					10 = { # Zariel
-						modifier = { has_global_flag = zariel_spawned factor = 0 }
-						modifier = { NOT = { has_global_flag = zariel_fallen } factor = 0 }
+						trigger = { 
+							has_global_flag = zariel_fallen
+							NOT = { has_global_flag = zariel_spawned }
+						}
+						
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2330,7 +2354,8 @@ character_event = {
 						}
 					}
 					10 = { #Dispater
-						modifier = { has_global_flag = dispater_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = dispater_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2382,7 +2407,8 @@ character_event = {
 						}
 					}
 					10 = { #Mammon
-						modifier = { has_global_flag = mammon_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = mammon_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2433,7 +2459,8 @@ character_event = {
 						}
 					}
 					5 = { #Belial
-						modifier = { has_global_flag = belial_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = belial_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2485,7 +2512,8 @@ character_event = {
 						}
 					}
 					5 = { #Fierna
-						modifier = { has_global_flag = fierna_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = fierna_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2538,7 +2566,8 @@ character_event = {
 						}
 					}
 					5 = { # Glasya (lower chance since she rarely leaves Baator)
-						modifier = { has_global_flag = glasya_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = glasya_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2592,7 +2621,8 @@ character_event = {
 						}
 					}
 					10 = { #Baalzebul
-						modifier = { has_global_flag = baalzebul_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = baalzebul_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2645,7 +2675,8 @@ character_event = {
 						}
 					}
 					10 = { #Geryon
-						modifier = { has_global_flag = geryon_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = geryon_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2695,7 +2726,8 @@ character_event = {
 						}
 					}
 					10 = { #Mephistopheles
-						modifier = { has_global_flag = mephistopheles_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = mephistopheles_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2760,15 +2792,20 @@ character_event = {
 			}
 			#Demon Lords
 			10 = {
-				modifier = {
-					event_target:target_ruler = { is_evil_religion = yes }
-					NOT = { event_target:target_ruler = { religion = infernal } }
-					NOT = { event_target:target_ruler = { culture = baatezu } }
-					factor = 0
+				trigger = {
+					event_target:target_ruler = { 
+						OR = {
+							is_evil_religion = no
+							religion = infernal
+							culture = baatezu
+						}
+					}
 				}
+				
 				random_list = {
 					10 = { #Demogorgon
-						modifier = { has_global_flag = demogorgon_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = demogorgon_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2849,7 +2886,8 @@ character_event = {
 						}
 					}
 					10 = { #Orcus
-						modifier = { has_global_flag = orcus_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = orcus_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2905,8 +2943,13 @@ character_event = {
 						}
 					}
 					10 = { #Graz'zt
-						modifier = { has_global_flag = grazzt_spawned factor = 0 }
-						modifier = { c_1015 = { is_alive = yes } factor = 0 }
+						trigger = {
+							NOR = {
+								has_global_flag = grazzt_spawned
+								c_1015 = { is_alive = yes }
+							}
+						}
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -2963,7 +3006,8 @@ character_event = {
 						}
 					}
 					10 = { #Pazuzu
-						modifier = { has_global_flag = pazuzu_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = pazuzu_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3015,7 +3059,8 @@ character_event = {
 						}
 					}
 					10 = { #Yeenoghu
-						modifier = { has_global_flag = yeenoghu_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = yeenoghu_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3067,7 +3112,8 @@ character_event = {
 						}
 					}
 					10 = { #Baphomet
-						modifier = { has_global_flag = baphomet_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = baphomet_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3119,7 +3165,8 @@ character_event = {
 						}
 					}
 					10 = { #Malcanthet
-						modifier = { has_global_flag = malcanthet_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = malcanthet_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3177,14 +3224,19 @@ character_event = {
 			}
 			# yugoloths
 			5 = {
-				modifier = {
-					event_target:target_ruler = { is_evil_religion = yes }
-					NOT = { event_target:target_ruler = { culture = gehreleth } }
-					factor = 0
+				trigger = {
+					event_target:target_ruler = { 
+						OR = {
+							is_evil_religion = no
+							culture = gehreleth
+						}
+					}
 				}
+				
 				random_list = {
 					10 = { # Anthraxus
-						modifier = { has_global_flag = anthraxus_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = anthraxus_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3235,7 +3287,8 @@ character_event = {
 						}
 					}
 					10 = { # Mydianchlarus
-						modifier = { has_global_flag = mydianchlarus_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = mydianchlarus_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3284,7 +3337,8 @@ character_event = {
 						}
 					}
 					10 = { # Typhus
-						modifier = { has_global_flag = typhus_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = typhus_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3331,7 +3385,8 @@ character_event = {
 						}
 					}
 					10 = { # Bubonix
-						modifier = { has_global_flag = bubonix_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = bubonix_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3378,7 +3433,8 @@ character_event = {
 						}
 					}
 					10 = { # Xengahra
-						modifier = { has_global_flag = xengahra_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = xengahra_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3424,7 +3480,8 @@ character_event = {
 						}
 					}
 					10 = { # Brugencephal - using our own modcanon here
-						modifier = { has_global_flag = brugencephal_spawned factor = 0 }
+						trigger = { NOT = { has_global_flag = brugencephal_spawned } }
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3475,16 +3532,22 @@ character_event = {
 			}
 			#gehreleths
 			2 = {
-				modifier = {
-					event_target:target_ruler = { is_evil_religion = yes }
-					NOT = { event_target:target_ruler = { culture = yugoloth } }
-					NOT = { event_target:target_ruler = { has_character_flag = is_grazzt } }
-					factor = 0
+				trigger = {
+					event_target:target_ruler = { 
+						OR = {
+							is_evil_religion = no
+							culture = yugoloth
+							trait = bio_grazzt
+						}
+					}
 				}
+
 				random_list = {
 					10 = { #Adimarchus
-						modifier = { has_global_flag = adimarchus_spawned factor = 0 }
-						modifier = { event_target:target_ruler = { has_character_flag = is_grazzt } factor = 20 } # Just itching for a rematch
+						trigger = { NOT = { has_global_flag = adimarchus_spawned } }
+
+						mult_modifier = { event_target:target_ruler = { has_character_flag = is_grazzt } factor = 20 } # Just itching for a rematch
+
 						create_character = {
 							historical = yes
 							random_traits = no
@@ -3575,19 +3638,18 @@ character_event = {
 			}
 			# oni
 			2 = {
-				modifier = {
-					NOT = { event_target:target_ruler = {
-							any_realm_province = {
-								port = yes
-								OR = {
-									region = hordelands_region
-									region = kara_tur_region
-								}
+				trigger = {
+					event_target:target_ruler = {
+						any_realm_province = {
+							OR = {
+								region = hordelands_region
+								region = kara_tur_region
 							}
+							port = yes
 						}
 					}
-					factor = 0
 				}
+
 				create_character = {
 					random_traits = no
 					dynasty = actually_culture
@@ -3738,14 +3800,16 @@ character_event = {
 						}
 					}
 					10 = { # Shou
-						modifier = {
-							e_shou_lung_west_governor = {
-								has_holder = yes
-								holder_scope = { is_landed = yes }
+						trigger = {
+							NOT = {
+								e_shou_lung_west_governor = {
+									has_holder = yes
+									holder_scope = { is_landed = yes }
+								}
 							}
-							NOT = { shou_lung = { has_status = shou_lung_civil_war } }
-							factor = 0
+							shou_lung = { has_status = shou_lung_civil_war }
 						}
+						
 						random_list = {
 							10 = {
 								sheng = {
@@ -3851,6 +3915,11 @@ character_event = {
 	is_triggered_only = yes
 
 	immediate = {
+		while = {
+			limit = { year_of_birth < 1 }
+
+			add_age = -1
+		}
 		create_title = {
 			tier = DUKE
 			landless = yes
