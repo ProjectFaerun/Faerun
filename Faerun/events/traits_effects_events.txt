@@ -18492,68 +18492,92 @@ character_event = {
 	desc = EVTDESC3660
 	picture = GFX_evt_courtiers_talking
 
-	only_playable = yes
-	min_age = 20
-	capable_only = yes
-	prisoner = no
-	ai = no
-	war = no
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events
 
-	is_triggered_only = yes
+	ai = no
+	min_age = 20
+	only_capable = yes
+	prisoner = no
+	war = no
+	in_command = no
 
 	trigger = {
 		trait = poet
-		in_command = no
-		NOT = { is_inaccessible_trigger = yes }
+
 		OR = {
 			trait = charitable
 			trait = gregarious
+
 			NAND = {
-				diplomacy = 15
+				diplomacy >= 15
 				trait = content
 			}
 		}
+
+		is_inaccessible_trigger = no
 	}
 
 	weight_multiplier = {
 		factor = 1
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = ambitious
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 2
 			trait = diligent
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.5
 			trait = shy
 		}
 
-		modifier = {
+		mult_modifier = {
 			factor = 0.2
 			trait = wroth
 		}
 	}
 
+	immediate = {
+		pick_culture_for_spawned_courtier_effect = yes
+		create_character = {
+			dynasty = random
+			age = 30
+			female = random
+			random_traits = yes
+
+			attributes = {
+				diplomacy = 10
+			}
+
+			add_trait = poet
+			culture = event_target:picked_culture
+			religion = event_target:picked_religion
+			flag = invited_courtier
+		}
+
+		new_character = {
+			give_nickname = nick_the_troubadour
+			save_event_target_as = target_poet
+		}
+		clear_event_target = picked_culture
+		clear_event_target = picked_religion
+	}
+
+
 	option = {
-		name = EVTOPTA3660 #Demand
+		name = EVTOPTA3660 # Demand
+
 		piety = -10
-		create_character = {
-			attributes = {
-				diplomacy = 10
-			}
-			dynasty = random
-			trait = poet
-			age = 30
-			female = no
-			has_nickname = nick_the_troubadour
-		}
-		new_character = {
+
+		event_target:target_poet = {
+			show_scope_change = no
+
 			set_character_flag = pressured_poet
+
 			character_event = {
 				id = 3661
 				days = 2
@@ -18561,21 +18585,17 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
-		name = EVTOPTB3660 #Ask nicely
+		name = EVTOPTB3660 # Ask nicely
+
 		prestige = -10
-		create_character = {
-			attributes = {
-				diplomacy = 10
-			}
-			dynasty = random
-			trait = poet
-			age = 30
-			female = no
-			has_nickname = nick_the_troubadour
-		}
-		new_character = {
+
+		event_target:target_poet = {
+			show_scope_change = no
+
 			set_character_flag = asked_poet
+
 			character_event = {
 				id = 3661
 				days = 2
@@ -18583,21 +18603,22 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
-		name = EVTOPTC3660 #Bribe
-		scaled_wealth = -0.10
-		create_character = {
-			attributes = {
-				diplomacy = 10
+		name = EVTOPTC3660 # Bribe
+
+		tooltip = {
+			transfer_scaled_wealth = {
+				to = event_target:target_poet
+				value = 0.10
 			}
-			dynasty = random
-			trait = poet
-			age = 30
-			female = no
-			has_nickname = nick_the_troubadour
 		}
-		new_character = {
+
+		event_target:target_poet = {
+			show_scope_change = no
+
 			set_character_flag = bribed_poet
+
 			character_event = {
 				id = 3661
 				days = 2
@@ -18605,19 +18626,11 @@ character_event = {
 			}
 		}
 	}
+
 	option = {
-		name = EVTOPTD3660 #Ignore
-		add_trait = content
-		create_character = {
-			attributes = {
-				diplomacy = 10
-			}
-			dynasty = random
-			trait = poet
-			age = 30
-			female = no
-			has_nickname = nick_the_troubadour
-		}
+		name = EVTOPTD3660 # Ignore
+
+		add_trait_fully_silently_content_effect = yes
 	}
 }
 

@@ -307,8 +307,11 @@ character_event = {
 
 	option = {
 		name = EVTOPTA71002  #take him in your service.
+		pick_culture_for_spawned_courtier_effect = yes
 		create_character = {
 			random_traits = no
+			culture = event_target:picked_culture
+			religion = event_target:picked_religion
 			dynasty = random
 			female = random
 			age = 16
@@ -319,6 +322,7 @@ character_event = {
 			attributes = {
 				martial = 10
 			}
+			flag = invited_soldier
 		}
 		scaled_wealth = -0.1
 	}
@@ -425,21 +429,18 @@ character_event = {
 	picture = GFX_evt_lovers
 
 	trigger = {
-		NOT = {	has_character_flag = hedge_knight_recruited }
-		NOT = {	has_character_flag = hedge_knight_woman_seduced	}
+		NOT = { has_character_flag = hedge_knight_recruited }
+		NOT = { has_character_flag = hedge_knight_woman_seduced }
 		any_courtier = {
-	 		age = 16
-	 		not = { age = 20 }
-	 		#is_female = yes
-	 		is_married = no
+			is_adult = yes
+			age <= 20
+			is_female = yes
+			is_married = no
 			has_lover = no
-	 		is_pregnant = no
+			is_pregnant = no
 			fertility = 0.3
-	 	}
-	}
-
-	immediate = {
-		set_character_flag = hedge_knight_woman_seduced
+			is_infertile_race = no
+		}
 	}
 
 	mean_time_to_happen = {
@@ -450,82 +451,102 @@ character_event = {
 			has_character_flag = hedge_knight_recruited
 		}
 	}
-	option = {
-		name = EVTOPTA71004 #stay
 
+	immediate = {
+		set_character_flag = hedge_knight_woman_seduced
+
+		pick_culture_for_spawned_courtier_effect = yes
+		create_character = {
+			random_traits = yes
+			culture = event_target:picked_culture
+			religion = event_target:picked_religion
+			dynasty = random
+			fertility = 0.6
+			female = no
+			age = 24
+			flag = invited_soldier
+		}
+		new_character = {
+			save_event_target_as = hedge_knight
+		}
 
 		any_courtier = {
-	 		limit = {
-	 			age = 16
-	 			not = { age = 20 }
-	 			#is_female = yes
-	 			is_married = no
-	 			is_pregnant = no
+			limit = {
+				is_female = yes
+				is_adult = yes
+				age < 20
+				fertility >= 0.3
+				is_married = no
+				is_pregnant = no
 				has_lover = no
-				fertility = 0.25
-	 		}
-	 		score_value = { #Prioritizes selecting an interesting courtier...
-	            value = 10
-	            interesting_courtier_selection_score = yes
-	        }
-	 		add_trait = lustful
-	 		create_character = {
-				random_traits = yes
-				dynasty = random
-				fertility = 0.6
-				female = random
-				age = 24
-	 		}
-			new_character = {
-	 			impregnate = PREV
-				PREV = { save_event_target_as = new_lover }
-				new_lover_effect = yes
-				add_trait = lustful
-	 		}
-	 	}
-	 	piety = -10
+				NOR = {
+					trait = homosexual
+					trait = asexual
+				}
+				is_infertile_race = no
+			}
+
+			score_value = {
+				value = 10
+				interesting_courtier_selection_score = yes
+			}
+
+			save_event_target_as = seduced_courtier
+		}
 	}
+
 	option = {
-		name = EVTOPTB71004 #dungeon
+		name = EVTOPTA71004 # Stay
+
+		event_target:seduced_courtier = {
+			show_scope_change = no
+
+			add_trait_fully_silently_lustful_effect = yes
+			save_event_target_as = new_lover
+		}
+
+		event_target:hedge_knight = {
+			show_scope_change = no
+
+			add_trait_fully_silently_lustful_effect = yes
+			new_lover_effect = yes
+			impregnate_cuckoo = event_target:seduced_courtier
+		}
+
+		piety = -10
+	}
+
+	option = {
+		name = EVTOPTB71004 # Dungeon
+
+		event_target:seduced_courtier = {
+			show_scope_change = no
+
+			add_trait_fully_silently_lustful_effect = yes
+			save_event_target_as = new_lover
+		}
+
+		event_target:hedge_knight = {
+			show_scope_change = no
+
+			add_trait_fully_silently_lustful_effect = yes
+			new_lover_effect = yes
+			impregnate_cuckoo = event_target:seduced_courtier
+			imprison = ROOT
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 100
+
 				OR = {
 					trait = cruel
 					trait = zealous
-				 }
+				}
 			}
 		}
-		any_courtier = {
-	 		limit = {
-	 			age = 16
-	 			not = { age = 20 }
-	 			#is_female = yes
-	 			is_married = no
-	 			is_pregnant = no
-				fertility = 0.25
-	 		}
-	 		score_value = { #Prioritizes selecting an interesting courtier...
-	            value = 10
-	            interesting_courtier_selection_score = yes
-	        }
-	 		add_trait = lustful
-			create_character = {
-				random_traits = yes
-				dynasty = random
-				fertility = 0.6
-				female = random
-				age = 24
-	 		}
-			new_character = {
-	 			impregnate = PREV
-				PREV = { save_event_target_as = new_lover }
-				new_lover_effect = yes
-				add_trait = lustful
-				imprison = root
-	 		}
-	 	}
 	}
 }
 

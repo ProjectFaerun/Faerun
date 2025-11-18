@@ -1137,50 +1137,31 @@ character_event = {
 	}
 }
 
-#"Await the messenger" a letter reads
+# For Recruit: "Await the messenger" a letter reads
 letter_event = {
 	id = MNM.7014
 	desc = EVTDESC_MNM_7014
 	border = GFX_event_letter_frame_intrigue
+	portrait = event_target:satanists_recruiter
 
 	is_triggered_only = yes
 
+	prisoner = no
+
 	trigger = {
-		NOR = {
-			prisoner = yes
-			event_target:satanists_recruiter = {
-				OR = {
-					is_alive = no
-					is_devil_worshiper_trigger = no
-				}
-			}
+		event_target:satanists_recruiter = {
+			is_devil_worshiper_trigger = yes
+			prisoner = no
 		}
 	}
 
 	fail_trigger_effect = {
 		if = {
-			limit = {
-				prisoner = yes
-			}
+			limit = { prisoner = yes }
 			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 } #notify broken chain
-			break = yes
 		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					OR = {
-						is_alive = no
-						is_devil_worshiper_trigger = no
-						prisoner = yes
-					}
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.6995 } #notify broken chain
-			}
-			break = yes
-		}
+
+		character_event = { id = MNM.6995 } # notify broken chain
 	}
 
 	option = {
@@ -1193,18 +1174,17 @@ letter_event = {
 			}
 			if = {
 				limit = {
-					prefers_men_trigger = yes
 					has_character_flag = being_recruited_by_the_satanists
 					any_society_member = {
 						society_member_of = the_satanists
-						is_female = no
+						root_attraction_trigger = yes
 						is_attractive_trigger = yes
 					}
 				}
 				random_society_member = {
 					limit = {
 						society_member_of = the_satanists
-						is_female = no
+						root_attraction_trigger = yes
 						is_attractive_trigger = yes
 					}
 					save_event_target_as = satanists_inductor
@@ -1214,68 +1194,50 @@ letter_event = {
 				}
 			}
 
+			pick_culture_for_spawned_courtier_effect = yes
 			if = { #back up if there is no eligble society member
 				limit = { prefers_men_trigger = yes }
 				create_character = {
 					random_traits = yes
 					dynasty = none
-					religion = ROOT
-					culture = ROOT
+					culture = event_target:picked_culture
+					religion = event_target:picked_religion
 					female = no
 					age = 20
 					attributes = {
 						intrigue = 5
 					}
 					trait = elusive_shadow
-					historical = yes
-				}
-				new_character = {
-					remove_trait = ugly
-					remove_trait = hunchback
-					remove_trait = chaste
-					add_trait = lustful
-					add_trait = fair
-					save_event_target_as = satanists_inductor
-					set_character_flag = event_MNM_7015
-					ROOT = {
-						trigger_switch = {
-							on_trigger = has_character_flag
-							being_recruited_by_the_satanists = { PREV = { join_society = the_satanists } }
-						}
-					}
-					character_event = { id = MNM.7013 }
+					flag = special_courtier
 				}
 			}
-			if = { limit = { prefers_men_trigger = no }
+			else = {
 				create_character = {
 					random_traits = yes
 					dynasty = none
-					religion = ROOT
-					culture = ROOT
+					culture = event_target:picked_culture
+					religion = event_target:picked_religion
 					female = yes
 					age = 20
 					attributes = {
 						intrigue = 5
 					}
 					trait = elusive_shadow
-					historical = yes
+					flag = special_courtier
 				}
-				new_character = {
-					remove_trait = ugly
-					remove_trait = hunchback
-					remove_trait = chaste
-					add_trait = lustful
-					add_trait = fair
-					save_event_target_as = satanists_inductor
-					set_character_flag = event_MNM_7015
-					ROOT = {
-						trigger_switch = {
-							on_trigger = has_character_flag
-							being_recruited_by_the_satanists = { PREV = { join_society = the_satanists } }
-						}
-					}
-					character_event = { id = MNM.7013 }
-				}
+			}
+			new_character = {
+				remove_trait = ugly
+				remove_trait = hunchback
+				remove_trait = chaste
+				add_trait = lustful
+				add_trait = fair
+				save_event_target_as = satanists_inductor
+				set_character_flag = event_MNM_7015
+				join_society = the_satanists
+				clear_event_target = picked_culture
+				clear_event_target = picked_religion
+				character_event = { id = MNM.7013 }
 			}
 		}
 	}
@@ -5314,6 +5276,7 @@ character_event = {
 
 	immediate = {
 		clr_character_flag = disciple_arriving
+		pick_culture_for_spawned_courtier_effect = yes
 		random_list = {
 			#Witch
 			60 = {
@@ -5322,34 +5285,37 @@ character_event = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = yes
 							age = 19
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 					33 = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = yes
 							age = 37
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 					33 = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = yes
 							age = 68
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 				}
 			}
@@ -5360,40 +5326,46 @@ character_event = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = no
 							age = 22
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 					33 = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = no
 							age = 42
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 					33 = {
 						create_character = {
 							random_traits = yes
 							dynasty = none
-							religion = ROOT
+							culture = event_target:picked_culture
+							religion = event_target:picked_religion
 							female = no
 							age = 65
 							health = 7
+							flag = invited_courtier
 						}
-						new_character = { save_event_target_as = devil_disciple }
 					}
 				}
 			}
 		}
 
-		event_target:devil_disciple = {
+		new_character = {
+			save_event_target_as = devil_disciple
+			clear_event_target = picked_culture
+			clear_event_target = picked_religion
 			#Join PREV's (ROOT's) society
 			if = {
 				limit = {
