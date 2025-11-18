@@ -15,37 +15,44 @@ character_event = {
 	desc = EVTDESC_TOG_600
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
+
+	is_triggered_only = yes # hold_blot, minor_decisions.txt
 	hide_from = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_600
+
 		any_vassal = {
 			limit = {
-				can_have_shieldmaidens_trigger = yes
-				NOT = { is_inaccessible_trigger = yes }
-				age = 16
-				prisoner = no
+				block_general_event_trigger = no
 				war = no
-				NOT = { trait = incapable }
 			}
-			character_event = { id = TOG.601 tooltip = EVTTOOLTIP_TOG_601 }
-			hidden_tooltip = { character_event = { id = TOG.605 days = 10 } }
-		}
-		any_vassal = {
-			limit = {
-				can_have_shieldmaidens_trigger = no
-				NOT = { is_inaccessible_trigger = yes }
-				age = 16
-				prisoner = no
-				war = no
-				NOT = { trait = incapable }
+
+			if = {
+				limit = { religion = deities_of_fury }
+
+				character_event = {
+					id = TOG.601
+					tooltip = EVTTOOLTIP_TOG_601
+				}
+
+				character_event = {
+					id = TOG.605 # Blot begins
+					days = 10
+				}
 			}
-			character_event = { id = TOG.602 tooltip = EVTTOOLTIP_TOG_602 }
+			else = {
+				character_event = {
+					id = TOG.602
+					tooltip = EVTTOOLTIP_TOG_602
+				}
+			}
 		}
-		hidden_tooltip = { character_event = { id = TOG.604 days = 10 } }
+
+		character_event = {
+			id = TOG.604 # Blot begins
+			days = 10
+		}
 	}
 }
 
@@ -55,17 +62,19 @@ character_event = {
 	desc = EVTDESC_TOG_601
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
 
-	trigger =  { NOT = { is_inaccessible_trigger = yes } }
-	
 	option = {
 		name = EVTOPTA_TOG_601
+
 		set_character_flag = attending_blot
 		set_character_flag = do_not_disturb
-		
-		hidden_tooltip = { character_event = { id = TOG.699 days = 50 } } # Safety catch flag clearing
+
+		character_event = {
+			id = TOG.699 # Safety catch flag clearing
+			days = 50 # Increase this by 5 for each additional sacrifice, and also for each additional feast event
+		}
 	}
 }
 
@@ -75,38 +84,55 @@ character_event = {
 	desc = EVTDESC_TOG_602
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
 	hide_from = yes
-	
+
 	option = { # Pay
 		name = EVTOPTA_TOG_602
-		trigger = {
-			wealth = 5
-		}
+
+		trigger = { wealth >= 5 }
+
 		FROM = {
-			character_event = { id = TOG.603 tooltip = EVTTOOLTIP_TOG_603 }
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.603
+				tooltip = EVTTOOLTIP_TOG_603
+			}
 		}
+
 		wealth = -5
 	}
+
 	option = { # Don't pay
 		name = EVTOPTB_TOG_602
+
 		FROM = {
-			character_event = { id = TOG.636 tooltip = EVTTOOLTIP_TOG_636 }
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.636
+				tooltip = EVTTOOLTIP_TOG_636
+			}
 		}
-		tooltip = {
-			FROM = {
+
+		FROM = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_refused_blot
+				who = ROOT
+			}
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = { has_character_flag = attending_blot }
+
 				opinion = {
-					modifier = opinion_refused_blot
+					name = opinion_refused_blot
 					who = ROOT
-				}
-				any_vassal = {
-					limit = { has_character_flag = attending_blot }
-					opinion = {
-						modifier = opinion_refused_blot
-						who = ROOT
-					}
 				}
 			}
 		}
@@ -119,11 +145,12 @@ character_event = {
 	desc = EVTDESC_TOG_603
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_603
+
 		wealth = 20
 	}
 }
@@ -134,9 +161,11 @@ character_event = {
 	desc = EVTDESC_TOG_636
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
+	ai = no
+
 	option = {
 		name = EVTOPTA_TOG_636
 	}
@@ -148,47 +177,22 @@ character_event = {
 	desc = EVTDESC_TOG_604
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
 	hide_from = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_604
-		hidden_tooltip = {
-			if = {
-				limit = { 
-					any_courtier = {
-						prisoner = yes
-						host = { character = ROOT }
-						age = 16
-					}
-				}
-				random_courtier = {
-					limit = { 
-						prisoner = yes 
-						host = { character = ROOT }
-						age = 16
-					}
-					character_event = { id = TOG.606 days = 5 }
-				}
-			}
-			if = {
-				limit = { 
-					NOT = {
-						any_courtier = {
-							prisoner = yes
-							host = { character = ROOT }
-							age = 16
-						}
-					}
-				}
-				character_event = { id = TOG.634 days = 5 }
-			}
+
+		character_event = {
+			id = TOG.611
+			days = 5
+			tooltip = blot_begins
 		}
-		custom_tooltip = { text = blot_begins }
+
 		if = {
 			limit = { ai = no }
+
 			chronicle = {
 				entry = CHRONICLE_HELD_BLOT
 				picture = GFX_evt_viking_throneroom_oldgods
@@ -203,1083 +207,507 @@ character_event = {
 	desc = EVTDESC_TOG_605
 	picture = GFX_evt_viking_throneroom_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
 	hide_from = yes
-	
+
+	ai = no
+
 	option = {
 		name = EVTOPTA_TOG_604
 	}
 }
 
-# Sacrifice Prisoner 1 (Prisoner)
+# Prisoner selection
+character_event = {
+	id = TOG.611
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	immediate = {
+		clear_flags_with_prefix = blot_sacrifice_
+
+		if = {
+			limit = {
+				check_variable = {
+					which = local_sacrifice_count
+					value < 4
+				}
+
+				any_courtier = {
+					prisoner = yes
+					is_adult = yes
+					host = { character = ROOT }
+				}
+			}
+
+			change_variable = {
+				which = local_sacrifice_count
+				value = 1
+			}
+
+			random_courtier = {
+				limit = {
+					prisoner = yes
+					is_adult = yes
+					host = { character = ROOT }
+				}
+
+				# Setup for sacrifice event flavour, to avoid duplicating logic in triggered descriptions
+				if = {
+					limit = { sibling = ROOT }
+
+					if = {
+						limit = { is_female = no }
+						ROOT = { set_character_flag = blot_sacrifice_brother }
+					}
+					else = {
+						ROOT = { set_character_flag = blot_sacrifice_sister }
+					}
+				}
+				else_if = {
+					limit = { is_parent_of = ROOT }
+
+					if = {
+						limit = { is_female = no }
+						ROOT = { set_character_flag = blot_sacrifice_father }
+					}
+					else = {
+						ROOT = { set_character_flag = blot_sacrifice_mother }
+					}
+				}
+				else_if = {
+					limit = { is_child_of = ROOT }
+
+					if = {
+						limit = { is_female = no }
+						ROOT = { set_character_flag = blot_sacrifice_son }
+					}
+					else = {
+						ROOT = { set_character_flag = blot_sacrifice_daughter }
+					}
+				}
+				else_if = {
+					limit = { is_married = ROOT }
+					ROOT = { set_character_flag = blot_sacrifice_spouse }
+				}
+				else_if = {
+					limit = { dynasty = ROOT }
+					ROOT = { set_character_flag = blot_sacrifice_kin }
+				}
+				else_if = {
+					limit = { religion_group = good_human_pantheon_group }
+					ROOT = { set_character_flag = blot_sacrifice_good_human_pantheon }
+				}
+				else_if = {
+					limit = { religion_group = qismaite_group }
+					ROOT = { set_character_flag = blot_sacrifice_qismaite }
+				}
+				else_if = {
+					limit = { religion = toteteohuan }
+					ROOT = { set_character_flag = blot_sacrifice_toteteohuan }
+				}
+				else = {
+					ROOT = { set_character_flag = blot_sacrifice_generic }
+				}
+
+				character_event = { id = TOG.606 }
+			}
+		}
+
+		# Only sacrifice slaves once, then get on with the feast
+		else_if = {
+			limit = {
+				check_variable = {
+					which = local_sacrifice_count
+					value == 0
+				}
+			}
+
+			character_event = {
+				id = TOG.634 # Sacrifice slaves
+				days = 5
+			}
+		}
+		else = {
+			character_event = {
+				id = TOG.640 # Feast starts
+				days = 5
+			}
+		}
+	}
+}
+
+# Sacrifice Prisoner (Prisoner)
 character_event = {
 	id = TOG.606
 	desc = EVTDESC_TOG_606
 	picture = GFX_evt_midwinter_blot_oldgods
 	border = GFX_event_normal_frame_religion
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_606
-		hidden_tooltip = {
-			if = {
-				limit = { # Generic
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-						religion_group = good_human_pantheon_group
-						religion_group = qismaite_group
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-				}
-				random_list = {
-					25 = { FROM = { character_event = { id = TOG.610 } } }
-					25 = { FROM = { character_event = { id = TOG.680 } } }
-					25 = { FROM = { character_event = { id = TOG.681 } } }
-					25 = { FROM = { character_event = { id = TOG.682 } } }
-				}
-			}
-			if = {
-				limit = {
-					religion_group = good_human_pantheon_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.611 } }
-			}
-			if = {
-				limit = { # Muslim
-					religion_group = qismaite_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.612 } }
-			}
-			if = {
-				limit = { # Brother
-					sibling = FROM
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.613 } }
-			}
-			if = {
-				limit = { # Sister
-					sibling = FROM
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.614 } }
-			}
-			if = {
-				limit = { # Father
-					any_child = { character = FROM }
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.615 } }
-			}
-			if = {
-				limit = { # Mother
-					any_child = { character = FROM }
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.616 } }
-			}
-			if = {
-				limit = { # Son
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.617 } }
-			}
-			if = {
-				limit = { # Daughter
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.618 } }
-			}
-			if = {
-				limit = { # Kin
-					any_dynasty_member = { character = FROM}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-					}
-				}
-				FROM = { character_event = { id = TOG.619 } }
-			}
-			if = {
-				limit = { # Spouse
-					any_spouse = { character = FROM }
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.620 } }
-			}
-			if = {
-				limit = { # Aztec
-					OR = {
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.621 } }
-			}
-			FROM = { character_event = { id = TOG.645 } }
+
+		FROM = {
+			character_event = { id = TOG.610 } # Sacrifice
 		}
 	}
 }
 
-# Sacrifice Prisoner 2 (Prisoner)
-character_event = {
-	id = TOG.607
-	desc = EVTDESC_TOG_606
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_606
-		hidden_tooltip = {
-			if = {
-				limit = { # Generic
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-						religion_group = good_human_pantheon_group
-						religion_group = qismaite_group
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-				}
-				random_list = {
-					25 = { FROM = { character_event = { id = TOG.610 } } }
-					25 = { FROM = { character_event = { id = TOG.680 } } }
-					25 = { FROM = { character_event = { id = TOG.681 } } }
-					25 = { FROM = { character_event = { id = TOG.682 } } }
-				}
-			}
-			if = {
-				limit = {
-					religion_group = good_human_pantheon_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.611 } }
-			}
-			if = {
-				limit = { # Muslim
-					religion_group = qismaite_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.612 } }
-			}
-			if = {
-				limit = { # Brother
-					sibling = FROM
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.613 } }
-			}
-			if = {
-				limit = { # Sister
-					sibling = FROM
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.614 } }
-			}
-			if = {
-				limit = { # Father
-					any_child = { character = FROM }
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.615 } }
-			}
-			if = {
-				limit = { # Mother
-					any_child = { character = FROM }
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.616 } }
-			}
-			if = {
-				limit = { # Son
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.617 } }
-			}
-			if = {
-				limit = { # Daughter
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.618 } }
-			}
-			if = {
-				limit = { # Kin
-					any_dynasty_member = { character = FROM}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-					}
-				}
-				FROM = { character_event = { id = TOG.619 } }
-			}
-			if = {
-				limit = { # Spouse
-					any_spouse = { character = FROM }
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.620 } }
-			}
-			if = {
-				limit = { # Aztec
-					OR = {
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.621 } }
-			}
-			FROM = { character_event = { id = TOG.646 } }
-		}
-	}
-}
-
-# Sacrifice Prisoner 3 (Prisoner)
-character_event = {
-	id = TOG.608
-	desc = EVTDESC_TOG_606
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_606
-		hidden_tooltip = {
-			if = {
-				limit = { # Generic
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-						religion_group = good_human_pantheon_group
-						religion_group = qismaite_group
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-				}
-				random_list = {
-					25 = { FROM = { character_event = { id = TOG.610 } } }
-					25 = { FROM = { character_event = { id = TOG.680 } } }
-					25 = { FROM = { character_event = { id = TOG.681 } } }
-					25 = { FROM = { character_event = { id = TOG.682 } } }
-				}
-			}
-			if = {
-				limit = {
-					religion_group = good_human_pantheon_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.611 } }
-			}
-			if = {
-				limit = { # Muslim
-					religion_group = qismaite_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.612 } }
-			}
-			if = {
-				limit = { # Brother
-					sibling = FROM
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.613 } }
-			}
-			if = {
-				limit = { # Sister
-					sibling = FROM
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.614 } }
-			}
-			if = {
-				limit = { # Father
-					any_child = { character = FROM }
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.615 } }
-			}
-			if = {
-				limit = { # Mother
-					any_child = { character = FROM }
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.616 } }
-			}
-			if = {
-				limit = { # Son
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.617 } }
-			}
-			if = {
-				limit = { # Daughter
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.618 } }
-			}
-			if = {
-				limit = { # Kin
-					any_dynasty_member = { character = FROM}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-					}
-				}
-				FROM = { character_event = { id = TOG.619 } }
-			}
-			if = {
-				limit = { # Spouse
-					any_spouse = { character = FROM }
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.620 } }
-			}
-			if = {
-				limit = { # Aztec
-					OR = {
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.621 } }
-			}
-			FROM = { character_event = { id = TOG.647 } }
-		}
-	}
-}
-
-# Sacrifice Prisoner 4 (Prisoner)
-character_event = {
-	id = TOG.609
-	desc = EVTDESC_TOG_606
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_606
-		hidden_tooltip = {
-			if = {
-				limit = { # Generic
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-						religion_group = good_human_pantheon_group
-						religion_group = qismaite_group
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-				}
-				random_list = {
-					25 = { FROM = { character_event = { id = TOG.610 } } }
-					25 = { FROM = { character_event = { id = TOG.680 } } }
-					25 = { FROM = { character_event = { id = TOG.681 } } }
-					25 = { FROM = { character_event = { id = TOG.682 } } }
-				}
-			}
-			if = {
-				limit = {
-					religion_group = good_human_pantheon_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.611 } }
-			}
-			if = {
-				limit = { # Muslim
-					religion_group = qismaite_group
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.612 } }
-			}
-			if = {
-				limit = { # Brother
-					sibling = FROM
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.613 } }
-			}
-			if = {
-				limit = { # Sister
-					sibling = FROM
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.614 } }
-			}
-			if = {
-				limit = { # Father
-					any_child = { character = FROM }
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.615 } }
-			}
-			if = {
-				limit = { # Mother
-					any_child = { character = FROM }
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.616 } }
-			}
-			if = {
-				limit = { # Son
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = no
-				}
-				FROM = { character_event = { id = TOG.617 } }
-			}
-			if = {
-				limit = { # Daughter
-					OR = {
-						father = { character = FROM }
-						mother = { character = FROM }
-					}
-					is_female = yes
-				}
-				FROM = { character_event = { id = TOG.618 } }
-			}
-			if = {
-				limit = { # Kin
-					any_dynasty_member = { character = FROM}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-					}
-				}
-				FROM = { character_event = { id = TOG.619 } }
-			}
-			if = {
-				limit = { # Spouse
-					any_spouse = { character = FROM }
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.620 } }
-			}
-			if = {
-				limit = { # Aztec
-					OR = {
-						religion = toteteohuan
-						has_religion_feature = religion_feature_toteteohuan
-					}
-					NOT = {
-						sibling = FROM
-						father = { character = FROM }
-						mother = { character = FROM }
-						any_spouse = { character = FROM }
-						any_child = { character = FROM }
-						any_dynasty_member = { character = FROM}
-					}
-				}
-				FROM = { character_event = { id = TOG.621 } }
-			}
-			FROM = { character_event = { id = TOG.640 days = 5 } }
-		}
-	}
-}
-
-# Sacrifice Generic 1 (Liege)
+# Sacrifice (Liege)
 character_event = {
 	id = TOG.610
-	desc = EVTDESC_TOG_610
 	picture = GFX_evt_midwinter_blot_oldgods
 	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_610
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.622 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_610
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
 
-character_event = {
-	id = TOG.611
-	desc = EVTDESC_TOG_611
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_611
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.623 }
-			}
-		}
-		prestige = 50
-		piety = 25
+	desc = {
+		text = EVTDESC_TOG_610 # Generic 1
+		trigger = { has_character_flag = blot_sacrifice_generic }
 	}
-	option = {
-		name = EVTOPTB_TOG_611
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -50
+	desc = {
+		text = EVTDESC_TOG_680 # Generic 2
+		trigger = { has_character_flag = blot_sacrifice_generic }
 	}
-}
+	desc = {
+		text = EVTDESC_TOG_681 # Generic 3
+		trigger = { has_character_flag = blot_sacrifice_generic }
+	}
+	desc = {
+		text = EVTDESC_TOG_682 # Generic 4
+		trigger = { has_character_flag = blot_sacrifice_generic }
+	}
+	desc = {
+		text = EVTDESC_TOG_611
+		trigger = { has_character_flag = blot_sacrifice_good_human_pantheon }
+	}
+	desc = {
+		text = EVTDESC_TOG_612
+		trigger = { has_character_flag = blot_sacrifice_qismaite }
+	}
+	desc = {
+		text = EVTDESC_TOG_621
+		trigger = { has_character_flag = blot_sacrifice_toteteohuan }
+	}
+	desc = {
+		text = EVTDESC_TOG_613
+		trigger = { has_character_flag = blot_sacrifice_brother }
+	}
+	desc = {
+		text = EVTDESC_TOG_614
+		trigger = { has_character_flag = blot_sacrifice_sister }
+	}
+	desc = {
+		text = EVTDESC_TOG_615
+		trigger = { has_character_flag = blot_sacrifice_father }
+	}
+	desc = {
+		text = EVTDESC_TOG_616
+		trigger = { has_character_flag = blot_sacrifice_mother }
+	}
+	desc = {
+		text = EVTDESC_TOG_617
+		trigger = { has_character_flag = blot_sacrifice_son }
+	}
+	desc = {
+		text = EVTDESC_TOG_618
+		trigger = { has_character_flag = blot_sacrifice_daughter }
+	}
+	desc = {
+		text = EVTDESC_TOG_619
+		trigger = { has_character_flag = blot_sacrifice_kin }
+	}
+	desc = {
+		text = EVTDESC_TOG_620
+		trigger = { has_character_flag = blot_sacrifice_spouse }
+	}
 
-# Sacrifice Muslim (Liege)
-character_event = {
-	id = TOG.612
-	desc = EVTDESC_TOG_612
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
 	is_triggered_only = yes
-	
+
 	option = {
+		name = {
+			text = EVTOPTA_TOG_610
+			trigger = { has_character_flag = blot_sacrifice_generic }
+		}
+		name = {
+			text = EVTOPTA_TOG_611
+			trigger = { has_character_flag = blot_sacrifice_good_human_pantheon }
+		}
+		name = {
+			text = EVTOPTA_TOG_612
+			trigger = { has_character_flag = blot_sacrifice_qismaite }
+		}
+		name = {
+			text = EVTOPTA_TOG_621
+			trigger = { has_character_flag = blot_sacrifice_toteteohuan }
+		}
+		name = {
+			text = EVTOPTA_TOG_613
+			trigger = { has_character_flag = blot_sacrifice_brother }
+		}
+		name = {
+			text = EVTOPTA_TOG_614
+			trigger = { has_character_flag = blot_sacrifice_sister }
+		}
+		name = {
+			text = EVTOPTA_TOG_615
+			trigger = { has_character_flag = blot_sacrifice_father }
+		}
+		name = {
+			text = EVTOPTA_TOG_616
+			trigger = { has_character_flag = blot_sacrifice_mother }
+		}
+		name = {
+			text = EVTOPTA_TOG_617
+			trigger = { has_character_flag = blot_sacrifice_son }
+		}
+		name = {
+			text = EVTOPTA_TOG_618
+			trigger = { has_character_flag = blot_sacrifice_daughter }
+		}
+		name = {
+			text = EVTOPTA_TOG_619
+			trigger = { has_character_flag = blot_sacrifice_kin }
+		}
+		name = {
+			text = EVTOPTA_TOG_620
+			trigger = { has_character_flag = blot_sacrifice_spouse }
+		}
+
 		trigger = {
 			FROM = { controls_religion = no }
 		}
-		name = EVTOPTA_TOG_612
+
 		FROM = {
+			show_scope_change = no
+
 			death = {
 				death_reason = death_sacrificed_norse
 				killer = ROOT
 			}
+
+			save_event_target_as = kinslayer_target
 		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.624 }
+
+		if = {
+			limit = { is_close_relative = FROM }
+			add_kinslayer_trait_effect = yes
+		}
+
+		any_vassal = {
+			limit = { has_character_flag = attending_blot }
+			character_event = { id = TOG.622 }
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = blot_sacrifice_good_human_pantheon
+					has_character_flag = blot_sacrifice_qismaite
+					has_character_flag = blot_sacrifice_toteteohuan
+				}
 			}
+
+			prestige = 50
+			piety = 25
 		}
-		prestige = 50
-		piety = 25
+		else = {
+			prestige = 25
+			piety = 15
+		}
 	}
+
 	option = {
+		name = {
+			text = EVTOPTA_TOG_610
+			trigger = { has_character_flag = blot_sacrifice_generic }
+		}
+		name = {
+			text = EVTOPTA_TOG_611_Pope
+			trigger = { has_character_flag = blot_sacrifice_good_human_pantheon }
+		}
+		name = {
+			text = EVTOPTA_TOG_612_Caliph
+			trigger = { has_character_flag = blot_sacrifice_qismaite }
+		}
+		name = {
+			text = EVTOPTA_TOG_621_Aztec_Religious_Head
+			trigger = { has_character_flag = blot_sacrifice_toteteohuan }
+		}
+		name = {
+			text = EVTOPTA_TOG_613
+			trigger = { has_character_flag = blot_sacrifice_brother }
+		}
+		name = {
+			text = EVTOPTA_TOG_614
+			trigger = { has_character_flag = blot_sacrifice_sister }
+		}
+		name = {
+			text = EVTOPTA_TOG_615
+			trigger = { has_character_flag = blot_sacrifice_father }
+		}
+		name = {
+			text = EVTOPTA_TOG_616
+			trigger = { has_character_flag = blot_sacrifice_mother }
+		}
+		name = {
+			text = EVTOPTA_TOG_617
+			trigger = { has_character_flag = blot_sacrifice_son }
+		}
+		name = {
+			text = EVTOPTA_TOG_618
+			trigger = { has_character_flag = blot_sacrifice_daughter }
+		}
+		name = {
+			text = EVTOPTA_TOG_619
+			trigger = { has_character_flag = blot_sacrifice_kin }
+		}
+		name = {
+			text = EVTOPTA_TOG_620
+			trigger = { has_character_flag = blot_sacrifice_spouse }
+		}
+
 		trigger = {
 			FROM = { controls_religion = yes }
 		}
-		name = EVTOPTA_TOG_612_Caliph
+
 		FROM = {
-			religion_authority = { modifier = sacrificed_head_bad years = 20 }
+			show_scope_change = no
+
 			death = {
 				death_reason = death_sacrificed_norse
 				killer = ROOT
 			}
+
+			save_event_target_as = kinslayer_target
 		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.624 }
+
+		if = {
+			limit = { is_close_relative = FROM }
+			add_kinslayer_trait_effect = yes
+		}
+
+		any_vassal = {
+			limit = { has_character_flag = attending_blot }
+			character_event = { id = TOG.622 }
+		}
+
+		if = {
+			limit = {
+				FROM = {
+					NOT = { religion = deities_of_fury }
+				}
+			}
+
+			prestige = 250
+			piety = 100
+
+			religion_authority = {
+				name = sacrificed_head_good
+				years = 20
+			}
+
+			FROM = {
+				show_scope_change = no
+
+				religion_authority = {
+					name = sacrificed_head_bad
+					years = 20
+				}
 			}
 		}
-		prestige = 250
-		piety = 100
-		religion_authority = { modifier = sacrificed_head_good years = 20 }
+		else = {
+			prestige = 25
+			piety = 15
+		}
 	}
-	option = {
-		name = EVTOPTB_TOG_612
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -50
-	}
-}
 
-# Sacrifice Brother (Liege)
-character_event = {
-	id = TOG.613
-	desc = EVTDESC_TOG_613
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
 	option = {
-		name = EVTOPTA_TOG_613
+		name = {
+			text = EVTOPTB_TOG_610
+			trigger = { has_character_flag = blot_sacrifice_generic }
+		}
+		name = {
+			text = EVTOPTB_TOG_611
+			trigger = { has_character_flag = blot_sacrifice_good_human_pantheon }
+		}
+		name = {
+			text = EVTOPTB_TOG_612
+			trigger = { has_character_flag = blot_sacrifice_qismaite }
+		}
+		name = {
+			text = EVTOPTB_TOG_621
+			trigger = { has_character_flag = blot_sacrifice_toteteohuan }
+		}
+		name = {
+			text = EVTOPTB_TOG_613
+			trigger = { has_character_flag = blot_sacrifice_brother }
+		}
+		name = {
+			text = EVTOPTB_TOG_614
+			trigger = { has_character_flag = blot_sacrifice_sister }
+		}
+		name = {
+			text = EVTOPTB_TOG_615
+			trigger = { has_character_flag = blot_sacrifice_father }
+		}
+		name = {
+			text = EVTOPTB_TOG_616
+			trigger = { has_character_flag = blot_sacrifice_mother }
+		}
+		name = {
+			text = EVTOPTB_TOG_617
+			trigger = { has_character_flag = blot_sacrifice_son }
+		}
+		name = {
+			text = EVTOPTB_TOG_618
+			trigger = { has_character_flag = blot_sacrifice_daughter }
+		}
+		name = {
+			text = EVTOPTB_TOG_619
+			trigger = { has_character_flag = blot_sacrifice_kin }
+		}
+		name = {
+			text = EVTOPTB_TOG_620
+			trigger = { has_character_flag = blot_sacrifice_spouse }
+		}
+
 		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.637
+				tooltip = EVTTOOLTIP_TOG_637
 			}
 		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.625 }
+
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = blot_sacrifice_good_human_pantheon
+					has_character_flag = blot_sacrifice_qismaite
+					has_character_flag = blot_sacrifice_toteteohuan
+				}
 			}
+
+			piety = -50
 		}
-		prestige = 25
-		piety = 15
+		else = {
+			piety = -25
+		}
 	}
-	option = {
-		name = EVTOPTB_TOG_613
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
+
+	after = {
+		character_event = {
+			id = TOG.611
+			days = 5
+		}
 	}
 }
 
-# Sacrifice Sister (Liege)
-character_event = {
-	id = TOG.614
-	desc = EVTDESC_TOG_614
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_614
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.626 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_614
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Father (Liege)
-character_event = {
-	id = TOG.615
-	desc = EVTDESC_TOG_615
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_615
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.627 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_615
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Mother (Liege)
-character_event = {
-	id = TOG.616
-	desc = EVTDESC_TOG_616
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_616
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.628 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_616
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Son (Liege)
-character_event = {
-	id = TOG.617
-	desc = EVTDESC_TOG_617
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_617
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.629 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_617
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Daughter (Liege)
-character_event = {
-	id = TOG.618
-	desc = EVTDESC_TOG_618
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_618
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.630 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_618
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Other Kinsman (Liege)
-character_event = {
-	id = TOG.619
-	desc = EVTDESC_TOG_619
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_619
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		FROM = { save_event_target_as = kinslayer_target }
-		add_kinslayer_trait_effect = yes		
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.631 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_619
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Spouse/Consort (Liege)
-character_event = {
-	id = TOG.620
-	desc = EVTDESC_TOG_620
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_620
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.632 }
-			}
-		}
-		prestige = 25
-		piety = 15
-	}
-	option = {
-		name = EVTOPTB_TOG_620
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -25
-	}
-}
-
-# Sacrifice Aztec (Liege)
-character_event = {
-	id = TOG.621
-	desc = EVTDESC_TOG_621
-	picture = GFX_evt_midwinter_blot_oldgods
-	border = GFX_event_normal_frame_religion
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_621
-		FROM = {
-			death = {
-				death_reason = death_sacrificed_norse
-				killer = ROOT
-			}
-		}
-		hidden_tooltip = {
-			any_vassal = {
-				limit = { has_character_flag = attending_blot }
-				character_event = { id = TOG.633 }
-			}
-		}
-		prestige = 50
-		piety = 25
-	}
-	option = {
-		name = EVTOPTB_TOG_621
-		FROM = { character_event = { id = TOG.637 tooltip = EVTTOOLTIP_TOG_637 } }
-		piety = -50
-	}
-}
-
-# Sacrifice Generic (Vassal)
+# Sacrifice (Vassal)
 character_event = {
 	id = TOG.622
 	desc = EVTDESC_TOG_622
