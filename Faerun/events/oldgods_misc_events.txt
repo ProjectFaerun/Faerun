@@ -5,27 +5,28 @@
 # Called from on_action: on_prepared_invasion_aborts
 # The target character is in FROM
 character_event = {
-
 	id = 62300
 	desc = EVTDESC62300
-
 	picture = GFX_evt_viking_battle_oldgods
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_prepared_invasion_aborts
 
 	immediate = {
 		remove_character_modifier = launched_prepared_invasion
+
 		remove_opinion = {
+			name = preparing_to_invade
 			who = FROM
-			modifier = preparing_to_invade
 		}
+
 		FROM = {
 			remove_opinion = {
+				name = preparing_to_invade_me
 				who = ROOT
-				modifier = preparing_to_invade_me
 			}
 		}
+
 		disband_event_forces = prepared_invasion
 	}
 
@@ -39,26 +40,26 @@ character_event = {
 # Called from on_action: on_prepared_invasion_expires
 # The target character is in FROM
 character_event = {
-
 	id = 62310
 	desc = EVTDESC62310
-
 	picture = GFX_evt_viking_battle_oldgods
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_prepared_invasion_expires
 
 	immediate = {
 		remove_opinion = {
+			name = preparing_to_invade
 			who = FROM
-			modifier = preparing_to_invade
 		}
+
 		FROM = {
 			remove_opinion = {
+				name = preparing_to_invade_me
 				who = ROOT
-				modifier = preparing_to_invade_me
 			}
 		}
+
 		if = {
 			limit = {
 				NOT = {
@@ -67,6 +68,7 @@ character_event = {
 					}
 				}
 			}
+
 			disband_event_forces = prepared_invasion
 		}
 	}
@@ -75,6 +77,7 @@ character_event = {
 		name = {
 			text = EVTOPTB62310
 		}
+
 		if = {
 			limit = {
 				NOT = {
@@ -83,15 +86,18 @@ character_event = {
 					}
 				}
 			}
+
 			prestige = -200
 			piety = -50
+
 			any_realm_lord = {
-				limit = {
-					religion = ROOT
-				}
+				show_scope_change = no
+
+				limit = { religion = ROOT }
+
 				opinion = {
+					name = opinion_failed_invasion
 					who = ROOT
-					modifier = opinion_failed_invasion
 				}
 			}
 		}
@@ -130,7 +136,27 @@ character_event = {
 	picture = GFX_evt_vikings_arriving_oldgods
 	border = GFX_event_normal_frame_war
 
-	is_triggered_only = yes
+	desc = {
+		text = EVTDESC62320
+		trigger = {
+			is_viking_invader_religion = yes
+
+			NOT = {
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC62320_alt
+		trigger = {
+			OR = {
+				has_alternate_start_parameter = {
+					key = religion_names
+					value = random
+				}
 
 	# On_action, so BIG is MORE OFTEN!
 	weight_multiplier = {
@@ -507,34 +533,34 @@ character_event = {
 letter_event = {
 	id = 62800
 	desc = EVTDESC62800
-
 	border = GFX_event_letter_frame_religion
 
-	is_triggered_only = yes
+	is_triggered_only = yes # convert_to_attacker_religion, conversion_decisions.txt
 
 	option = {
 		name = EVTOPTA62800
+
 		if = {
 			limit = {
-				FROM = { tier = COUNT }
+				FROM = { real_tier = COUNT }
 			}
 			piety = 50
 		}
-		if = {
+		else_if = {
 			limit = {
-				FROM = { tier = DUKE }
+				FROM = { real_tier = DUKE }
 			}
 			piety = 100
 		}
-		if = {
+		else_if = {
 			limit = {
-				FROM = { tier = KING }
+				FROM = { real_tier = KING }
 			}
 			piety = 300
 		}
-		if = {
+		else_if = {
 			limit = {
-				FROM = { tier = EMPEROR }
+				FROM = { real_tier = EMPEROR }
 			}
 			piety = 1000
 		}
