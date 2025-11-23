@@ -66,27 +66,22 @@ namespace = MNM
 # 	}
 # }
 
+### JOINING & RECRUITMENT EVENTS ###
 
-###JOINING & RECRUITMENT EVENTS###
-
-#For the recruit: Do you approve of "alternative views"?
+# For Recruit: Do you approve of "alternative views"?
 character_event = {
 	id = MNM.7001
-	desc = EVTDESC_MNM_7001_A
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
 
-	is_triggered_only = yes
+	desc = EVTDESC_MNM_7001_B
 
+	is_triggered_only = yes # devil_worshiper_recruit, mnm_devil_worshipers_decisions.txt; MNM.10011
+
+	has_dlc = "Mystics"
 	prisoner = no
 
-	trigger = { has_dlc = Mystics }
-
 	immediate = {
-		if = {
-			limit = { NOT = { event_target:satanists_recruiter = { always = yes } } }
-			FROMFROM = { save_event_target_as = satanists_recruiter }
-		}
 		save_event_target_as = satanists_recruit
 	}
 
@@ -94,294 +89,134 @@ character_event = {
 		clr_character_flag = being_recruited_by_the_satanists
 	}
 
-	#Approving of heretics
+	# Approving of heretics
 	option = {
-		name = {
-			text = EVTOPTA_7001 #If God didn't want us to ask questions, why did he make us curious?
-		}
-		
-		trigger = {
-			OR = {
-				ai = no
-				NOT = { controls_religion = yes }
-				trait = possessed
-			}
-		}
-
+		name = EVTOPTA_7001_B
 		custom_tooltip = { text = EVTOPTA_7001_TT }
 
 		reverse_opinion = {
+			name = opinion_agreed_with_opinion
 			who = event_target:satanists_recruiter
-			modifier = opinion_agreed_with_opinion
 			years = 5
 		}
 
 		set_character_flag = approves_of_satanism
 
-		hidden_effect = { 
-			character_event = { id = MNM.6999 days = 3 } 
+		event_target:satanists_recruiter = {
+			character_event = { id = MNM.7002 days = 3 }
 		}
 
 		ai_chance = {
 			factor = 20
-			modifier = {
-				factor = 0
-				AND = {
-				trait = zealous
-				NOR = { 
-				religion = faithless
-				secret_religion = faithless 
+
+			trigger = {
+				trigger_if = {
+					limit = { trait = zealous }
+
+					true_religion = faithless
 				}
-			    }
-			}
-			modifier = {
-				factor = 90
-				AND = {
-				trait = zealous
-				religion = faithless
+
+				trigger_if = {
+					limit = { controls_religion = yes }
+
+					trait = possessed
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 90
-			        OR = {
-				   religion = faithless
-				   secret_religion = faithless
-				}	
+				trait = zealous
+				true_religion = faithless
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 90
+				true_religion = faithless
+			}
+			mult_modifier = {
 				factor = 2
-			        OR = {
-				   trait = sympathy_aberration_group
-				}	
+				trait = sympathy_aberration_group
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = trusting
 			}
-			modifier = {
-				factor = 50 #likely if "possessed"
-				has_opinion_modifier = { who = event_target:satanists_recruiter modifier = opinion_loyal_servant }
+			mult_modifier = {
+				factor = 50 # likely if "possessed"
+				has_opinion_modifier = {
+					name = opinion_loyal_servant
+					who = event_target:satanists_recruiter
+				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				is_dumb_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = hedonist
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = lustful
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = cynical
 			}
-			modifier = {
-				factor = 0.2
-				has_character_flag = being_recruited_by_the_satanists
-			}
 		}
 	}
 
-	#Disapproving of heretics
+	# Disapproving of heretics
 	option = {
-		name = {
-			text = EVTOPTB_7001
-		}
-		
+		name = EVTOPTB_7001
+
 		custom_tooltip = { text = EVTOPTB_7001_TT }
 
-		reverse_opinion = {
-			who = event_target:satanists_recruiter
-			modifier = opinion_disagreed_with_opinion
-			years = 5
+		event_target:satanists_recruiter = {
+			show_scope_change = no
+
+			character_event = { id = MNM.7002 days = 15 }
+
+			opinion = {
+				name = opinion_disagreed_with_opinion
+				who = ROOT
+				years = 5
+			}
 		}
 
 		set_character_flag = disapproves_of_satanism
-
 		clr_character_flag = being_recruited_by_the_satanists
-
-		hidden_effect = { 
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.7002 days = 15 } 
-			} 
-		}
 
 		ai_chance = {
 			factor = 80
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				has_pious_trait_trigger = yes
 			}
-			modifier = {
-				factor = 1.5
-				has_crusade_trait_trigger = yes
-			}
 		}
 	}
 }
 
-# Safety ping.
+# For Recruit: Event notifying recruit that "Something must've gone wrong" (in case recruiter dies)
 character_event = {
-	id = MNM.6999
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				prisoner = yes
-			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 }
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					is_alive = yes
-					is_devil_worshiper_trigger = yes
-					prisoner = no
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.7002 }
-			}
-			break = yes
-		}
-		# Else notify broken chain
-		character_event = { id = MNM.6995 }
-	}
-}
-
-# Safety ping.
-character_event = {
-	id = MNM.6998
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				prisoner = yes
-			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 }
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					is_alive = yes
-					is_devil_worshiper_trigger = yes
-					prisoner = no
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.7004 }
-			}
-			break = yes
-		}
-		# Else notify broken chain
-		character_event = { id = MNM.6995 }
-	}
-}
-
-# Safety ping.
-character_event = {
-	id = MNM.6997
-	hide_window = yes
-
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				OR = {
-					prisoner = yes
-					event_target:satanists_recruiter = { prisoner = yes }
-				}
-			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 }
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					is_alive = yes
-					is_devil_worshiper_trigger = yes
-					prisoner = no
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.7007 }
-			}
-			break = yes
-		}
-		# Else notify broken chain
-		character_event = { id = MNM.6995 }
-	}
-}
-
-# Safety ping.
-character_event = {
-	id = MNM.6996
-	hide_window = yes
-
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				OR = {
-					prisoner = yes
-					event_target:satanists_recruiter = { prisoner = yes }
-				}
-			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 }
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					is_alive = yes
-					is_devil_worshiper_trigger = yes
-					prisoner = no
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.7006 }
-			}
-			break = yes
-		}
-		# Else notify broken chain
-		character_event = { id = MNM.6995 }
-	}
-}
-
-character_event = { # event notifying recruitee that "Something must've gone wrong" (in case recruiter/inductor dies)
 	id = MNM.6995
+	picture = GFX_evt_state_diplomacy
+	border = GFX_event_normal_frame_intrigue
+
 	desc = {
 		text = EVTDESCA_MNM_6995
 		trigger = { NOT = { has_character_flag = dw_recruitment_end_unable } }
 	}
 	desc = {
 		text = EVTDESCB_MNM_6995
-		trigger = { has_character_flag = dw_recruitment_end_unable }
 		picture = GFX_evt_into_the_dungeon
+		trigger = { has_character_flag = dw_recruitment_end_unable }
 	}
-	picture = GFX_evt_state_diplomacy
-	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
 	show_root = yes
-	
+
 	option = {
 		name = {
 			text = EVTOPTA_MNM_6995
@@ -391,63 +226,108 @@ character_event = { # event notifying recruitee that "Something must've gone wro
 			text = EVTOPTB_MNM_6995
 			trigger = { has_character_flag = dw_recruitment_end_unable }
 		}
+
 		custom_tooltip = { text = EVTTOOLTIP_MNM_6995 }
 		clr_character_flag = being_recruited_by_the_satanists
 		clr_character_flag = dw_recruitment_end_unable
 	}
 }
 
-# For recruiter: consider the target's reaction, continue or abandon endeavor
+# For Recruiter: consider the target's reaction, continue or abandon endeavor
 character_event = {
 	id = MNM.7002
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
-		trigger = { FROM = { has_character_flag = approves_of_satanism } } #They seemed kinda fine with it
-		text = EVTDESC_MNM_7002_A
+		text = EVTDESC_MNM_7002_C
+		trigger = {
+			event_target:satanists_recruit = { has_character_flag = approves_of_satanism } } # They seemed kinda fine with it
 	}
 	desc = {
-		trigger = { FROM = { has_character_flag = disapproves_of_satanism } } #They seemed kinda hesitant to the whole thing
-		text = EVTDESC_MNM_7002_B
+		text = EVTDESC_MNM_7002_D
+		trigger = {
+			event_target:satanists_recruit = { has_character_flag = disapproves_of_satanism } } # They seemed kinda hesitant to the whole thing
 	}
 
 	is_triggered_only = yes
 
-	#Continue recruitment-attempt
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+
+		event_target:satanists_recruit = {
+			prisoner = no
+		}
+	}
+
+	fail_trigger_effect = {
+		event_target:satanists_recruit = {
+			if = {
+				limit = {
+					NOT = { has_character_flag = disapproves_of_satanism }
+				}
+
+				if = {
+					limit = { prisoner = yes }
+					set_character_flag = dw_recruitment_end_unable
+				}
+
+				character_event = { id = MNM.6995 } # notify broken chain
+			}
+
+			clr_character_flag = approves_of_satanism
+			clr_character_flag = disapproves_of_satanism
+		}
+	}
+
+	# Continue recruitment-attempt
 	option = {
-		trigger = { FROM = { has_character_flag = approves_of_satanism } }
 		name = EVTOPTA_7002
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = approves_of_satanism } }
+
 		custom_tooltip = { text = EVTOPTA_7002_TT }
 
 		hidden_effect = {
-			FROM = {
+			event_target:satanists_recruit = {
 				character_event = { id = MNM.7003 }
 				clr_character_flag = approves_of_satanism
 			}
 		}
-		ai_chance = { factor = 100 }
 	}
 
-	#Too risky - Recruitment attempt ends
+	# Too risky - Recruitment attempt ends
 	option = {
-		trigger = { FROM = { has_character_flag = approves_of_satanism } }
 		name = EVTOPTB_7002
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = approves_of_satanism } }
+
 		custom_tooltip = { text = EVTOPTB_7002_TT }
-		hidden_effect = { FROM = { clr_character_flag = approves_of_satanism } }
+
+		hidden_effect = {
+			event_target:satanists_recruit = { clr_character_flag = approves_of_satanism }
+		}
+
 		ai_chance = { factor = 0 }
 	}
 
 	# The recruit refuses to question their god - Recruitment attempt ends
 	option = {
-		trigger = { FROM = { has_character_flag = disapproves_of_satanism } }
 		name = EVTOPTC_7002
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = disapproves_of_satanism } }
+
 		custom_tooltip = { text = EVTOPTB_7002_TT }
-		hidden_effect = { FROM = { clr_character_flag = disapproves_of_satanism } }
+
+		hidden_effect = {
+			event_target:satanists_recruit = { clr_character_flag = disapproves_of_satanism }
+		}
 	}
 }
 
-#For the recruit: Recruiter contiunes offering more radical ideas, gives strange idol
+# For Recruit: Recruiter continues offering more radical ideas, gives strange idol
 character_event = {
 	id = MNM.7003
 	desc = EVTDESC_MNM_7003_A
@@ -456,342 +336,334 @@ character_event = {
 
 	is_triggered_only = yes
 
-	immediate = {
-		if = { 
-			limit = { NOT = { event_target:satanists_recruit = { always = yes } } }
-			FROMFROM = { save_event_target_as = satanists_recruiter }
-			save_event_target_as = satanists_recruit
-		}
-	}
-
-	#You encourage the recruiter
+	# You encourage the recruiter
 	option = {
 		name = EVTOPTA_7003
+
 		custom_tooltip = { text = EVTOPTA_7003_TT }
-		
-		trigger = {
-			OR = {
-				ai = no
-				NOT = { controls_religion = yes }
-				trait = possessed
-			}
-		}
-		
-		reverse_opinion = {
-			who = event_target:satanists_recruiter
-			modifier = opinion_open_minded
-			years = 5
-		}
 
 		set_character_flag = willing_to_join
-		
-		hidden_effect = { character_event = { id = MNM.6998 } }  #to recruiter - via ping: make the offer?
-		
+
+		event_target:satanists_recruiter = {
+			show_scope_change = no
+
+			character_event = { id = MNM.7004 }
+
+			opinion = {
+				name = opinion_open_minded
+				who = ROOT
+				years = 5
+			}
+		}
+
 		ai_chance = {
 			factor = 50
-			modifier = {
-				factor = 1000
-				AND = {
-				trait = zealous
-				religion = faithless
+
+			trigger = {
+				trigger_if = {
+					limit = { controls_religion = yes }
+
+					trait = possessed
 				}
 			}
-			modifier = {
+
+			mult_modifier = {
+				factor = 1000
+				trait = zealous
+				true_religion = faithless
+			}
+			mult_modifier = {
 				factor = 20
-			        OR = {
-				   religion = faithless
-				   secret_religion = faithless
-				}	
+				true_religion = faithless
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2
-			        OR = {
-				   trait = sympathy_aberration_group
-				}	
+				trait = sympathy_aberration_group
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = ambitious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
 				has_education_intrigue_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
 				has_lifestyle_intrigue_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
 				trait = trusting
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				is_dumb_trigger = yes
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = hedonist
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = lustful
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = cynical
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = { diplomacy = 12 }
+				event_target:satanists_recruiter = { diplomacy >= 12 }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = { intrigue = 12 }
+				event_target:satanists_recruiter = { intrigue >= 12 }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
-				FROM = { has_fair_trait_trigger = yes }
+				event_target:satanists_recruiter = { has_fair_trait_trigger = yes }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
-				FROM = { has_attractive_trait_trigger = yes }
+				event_target:satanists_recruiter = { has_attractive_trait_trigger = yes }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.1
-				FROM = { is_attractive_trigger = yes }
+				event_target:satanists_recruiter = { is_attractive_trigger = yes }
 			}
 		}
 	}
 
-	#You strongly discourage the recruiter
+	# You strongly discourage the recruiter
 	option = {
 		name = EVTOPTB_7003
+
 		custom_tooltip = { text = EVTOPTB_7003_TT }
 
 		reverse_opinion = {
+			name = opinion_narrow_minded
 			who = event_target:satanists_recruiter
-			modifier = opinion_narrow_minded
 			years = 5
 		}
 
 		set_character_flag = unwilling_to_join
-		
 		clr_character_flag = being_recruited_by_the_satanists
 
+		event_target:satanists_recruiter = {
+			character_event = { id = MNM.7004 }
+		}
 
-		
-		hidden_effect = { character_event = { id = MNM.6998 } }  #to recruiter - via ping: recruit said no
-		
 		ai_chance = {
 			factor = 50
-			modifier = {
-				factor = 0
-				AND = {
-				trait = zealous
-				religion = faithless
-				}
-			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 1.5
 				trait = craven
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
 				trait = content
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = { trait = ugly }
+				event_target:satanists_recruiter = { trait = ugly }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = { has_unattractive_trait_trigger = yes }
+				event_target:satanists_recruiter = { has_unattractive_trait_trigger = yes }
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 1.5
-				FROM = { is_unattractive_trigger = yes }
+				event_target:satanists_recruiter = { is_unattractive_trigger = yes }
 			}
 		}
 	}
 }
 
-#For the recruiter: Can, and will, you make the offer?
+# For Recruiter: Can, and will, you make the offer?
 character_event = {
 	id = MNM.7004
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
-		trigger = { FROM = { has_character_flag = willing_to_join } }
 		text = EVTDESC_MNM_7004_A
+		trigger = { event_target:satanists_recruit = { has_character_flag = willing_to_join } }
 	}
 	desc = {
-		trigger = { FROM = { has_character_flag = unwilling_to_join } }
 		text = EVTDESC_MNM_7004_B
+		trigger = { event_target:satanists_recruit = { has_character_flag = unwilling_to_join } }
 	}
 
 	is_triggered_only = yes
 
-	#Pose the question (only available if recruit is willing to join)
+	# Pose the question (only available if recruit is willing to join)
 	option = {
-		trigger = { FROM = { has_character_flag = willing_to_join } }
 		name = EVTOPTA_7004
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = willing_to_join } }
+
 		custom_tooltip = { text = EVTOPTA_7004_TT }
 
 		hidden_effect = {
-			FROM = {
+			event_target:satanists_recruit = {
 				character_event = { id = MNM.7005 days = 1 }
 				clr_character_flag = willing_to_join
 			}
 		}
-
-		ai_chance = { factor = 100 }
 	}
 
-	#Too risky, volontary end (only available if recruit is willing to join)
+	# Too risky, volontary end (only available if recruit is willing to join)
 	option = {
-		trigger = { FROM = { has_character_flag = willing_to_join } }
 		name = EVTOPTB_7004
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = willing_to_join } }
+
 		custom_tooltip = { text = EVTOPTB_7002_TT }
-		hidden_effect = { FROM = { clr_character_flag = willing_to_join } }
+
+		hidden_effect = {
+			event_target:satanists_recruit = { clr_character_flag = willing_to_join }
+		}
 
 		ai_chance = { factor = 0 }
 	}
 
 	# The recruit refuses to see it my way - Recruitment attempt ends
 	option = {
-		trigger = { FROM = { has_character_flag = unwilling_to_join } }
 		name = EVTOPTC_7004
+
+		trigger = { event_target:satanists_recruit = { has_character_flag = unwilling_to_join } }
+
 		custom_tooltip = { text = EVTOPTB_7002_TT }
-		hidden_effect = { FROM = { clr_character_flag = unwilling_to_join } }
+
+		hidden_effect = {
+			event_target:satanists_recruit = { clr_character_flag = unwilling_to_join }
+		}
 	}
 }
 
-#For Recruit: Join Satanists? (this is where it is more or less confirmed that this is some devil-worshiping going on)
+# For Recruit: Join Satanists? (this is where it is more or less confirmed that this is some devil-worshiping going on)
 character_event = {
 	id = MNM.7005
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-
-	desc = {
-		trigger = { event_target:satanists_recruiter = { society_member_of = the_satanists } } # Recruiter reveals symbol on their arm
-		text = EVTDESC_MNM_7005
-	}
-	desc = {
-		trigger = { event_target:satanists_recruiter = { NOT = { society_member_of = the_satanists } } } 
-		text = EVTDESC_MNM_7005_ALT
-	}
+	desc = EVTDESC_MNM_7005
 
 	is_triggered_only = yes
 
 	immediate = {
 		hidden_effect = {
-			if = {
-				limit = { any_lover = { has_disease_trigger = yes } }
-				set_character_flag = has_ill_lover_loc
-			}
-			if = {
-				limit = { any_spouse = { has_disease_trigger = yes }}
-				set_character_flag = has_ill_spouse_loc
-			}
-			if = {
-				limit = { any_child = { has_disease_trigger = yes }	}
-				set_character_flag = has_ill_child_loc
-			}
-			if = {
-				limit = { NOT = { wealth = 0 } }
-				set_character_flag = has_money_troubles_loc
-			}
-			if = {
-				limit = { NOT = { wealth = 0 } }
-				set_character_flag = has_money_troubles_loc
-			}
-			if = {
-				limit = { has_disease_trigger = yes }
-				set_character_flag = has_some_illness_loc
-			}
-			if = {
-				limit = { war = yes	}
-				set_character_flag = has_need_of_winning_battles_loc
-			}
-			if = {
-				limit = { any_rival = { always = yes } }
-				set_character_flag = has_a_rival_loc
-			}
-			if = {
-				limit = {
-					OR = {
-						is_weak_trigger = yes
-						trait = hunchback
-					}
+			random_list = {
+				1 = {
+					trigger = { any_lover = { is_ill = yes } }
+					set_character_flag = has_ill_lover_loc
 				}
-				set_character_flag = is_weak_loc
-			}
-			if = {
-				limit = {
-					OR = {
-						is_dumb_trigger = yes
-						trait = inbred
-					}
+
+				1 = {
+					trigger = { any_spouse = { is_ill = yes } }
+					set_character_flag = has_ill_spouse_loc
 				}
-				set_character_flag = is_dumb_loc
+
+				1 = {
+					trigger = { any_child = { is_ill = yes } }
+					set_character_flag = has_ill_child_loc
+				}
+
+				1 = {
+					trigger = { wealth < 0 }
+					set_character_flag = has_money_troubles_loc
+				}
+
+				1 = {
+					trigger = { is_ill = yes }
+					set_character_flag = has_some_illness_loc
+				}
+
+				1 = {
+					trigger = { war = yes }
+					set_character_flag = has_need_of_winning_battles_loc
+				}
+
+				1 = {
+					trigger = { any_rival = { always = yes } }
+					set_character_flag = has_a_rival_loc
+				}
 			}
 		}
 	}
 
-	#Yes - can you help me [GetDWReasonToJoin]?
+	# Yes - can you help me [GetDWReasonToJoin]?
 	option = {
 		name = EVTOPTA_7005
+
 		custom_tooltip = { text = EVTOPTA_7005_TT }
 
-		hidden_effect = { character_event = { id = MNM.6997 days = 5 } }
-
+		event_target:satanists_recruiter = {
+			character_event = { id = MNM.7007 days = 5 }
+		}
 	}
 
-	#No - this is blasphemy, get out of my sight
+	# No - this is blasphemy, get out of my sight
 	option = {
 		name = EVTOPTB_7005
 		custom_tooltip = { text = EVTOPTB_7005_TT }
+
 		clr_character_flag = being_recruited_by_the_satanists
 
-		hidden_effect = { character_event = { id = MNM.6996 days = 1 } } # turn down the satanists
+		event_target:satanists_recruiter = {
+			character_event = { id = MNM.7006 days = 1 }
+		}
 
 		ai_chance = { factor = 0 }
 	}
 }
 
-#For Recruiter: Recruit said no
+# For Recruiter: Recruit said no
 character_event = {
 	id = MNM.7006
-	picture = GFX_evt_secret_ceremony
 	desc = EVTDESC_MNM_7006
+	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
 
+	ai = no
+
 	option = { # The recruit refuses to see it my way - Recruitment attempt ends
 		name = EVTOPTA_7006
+
 		custom_tooltip = { text = EVTOPTB_7002_TT }
 	}
 }
 
-#For Recruiter: Recruit said yes
+# For Recruiter: Recruit said yes
 character_event = {
 	id = MNM.7007
-	picture = GFX_evt_secret_ceremony
 	desc = EVTDESC_MNM_7007
+	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
 
-	immediate = {
-		random_society_member = {
-			limit = {
-				society_rank >= 3
-				same_society_as = event_target:satanists_recruiter
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+
+		event_target:satanists_recruit = {
+			prisoner = no
+		}
+	}
+
+	fail_trigger_effect = {
+		event_target:satanists_recruit = {
+			if = {
+				limit = { prisoner = yes }
+				set_character_flag = dw_recruitment_end_unable
 			}
-			save_event_target_as = satanists_inductor 
+
+			character_event = { id = MNM.6995 } # notify broken chain
 		}
 	}
 
@@ -799,307 +671,200 @@ character_event = {
 		name = EVTOPTA_7007
 		custom_tooltip = { text = EVTOPTA_7007_TT }
 
-		hidden_effect = { FROM = { character_event = { id = MNM.7008 } } }
+		event_target:satanists_recruit = { character_event = { id = MNM.7008 } }
 	}
 }
 
-#For Recruit: Confirmation
+# For Recruit: Confirmation
 character_event = {
 	id = MNM.7008
-	picture = GFX_evt_secret_ceremony
 	desc = EVTDESC_MNM_7008
+	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_7008
+
 		custom_tooltip = { text = EVTOPTA_7008_TT }
 
-		hidden_effect = { 
-			character_event = { id = MNM.7009 days = 14 random = 21 } 
+		character_event = {
+			id = MNM.7009
+			days = 14
+			random = 21
 		}
 	}
 }
 
-#For Recruit: Joining begins (seek out books and knowledge on the occult)
+# For Recruit: Joining begins (seek out books and knowledge on the occult)
 character_event = {
 	id = MNM.7009
 	picture = GFX_evt_ritual_scroll
 	border = GFX_event_normal_frame_intrigue
-
-	desc = {
-		trigger = { event_target:satanists_recruiter = { society_member_of = the_satanists } } 
-		text = EVTDESC_MNM_7009_A
-	}
-	desc = {
-		trigger = { event_target:satanists_recruiter = { NOT = { society_member_of = the_satanists } } } 
-		text = EVTDESC_MNM_7009_ALT
-	}
+	desc = EVTDESC_MNM_7009_ALT
 
 	hide_from = yes
-
 	is_triggered_only = yes
 
+	prisoner = no
+
 	trigger = {
-		NOR = {
-			prisoner = yes
-			event_target:satanists_recruiter = {
-				OR = {
-					is_alive = no
-					is_devil_worshiper_trigger = no
-				}
-			}
+		event_target:satanists_recruiter = {
+			society_member_of = the_satanists
+			prisoner = no
 		}
 	}
 
 	fail_trigger_effect = {
 		if = {
-			limit = {
-				prisoner = yes
-			}
+			limit = { prisoner = yes }
 			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 } #notify broken chain
-			break = yes
 		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					OR = {
-						is_alive = no
-						is_devil_worshiper_trigger = no
-						prisoner = yes
-					}
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.6995 } #notify broken chain
-			}
-			break = yes
-		}
+
+		character_event = { id = MNM.6995 } # notify broken chain
 	}
 
 	# I have been blinded by convention
 	option = {
 		name = EVTOPTA_7009
-		custom_tooltip = { text = EVTOPTA_7009_TT }
-		remove_trait_zealous_effect = yes
 
-		hidden_effect = { character_event = { id = MNM.7010 days = 20 random = 15 } }
+		custom_tooltip = { text = EVTOPTA_7009_TT }
+
+		remove_trait_silently_zealous_effect = yes
 	}
+
 	# I can't believe I have been so gullible!
 	option = {
 		name = EVTOPTB_7009
-		custom_tooltip = { text = EVTOPTA_7009_TT }
 		tooltip_info = trusting
 
-		remove_trait_trusting_effect = yes
+		trigger = { trait = trusting }
 
-		hidden_effect = { character_event = { id = MNM.7010 days = 20 random = 15 } }
+		custom_tooltip = { text = EVTOPTA_7009_TT }
 
-		trigger = {
-			trait = trusting
-		}
+		remove_trait_silently_trusting_effect = yes
 	}
+
 	# I am beginning to feel that I have been missing out...
 	option = {
 		name = EVTOPTC_7009
-		custom_tooltip = { text = EVTOPTA_7009_TT }
 		tooltip_info = chaste
 
-		remove_trait_chaste_effect = yes
+		trigger = { trait = chaste }
 
-		hidden_effect = { character_event = { id = MNM.7010 days = 20 random = 15 } }
+		custom_tooltip = { text = EVTOPTA_7009_TT }
 
-		trigger = {
-			trait = chaste
-		}
+		remove_trait_silently_chaste_effect = yes
 	}
+
 	# I am beginning to feel that I have been missing out...
 	option = {
 		name = EVTOPTD_7009
-		custom_tooltip = { text = EVTOPTA_7009_TT }
 		tooltip_info = charitable
 
-		remove_trait_charitable_effect = yes
+		trigger = { trait = charitable }
 
-		hidden_effect = { character_event = { id = MNM.7010 days = 20 random = 15 } }
+		custom_tooltip = { text = EVTOPTA_7009_TT }
 
-		trigger = {
-			trait = charitable
-		}
+		remove_trait_silently_charitable_effect = yes
 	}
+
 	# Why put the needs of others before our own?
 	option = {
 		name = EVTOPTD_7009
-		custom_tooltip = { text = EVTOPTA_7009_TT }
-
-		add_trait_greedy_effect = yes
-
-		hidden_effect = { character_event = { id = MNM.7010 days = 20 random = 15 } }
 
 		trigger = {
-			NOT = { trait = charitable }
-			NOT = { trait = greedy }
+			NOR = {
+				trait = charitable
+				trait = greedy
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTA_7009_TT }
+
+		add_trait_silently_greedy_effect = yes
+	}
+
+	after = {
+		character_event = {
+			id = MNM.7010
+			days = 20
+			random = 15
 		}
 	}
 }
 
-#Seal it with blood (loyalty to grand master)
+# For Recruit: Seal it with blood (loyalty to grand master)
 character_event = {
 	id = MNM.7010
-	desc = EVTDESC_MNM_7010_ALT
 	picture = GFX_evt_dark_prayer
 	border = GFX_event_normal_frame_intrigue
+	desc = EVTDESC_MNM_7010_ALT
 
 	hide_from = yes
-
 	is_triggered_only = yes
 
+	prisoner = no
+
 	trigger = {
-		NOR = {
-			prisoner = yes
-			event_target:satanists_recruiter = {
-				OR = {
-					is_alive = no
-					is_devil_worshiper_trigger = no
-				}
-			}
+		event_target:satanists_recruiter = {
+			is_devil_worshiper_trigger = yes
+			prisoner = no
 		}
 	}
 
 	fail_trigger_effect = {
 		if = {
-			limit = {
-				prisoner = yes
-			}
+			limit = { prisoner = yes }
 			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6995 } #notify broken chain
-			break = yes
 		}
-		if = {
-			limit = {
-				event_target:satanists_recruiter = {
-					OR = {
-						is_alive = no
-						is_devil_worshiper_trigger = no
-						prisoner = yes
-					}
-				}
-			}
-			event_target:satanists_recruiter = { 
-				character_event = { id = MNM.6995 } #notify broken chain
-			}
-			break = yes
-		}
+
+		character_event = { id = MNM.6995 } # notify broken chain
 	}
 
-	#Yes - Openly Embrace Infernal # Cult no longer accepts open worshippers
-	# option = {
-	# 	name = EVTOPTA_7010
-	# 	if = {
-	# 		limit = { event_target:satanists_inductor = { society_member_of = the_satanists } }
-	# 		custom_tooltip = { text = EVTOPTA_7010_TT_1 }
-	# 	}
-	# 	if = {
-	# 		limit = { event_target:satanists_inductor = { NOT = { society_member_of = the_satanists } } }
-	# 		custom_tooltip = { text = EVTOPTA_7010_TT_1 }
-	# 	}
-
-	# 	hidden_effect = { character_event = { id = MNM.7012 days = 35 random = 20 } } #Inductor will get in contact with you
-		
-	# 	religion = infernal
-
-	# 	ai_chance = {
-	# 		factor = 2
-	# 		modifier = {
-	# 			factor = 0
-	# 			is_landed = yes
-	# 			liege = {
-	# 				NOT = { religion = infernal }
-	# 			}
-	# 		}
-	# 		modifier = {
-	# 			factor = 0
-	# 			is_landed = no
-	# 			employer = {
-	# 				NOT = { religion = infernal }
-	# 			}
-	# 		}
-	# 	}
-	# }
-
-	#Yes - Secretly Embrace Infernal
+	# Yes
 	option = {
-		name = EVTOPTC_7010
-		if = {
-			limit = { event_target:satanists_inductor = { society_member_of = the_satanists } }
-			custom_tooltip = { text = EVTOPTC_7010_TT_1 }
-		}
-		if = {
-			limit = { event_target:satanists_inductor = { NOT = { society_member_of = the_satanists } } }
-			custom_tooltip = { text = EVTOPTC_7010_TT_1 }
+		name = EVTOPTA_7010
+
+		custom_tooltip = { text = EVTOPTA_7010_TT_2 }
+
+		letter_event = { # Inductor will get in contact with you
+			id = MNM.7014
+			days = 35
+			random = 20
 		}
 
-		hidden_effect = { character_event = { id = MNM.7012 days = 35 random = 20 } } #Inductor will get in contact with you
-		
-		#set_secret_religion = infernal
-
-		#ai_chance = {
-		#	factor = 1
-		#	modifier = {
-		#		factor = 0
-		#		religion = infernal 
-		#	}
-		#}
+		add_character_modifier = {
+			name = bandaged_arm
+			days = 65
+		}
 	}
 
-	#No
+	# No
 	option = {
 		name = EVTOPTB_7010
+
 		custom_tooltip = { text = EVTOPTB_7010_TT }
 
-		hidden_effect = { 
-			FROM = { character_event = { id = MNM.7020 days = 60 random = 20 } } #Fail 
+		character_event = { # Fail
+			id = MNM.7020
+			days = 60
+			random = 20
+		}
 
+		hidden_effect = {
 			if = {
 				limit = { event_target:satanists_recruiter = { always = yes } }
-				event_target:satanists_recruiter = { 
+
+				event_target:satanists_recruiter = {
 					set_character_flag = recruitment_fail
-					character_event = { id = MNM.7021 } #Tell original recruiter what happened (if there is one) OR grand master of cult?
+					letter_event = { id = MNM.7022 } # Tell original recruiter what happened
 				}
 			}
-		} 
-
-		ai_chance = {
-			factor = 0
 		}
-	}
-}
 
-#Sending event to inductor - hidden event to find somebody appropriate to invite you
-character_event = {
-	id = MNM.7012
-	hide_window = yes
-	is_triggered_only = yes
-
-	immediate = {
-		if = { 
-			limit = { NOT = { event_target:satanists_inductor = { always = yes } } }
-
-			random_society_member = {
-				limit = {
-					society_rank >= 3
-					same_society_as = event_target:satanists_recruiter
-					prisoner = no
-				}
-				save_event_target_as = satanists_inductor 
-			}
-		}
-		event_target:satanists_inductor = { 
-			set_character_flag = event_MNM_7014
-			character_event = { id = MNM.7013 }
-		}
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -1142,7 +907,7 @@ letter_event = {
 
 	trigger = {
 		event_target:satanists_recruiter = {
-			is_devil_worshiper_trigger = yes
+			society_member_of = the_satanists
 			prisoner = no
 		}
 	}
@@ -1158,185 +923,102 @@ letter_event = {
 
 	option = {
 		name = EVTOPTA_7014
+
 		custom_tooltip = { text = EVTOPTA_7014_TT }
 
-		hidden_effect = {
-			event_target:satanists_inductor = { 
-				clr_character_flag = event_MNM_7014
-			}
-			if = {
-				limit = {
-					has_character_flag = being_recruited_by_the_satanists
-					any_society_member = {
-						society_member_of = the_satanists
-						root_attraction_trigger = yes
-						is_attractive_trigger = yes
-					}
-				}
-				random_society_member = {
-					limit = {
-						society_member_of = the_satanists
-						root_attraction_trigger = yes
-						is_attractive_trigger = yes
-					}
-					save_event_target_as = satanists_inductor
-					set_character_flag = event_MNM_7015
-					character_event = { id = MNM.7013 }
-					break = yes
-				}
-			}
-
-			pick_culture_for_spawned_courtier_effect = yes
-			if = { #back up if there is no eligble society member
-				limit = { prefers_men_trigger = yes }
-				create_character = {
-					random_traits = yes
-					dynasty = none
-					culture = event_target:picked_culture
-					religion = event_target:picked_religion
-					female = no
-					age = 20
-					attributes = {
-						intrigue = 5
-					}
-					trait = elusive_shadow
-					flag = special_courtier
-				}
-			}
-			else = {
-				create_character = {
-					random_traits = yes
-					dynasty = none
-					culture = event_target:picked_culture
-					religion = event_target:picked_religion
-					female = yes
-					age = 20
-					attributes = {
-						intrigue = 5
-					}
-					trait = elusive_shadow
-					flag = special_courtier
-				}
-			}
-			new_character = {
-				remove_trait = ugly
-				remove_trait = hunchback
-				remove_trait = chaste
-				add_trait = lustful
-				add_trait = fair
-				save_event_target_as = satanists_inductor
-				set_character_flag = event_MNM_7015
-				join_society = the_satanists
-				clear_event_target = picked_culture
-				clear_event_target = picked_religion
-				character_event = { id = MNM.7013 }
-			}
-		}
+		character_event = { id = MNM.7015 days = 14 }
 	}
 }
 
-##ping event for the messenger
-#character_event = {
-#	id = MNM.7011
-#	hide_window = yes#
-
-#	is_triggered_only = yes#
-
-#	immediate = { FROM = { character_event = { id = MNM.7015 days = 5 } } }
-#}
-
-#For Recruit: Have met an intriguing person at court
+# For Recruit: Have met an intriguing person at court
 character_event = {
 	id = MNM.7015
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-
-	desc = {
-		trigger = { event_target:satanists_inductor = { society_member_of = the_satanists } } 
-		text = EVTDESC_MNM_7015
-	}
-	desc = {
-		trigger = { event_target:satanists_inductor = { NOT = { society_member_of = the_satanists } } } 
-		text = EVTDESC_MNM_7015_ALT
-	}
+	portrait = event_target:satanists_inductor
+	desc = EVTDESC_MNM_7015_ALT
 
 	is_triggered_only = yes
 
-	trigger = {
-		NOR = {
-			prisoner = yes
-			event_target:satanists_inductor = {
-				OR = {
-					is_alive = no
-					is_devil_worshiper_trigger = no
-				}
-			}
-		}
-	}
+	prisoner = no
 
 	fail_trigger_effect = {
-		if = {
-			limit = {
-				prisoner = yes
+		set_character_flag = dw_recruitment_end_unable
+		character_event = { id = MNM.6993 } # notify broken chain
+	}
+
+	immediate = {
+		hidden_effect = {
+			random_society_member = {
+				limit = {
+					society_member_of = the_satanists
+					is_attractive_trigger = yes
+					is_incapable = no
+					prisoner = no
+					root_attraction_trigger = yes
+				}
+
+				save_event_target_as = satanists_inductor
 			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6993 } #notify broken chain
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_inductor = {
-					OR = {
-						is_alive = no
-						is_devil_worshiper_trigger = no
+
+			if = { # back up if there is no eligble society member
+				limit = {
+					NOT = { event_target:satanists_inductor = { always = yes } }
+				}
+
+				pick_culture_for_spawned_courtier_effect = yes
+				if = {
+					limit = { prefers_men_trigger = yes }
+					create_character = {
+						random_traits = yes
+						dynasty = none
+						culture = event_target:picked_culture
+						religion = event_target:picked_religion
+						female = no
+						age = 20
+						attributes = {
+							intrigue = 5
+						}
+						trait = elusive_shadow
+						flag = special_courtier
 					}
 				}
+				else = {
+					create_character = {
+						random_traits = yes
+						dynasty = none
+						culture = event_target:picked_culture
+						religion = event_target:picked_religion
+						female = yes
+						age = 20
+						attributes = {
+							intrigue = 5
+						}
+						trait = elusive_shadow
+						flag = special_courtier
+					}
+				}
+				new_character = {
+					save_event_target_as = satanists_inductor
+
+					remove_trait = ugly
+					remove_trait = hunchback
+					remove_trait = dwarf
+					remove_trait = chaste
+					add_trait = lustful
+					add_trait = fair
+					join_society = the_satanists
+				}
+				clear_event_target = picked_culture
+				clear_event_target = picked_religion
 			}
-			event_target:satanists_inductor = { 
-				character_event = { id = MNM.6993 } #notify broken chain
-			}
-			break = yes
 		}
 	}
 
 	option = {
 		name = EVTOPTA_7015
 
-		hidden_effect = {
-			character_event = { id = MNM.6994 }
-		}
-	}
-}
-
-# Safety ping
-character_event = {
-	id = MNM.6994
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				prisoner = yes
-			}
-			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6993 }
-			break = yes
-		}
-		if = {
-			limit = {
-				event_target:satanists_inductor = { is_alive = yes }
-			}
-			event_target:satanists_inductor = { 
-				clr_character_flag = event_MNM_7015
-				set_character_flag = event_MNM_7016
-				character_event = { id = MNM.7013 }
-			}
-			break = yes
-		}
-		# Else notify failure
-		character_event = { id = MNM.6993 }
+		character_event = { id = MNM.7016 days = 3 }
 	}
 }
 
@@ -1434,23 +1116,25 @@ character_event = {
 	}
 }
 
+# For Recruit: Unable to continue induction notification
 character_event = {
 	id = MNM.6993
+	picture = GFX_evt_dark_prayer
+	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:satanists_inductor
+
 	desc = {
 		text = EVTDESCA_MNM_6993
 		trigger = { NOT = { has_character_flag = dw_recruitment_end_unable } }
 	}
 	desc = {
 		text = EVTDESCB_MNM_6993
-		trigger = { has_character_flag = dw_recruitment_end_unable }
 		picture = GFX_evt_into_the_dungeon
+		trigger = { has_character_flag = dw_recruitment_end_unable }
 	}
-	picture = GFX_evt_dark_prayer
-	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	show_root = yes
-	
+
 	option = {
 		name = {
 			text = EVTOPTA_MNM_6993
@@ -1460,223 +1144,219 @@ character_event = {
 			text = EVTOPTB_MNM_6993
 			trigger = { has_character_flag = dw_recruitment_end_unable }
 		}
+
 		custom_tooltip = { text = EVTTOOLTIP_MNM_6993 }
+
 		clr_character_flag = being_recruited_by_the_satanists
 		clr_character_flag = dw_recruitment_end_unable
 	}
 }
 
-#Meet the Seducer/Seductress who then leads you away
+# Meet the Seducer/Seductress who then leads you away
 character_event = {
 	id = MNM.7016
-	picture = GFX_evt_secret_ceremony
 	desc = EVTDESC_MNM_7016
+	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:satanists_inductor
 
 	is_triggered_only = yes
 
+	prisoner = no
+
 	trigger = {
-		NOR = {
-			prisoner = yes
-			event_target:satanists_inductor = {
-				OR = {
-					is_alive = no
-					is_devil_worshiper_trigger = no
-				}
-			}
+		event_target:satanists_inductor = {
+			is_alive = yes
+			prisoner = no
 		}
 	}
 
 	fail_trigger_effect = {
 		if = {
-			limit = {
-				prisoner = yes
-			}
+			limit = { prisoner = yes }
 			set_character_flag = dw_recruitment_end_unable
-			character_event = { id = MNM.6993 } #notify broken chain
-			break = yes
 		}
-		if = {
-			limit = {
-				event_target:satanists_inductor = {
-					OR = {
-						is_alive = no
-						is_devil_worshiper_trigger = no
-					}
-				}
-			}
-			event_target:satanists_inductor = { 
-				character_event = { id = MNM.6993 } #notify broken chain
-			}
-			break = yes
-		}
+
+		character_event = { id = MNM.6993 } # notify broken chain
 	}
 
 	option = {
 		name = EVTOPTA_7016
+
 		custom_tooltip = { text = EVTOPTA_7016_TT }
 
-		hidden_effect = {
-			character_event = { id = MNM.6987 }
-		}
+		character_event = { id = MNM.7017 days = 5 }
 	}
 }
 
 # Prove your ambition
 character_event = {
 	id = MNM.7017
+	desc = EVTDESC_MNM_7017_A
 	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
-
-	desc = {
-		trigger = { }
-		text = EVTDESC_MNM_7017_A 
-	}
+	portrait = event_target:satanists_inductor
 
 	is_triggered_only = yes
-	
-	immediate = {
-		
+
+	prisoner = no
+
+	trigger = {
+		event_target:satanists_inductor = {
+			is_alive = yes
+			prisoner = no
+		}
 	}
 
-	#Anything for the coven and the power you offer
-	option = {
-		name = EVTOPTA_7017
-		custom_tooltip = { text = EVTOPTA_7017_TT }
-
-		hidden_effect = {
-			character_event = { id = MNM.6989 }
+	fail_trigger_effect = {
+		if = {
+			limit = { prisoner = yes }
+			set_character_flag = dw_recruitment_end_unable
 		}
 
-		ai_chance = { factor = 100 }
+		character_event = { id = MNM.6993 } # notify broken chain
 	}
 
-	#I... I can't do this!
+	# Anything for the coven and the power you offer
+	option = {
+		name = EVTOPTA_7017
+
+		custom_tooltip = { text = EVTOPTA_7017_TT }
+
+		character_event = { id = MNM.7018 days = 1 }
+	}
+
+	# I... I can't do this!
 	option = {
 		name = {
 			text = EVTOPTB_7017
 			trigger = {
 				OR = {
 					is_married = no
-					any_spouse = {
-						character = event_target:satanists_inductor
-					}
+					is_married = event_target:satanists_inductor
 				}
 			}
 		}
 		name = {
-			text = EVTOPTC_7017 #I am married! (and not to the inductor)
+			text = EVTOPTC_7017 # I am married! (and not to the inductor)
 			trigger = {
 				is_married = yes
-				NOT = {
-					any_spouse = {
-						character = event_target:satanists_inductor
-					}
-				}
+				NOT = { is_married = event_target:satanists_inductor }
 			}
 		}
 		custom_tooltip = { text = EVTOPTB_7017_TT }
-		
-		hidden_effect = { 
+
+		hidden_effect = {
 			random_list = {
-				#Getaway
+				# Getaway
 				33 = {
 					set_character_flag = escape_successful
 
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						attribute_diff = { character = FROM attribute = intrigue value = 2 }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value >= 2 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						attribute_diff = { character = FROM attribute = intrigue value = 4 }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value >= 4 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						attribute_diff = { character = FROM attribute = intrigue value = 6 }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value >= 6 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						combat_rating_diff = { character = FROM value = 10 }
+						combat_rating_diff = { character = event_target:satanists_inductor value >= 10 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						combat_rating_diff = { character = FROM value = 20 }
+						combat_rating_diff = { character = event_target:satanists_inductor value >= 20 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						combat_rating_diff = { character = FROM value = 30 }
+						combat_rating_diff = { character = event_target:satanists_inductor value >= 30 }
 					}
 				}
-				#Injured
-				33 = {
-					set_character_flag = escape_injured
-				}
-				#Death
+
+				# Injured
+				33 = { set_character_flag = escape_injured }
+
+				# Death
 				33 = {
 					set_character_flag = escape_death
-					modifier = {
+
+					mult_modifier = {
 						factor = 1.4
-						FROM = { attribute_diff = { character = ROOT attribute = intrigue value = 2 } }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value < -2 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						FROM = { attribute_diff = { character = ROOT attribute = intrigue value = 4 } }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value < -4 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						FROM = { attribute_diff = { character = ROOT attribute = intrigue value = 6 } }
+						attribute_diff = { character = event_target:satanists_inductor attribute = intrigue value < -6 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						FROM = { combat_rating_diff = { character = ROOT value = 10 } }
+						combat_rating_diff = { character = event_target:satanists_inductor value < -10 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						FROM = { combat_rating_diff = { character = ROOT value = 20 } }
+						combat_rating_diff = { character = event_target:satanists_inductor value < -20 }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 1.4
-						FROM = { combat_rating_diff = { character = ROOT value = 30 } }
+						combat_rating_diff = { character = event_target:satanists_inductor value < -30 }
 					}
 				}
 			}
-			
-			character_event = { id = MNM.6988 }
 		}
+
+		character_event = { id = MNM.7019 days = 1 }
 
 		ai_chance = { factor = 0 }
 	}
 }
 
-#You are a member! - The inductor sleeping soundly
+# You are a member! - The inductor sleeping soundly
 character_event = {
 	id = MNM.7018
-	picture = GFX_evt_dark_love
 	desc = EVTDESC_MNM_7018
+	picture = GFX_evt_dark_love
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:satanists_inductor
 
 	is_triggered_only = yes
 
+	prisoner = no
+
+	trigger = {
+		event_target:satanists_inductor = {
+			is_alive = yes
+			prisoner = no
+		}
+	}
+
+	fail_trigger_effect = {
+		if = {
+			limit = { prisoner = yes }
+			set_character_flag = dw_recruitment_end_unable
+		}
+
+		character_event = { id = MNM.6993 } # notify broken chain
+	}
+
 	immediate = {
-		#If original recruiter is still around, find Grand Master and have them send word of success to that original recruiter
+		# If original recruiter is still around, send word of success
 		hidden_effect = {
 			if = {
-				limit = { event_target:satanists_recruiter = { always = yes } }
-				event_target:satanists_recruiter = { set_character_flag = recruitment_success }
+				limit = { event_target:satanists_recruiter = { is_alive = yes } }
 
-				if = { limit = { has_character_flag = being_recruited_by_the_satanists }
-					random_society_member = {
-						limit = {
-							society_rank = {
-								rank == 4
-								society = the_satanists
-							}
-						}
-						save_event_target_as = grand_master
-					}
+				event_target:satanists_recruiter = {
+					set_character_flag = recruitment_success
+					letter_event = { id = MNM.7022 days = 5 }
 				}
-				event_target:grand_master = { character_event = { id = MNM.7021 } }
 			}
 		}
 	}
@@ -1684,335 +1364,305 @@ character_event = {
 	option = {
 		name = EVTOPTA_7018 # I wish you'd found me sooner
 
-		if = {
-			limit = { has_character_flag = being_recruited_by_the_satanists }
-			join_society = the_satanists
-		}
-
-		if = { 
-			limit = { ai = no }
-		}
-
 		opinion = {
+			name = opinion_budding_romance
 			who = event_target:satanists_inductor
-			modifier = opinion_budding_romance
 		}
 
-		event_target:satanists_inductor = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_budding_friendship
-			}
-		}
-
-		hidden_effect = {
-			clr_character_flag = being_recruited_by_the_satanists
+		reverse_opinion = {
+			name = opinion_budding_romance
+			who = event_target:satanists_inductor
 		}
 	}
+
 	option = {
 		name = EVTOPTB_7018 # this was a necessary evil
 
-		if = {
-			limit = { has_character_flag = being_recruited_by_the_satanists }
-			join_society = the_satanists
+		reverse_opinion = {
+			name = opinion_very_disappointed
+			who = event_target:satanists_inductor
 		}
+	}
 
-		event_target:satanists_inductor = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_very_disappointed
-			}
-		}
-
-		hidden_effect = {
-			if = {
-				limit = { event_target:satanists_recruiter = { always = yes } }
-				event_target:satanists_recruiter = { set_character_flag = recruitment_success } #notify original recruiter
-				if = { limit = { has_character_flag = being_recruited_by_the_satanists }
-					random_society_member = {
-						limit = {
-							society_rank = {
-								rank == 4
-								society = the_satanists
-							}
-						}
-						save_event_target_as = grand_master
-					}
-				}
-				event_target:grand_master = { character_event = { id = MNM.7021 } }
-			}
-			clr_character_flag = being_recruited_by_the_satanists
-		}
+	after = {
+		join_society = the_satanists
+		clr_character_flag = being_recruited_by_the_satanists
 	}
 }
 
-#You flee
+# You flee
 character_event = {
 	id = MNM.7019
 	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
 
 	desc = {
-		trigger = { has_character_flag = escape_successful }
 		text = EVTDESC_MNM_7019_A
+		trigger = { has_character_flag = escape_successful }
 	}
 	desc = {
-		trigger = { has_character_flag = escape_injured }
 		text = EVTDESC_MNM_7019_B
+		trigger = { has_character_flag = escape_injured }
 	}
 	desc = {
-		trigger = { has_character_flag = escape_death }
 		text = EVTDESC_MNM_7019_C
+		trigger = { has_character_flag = escape_death }
 	}
 
 	is_triggered_only = yes
 
+	prisoner = no
+
+	trigger = {
+		event_target:satanists_inductor = {
+			is_alive = yes
+			prisoner = no
+		}
+	}
+
+	fail_trigger_effect = {
+		if = {
+			limit = { prisoner = yes }
+			set_character_flag = dw_recruitment_end_unable
+		}
+
+		character_event = { id = MNM.6993 } # notify broken chain
+		clr_character_flag = escape_successful
+		clr_character_flag = escape_injured
+		clr_character_flag = escape_death
+	}
+
 	immediate = {
-		#If original recruiter is still around, find Grand Master and have them send word of failure to that original recruiter
 		hidden_effect = {
 			if = {
 				limit = { event_target:satanists_recruiter = { always = yes } }
-				event_target:satanists_recruiter = { set_character_flag = recruitment_fail }
-				
-				if = { limit = { has_character_flag = being_recruited_by_the_satanists }
-					random_society_member = {
-						limit = {
-							society_rank = {
-								rank == 4
-								society = the_satanists
-							}
-						}
-						save_event_target_as = grand_master
-					}
+
+				event_target:satanists_recruiter = {
+					set_character_flag = recruitment_fail
+					letter_event = { id = MNM.7022 days = 5 }
 				}
-				event_target:grand_master = { character_event = { id = MNM.7021 } }
 			}
 		}
 
 		clr_character_flag = being_recruited_by_the_satanists
 	}
 
-	#Escape successfully
+	# Escape successfully
 	option = {
-		trigger = { has_character_flag = escape_successful }
 		name = EVTOPTA_7019
+
+		trigger = { has_character_flag = escape_successful }
+
 		custom_tooltip = { text = EVTOPTA_7019_TT }
 
 		clr_character_flag = escape_successful
 	}
 
-	#Escaped but got injured
+	# Escaped but got injured
 	option = {
-		trigger = { has_character_flag = escape_injured }
 		name = EVTOPTB_7019
+
+		trigger = { has_character_flag = escape_injured }
+
 		custom_tooltip = { text = EVTOPTB_7019_TT }
 
 		clr_character_flag = escape_injured
-
 		add_maimed_trait_effect = yes
 	}
 
-	#Escaped but died
+	# Escaped but died
 	option = {
-		trigger = { has_character_flag = escape_death }
 		name = EVTOPTC_7019
+
+		trigger = { has_character_flag = escape_death }
+
 		custom_tooltip = { text = EVTOPTC_7019_TT }
 
-		death = { death_reason = death_murder_unknown killer = FROM }
+		death = {
+			death_reason = death_murder_unknown
+			killer = FROM
+		}
 	}
 }
 
-#Opt out failstate
+# Opt out failstate
 character_event = {
 	id = MNM.7020
-	picture = GFX_evt_secret_ceremony
 	desc = EVTDESC_MNM_7020
+	picture = GFX_evt_secret_ceremony
 	border = GFX_event_normal_frame_intrigue
 
 	hide_from = yes
-
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_7020
-		custom_tooltip = { text = EVTOPTA_7020_TT}
+
+		custom_tooltip = { text = EVTOPTA_7020_TT }
 		clr_character_flag = being_recruited_by_the_satanists
 	}
 }
 
-#Ping event GM for outcome notification
-character_event = {
-	id = MNM.7021
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = { event_target:satanists_recruiter = { letter_event = { id = MNM.7022 days = 5 } } }
-}
-
-#Outcome of recruitment for the original recruiter (if there is one)
+# Outcome of recruitment for the original recruiter (if there is one)
 letter_event = {
 	id = MNM.7022
 	border = GFX_event_letter_frame_intrigue
-
-	trigger = { is_devil_worshiper_trigger = yes }
+	portrait = event_target:grand_master
 
 	desc = {
-		trigger = { has_character_flag = recruitment_success }
 		text = EVTDESC_MNM_7022_A
+		trigger = { has_character_flag = recruitment_success }
 	}
 	desc = {
-		trigger = { has_character_flag = recruitment_fail }
 		text = EVTDESC_MNM_7022_B
+		trigger = { has_character_flag = recruitment_fail }
 	}
 
 	is_triggered_only = yes
 
+	trigger = { society_member_of = the_satanists }
+
+	immediate = {
+		society = {
+			leader = { save_event_target_as = grand_master }
+		}
+	}
+
 	option = {
-		trigger = { has_character_flag = recruitment_success }
 		name = EXCELLENT
+
+		trigger = { has_character_flag = recruitment_success }
 
 		add_society_currency_medium_effect = yes
 		clr_character_flag = recruitment_success
 	}
 
 	option = {
-		trigger = { has_character_flag = recruitment_fail }
 		name = CURSES
 
+		trigger = { has_character_flag = recruitment_fail }
+
 		clr_character_flag = recruitment_fail
-
 	}
 }
 
-#First ping event for joining in case inductor(s) died
-character_event = {
-	id = MNM.7030
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = { 
-		hidden_effect = {	
-			if = {
-				limit = {
-					AND = {
-						is_in_society = no
-						OR = {
-							has_character_flag = being_recruited_by_the_satanists
-							has_character_flag = assassins_attempted_recruitment
-						}
-					}
-				}
-				if = { limit = { has_character_flag = being_recruited_by_the_satanists }
-					random_society_member = {
-						limit = {
-							society_rank = {
-								rank == 4
-								society = the_satanists
-							}
-						}
-						save_event_target_as = grand_master
-					}
-				}
-				if = { limit = { has_character_flag = assassins_attempted_recruitment }
-					random_society_member = {
-						limit = {
-							society_rank = {
-								rank == 4
-								society = eldreth_veluuthra
-							}
-						}
-						save_event_target_as = grand_master
-					}
-				}
-				event_target:grand_master = { character_event = { id = MNM.7031 } }
-			}
-			#Assassins
-			clr_character_flag = ongoing_recruitment
-			clr_character_flag = approves_of_shia
-			clr_character_flag = disapproves_of_shia
-			clr_character_flag = willing_to_join
-			clr_character_flag = unwilling_to_join
-			clr_character_flag = escape_successful
-			clr_character_flag = escape_injured
-			clr_character_flag = escape_death
-			clr_character_flag = escape_bribe 
-			#Devil Worshipers
-			clr_character_flag = approves_of_satanism
-			clr_character_flag = disapproves_of_satanism
-			clr_character_flag = has_ill_lover_loc
-			clr_character_flag = has_ill_spouse_loc
-			clr_character_flag = has_ill_child_loc
-			clr_character_flag = has_money_troubles_loc
-			clr_character_flag = has_some_illness_loc
-			clr_character_flag = has_need_of_winning_battles_loc
-			clr_character_flag = has_a_rival_loc
-			clr_character_flag = is_weak_loc
-			clr_character_flag = is_dumb_loc
-		}
-	}
-}
-
-#Second ping event for joining in case inductor(s) died
-character_event = {
-	id = MNM.7031
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = { 
-		FROM = {
-			letter_event = { id = MNM.7032 }
-		}
-	}
-}
-
-#Joining event in case inductor(s) died
+# Joining event in case inductor(s) died
+# Fired on a one year delay from the recruitment decision, or if the assassins_inductor dies during the event chain
 letter_event = {
-	id = MNM.7032
-	desc = {
-		trigger = { NOT = { FROM = { society_member_of = eldreth_veluuthra } } }
-		text = EVTDESC_MNM_7032_A
-	}
-	desc = {
-		trigger = { FROM = { society_member_of = eldreth_veluuthra } }
-		text = EVTDESC_MNM_7032_B
-	}
+	id = MNM.7030
 	border = GFX_event_letter_frame_intrigue
+	portrait = event_target:grand_master
+
+	desc = {
+		text = EVTDESC_MNM_7032_A
+		trigger = { NOT = { event_target:grand_master = { society_member_of = the_assassins } } }
+	}
+	desc = {
+		text = EVTDESC_MNM_7032_B
+		trigger = { event_target:grand_master = { society_member_of = the_assassins } }
+	}
 
 	is_triggered_only = yes
 
-	option = {
-		name = EVTOPTA_7032 #I will join
-		if = {
-			limit = { has_character_flag = being_recruited_by_the_satanists }
-			join_society = the_satanists
-		}
-		if = {
-			limit = { has_character_flag = assassins_attempted_recruitment }
-			join_society = eldreth_veluuthra
-		}
+	is_in_society = no
 
-		hidden_effect = {
-			clr_character_flag = being_recruited_by_the_satanists
-			clr_character_flag = assassins_attempted_recruitment
+	trigger = {
+		OR = {
+			has_character_flag = being_recruited_by_the_satanists
+			has_character_flag = assassins_attempted_recruitment
+		}
+	}
+
+	fail_trigger_effect = {
+		# Assassins
+		clr_character_flag = ongoing_recruitment
+		clr_character_flag = approves_of_shia
+		clr_character_flag = disapproves_of_shia
+		clr_character_flag = willing_to_join
+		clr_character_flag = unwilling_to_join
+		clr_character_flag = escape_successful
+		clr_character_flag = escape_injured
+		clr_character_flag = escape_death
+		clr_character_flag = escape_bribe
+
+		# Devil Worshipers
+		clr_character_flag = approves_of_satanism
+		clr_character_flag = disapproves_of_satanism
+		clr_character_flag = has_ill_lover_loc
+		clr_character_flag = has_ill_spouse_loc
+		clr_character_flag = has_ill_child_loc
+		clr_character_flag = has_money_troubles_loc
+		clr_character_flag = has_some_illness_loc
+		clr_character_flag = has_need_of_winning_battles_loc
+		clr_character_flag = has_a_rival_loc
+		# clr_character_flag = is_weak_loc
+		# clr_character_flag = is_dumb_loc
+	}
+
+	immediate = {
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			being_recruited_by_the_satanists = {
+				the_satanists = {
+					leader = { save_event_target_as = grand_master }
+				}
+			}
+			assassins_attempted_recruitment = {
+				eldreth_veluuthra = {
+					leader = { save_event_target_as = grand_master }
+				}
+			}
+		}
+	}
+
+	option = { # I will join
+		name = EVTOPTA_7032
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			being_recruited_by_the_satanists      = { join_society = the_satanists }
+			assassins_attempted_recruitment       = { join_society = eldreth_veluuthra }
 		}
 	}
 
 	option = {
-		name = EVTOPTB_7032 #Changed my mind
-		event_target:grand_master = {
-			opinion = {
-				who = ROOT
-				modifier = opinion_very_disappointed
-			}
+		name = EVTOPTB_7032 # Changed my mind
+
+		reverse_opinion = {
+			name = opinion_very_disappointed
+			who = event_target:grand_master
 		}
-		hidden_effect = {
-			clr_character_flag = being_recruited_by_the_satanists
-			clr_character_flag = assassins_attempted_recruitment
-		}
+
 		ai_chance = { factor = 0 }
+	}
+
+	after = {
+		clr_character_flag = being_recruited_by_the_satanists
+		clr_character_flag = assassins_attempted_recruitment
+
+		# Assassins
+		clr_character_flag = ongoing_recruitment
+		clr_character_flag = approves_of_shia
+		clr_character_flag = disapproves_of_shia
+		clr_character_flag = willing_to_join
+		clr_character_flag = unwilling_to_join
+		clr_character_flag = escape_successful
+		clr_character_flag = escape_injured
+		clr_character_flag = escape_death
+		clr_character_flag = escape_bribe
+
+		# Devil Worshipers
+		clr_character_flag = approves_of_satanism
+		clr_character_flag = disapproves_of_satanism
+		clr_character_flag = has_ill_lover_loc
+		clr_character_flag = has_ill_spouse_loc
+		clr_character_flag = has_ill_child_loc
+		clr_character_flag = has_money_troubles_loc
+		clr_character_flag = has_some_illness_loc
+		clr_character_flag = has_need_of_winning_battles_loc
+		clr_character_flag = has_a_rival_loc
 	}
 }
 
