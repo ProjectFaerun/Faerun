@@ -1809,6 +1809,7 @@ character_event = {
 
 	trigger = {
 		is_weak_non_congenital_tier_3_trigger = no
+		NOT = { has_character_flag = infernal_strength }
 	}
 
 	option = {
@@ -1828,93 +1829,88 @@ character_event = {
 
 # Power: Corrupt a priest
 
-#Ping event for Corrupt a priest
-character_event = {
-	id = MNM.7825
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		save_event_target_as = corrupt_priest_target
-		FROMFROM = {
-			save_event_target_as = corrupt_priest_spell_caster
-		}
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7826 }
-		}
-	}
-}
-
-#Corrupt a Priest (find out whether corruptible)
+# Corrupt a Priest (find out whether corruptible)
 character_event = {
 	id = MNM.7826
-	picture = GFX_evt_dark_prayer
 	desc = EVTDESC_MNM_7826
+	picture = GFX_evt_dark_prayer
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:corrupt_priest_target
 
-	is_triggered_only = yes
+	is_triggered_only = yes # mnm_devil_worshipers_decisions.txt
 
-	trigger = {
-		is_devil_worshiper_trigger = yes
-	}
+	trigger = { society_member_of = the_satanists }
 
 	option = {
-		name = EVTOPTA_MNM_7826 #try to find something new to corrupt them with (add new sinful traits)
+		name = EVTOPTA_MNM_7826 # try to find something new to corrupt them with (add new sinful traits)
+
 		trigger = {
 			event_target:corrupt_priest_target = {
 				OR = {
-					AND = {
-						NOT = { trait = lustful }
-						NOT = { trait = chaste }
+					NOR = {
+						trait = lustful
+						trait = chaste
 					}
-					AND = {
-						NOT = { trait = temperate }
-						NOT = { trait = gluttonous }
+
+					NOR = {
+						trait = temperate
+						trait = gluttonous
 					}
-					AND = {
-						NOT = { trait = charitable }
-						NOT = { trait = greedy }
+
+					NOR = {
+						trait = charitable
+						trait = greedy
 					}
-					AND = {
-						NOT = { trait = diligent }
-						NOT = { trait = slothful }
+
+					NOR = {
+						trait = diligent
+						trait = slothful
 					}
-					AND = {
-						NOT = { trait = kind }
-						OR = {
-							NOT = { trait = envious }
-							NOT = { trait = cruel }
-						}	
+
+					NOR = {
+						trait = kind
+
+						AND = {
+							trait = envious
+							trait = cruel
+						}
 					}
-					AND = {
-						NOT = { trait = patient }
-						NOT = { trait = wroth }
+
+					NOR = {
+						trait = patient
+						trait = wroth
 					}
-					AND = {
-						NOT = { trait = humble }
-						NOT = { trait = proud }
+
+					NOR = {
+						trait = humble
+						trait = proud
 					}
-					AND = {
-						NOT = { trait = honest }
-						NOT = { trait = deceitful }
+
+					NOR = {
+						trait = honest
+						trait = deceitful
 					}
-					AND = {
-						NOT = { trait = just }
-						NOT = { trait = arbitrary }
+
+					NOR = {
+						trait = just
+						trait = arbitrary
 					}
 				}
 			}
 		}
+
 		custom_tooltip = { text = EVTOPTA_MNM_7826_TOOLTIP }
-		hidden_effect = {
-			event_target:corrupt_priest_target = {
-				character_event = { id = MNM.7827 days = 3 random = 27 } 
-			}
-		}		
+
+		character_event = {
+			id = MNM.7830
+			days = 3
+			random = 27
+		}
 	}
+
 	option = {
-		name = EVTOPTB_MNM_7826 #remove virtues (slight chance to add new sinful traits)
+		name = EVTOPTB_MNM_7826 # remove virtues (slight chance to add new sinful traits)
+
 		trigger = {
 			event_target:corrupt_priest_target = {
 				OR = {
@@ -1930,1319 +1926,1260 @@ character_event = {
 				}
 			}
 		}
+
 		custom_tooltip = { text = EVTOPTB_MNM_7826_TOOLTIP }
-		hidden_effect = {
-			event_target:corrupt_priest_target = {
-				character_event = { id = MNM.7828 days = 3 random = 27 }
-			}
-		}		
+
+		character_event = {
+			id = MNM.7835
+			days = 3
+			random = 27
+		}
 	}
+
 	option = {
-		name = EVTOPTC_MNM_7826 #nevermind I'm a nice guy
+		name = EVTOPTC_MNM_7826 # nevermind I'm a nice guy
+
 		custom_tooltip = { text = EVTOPTC_MNM_7826_TOOLTIP }
+
 		hidden_effect = {
 			event_target:corrupt_priest_target = {
 				clr_character_flag = attempted_corrupt_priest
 			}
 		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
-#Ping event for Corrupt a Priest find new sinful traits
-character_event = {
-	id = MNM.7827
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	trigger = {
-		FROM = { is_devil_worshiper_trigger = yes }
-	}
-
-	immediate = {
-		event_target:corrupt_priest_target = {
-			random_list = {
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = lustful
-							trait = chaste
-						} 
-					}
-					set_character_flag = corrupt_priest_add_lustful
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = gluttonous
-							trait = temperate
-						} 
-					}
-					set_character_flag = corrupt_priest_add_gluttonous
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = greedy
-							trait = charitable
-						} 
-					}
-					set_character_flag = corrupt_priest_add_greedy
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = slothful
-							trait = diligent
-						} 
-					}
-					set_character_flag = corrupt_priest_add_slothful
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = envious
-							trait = kind
-						} 
-					}
-					set_character_flag = corrupt_priest_add_envious		
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = wroth
-							trait = patient
-						} 
-					}
-					set_character_flag = corrupt_priest_add_wroth		
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = proud
-							trait = humble
-						} 
-					}
-					set_character_flag = corrupt_priest_add_proud		
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = deceitful
-							trait = honest
-						} 
-					}
-					set_character_flag = corrupt_priest_add_deceitful		
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = arbitrary
-							trait = just
-						} 
-					}
-					set_character_flag = corrupt_priest_add_arbitrary		
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						OR = {
-							trait = cruel
-							trait = kind
-						} 
-					}
-					set_character_flag = corrupt_priest_add_cruel		
-				}
-			}
-		}
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7830 }
-		}
-	}
-}
-
-#Ping event for Corrupt a Priest remove virtue traits
-character_event = {
-	id = MNM.7828
-	hide_window = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		event_target:corrupt_priest_target = {
-			random_list = {
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = chaste } 
-					}
-					set_character_flag = corrupt_priest_remove_chaste
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = temperate } 
-					}
-					set_character_flag = corrupt_priest_remove_temperate
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = charitable } 
-					}
-					set_character_flag = corrupt_priest_remove_charitable
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = diligent } 
-					}
-					set_character_flag = corrupt_priest_remove_diligent
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = kind } 
-					}
-					set_character_flag = corrupt_priest_remove_kind	
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = patient } 
-					}
-					set_character_flag = corrupt_priest_remove_patient	
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = humble } 
-					}
-					set_character_flag = corrupt_priest_remove_humble	
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = honest } 
-					}
-					set_character_flag = corrupt_priest_remove_honest	
-				}
-				10 = {
-					modifier = {
-						factor = 0
-						NOT = { trait = just } 
-					}
-					set_character_flag = corrupt_priest_remove_just	
-				}
-			}
-		}
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7835 }
-		}
-	}
-}
-
-#Corrupt a priest add trait: corrupt them!
+# Corrupt a priest add trait: corrupt them!
 character_event = {
 	id = MNM.7830
 	picture = GFX_evt_eavesdropping
-	desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_lustful
-            }
-        }
-        text = EVTDESC_MNM_7830_lustful
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_gluttonous
-            }
-        }
-        text = EVTDESC_MNM_7830_gluttonous
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_greedy
-            }
-        }
-        text = EVTDESC_MNM_7830_greedy
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_add_slothful
-            }
-        }
-        text = EVTDESC_MNM_7830_slothful
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_envious
-            }
-        }
-        text = EVTDESC_MNM_7830_envious
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_wroth
-            }
-        }
-        text = EVTDESC_MNM_7830_wroth
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_add_proud
-            }
-        }
-        text = EVTDESC_MNM_7830_proud
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_deceitful
-            }
-        }
-        text = EVTDESC_MNM_7830_deceitful
-    }
-    desc = {
-        trigger = { 
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_arbitrary
-            }
-        }
-        text = EVTDESC_MNM_7830_arbitrary
-    }
-    desc = {
-        trigger = { 
-       		event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_add_cruel
-            }
-        }
-        text = EVTDESC_MNM_7830_cruel
-    }
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:corrupt_priest_target
 
-	is_triggered_only = yes
-
-	option = {
-		name = EVTOPTA_MNM_7830 #try to corrupt them
-		custom_tooltip = { text = EVTOPTA_MNM_7830_TOOLTIP }
-		hidden_effect = {
-			random_list = {
-				50 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7831 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				50 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
-				}
-			}	
-		}
-		ai_chance = {
-			factor = 33
-			modifier = {
-				factor = 0
-				OR = {
-					diplomacy = 15
-					intrigue = 15
-				}
-			}
-		}	
-	}
-	option = {
+	desc = {
+		text = EVTDESC_MNM_7830_lustful
 		trigger = {
-			AND = { 
-				has_society_currency_minor_trigger = yes
-				NAND = {
-					has_quest = quest_devil_worshipers_corrupt_priest
-					quest_target = { character = event_target:corrupt_priest_target }
-				}
-			}
-		}
-		name = EVTOPTB_MNM_7830 #use dark power to corrupt them
-		custom_tooltip = { text = EVTOPTB_MNM_7830_TOOLTIP }
-		hidden_effect = {
-			event_target:corrupt_priest_spell_caster = {
-				detract_society_currency_minor_effect = yes
-			}
 			event_target:corrupt_priest_target = {
-				character_event = { id = MNM.7831 days = 15 random = 45 } #success event
+				has_character_flag = corrupt_priest_add_lustful
 			}
 		}
-		ai_chance = { factor = 0 }		
 	}
-	option = {
-		name = EVTOPTC_MNM_7830 #use diplomacy to talk them into it
-		tooltip_info = diplomacy
+	desc = {
+		text = EVTDESC_MNM_7830_gluttonous
 		trigger = {
-			diplomacy = 15
-		}
-		custom_tooltip = { text = EVTOPTC_MNM_7830_TOOLTIP }
-		hidden_effect = {
-			random_list = {
-				90 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7831 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				10 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
-				}
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_gluttonous
 			}
 		}
-		ai_chance = {
-			factor = 33
-		}	
 	}
-	option = {
-		name = EVTOPTD_MNM_7830 #use learning to reason them into it
-		tooltip_info = learning
+	desc = {
+		text = EVTDESC_MNM_7830_greedy
 		trigger = {
-			learning = 15
-		}
-		custom_tooltip = { text = EVTOPTD_MNM_7830_TOOLTIP }
-		hidden_effect = {
-			random_list = {
-				90 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7831 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				10 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
-				}
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_greedy
 			}
 		}
-		ai_chance = {
-			factor = 33
-		}	
 	}
-}
-	
-
-#Ping event for corrupt a priest adding trait successful
-character_event = {
-	id = MNM.7831
-	hide_window = yes
+	desc = {
+		text = EVTDESC_MNM_7830_slothful
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_slothful
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_envious
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_envious
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_wroth
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_wroth
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_proud
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_proud
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_deceitful
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_deceitful
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_arbitrary
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_arbitrary
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7830_cruel
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_cruel
+			}
+		}
+	}
 
 	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_lustful
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_lustful_effect = yes
+		event_target:corrupt_priest_target = {
+			random_list = {
+				10 = {
+					trigger = {
+						NOR = {
+							trait = lustful
+							trait = chaste
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_lustful
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = gluttonous
+							trait = temperate
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_gluttonous
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = greedy
+							trait = charitable
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_greedy
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = slothful
+							trait = diligent
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_slothful
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = envious
+							trait = kind
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_envious
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = wroth
+							trait = patient
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_wroth
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = proud
+							trait = humble
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_proud
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = deceitful
+							trait = honest
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_deceitful
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = arbitrary
+							trait = just
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_arbitrary
+				}
+
+				10 = {
+					trigger = {
+						NOR = {
+							trait = cruel
+							trait = kind
+						}
+					}
+
+					set_character_flag = corrupt_priest_add_cruel
+				}
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_gluttonous
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_gluttonous_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_greedy
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_greedy_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_slothful
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_slothful_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_envious
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_envious_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_wroth
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_wroth_effect = yes
+	}
+
+	option = {
+		name = EVTOPTA_MNM_7830 # try to corrupt them
+
+		custom_tooltip = { text = EVTOPTA_MNM_7830_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				50 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					# Success
+					character_event = {
+						id = MNM.7832
+						days = 15
+						random = 45
+					}
+				}
+
+				50 = {
+					# Failure
+					character_event = {
+						id = MNM.7834
+						days = 15
+						random = 45
+					}
+				}
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_proud
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_proud_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_deceitful
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_deceitful_effect = yes
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				diplomacy < 15
+				intrigue < 15
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_arbitrary
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_arbitrary_effect = yes
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_add_cruel
-			}
-			event_target:corrupt_priest_target = {
-				add_trait_cruel_effect = yes
+	}
+
+	option = {
+		name = EVTOPTB_MNM_7830 # use dark power to corrupt them
+
+		trigger = {
+			has_society_currency_minor_trigger = yes
+
+			NAND = {
+				has_quest = quest_devil_worshipers_corrupt_priest
+				quest_target = { character = event_target:corrupt_priest_target }
 			}
 		}
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7832 }
+
+		custom_tooltip = { text = EVTOPTB_MNM_7830_TOOLTIP }
+
+		detract_society_currency_minor_effect = yes
+
+		character_event = {
+			id = MNM.7832 # Success
+			days = 15
+			random = 45
+		}
+
+		ai_chance = { factor = 0 }
+	}
+
+	option = {
+		name = EVTOPTC_MNM_7830 # use diplomacy to talk them into it
+		tooltip_info = diplomacy
+
+		trigger = { diplomacy >= 15 }
+
+		custom_tooltip = { text = EVTOPTC_MNM_7830_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				90 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					character_event = {
+						id = MNM.7832 # Success
+						days = 15
+						random = 45
+					}
+				}
+				10 = {
+					character_event = {
+						id = MNM.7834 # Failure
+						days = 15
+						random = 45
+					}
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTD_MNM_7830 # use learning to reason them into it
+		tooltip_info = learning
+
+		trigger = { learning >= 15 }
+
+		custom_tooltip = { text = EVTOPTD_MNM_7830_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				90 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					character_event = {
+						id = MNM.7832 # Success
+						days = 15
+						random = 45
+					}
+				}
+
+				10 = {
+					character_event = {
+						id = MNM.7834 # Failure
+						days = 15
+						random = 45
+					}
+				}
+			}
 		}
 	}
 }
 
-#Corrupt a Priest successful corruption notification
+# Corrupt a Priest successful corruption notification
 character_event = {
 	id = MNM.7832
 	picture = GFX_evt_shady_meeting
-	###default descriptions
-	desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {
-       			AND = { 
-            		has_character_flag = corrupt_priest_add_lustful
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_lustful
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_gluttonous
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_gluttonous
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_greedy
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_greedy
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_slothful
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_slothful
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_envious
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_envious
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_wroth
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_wroth
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_proud
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_proud
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_deceitful
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_deceitful
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_arbitrary
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_arbitrary
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	AND = { 
-            		has_character_flag = corrupt_priest_add_cruel
-            		NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_cruel
-    }
-
-    ###bonus descriptions if resulting from event id = MNM.7836
-
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {
-       			AND = {
-       				OR = {
-       					has_character_flag = corrupt_priest_add_lustful
-            			has_character_flag = corrupt_priest_add_gluttonous
-            			has_character_flag = corrupt_priest_add_greedy
-            			has_character_flag = corrupt_priest_add_slothful
-            			has_character_flag = corrupt_priest_add_envious
-            			has_character_flag = corrupt_priest_add_wroth
-            			has_character_flag = corrupt_priest_add_proud
-            			has_character_flag = corrupt_priest_add_deceitful
-            			has_character_flag = corrupt_priest_add_arbitrary
-            			has_character_flag = corrupt_priest_add_cruel
-       				} 
-            		has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption }
-            	}
-            }
-        }
-        text = EVTDESC_MNM_7832_bonus
-    }
-
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:corrupt_priest_target
 
-	is_triggered_only = yes
-
-	option = {
-		name = EVTOPTA_MNM_7832 #event option if standard event
+	### default descriptions
+	desc = {
+		text = EVTDESC_MNM_7832_lustful
 		trigger = {
 			event_target:corrupt_priest_target = {
-				NOT = { has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption } }
+				has_character_flag = corrupt_priest_add_lustful
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
 			}
 		}
-		custom_tooltip = { text = EVTOPTA_MNM_7832_TOOLTIP }
-		reverse_opinion = {
-			who = event_target:corrupt_priest_target
-			modifier = opinion_successful_corruption
-			years = 100
-		}
-		if = {
-			limit = {
-				event_target:corrupt_priest_spell_caster = { ai = no }
-			}
-			event_target:corrupt_priest_target = { set_character_flag = corrupted_by_player }
-		}
-		hidden_effect = {
-			event_target:corrupt_priest_target = {
-				clr_character_flag = corrupt_priest_add_lustful
-				clr_character_flag = corrupt_priest_add_gluttonous
-				clr_character_flag = corrupt_priest_add_greedy
-				clr_character_flag = corrupt_priest_add_slothful
-				clr_character_flag = corrupt_priest_add_envious
-				clr_character_flag = corrupt_priest_add_wroth
-				clr_character_flag = corrupt_priest_add_proud
-				clr_character_flag = corrupt_priest_add_deceitful
-				clr_character_flag = corrupt_priest_add_arbitrary
-				clr_character_flag = corrupt_priest_add_cruel
-				clr_character_flag = attempted_corrupt_priest
-			}
-			event_target:corrupt_priest_spell_caster = {
-				if = {
-					limit = {
-						NAND = {
-							has_quest = quest_devil_worshipers_corrupt_priest
-							quest_target = { character = event_target:corrupt_priest_target }
-						}
-					}
-					add_society_currency_minor_effect = yes
-				}
-				#If quest holder, clear quest and reward
-				if = {
-					limit = { 
-						has_quest = quest_devil_worshipers_corrupt_priest
-						quest_target = { character = event_target:corrupt_priest_target }
-					} 
-					clr_quest = quest_devil_worshipers_corrupt_priest
-					sound_effect = devil_worshippers_corrupt_priest
-		
-					if = {
-						limit = { event_target:corrupt_priest_target = { higher_tier_than = DUKE } }
-						add_society_currency_major_effect = yes
-					}
-					if = {
-						limit = { event_target:corrupt_priest_target = { tier = DUKE } } 
-						add_society_currency_medium_effect = yes
-					}
-					if = {
-						limit = { event_target:corrupt_priest_target = { lower_tier_than = DUKE } }
-						add_society_currency_minor_effect = yes
-					}
-				}
-				if = {
-					limit = {
-						NOT = { trait = creature_fiend }
-					}
-                    minor_soul_corruption_effect = yes
-				}                
-			}
-		}	
 	}
-
-	option = {
-		name = EVTOPTB_MNM_7832 #event option if bonus event
+	desc = {
+		text = EVTDESC_MNM_7832_gluttonous
 		trigger = {
 			event_target:corrupt_priest_target = {
-				has_opinion_modifier = { who = event_target:corrupt_priest_spell_caster modifier = opinion_successful_corruption }
+				has_character_flag = corrupt_priest_add_gluttonous
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
 			}
 		}
-		custom_tooltip = { text = EVTOPTB_MNM_7832_TOOLTIP }
-		hidden_effect = {
-			event_target:corrupt_priest_spell_caster = {
-				add_society_currency_medium_effect = yes
-			}
-			event_target:corrupt_priest_target = {
-				clr_character_flag = corrupt_priest_add_lustful
-				clr_character_flag = corrupt_priest_add_gluttonous
-				clr_character_flag = corrupt_priest_add_greedy
-				clr_character_flag = corrupt_priest_add_slothful
-				clr_character_flag = corrupt_priest_add_envious
-				clr_character_flag = corrupt_priest_add_wroth
-				clr_character_flag = corrupt_priest_add_proud
-				clr_character_flag = corrupt_priest_add_deceitful
-				clr_character_flag = corrupt_priest_add_arbitrary
-				clr_character_flag = corrupt_priest_add_cruel
-			}
-		}	
 	}
-}
+	desc = {
+		text = EVTDESC_MNM_7832_greedy
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_greedy
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_slothful
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_slothful
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_envious
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_envious
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_wroth
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_wroth
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_proud
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_proud
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_deceitful
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_deceitful
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_arbitrary
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_arbitrary
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7832_cruel
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_add_cruel
+				NOT = { has_opinion_modifier = { who = ROOT name = opinion_successful_corruption } }
+			}
+		}
+	}
 
-#Ping event for corrupt a priest adding trait failure
-character_event = {
-	id = MNM.7833
-	hide_window = yes
+	### bonus descriptions if resulting from event id = MNM.7836
+	desc = {
+		text = EVTDESC_MNM_7832_bonus
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_opinion_modifier = {
+					name = opinion_successful_corruption
+					who = ROOT
+				}
+
+				OR = {
+					has_character_flag = corrupt_priest_add_lustful
+					has_character_flag = corrupt_priest_add_gluttonous
+					has_character_flag = corrupt_priest_add_greedy
+					has_character_flag = corrupt_priest_add_slothful
+					has_character_flag = corrupt_priest_add_envious
+					has_character_flag = corrupt_priest_add_wroth
+					has_character_flag = corrupt_priest_add_proud
+					has_character_flag = corrupt_priest_add_deceitful
+					has_character_flag = corrupt_priest_add_arbitrary
+					has_character_flag = corrupt_priest_add_cruel
+				}
+			}
+		}
+	}
 
 	is_triggered_only = yes
 
 	immediate = {
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7834 }
+		event_target:corrupt_priest_target = {
+			trigger_switch = {
+				on_trigger = has_character_flag
+
+				corrupt_priest_add_lustful    = { add_trait_lustful_effect = yes }
+				corrupt_priest_add_gluttonous = { add_trait_gluttonous_effect = yes }
+				corrupt_priest_add_greedy     = { add_trait_greedy_effect = yes }
+				corrupt_priest_add_slothful   = { add_trait_slothful_effect = yes }
+				corrupt_priest_add_envious    = { add_trait_envious_effect = yes }
+				corrupt_priest_add_wroth      = { add_trait_wroth_effect = yes }
+				corrupt_priest_add_proud      = { add_trait_proud_effect = yes }
+				corrupt_priest_add_deceitful  = { add_trait_deceitful_effect = yes }
+				corrupt_priest_add_arbitrary  = { add_trait_arbitrary_effect = yes }
+				corrupt_priest_add_cruel      = { add_trait_cruel_effect = yes }
+			}
 		}
-	}
-}
-
-#Corrupt a Priest failed corruption notification
-character_event = {
-	id = MNM.7834
-	picture = GFX_evt_scandal
-	desc = EVTDESC_MNM_7834
-	border = GFX_event_normal_frame_intrigue
-
-	is_triggered_only = yes
-	
-	trigger = {
-		is_alive = yes
 	}
 
 	option = {
-		name = EVTOPTA_MNM_7834
-		custom_tooltip = { text = EVTOPTA_MNM_7834_TOOLTIP }
-		hidden_effect = {
-			increase_visibility_effect = yes
-			reverse_opinion = {
-				who = event_target:corrupt_priest_target
-				modifier = opinion_failed_corruption
-				years = 10
-			}
-			any_realm_character = { #exposed corrupter -10
-				opinion = {
-					who = event_target:corrupt_priest_spell_caster
-					modifier = opinion_known_corrupter
-					years = 10
+		name = EVTOPTA_MNM_7832 # event option if standard event
+
+		trigger = {
+			NOT = {
+				reverse_has_opinion_modifier = {
+					name = opinion_successful_corruption
+					who = event_target:corrupt_priest_target
 				}
 			}
-			event_target:corrupt_priest_target = {
-				clr_character_flag = corrupt_priest_add_lustful
-				clr_character_flag = corrupt_priest_add_gluttonous
-				clr_character_flag = corrupt_priest_add_greedy
-				clr_character_flag = corrupt_priest_add_slothful
-				clr_character_flag = corrupt_priest_add_envious
-				clr_character_flag = corrupt_priest_add_wroth
-				clr_character_flag = corrupt_priest_add_proud
-				clr_character_flag = corrupt_priest_add_deceitful
-				clr_character_flag = corrupt_priest_add_arbitrary
-				clr_character_flag = corrupt_priest_add_cruel
-				clr_character_flag = attempted_corrupt_priest
-			}
 		}
+
+		custom_tooltip = { text = EVTOPTA_MNM_7832_TOOLTIP }
+
+		reverse_opinion = {
+			name = opinion_successful_corruption
+			who = event_target:corrupt_priest_target
+			years = 100
+		}
+
+		event_target:corrupt_priest_target = {
+			clr_character_flag = corrupt_priest_add_lustful
+			clr_character_flag = corrupt_priest_add_gluttonous
+			clr_character_flag = corrupt_priest_add_greedy
+			clr_character_flag = corrupt_priest_add_slothful
+			clr_character_flag = corrupt_priest_add_envious
+			clr_character_flag = corrupt_priest_add_wroth
+			clr_character_flag = corrupt_priest_add_proud
+			clr_character_flag = corrupt_priest_add_deceitful
+			clr_character_flag = corrupt_priest_add_arbitrary
+			clr_character_flag = corrupt_priest_add_cruel
+			clr_character_flag = attempted_corrupt_priest
+		}
+
+		# If quest holder, clear quest and reward
 		if = {
 			limit = {
 				has_quest = quest_devil_worshipers_corrupt_priest
+				quest_target = { character = event_target:corrupt_priest_target }
 			}
-			clr_quest = { id = quest_devil_worshipers_corrupt_priest failure = yes } 
-		}	
+
+			clr_quest = quest_devil_worshipers_corrupt_priest
+
+			if = {
+				limit = { event_target:corrupt_priest_target = { higher_real_tier_than = DUKE } }
+				add_society_currency_major_effect = yes
+			}
+			else_if = {
+				limit = { event_target:corrupt_priest_target = { real_tier = DUKE } }
+				add_society_currency_medium_effect = yes
+			}
+			else = {
+				add_society_currency_minor_effect = yes
+			}
+		}
+		else = {
+			add_society_currency_minor_effect = yes
+		}
+
+		sound_effect = devil_worshippers_corrupt_priest
+		hidden_effect = { minor_soul_corruption_effect = yes }
+	}
+
+	option = {
+		name = EVTOPTB_MNM_7832 # event option if bonus event
+
+		trigger = {
+			reverse_has_opinion_modifier = {
+				name = opinion_successful_corruption
+				who = event_target:corrupt_priest_target
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTB_MNM_7832_TOOLTIP }
+
+		add_society_currency_medium_effect = yes
+
+		hidden_effect = {
+			event_target:corrupt_priest_target = {
+				clr_character_flag = corrupt_priest_add_lustful
+				clr_character_flag = corrupt_priest_add_gluttonous
+				clr_character_flag = corrupt_priest_add_greedy
+				clr_character_flag = corrupt_priest_add_slothful
+				clr_character_flag = corrupt_priest_add_envious
+				clr_character_flag = corrupt_priest_add_wroth
+				clr_character_flag = corrupt_priest_add_proud
+				clr_character_flag = corrupt_priest_add_deceitful
+				clr_character_flag = corrupt_priest_add_arbitrary
+				clr_character_flag = corrupt_priest_add_cruel
+			}
+		}
 	}
 }
 
-#Corrupt a priest remove trait: corrupt them!
+# Corrupt a Priest failed corruption notification
 character_event = {
-	id = MNM.7835
-	picture = GFX_evt_eavesdropping
-	desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_chaste
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_chaste
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_temperate
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_temperate
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_charitable
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_charitable
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_diligent
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_diligent
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_kind
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_kind
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_patient
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_patient
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_humble
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_humble
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_honest
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_honest
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {  
-            	has_character_flag = corrupt_priest_remove_just
-        	}
-        }
-        text = EVTDESC_MNM_7835_remove_just
-    }
+	id = MNM.7834
+	desc = EVTDESC_MNM_7834
+	picture = GFX_evt_scandal
 	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:corrupt_priest_target
 
 	is_triggered_only = yes
 
 	option = {
-		name = EVTOPTA_MNM_7835 #try to corrupt them
-		custom_tooltip = { text = EVTOPTA_MNM_7835_TOOLTIP }
+		name = EVTOPTA_MNM_7834
+
+		custom_tooltip = { text = EVTOPTA_MNM_7834_TOOLTIP }
+
+		increase_visibility_effect = yes
+
 		hidden_effect = {
-			random_list = {
-				50 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7836 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				50 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
+			reverse_opinion = {
+				name = opinion_failed_corruption
+				who = event_target:corrupt_priest_target
+				years = 10
+			}
+
+			any_realm_character = { # exposed corrupter -10
+				opinion = {
+					name = opinion_known_corrupter
+					who = ROOT
+					years = 10
 				}
 			}
-		}
-		ai_chance = {
-			factor = 33
-			modifier = {
-				factor = 0
-				OR = {
-					diplomacy = 15
-					intrigue = 15
-				}
-			}
-		}		
-	}
-	option = {
-		trigger = {
-			AND = { 
-				has_society_currency_minor_trigger = yes
-				NAND = {
-					has_quest = quest_devil_worshipers_corrupt_priest
-					quest_target = { character = event_target:corrupt_priest_target }
-				}
-			}
-		}
-		name = EVTOPTB_MNM_7835 #use dark power to corrupt them
-		custom_tooltip = { text = EVTOPTB_MNM_7835_TOOLTIP }
-		hidden_effect = {
-			event_target:corrupt_priest_spell_caster = {
-				detract_society_currency_minor_effect = yes
-			}
+
 			event_target:corrupt_priest_target = {
-				character_event = { id = MNM.7836 days = 15 random = 45 } #success event
+				clr_character_flag = corrupt_priest_add_lustful
+				clr_character_flag = corrupt_priest_add_gluttonous
+				clr_character_flag = corrupt_priest_add_greedy
+				clr_character_flag = corrupt_priest_add_slothful
+				clr_character_flag = corrupt_priest_add_envious
+				clr_character_flag = corrupt_priest_add_wroth
+				clr_character_flag = corrupt_priest_add_proud
+				clr_character_flag = corrupt_priest_add_deceitful
+				clr_character_flag = corrupt_priest_add_arbitrary
+				clr_character_flag = corrupt_priest_add_cruel
+				clr_character_flag = attempted_corrupt_priest
 			}
 		}
-		ai_chance = { factor = 0 }		
-	}
-	option = {
-		name = EVTOPTC_MNM_7835 #use diplomacy to talk them into it
-		tooltip_info = diplomacy
-		trigger = {
-			diplomacy = 15
-		}
-		custom_tooltip = { text = EVTOPTC_MNM_7835_TOOLTIP }
-		hidden_effect = {
-			random_list = {
-				90 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7836 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				10 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
-				}
-			}	
-		}
-		ai_chance = {
-			factor = 33
-		}
-	}
-	option = {
-		name = EVTOPTD_MNM_7835 #use learning to reason them into it
-		tooltip_info = learning
-		trigger = {
-			learning = 15
-		}
-		custom_tooltip = { text = EVTOPTD_MNM_7835_TOOLTIP }
-		hidden_effect = {
-			random_list = {
-				90 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7836 days = 15 random = 45 } #success event
-						}
-					}
-				}
-				10 = {
-					hidden_effect = {
-						event_target:corrupt_priest_target = {
-							character_event = { id = MNM.7833 days = 15 random = 45 } #failure event
-						}
-					}
-				}
-			}	
-		}
-		ai_chance = {
-			factor = 33
+
+		if = {
+			limit = { has_quest = quest_devil_worshipers_corrupt_priest }
+
+			clr_quest = {
+				id = quest_devil_worshipers_corrupt_priest
+				failure = yes
+			}
 		}
 	}
 }
 
-#Ping event for corrupt a priest removing trait successful, leads back to event id = MNM.7831 (because recycling = awesome!)
+# Corrupt a priest remove trait: corrupt them!
 character_event = {
-	id = MNM.7836
-	hide_window = yes
+	id = MNM.7835
+	picture = GFX_evt_eavesdropping
+	border = GFX_event_normal_frame_intrigue
+	portrait = event_target:corrupt_priest_target
+
+	desc = {
+		text = EVTDESC_MNM_7835_remove_chaste
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_chaste
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_temperate
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_temperate
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_charitable
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_charitable
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_diligent
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_diligent
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_kind
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_kind
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_patient
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_patient
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_humble
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_humble
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_honest
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_honest
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7835_remove_just
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_just
+			}
+		}
+	}
 
 	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_chaste
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_chaste_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_lustful
-					character_event = { id = MNM.7831 days = 30 random = 330 }
+		event_target:corrupt_priest_target = {
+			random_list = {
+				10 = {
+					trigger = { trait = chaste }
+					set_character_flag = corrupt_priest_remove_chaste
+				}
+
+				10 = {
+					trigger = { trait = temperate }
+					set_character_flag = corrupt_priest_remove_temperate
+				}
+
+				10 = {
+					trigger = { trait = charitable }
+					set_character_flag = corrupt_priest_remove_charitable
+				}
+
+				10 = {
+					trigger = { trait = diligent }
+					set_character_flag = corrupt_priest_remove_diligent
+				}
+
+				10 = {
+					trigger = { trait = kind }
+					set_character_flag = corrupt_priest_remove_kind
+				}
+
+				10 = {
+					trigger = { trait = patient }
+					set_character_flag = corrupt_priest_remove_patient
+				}
+
+				10 = {
+					trigger = { trait = humble }
+					set_character_flag = corrupt_priest_remove_humble
+				}
+
+				10 = {
+					trigger = { trait = honest }
+					set_character_flag = corrupt_priest_remove_honest
+				}
+
+				10 = {
+					trigger = { trait = just }
+					set_character_flag = corrupt_priest_remove_just
 				}
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_temperate
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_temperate_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_gluttonous
-					character_event = { id = MNM.7831 days = 30 random = 330 }
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_charitable
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_charitable_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_greedy
-					character_event = { id = MNM.7831 days = 30 random = 330 }
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_diligent
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_diligent_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_slothful
-					character_event = { id = MNM.7831 days = 30 random = 330 }
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_kind
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_kind_effect = yes
-				random_list = {
-					5 = {
-						set_character_flag = corrupt_priest_add_envious
-						character_event = { id = MNM.7831 days = 30 random = 330 }
+	}
+
+	option = {
+		name = EVTOPTA_MNM_7835 # try to corrupt them
+
+		custom_tooltip = { text = EVTOPTA_MNM_7835_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				50 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					character_event = {
+						id = MNM.7837 # Success
+						days = 15
+						random = 45
 					}
-					5 = {
-						set_character_flag = corrupt_priest_add_cruel
-						character_event = { id = MNM.7831 days = 30 random = 330 }
+				}
+				50 = {
+					character_event = {
+						id = MNM.7834 # Failure
+						days = 15
+						random = 45
 					}
-					90 = { }
 				}
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_patient
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				diplomacy < 15
+				intrigue < 15
 			}
-			event_target:corrupt_priest_target = {
-				remove_trait_patient_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_wroth
-					character_event = { id = MNM.7831 days = 30 random = 330 }
+		}
+	}
+
+	option = {
+		name = EVTOPTB_MNM_7830 # use dark power to corrupt them
+
+		trigger = {
+			has_society_currency_minor_trigger = yes
+
+			NAND = {
+				has_quest = quest_devil_worshipers_corrupt_priest
+				quest_target = { character = event_target:corrupt_priest_target }
+			}
+		}
+
+		custom_tooltip = { text = EVTOPTB_MNM_7830_TOOLTIP }
+
+		detract_society_currency_minor_effect = yes
+
+		character_event = {
+			id = MNM.7837 # Success
+			days = 15
+			random = 45
+		}
+
+		ai_chance = { factor = 0 }
+	}
+
+	option = {
+		name = EVTOPTC_MNM_7835 # use diplomacy to talk them into it
+		tooltip_info = diplomacy
+
+		trigger = { diplomacy >= 15 }
+
+		custom_tooltip = { text = EVTOPTC_MNM_7835_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				90 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					character_event = {
+						id = MNM.7837 # Success
+						days = 15
+						random = 45
+					}
+				}
+				10 = {
+					character_event = {
+						id = MNM.7834 # Failure
+						days = 15
+						random = 45
+					}
 				}
 			}
 		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_humble
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_humble_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_proud
-					character_event = { id = MNM.7831 days = 30 random = 330 }
+	}
+
+	option = {
+		name = EVTOPTD_MNM_7835 # use learning to reason them into it
+		tooltip_info = learning
+
+		trigger = { learning >= 15 }
+
+		custom_tooltip = { text = EVTOPTD_MNM_7835_TOOLTIP }
+
+		hidden_effect = {
+			random_list = {
+				90 = {
+					#mult_modifier = {
+					#	factor = 2
+					#	event_target:corrupt_priest_target = {
+					#		has_bad_priest_trait_trigger = yes
+					#	}
+					#}
+
+					character_event = {
+						id = MNM.7837 # Success
+						days = 15
+						random = 45
+					}
+				}
+				10 = {
+					character_event = {
+						id = MNM.7834 # Failure
+						days = 15
+						random = 45
+					}
 				}
 			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_honest
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_honest_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_deceitful
-					character_event = { id = MNM.7831 days = 30 random = 330 }
-				}
-			}
-		}
-		if = {
-			limit = {
-				has_character_flag = corrupt_priest_remove_just
-			}
-			event_target:corrupt_priest_target = {
-				remove_trait_just_effect = yes
-				random = {
-					chance = 10
-					set_character_flag = corrupt_priest_add_arbitrary
-					character_event = { id = MNM.7831 days = 30 random = 330 }
-				}
-			}
-		}
-		event_target:corrupt_priest_spell_caster = {
-			character_event = { id = MNM.7837 }
 		}
 	}
 }
 
-#Corrupt a Priest successful corruption notification (remove trait)
+# Corrupt a Priest successful corruption notification (remove trait), leads back to event id = MNM.7832 (because recycling = awesome!)
 character_event = {
 	id = MNM.7837
 	picture = GFX_evt_shady_meeting
-	desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = {        	
-            	has_character_flag = corrupt_priest_remove_chaste
-        	}
-        }
-        text = EVTDESC_MNM_7837_chaste
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_temperate
-        	}
-        }
-        text = EVTDESC_MNM_7837_temperate
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_charitable
-        	}
-        }
-        text = EVTDESC_MNM_7837_charitable
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_diligent
-        	}
-        }
-        text = EVTDESC_MNM_7837_diligent
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_kind
-        	}
-        }
-        text = EVTDESC_MNM_7837_kind
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_patient
-        	}
-        }
-        text = EVTDESC_MNM_7837_patient
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_humble
-        	}
-        }
-        text = EVTDESC_MNM_7837_humble
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_honest
-        	}
-        }
-        text = EVTDESC_MNM_7837_honest
-    }
-    desc = {
-        trigger = {
-        	event_target:corrupt_priest_target = { 
-            	has_character_flag = corrupt_priest_remove_just
-        	}
-        }
-        text = EVTDESC_MNM_7837_just
-    }
-
 	border = GFX_event_normal_frame_intrigue
+
+	desc = {
+		text = EVTDESC_MNM_7837_chaste
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_chaste
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_temperate
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_temperate
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_charitable
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_charitable
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_diligent
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_diligent
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_kind
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_kind
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_patient
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_patient
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_humble
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_humble
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_honest
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_honest
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_7837_just
+		trigger = {
+			event_target:corrupt_priest_target = {
+				has_character_flag = corrupt_priest_remove_just
+			}
+		}
+	}
 
 	is_triggered_only = yes
 
-	option = {
-		name = EVTOPTA_MNM_7837
-		custom_tooltip = { text = EVTOPTA_MNM_7837_TOOLTIP }
-		reverse_opinion = {
-			who = event_target:corrupt_priest_target
-			modifier = opinion_successful_corruption
-			years = 100
-		}
-		if = {
-			limit = {
-				event_target:corrupt_priest_spell_caster = { ai = no }
-			}
-			event_target:corrupt_priest_target = { set_character_flag = corrupted_by_player }
-		}
-		hidden_effect = {
-			event_target:corrupt_priest_target = {
-				clr_character_flag = corrupt_priest_remove_chaste
-				clr_character_flag = corrupt_priest_remove_temperate
-				clr_character_flag = corrupt_priest_remove_charitable
-				clr_character_flag = corrupt_priest_remove_diligent
-				clr_character_flag = corrupt_priest_remove_kind
-				clr_character_flag = corrupt_priest_remove_patient
-				clr_character_flag = corrupt_priest_remove_humble
-				clr_character_flag = corrupt_priest_remove_honest
-				clr_character_flag = corrupt_priest_remove_just
-				clr_character_flag = attempted_corrupt_priest
-			}
-			event_target:corrupt_priest_spell_caster = {
-				#If not quest holder, give some currency
-				if = {
-					limit = {
-						NAND = { 
-							has_quest = quest_devil_worshipers_corrupt_priest
-							quest_target = { character = event_target:corrupt_priest_target }
+	immediate = {
+		event_target:corrupt_priest_target = {
+			trigger_switch = {
+				on_trigger = has_character_flag
+
+				corrupt_priest_remove_chaste = {
+					remove_trait_chaste_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_lustful
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
 						}
 					}
-					add_society_currency_minor_effect = yes
 				}
-				#If quest holder, clear quest and reward
-				if = {
-					limit = {
-						has_quest = quest_devil_worshipers_corrupt_priest
-						quest_target = { character = event_target:corrupt_priest_target }
-					} 
-					clr_quest = quest_devil_worshipers_corrupt_priest
-					sound_effect = devil_worshippers_corrupt_priest
-		
-					if = {
-						limit = { event_target:corrupt_priest_target = { higher_tier_than = DUKE } }
-						add_society_currency_major_effect = yes
-					}
-					if = {
-						limit = { event_target:corrupt_priest_target = { tier = DUKE } } 
-						add_society_currency_medium_effect = yes
-					}
-					if = {
-						limit = { event_target:corrupt_priest_target = { lower_tier_than = DUKE } }
-						add_society_currency_minor_effect = yes
+
+				corrupt_priest_remove_temperate = {
+					remove_trait_temperate_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_gluttonous
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
 					}
 				}
-				if = {
-					limit = {
-						NOT = { trait = creature_fiend }
+				corrupt_priest_remove_charitable = {
+					remove_trait_charitable_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_greedy
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
 					}
-                    minor_soul_corruption_effect = yes
-				}                
+				}
+				corrupt_priest_remove_diligent = {
+					remove_trait_diligent_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_slothful
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
+					}
+				}
+				corrupt_priest_remove_kind = {
+					remove_trait_kind_effect = yes
+
+					random_list = {
+						5 = {
+							set_character_flag = corrupt_priest_add_envious
+
+							ROOT = {
+								character_event = {
+									id = MNM.7832
+									days = 30
+									random = 330
+								}
+							}
+						}
+
+						5 = {
+							set_character_flag = corrupt_priest_add_cruel
+
+							ROOT = {
+								character_event = {
+									id = MNM.7832
+									days = 30
+									random = 330
+								}
+							}
+						}
+
+						90 = { }
+					}
+				}
+
+				corrupt_priest_remove_patient = {
+					remove_trait_patient_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_wroth
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
+					}
+				}
+
+				corrupt_priest_remove_humble = {
+					remove_trait_humble_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_proud
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
+					}
+				}
+
+				corrupt_priest_remove_honest = {
+					remove_trait_honest_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_deceitful
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
+					}
+				}
+				corrupt_priest_remove_just = {
+					remove_trait_just_effect = yes
+
+					random = {
+						chance = 10
+
+						set_character_flag = corrupt_priest_add_arbitrary
+
+						ROOT = {
+							character_event = {
+								id = MNM.7832
+								days = 30
+								random = 330
+							}
+						}
+					}
+				}
 			}
-		}	
+		}
+	}
+
+	option = {
+		name = EVTOPTA_MNM_7837
+
+		custom_tooltip = { text = EVTOPTA_MNM_7837_TOOLTIP }
+
+		reverse_opinion = {
+			name = opinion_successful_corruption
+			who = event_target:corrupt_priest_target
+			years = 100
+		}
+
+		event_target:corrupt_priest_target = {
+			clr_character_flag = corrupt_priest_remove_chaste
+			clr_character_flag = corrupt_priest_remove_temperate
+			clr_character_flag = corrupt_priest_remove_charitable
+			clr_character_flag = corrupt_priest_remove_diligent
+			clr_character_flag = corrupt_priest_remove_kind
+			clr_character_flag = corrupt_priest_remove_patient
+			clr_character_flag = corrupt_priest_remove_humble
+			clr_character_flag = corrupt_priest_remove_honest
+			clr_character_flag = corrupt_priest_remove_just
+			clr_character_flag = attempted_corrupt_priest
+		}
+
+		sound_effect = devil_worshippers_corrupt_priest
+
+		# If quest holder, clear quest and reward
+		if = {
+			limit = {
+				has_quest = quest_devil_worshipers_corrupt_priest
+				quest_target = { character = event_target:corrupt_priest_target }
+			}
+
+			clr_quest = quest_devil_worshipers_corrupt_priest
+
+			if = {
+				limit = { event_target:corrupt_priest_target = { higher_real_tier_than = DUKE } }
+				add_society_currency_major_effect = yes
+			}
+			else_if = {
+				limit = { event_target:corrupt_priest_target = { real_tier = DUKE } }
+				add_society_currency_medium_effect = yes
+			}
+			else = {
+				add_society_currency_minor_effect = yes
+			}
+		}
+		# If not quest holder, give some currency
+		else = {
+			add_society_currency_minor_effect = yes
+		}
+
+		hidden_effect = { minor_soul_corruption_effect = yes }
 	}
 }
 

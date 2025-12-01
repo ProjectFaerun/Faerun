@@ -2241,58 +2241,41 @@ targeted_decisions = {
 		}
 	}
 
-	#Action: corrupt a priest
+	# Action: corrupt a priest
 	devil_worshipers_corrupt_priest = {
-		only_playable = yes
-		is_in_society = yes
 		ai_target_filter = realm
 		ai_check_interval = 12
 
+		is_in_society = yes
+		only_playable = yes
+
 		from_potential = {
-			is_devil_worshiper_trigger = yes
+			society_member_of = the_satanists
 			society_rank > 1
 		}
 
 		potential = {
+			trigger_if = {
+				limit = { FROM = { ai = no } }
+				is_within_diplo_range = FROM
+			}
+
 			ai = yes
-			is_within_diplo_range = FROM
 			religion = FROM
+
 			OR = {
-				AND = {
-					same_realm = FROM
-					OR = {
-						AND = {
-							is_landed = yes
-							capital_holding = { holding_type = temple }
-						}
-					    AND = {
-					        tier = baron
-					        liege = {
-					            any_demesne_province = {
-					                any_province_holding = {
-					                    owner = { character = ROOT }
-					                    holding_type = temple
-					                }
-					            }
-					        }
-					    }
-					}
-				}
 				FROM = {
 					has_quest = quest_devil_worshipers_corrupt_priest
 					quest_target = { character = ROOT }
 				}
-			}
 
-			OR = {
-				is_inaccessible_trigger = no
 				AND = {
-					FROM = {
-						has_character_modifier = in_seclusion
-						at_location = ROOT
-					}
-					ROOT = {
-						has_character_modifier = in_seclusion
+					same_realm = FROM
+					is_ruler = yes
+					OR = {
+						is_theocracy = yes
+						government = theocracy_government
+						z_cleric = yes
 					}
 				}
 			}
@@ -2303,101 +2286,119 @@ targeted_decisions = {
 				prisoner = no
 				is_incapable = no
 
+				OR = {
+					has_society_currency_tiny_trigger = yes
+
+					custom_tooltip = {
+						text = corrupt_priest_has_quest
+
+						has_quest = quest_devil_worshipers_corrupt_priest
+					}
+				}
+
 				custom_tooltip = {
 					text = is_accessible
-					OR = {
-						is_inaccessible_trigger = no
-						AND = {
-							FROM = {
-								has_character_modifier = in_seclusion
-								at_location = ROOT
-							}
-							ROOT = {
-								has_character_modifier = in_seclusion
-							}
+
+					trigger_if = {
+						limit = { is_inaccessible_trigger = yes }
+
+						in_seclusion = yes
+						at_location = ROOT
+
+						ROOT = {
+							in_seclusion = yes
 						}
 					}
 				}
+
 				OR = {
 					custom_tooltip = {
 						text = corrupt_priest_not_recently_attempted
+
 						ROOT = {
 							NOR = {
 								has_character_flag = attempted_corrupt_priest
-								has_opinion_modifier = { who = FROM modifier = opinion_successful_corruption }
-								has_opinion_modifier = { who = FROM modifier = opinion_failed_corruption }
+
+								has_opinion_modifier = {
+									name = opinion_successful_corruption
+									who = FROM
+								}
+
+								has_opinion_modifier = {
+									name = opinion_failed_corruption
+									who = FROM
+								}
 							}
 						}
 					}
+
 					custom_tooltip = {
 						text = corrupt_priest_has_quest
+
 						has_quest = quest_devil_worshipers_corrupt_priest
 					}
 				}
 			}
+
 			ROOT = {
 				prisoner = no
-
-				NOT = { trait = incapable }
-
+				is_incapable = no
 				is_inaccessible_trigger = no
 			}
 		}
 
 		effect = {
-			if = {
-				limit = {
-					NOT = {
-						is_quest_target_of = FROM
+			custom_tooltip = { text = corrupt_priest_effect_TOOLTIP }
+			save_event_target_as = corrupt_priest_target
+			set_character_flag = attempted_corrupt_priest
+
+			FROM = {
+				show_scope_change = no
+
+				save_event_target_as = corrupt_priest_spell_caster
+
+				if = {
+					limit = {
+						has_quest = quest_devil_worshipers_corrupt_priest
+						ROOT = { is_quest_target_of = FROM }
 					}
-				}
-				FROM = {
-					increase_visibility_effect = yes
-				}
-			}
-			if = {
-				limit = {
-					is_quest_target_of = FROM
-				}
-				FROM = {
+
 					increase_visibility_minor_effect = yes
 				}
-			}
-			custom_tooltip = {
-				text = corrupt_priest_effect_TOOLTIP
-			}
-			ROOT = {
-				set_character_flag = attempted_corrupt_priest
-				hidden_effect = {
-					character_event = { id = MNM.7825 days = 3 random = 7 }
+				else = {
+					increase_visibility_effect = yes
+					detract_society_currency_tiny_effect = yes
+				}
+
+				character_event = {
+					id = MNM.7826
+					days = 3
+					random = 7
 				}
 			}
 		}
 
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.1 # slow down
-			}
-			modifier = {
+			factor = 0.1
+
+			mult_modifier = {
 				factor = 0.5
 				is_benevolent_trigger = yes
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 2
 				is_evil_trigger = yes
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 50
 				FROM = { is_quest_target_of = ROOT }
 			}
-			modifier = {
+
+			mult_modifier = {
 				factor = 0.5
-				NOT = {
-					FROM = {
-						any_vassal = { character = ROOT }
-					}
-				}
+				NOT = { vassal_of = FROM }
 			}
 		}
 	}
