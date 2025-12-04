@@ -79,13 +79,14 @@ character_event = {
 	desc = EVTDESC_TOG_101
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
 
-	trigger = { NOT = { is_inaccessible_trigger = yes } }
-	
+	ai = no
+
 	option = {
 		name = EVTOPTA_TOG_101
+
 		custom_tooltip = { text = nerge_assemble }
 	}
 }
@@ -96,22 +97,47 @@ character_event = {
 	desc = EVTDESC_TOG_102
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
 	hide_from = yes
-	
+
+	immediate = {
+		set_character_flag = khagan_holding_nerge
+	}
+
 	option = {
 		name = EVTOPTA_TOG_102
-		set_character_flag = khagan_holding_nerge
-		custom_tooltip = { 
+
+		custom_tooltip = {
 			text = nerge_starts
-			hidden_tooltip = {
-				character_event = { id = TOG.150 days = 60 random = 10 }
-			}	
+
+			character_event = {
+				id = TOG.150 # Hunt Ends, Animals corralled, Khagan takes first shot
+				days = 60
+				random = 10
+			}
+
+			character_event = {
+				id = TOG.158 # Exceptional Soldier brought to Khagan's attention
+				days = 1
+				random = 479
+			}
+
+			character_event = {
+				id = TOG.159 # Exceptional Bear Captured
+				days = 1
+				random = 479
+			}
+
+			character_event = {
+				id = TOG.109 # Nerge Hunt Event Tombola
+				days = 14
+			}
 		}
+
 		if = {
 			limit = { ai = no }
+
 			chronicle = {
 				entry = CHRONICLE_HELD_NERGE
 				picture = GFX_evt_tengri_throneroom_oldgods
@@ -126,17 +152,217 @@ character_event = {
 	desc = EVTDESC_TOG_103
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
+	immediate = {
+		set_character_flag = vassal_holding_nerge
+	}
+
 	option = {
 		name = EVTOPTA_TOG_102
-		set_character_flag = vassal_holding_nerge
+
 		custom_tooltip = { text = nerge_starts }
 	}
 }
 
 ### During Hunt
+
+# Nerge Hunt Event Tombola
+character_event = {
+	id = TOG.109
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	has_character_flag = khagan_holding_nerge
+
+	immediate = {
+		random_list = {
+			100 = { } # No event
+
+			25 = { # Vassal is injured
+				any_vassal = {
+					limit = {
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+					}
+
+					score_value = {
+						value = 100
+
+						mult_modifier = {
+							factor = 1.25
+							martial < 8
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							martial < 4
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = imbecile
+						}
+
+						mult_modifier = {
+							factor = 0.8
+							martial >= 10
+						}
+
+						mult_modifier = {
+							factor = 0.67
+							martial >= 14
+						}
+					}
+
+					character_event = { id = TOG.110 }
+				}
+			}
+
+			25 = { # Vassal comes to blow with another vassal
+				trigger = {
+					any_vassal = {
+						count >= 2
+
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+					}
+				}
+
+				any_vassal = {
+					limit = {
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+					}
+
+					score_value = {
+						value = 100
+
+						mult_modifier = {
+							factor = 1.67
+							trait = wroth
+						}
+
+						mult_modifier = {
+							factor = 0.7
+							trait = kind
+						}
+					}
+
+					save_event_target_as = quarreling_vassal
+				}
+
+				random_vassal = {
+					limit = {
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+						NOT = { character = event_target:quarreling_vassal }
+					}
+
+					character_event = { id = TOG.112 }
+				}
+			}
+
+			25 = { # Vassal's forces let wild game escape
+				any_vassal = {
+					limit = {
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+					}
+
+					score_value = {
+						value = 100
+
+						mult_modifier = {
+							factor = 1.25
+							trait = slothful
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = imbecile
+						}
+
+						mult_modifier = {
+							factor = 0.7
+							trait = diligent
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							martial < 8
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							martial < 4
+						}
+
+						mult_modifier = {
+							factor = 0.8
+							martial >= 10
+						}
+
+						mult_modifier = {
+							factor = 0.8
+							martial >= 14
+						}
+					}
+
+					character_event = { id = TOG.114 }
+				}
+			}
+
+			25 = { # Vassal killed animal without permission
+				any_vassal = {
+					limit = {
+						has_character_flag = vassal_holding_nerge
+						is_incapable = no
+						prisoner = no
+					}
+
+					score_value = {
+						value = 100
+
+						mult_modifier = {
+							factor = 0.67
+							trait = patient
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = greedy
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = arbitrary
+						}
+
+						mult_modifier = {
+							factor = 1.25
+							trait = imbecile
+						}
+					}
+
+					character_event = { id = TOG.117 }
+				}
+			}
+		}
+
+		repeat_event = {
+			id = TOG.109
+			days = 14
+		}
+	}
+}
 
 # Vassal is injured
 character_event = {
@@ -144,75 +370,17 @@ character_event = {
 	desc = EVTDESC_TOG_110
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	has_character_flag = vassal_holding_nerge
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		days = 380
-		
-		modifier = {
-			factor = 0.8
-			NOT = { martial = 8 }
-		}
-		modifier = {
-			factor = 0.8
-			NOT = { martial = 4 }
-		}
-		modifier = {
-			factor = 0.8
-			trait = imbecile
-		}
-		modifier = {
-			factor = 1.2
-			martial = 10
-		}
-		modifier = {
-			factor = 1.5
-			martial = 14
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 5 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 10 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 15 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 20 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 25 }
-		}
-		modifier = {
-			factor = 1.6
-			liege = { num_of_vassals = 30 }
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA_TOG_110
-		hidden_tooltip = {
-			liege = {
-				character_event = { id = TOG.111 }
-			}
-		}
+
 		add_trait = wounded
+
+		liege = {
+			character_event = { id = TOG.111 }
+		}
 	}
 }
 
@@ -222,76 +390,19 @@ character_event = {
 	desc = EVTDESC_TOG_111
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
+	ai = no
+
 	option = {
 		name = EVTOPTA_TOG_111
-		tooltip = { FROM = { add_trait = wounded } }
-	}
-}
 
-# Vassal comes to blow with another vassal
-character_event = {
-	id = TOG.119
-	hide_window = yes
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	has_character_flag = vassal_holding_nerge
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		days = 380
-		
-		modifier = {
-			factor = 0.6
-			trait = wroth
-		}
-		modifier = {
-			factor = 1.4
-			trait = kind
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 5 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 10 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 15 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 20 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 25 }
-		}
-		modifier = {
-			factor = 1.6
-			liege = { num_of_vassals = 30 }
-		}
-	}
-	
-	immediate = {
-		liege = {
-			random_vassal = {
-				limit = {
-					has_character_flag = vassal_holding_nerge
-					NOT = { character = ROOT }
-				}
-				character_event = { id = TOG.112 }
+		tooltip = {
+			FROM = {
+				show_scope_change = no
+
+				add_trait = wounded
 			}
 		}
 	}
@@ -303,18 +414,19 @@ character_event = {
 	desc = EVTDESC_TOG_112
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+	portrait = event_target:quarreling_vassal
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_112
-		hidden_tooltip = {
-			liege = { character_event = { id = TOG.113 } }
-			FROM = { character_event = { id = TOG.120 } }
-		}
+
+		liege = { character_event = { id = TOG.113 } }
+		event_target:quarreling_vassal = { character_event = { id = TOG.120 } }
+
 		opinion = {
-			modifier = opinion_nerge_rival
-			who = FROM
+			name = opinion_nerge_rival
+			who = event_target:quarreling_vassal
 		}
 	}
 }
@@ -325,13 +437,18 @@ character_event = {
 	desc = EVTDESC_TOG_112
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
+	immediate = {
+		FROM = { save_event_target_as = quarreling_vassal } # For loc
+	}
+
 	option = {
 		name = EVTOPTA_TOG_112
+
 		opinion = {
-			modifier = opinion_nerge_rival
+			name = opinion_nerge_rival
 			who = FROM
 		}
 	}
@@ -343,22 +460,24 @@ character_event = {
 	desc = EVTDESC_TOG_113
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_113
+
 		tooltip = {
 			FROM = {
+				show_scope_change = no
+
 				opinion = {
-					modifier = opinion_nerge_rival
-					who = FROMFROM
+					name = opinion_nerge_rival
+					who = event_target:quarreling_vassal
 				}
-			}
-			FROM = {
+
 				reverse_opinion = {
-					modifier = opinion_nerge_rival
-					who = FROMFROM
+					name = opinion_nerge_rival
+					who = event_target:quarreling_vassal
 				}
 			}
 		}
@@ -371,82 +490,15 @@ character_event = {
 	desc = EVTDESC_TOG_114
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	has_character_flag = vassal_holding_nerge
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		days = 380
-		
-		modifier = {
-			factor = 0.8
-			trait = slothful
-		}
-		modifier = {
-			factor = 0.8
-			trait = imbecile
-		}
-		modifier = {
-			factor = 1.4
-			trait = diligent
-		}
-		modifier = {
-			factor = 0.8
-			NOT = { martial = 8 }
-		}
-		modifier = {
-			factor = 0.8
-			NOT = { martial = 4 }
-		}
-		modifier = {
-			factor = 1.2
-			martial = 10
-		}
-		modifier = {
-			factor = 1.5
-			martial = 14
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 5 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 10 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 15 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 20 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 25 }
-		}
-		modifier = {
-			factor = 1.6
-			liege = { num_of_vassals = 30 }
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA_TOG_114
-		hidden_tooltip = {
-			liege = {
-				character_event = { id = TOG.115 }
-			}
-		}	
+
+		liege = {
+			character_event = { id = TOG.115 }
+		}
 	}
 }
 
@@ -456,52 +508,59 @@ character_event = {
 	desc = EVTDESC_TOG_115
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
 	option = { # Punish
 		name = EVTOPTA_TOG_115
-		FROM = { 
-			character_event = { id = TOG.116 tooltip = EVTTOOLTIP_TOG_116 } 
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.116
+				tooltip = EVTTOOLTIP_TOG_116
+			}
+
 			opinion = {
-				modifier = opinion_punished_nerge
+				name = opinion_punished_nerge
 				who = ROOT
 			}
+
+			tooltip = {
+				add_trait = wounded
+			}
 		}
-		tooltip = { FROM = { add_trait = wounded } }
 	}
+
 	option = { # Do not punish
 		name = EVTOPTB_TOG_115
-		FROM = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-			}
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = FROM
 		}
-		random_vassal = {
-			limit = { 
-				has_character_flag = vassal_holding_nerge 
-				NOT = {
+
+		any_vassal = {
+			show_scope_change = no
+
+			limit = {
+				has_character_flag = vassal_holding_nerge
+
+				NOR = {
 					character = FROM
-					has_opinion_modifier = { who = ROOT modifier = opinion_disappointed }
+
+					has_opinion_modifier = {
+						name = opinion_disappointed
+						who = ROOT
+					}
 				}
 			}
+
+			count = 2
+
 			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 1
-			}
-		}
-		random_vassal = {
-			limit = { 
-				has_character_flag = vassal_holding_nerge 
-				NOT = {
-					character = FROM
-					has_opinion_modifier = { who = ROOT modifier = opinion_disappointed }
-				}
-			}
-			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = ROOT
 				years = 1
 			}
@@ -515,12 +574,13 @@ character_event = {
 	desc = EVTDESC_TOG_116
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_116
-		add_trait = wounded
+
+		add_trait_silently_wounded_effect = yes
 	}
 }
 
@@ -530,70 +590,15 @@ character_event = {
 	desc = EVTDESC_TOG_117
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	has_character_flag = vassal_holding_nerge
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		days = 380
-		
-		modifier = {
-			factor = 1.5
-			trait = patient
-		}
-		modifier = {
-			factor = 0.8
-			trait = greedy
-		}
-		modifier = {
-			factor = 0.8
-			trait = arbitrary
-		}
-		modifier = {
-			factor = 0.8
-			trait = imbecile
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 5 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 10 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 15 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 20 }
-		}
-		modifier = {
-			factor = 1.3
-			liege = { num_of_vassals = 25 }
-		}
-		modifier = {
-			factor = 1.6
-			liege = { num_of_vassals = 30 }
-		}
-	}
-	
+
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA_TOG_117
-		hidden_tooltip = {
-			liege = {
-				character_event = { id = TOG.118 }
-			}
-		}	
+
+		liege = {
+			character_event = { id = TOG.118 }
+		}
 	}
 }
 
@@ -603,52 +608,59 @@ character_event = {
 	desc = EVTDESC_TOG_118
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
 	option = { # Punish
 		name = EVTOPTA_TOG_118
-		FROM = { 
-			character_event = { id = TOG.116 tooltip = EVTTOOLTIP_TOG_116 }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.116
+				tooltip = EVTTOOLTIP_TOG_116
+			}
+
 			opinion = {
-				modifier = opinion_punished_nerge
+				name = opinion_punished_nerge
 				who = ROOT
 			}
+
+			tooltip = {
+				add_trait = wounded
+			}
 		}
-		tooltip = { FROM = { add_trait = wounded } }
 	}
+
 	option = { # Do not punish
 		name = EVTOPTB_TOG_118
-		FROM = {
-			opinion = {
-				modifier = opinion_grateful
-				who = ROOT
-			}
+
+		reverse_opinion = {
+			name = opinion_grateful
+			who = FROM
 		}
-		random_vassal = {
-			limit = { 
-				has_character_flag = vassal_holding_nerge 
-				NOT = {
+
+		any_vassal = {
+			show_scope_change = no
+
+			limit = {
+				has_character_flag = vassal_holding_nerge
+
+				NOR = {
 					character = FROM
-					has_opinion_modifier = { who = ROOT modifier = opinion_disappointed }
+
+					has_opinion_modifier = {
+						name = opinion_disappointed
+						who = ROOT
+					}
 				}
 			}
+
+			count = 2
+
 			opinion = {
-				modifier = opinion_disappointed
-				who = ROOT
-				years = 1
-			}
-		}
-		random_vassal = {
-			limit = { 
-				has_character_flag = vassal_holding_nerge 
-				NOT = {
-					character = FROM
-					has_opinion_modifier = { who = ROOT modifier = opinion_disappointed }
-				}
-			}
-			opinion = {
-				modifier = opinion_disappointed
+				name = opinion_disappointed
 				who = ROOT
 				years = 1
 			}
@@ -664,52 +676,62 @@ character_event = {
 	desc = EVTDESC_TOG_150
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-		has_character_flag = khagan_holding_nerge
-	}
-	
 	hide_from = yes
-	
+
+	has_dlc = "The Old Gods"
+	has_character_flag = khagan_holding_nerge
+
 	immediate = {
+		clear_delayed_event = { id = TOG.158 }
+		clear_delayed_event = { id = TOG.159 }
 		clr_character_flag = khagan_holding_nerge
 		set_character_flag = khagan_finishing_nerge
+
 		any_vassal = {
-			limit = {
-				has_character_flag = vassal_holding_nerge
-			}
+			limit = { has_character_flag = vassal_holding_nerge }
+
 			clr_character_flag = vassal_holding_nerge
 			set_character_flag = vassal_finishing_nerge
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTA_TOG_150
-		custom_tooltip = { 
+
+		custom_tooltip = {
 			text = hunt_animals
-			hidden_tooltip = {
-				any_vassal = {
-					limit = {
-						has_character_flag = vassal_finishing_nerge
-					}
-					character_event = { id = TOG.151 }
+
+			any_vassal = {
+				limit = { has_character_flag = vassal_finishing_nerge }
+				character_event = { id = TOG.151 }
+			}
+
+			if = {
+				limit = { trait = hunter }
+
+				character_event = {
+					id = TOG.152
+					days = 2
 				}
-				if = {
-					limit = { trait = hunter }
-					character_event = { id = TOG.152 days = 2 }
-				}
-				if = {
-					limit = { NOT = { lifestyle_traits = 1 } }
-					random = {
-						chance = 25
-					
-						character_event = { id = TOG.152 days = 2 }
+			}
+			else_if = {
+				limit = { lifestyle_traits < 1 }
+
+				random = {
+					chance = 25
+
+					character_event = {
+						id = TOG.152
+						days = 2
 					}
-				}	
-				character_event = { id = TOG.169 days = 10 }
+				}
+			}
+
+			character_event = {
+				id = TOG.169
+				days = 10
 			}
 		}
 	}
@@ -721,24 +743,32 @@ character_event = {
 	desc = EVTDESC_TOG_151
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_151
-		custom_tooltip = { 
+
+		custom_tooltip = {
 			text = hunt_animals
-			hidden_tooltip = {
-				if = {
-					limit = { trait = hunter }
-					character_event = { id = TOG.152 days = 2 }
+
+			if = {
+				limit = { trait = hunter }
+
+				character_event = {
+					id = TOG.152
+					days = 2
 				}
-				if = {
-					limit = { NOT = { lifestyle_traits = 1 } }
-					random = {
-						chance = 25
-					
-						character_event = { id = TOG.152 days = 2 }
+			}
+			else_if = {
+				limit = { lifestyle_traits < 1 }
+
+				random = {
+					chance = 25
+
+					character_event = {
+						id = TOG.152
+						days = 2
 					}
 				}
 			}
@@ -752,20 +782,22 @@ character_event = {
 	desc = EVTDESC_TOG_152
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	hide_from = yes
-	
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_TOG_152
+
 		if = {
 			limit = {
-				NOT = { lifestyle_traits = 1 }
+				lifestyle_traits < 1
 				NOT = { has_dlc = "Way of Life" }
 			}
+
 			add_trait = hunter
 		}
+
 		prestige = 100
 	}
 }
@@ -776,26 +808,16 @@ character_event = {
 	desc = EVTDESC_TOG_158
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
+
+	is_triggered_only = yes
+
 	has_character_flag = khagan_holding_nerge
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-		NOT = { has_character_flag = exceptional_soldier }
-	}
-		
-	mean_time_to_happen = {
-		days = 480
-	}
-	
+	only_capable = yes
+	prisoner = no
+
 	option = { # Bring to court
 		name = EVTOPTA_TOG_158
+
 		set_character_flag = exceptional_soldier
 		pick_culture_for_spawned_courtier_effect = yes
 		create_character = {
@@ -805,19 +827,20 @@ character_event = {
 			age = 26
 			culture = event_target:picked_culture
 			religion = event_target:picked_religion
-			trait = diligent
-			trait = quick
-			trait = brave
-			trait = brilliant_strategist
+			add_trait = diligent
+			add_trait = quick
+			add_trait = brave
+			add_trait = brilliant_strategist
+
 			attributes = {
 				martial = 10
 			}
 			flag = invited_soldier
 		}
 	}
+
 	option = { # Leave as soldier
 		name = EVTOPTB_TOG_158
-		set_character_flag = exceptional_soldier
 	}
 }
 
@@ -827,125 +850,147 @@ character_event = {
 	desc = EVTDESC_TOG_159
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
+
+	is_triggered_only = yes
+
 	has_character_flag = khagan_holding_nerge
-	
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		has_dlc = "The Old Gods"
 		NOT = { has_character_flag = pet_bear }
 	}
-		
-	mean_time_to_happen = {
-		days = 480
-	}
-	
+
 	option = { # Keep as pet
 		name = EVTOPTA_TOG_159
-		set_character_flag = pet_bear
-		custom_tooltip = { text = pet_bear }
+
+		custom_tooltip = {
+			text = pet_bear
+			set_character_flag = pet_bear
+		}
 	}
+
 	option = { # Kill
 		name = EVTOPTB_TOG_159
+
 		custom_tooltip = { text = dead_bear }
 	}
 }
 
-# Bear attacks courtier (AI event)
-character_event = {
-	id = TOG.168
-	hide_window = yes
-	
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	ai = yes
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-		liege = { 
-			has_character_flag = pet_bear
-			NOT = { is_close_relative = ROOT }
-		}
-		NOT = { has_character_flag = pet_bear }
-		host = { 
-			character = liege
-			prisoner = no
-		}
-		is_primary_heir = no
-		is_pretender = no
-		in_command = no
-		NOT = { spouse = { character = host } }
-	}
-	
-	mean_time_to_happen = {
-		months = 680
-	}
-	
-	immediate = {
-		random_list = {
-			33 = {
-				liege = { character_event = { id = TOG.160 } }
-			}
-			33 = {
-				liege = { character_event = { id = TOG.161 } }
-			}
-			33 = {
-				liege = { character_event = { id = TOG.162 } }
-			}
-		}
-	}
-}
-
-# Bear wounds courtier
+# Bear attacks courtier
 character_event = {
 	id = TOG.160
-	desc = EVTDESC_TOG_160
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_160
-		FROM = { add_trait = wounded }
-	}
-}
 
-# Bear maims courtier
-character_event = {
-	id = TOG.161
-	desc = EVTDESC_TOG_161
-	picture = GFX_evt_tengri_throneroom_oldgods
-	border = GFX_event_normal_frame_diplomacy
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = EVTOPTA_TOG_160
-		FROM = { add_maimed_trait_effect = yes }
+	desc = {
+		text = EVTDESC_TOG_160
+		trigger = { has_character_flag = bear_attack_wounds }
 	}
-}
+	desc = {
+		text = EVTDESC_TOG_161
+		trigger = { has_character_flag = bear_attack_maims }
+	}
+	desc = {
+		text = EVTDESC_TOG_162
+		trigger = { has_character_flag = bear_attack_kills }
+	}
 
-# Bear kills courtier
-character_event = {
-	id = TOG.162
-	desc = EVTDESC_TOG_162
-	picture = GFX_evt_tengri_throneroom_oldgods
-	border = GFX_event_normal_frame_diplomacy
-	
-	is_triggered_only = yes
-	
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, pet_bear_events
+
+	only_playable = yes
+	has_character_flag = pet_bear
+	culture_group = taan_group
+	has_dlc = "The Old Gods"
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		any_courtier = {
+			is_ruler = no
+			is_adult = yes
+			host = { character = ROOT }
+			prisoner = no
+			is_incapable = no
+			is_primary_heir = no
+			is_pretender = no
+			in_command = no
+
+			NOR = {
+				is_married = ROOT
+				is_close_relative = ROOT
+				has_character_flag = pet_bear
+			}
+		}
+	}
+
+	immediate = {
+		random_courtier = {
+			limit = {
+				is_ruler = no
+				is_adult = yes
+				host = { character = ROOT }
+				prisoner = no
+				is_incapable = no
+				is_primary_heir = no
+				is_pretender = no
+				in_command = no
+
+				NOR = {
+					is_married = ROOT
+					is_close_relative = ROOT
+					has_character_flag = pet_bear
+				}
+			}
+
+			save_event_target_as = bear_victim
+		}
+
+		random_list = {
+			33 = { set_character_flag = bear_attack_wounds }
+			33 = { set_character_flag = bear_attack_maims }
+			33 = { set_character_flag = bear_attack_kills }
+		}
+	}
+
 	option = {
 		name = EVTOPTA_TOG_160
-		FROM = { 
+
+		trigger = { has_character_flag = bear_attack_wounds }
+
+		event_target:bear_victim = {
+			show_scope_change = no
+
+			add_trait_silently_wounded_effect = yes
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_160
+
+		trigger = { has_character_flag = bear_attack_maims }
+
+		event_target:bear_victim = {
+			show_scope_change = no
+
+			add_maimed_trait_effect = yes
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_160
+
+		trigger = { has_character_flag = bear_attack_kills }
+
+		event_target:bear_victim = {
+			show_scope_change = no
+
 			death = { death_reason = death_accident_bear }
 		}
+	}
+
+	after = {
+		clear_flags_with_prefix = bear_attack_
 	}
 }
 
@@ -955,25 +1000,19 @@ character_event = {
 	desc = EVTDESC_TOG_163
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, pet_bear_events
+
 	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
 	has_character_flag = pet_bear
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		months = 480
-	}
-	
+	culture_group = taan_group
+	has_dlc = "The Old Gods"
+	only_capable = yes
+	prisoner = no
+
 	option = {
 		name = EVTOPTA_TOG_163
+
 		prestige = 200
 	}
 }
@@ -984,25 +1023,34 @@ character_event = {
 	desc = EVTDESC_TOG_164
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, pet_bear_events
+
 	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
 	has_character_flag = pet_bear
-	
+	culture_group = taan_group
+	has_dlc = "The Old Gods"
+	only_capable = yes
+	prisoner = no
+
 	trigger = {
-		has_dlc = "The Old Gods"
+		capital_scope = {
+			NOR = {
+				region = east_faerun_region
+				region = kara_tur_region
+			}
+		}
+
+		location = {
+			county = {
+				NOT = { region = east_faerun_region }
+			}
+		}
 	}
-	
-	mean_time_to_happen = {
-		months = 480
-	}
-	
+
 	option = {
 		name = EVTOPTA_TOG_164
+
 		prestige = 200
 	}
 }
@@ -1013,62 +1061,39 @@ character_event = {
 	desc = EVTDESC_TOG_165
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, pet_bear_events
+
 	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
 	has_character_flag = pet_bear
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		months = 480
-	}
-	
+	culture_group = taan_group
+	has_dlc = "The Old Gods"
+	only_capable = yes
+	prisoner = no
+
 	option = { # Release
 		name = EVTOPTA_TOG_165
-		custom_tooltip = { text = bear_released }
-		clr_character_flag = pet_bear
+
+		custom_tooltip = {
+			text = bear_released
+			clr_character_flag = pet_bear
+		}
+
 		prestige = -50
-		if = {
-			limit = {
-				NOT = {
-					trait = kind
-					trait = cruel
-				}
-			}
-			add_trait = kind
-			hidden_tooltip = {
-				character_event = {
-					days = 2
-					id = 38268 #Notify Kind
-				}
-			}
-		}
-		if = {
-			limit = { trait = cruel }
-			remove_trait = cruel
-		}
+		add_trait_partially_silently_kind_effect = yes
 	}
+
 	option = { # Keep
 		name = EVTOPTB_TOG_165
-		custom_tooltip = { text = keep_bear }
-		set_character_flag = pet_bear_depressed
+
+		custom_tooltip = {
+			text = keep_bear
+			set_character_flag = pet_bear_depressed
+		}
+
 		random = {
 			chance = 33
-				
-			add_trait = cruel
-			hidden_tooltip = {
-				character_event = {
-					days = 2
-					id = 38259 #Notify Cruel
-				}
-			}
+			add_trait_fully_cruel_effect = yes
 		}
 	}
 }
@@ -1079,43 +1104,38 @@ character_event = {
 	desc = EVTDESC_TOG_166
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
+	is_triggered_only = yes # on_bi_yearly_pulse, random_events, pet_bear_events
+
 	only_playable = yes
-	only_men = yes
-	min_age = 16
-	prisoner = no
-	only_capable = yes
-	culture_group = taan_group
 	has_character_flag = pet_bear
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-	}
-	
-	mean_time_to_happen = {
-		months = 680
-		
-		modifier = {
-			factor = 0.5
+	culture_group = taan_group
+	has_dlc = "The Old Gods"
+	only_capable = yes
+	prisoner = no
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2
 			has_character_flag = pet_bear_depressed
 		}
 	}
-	
-	option = { #
+
+	option = {
 		name = EVTOPTA_TOG_166
-		custom_tooltip = { text = bear_passes_away }
-		clr_character_flag = pet_bear
-		clr_character_flag = pet_bear_depressed
+
+		custom_tooltip = {
+			text = bear_passes_away
+
+			clr_character_flag = pet_bear
+			clr_character_flag = pet_bear_depressed
+		}
+
 		random = {
 			chance = 20
-				
-			add_trait = depressed
-			hidden_tooltip = {
-				character_event = {
-					days = 2
-					id = 38288 #Notify Depressed
-				}
-			}
+			add_trait_depressed_effect = yes
 		}
 	}
 }
@@ -1126,75 +1146,33 @@ character_event = {
 	desc = EVTDESC_TOG_169
 	picture = GFX_evt_tengri_throneroom_oldgods
 	border = GFX_event_normal_frame_diplomacy
-	
+
 	is_triggered_only = yes
-	
-	trigger = {
-		has_dlc = "The Old Gods"
-		has_character_flag = khagan_finishing_nerge
-	}
-	
 	hide_from = yes
-	
+
 	option = { # Yes
 		name = EVTOPTA_TOG_169
-		hidden_tooltip = {
-			character_event = { id = TOG.170 days = 5 }
-		}
+
 		random = {
 			chance = 33
-			
-			if = {
-				limit = {
-					NOT = {
-						trait = kind
-						trait = cruel
-					}
-				}
-				add_trait = kind
-				hidden_tooltip = {
-					character_event = {
-						days = 2
-						id = 38268 #Notify Kind
-					}
-				}
-			}
+			add_trait_partially_kind_effect = yes
 		}
-		random = {
-			chance = 33
-			
-			if = {
-				limit = { trait = cruel }
-				remove_trait = cruel
-			}
-		}
+
 		prestige = 25
 	}
+
 	option = { # No
 		name = EVTOPTB_TOG_169
-		if = {
-			limit = {
-				NOT = { 
-					trait = cruel
-					trait = kind
-				}
-			}
-			add_trait = cruel
-			hidden_tooltip = {
-				character_event = {
-					days = 2
-					id = 38259 #Notify Cruel
-				}
-			}
-		}
-		if = {
-			limit = { trait = kind }
-			remove_trait = kind
-		}
-		hidden_tooltip = {
-			character_event = { id = TOG.170 days = 5 }
-		}
+
+		add_trait_partially_silently_cruel_effect = yes
 		prestige = -25
+	}
+
+	after = {
+		character_event = {
+			id = TOG.170
+			days = 5
+		}
 	}
 }
 
@@ -1305,6 +1283,41 @@ character_event = {
 }
 
 # Nerge abandoned due to war
+character_event = {
+	id = TOG.183
+
+	is_triggered_only = yes # on_war_started
+	hide_window = yes
+
+	immediate = {
+		ROOT = {
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = khagan_holding_nerge
+						has_character_flag = khagan_finishing_nerge
+					}
+				}
+
+				character_event = { id = TOG.181 }
+			}
+		}
+
+		FROM = {
+			if = {
+				limit = {
+					OR = {
+						has_character_flag = khagan_holding_nerge
+						has_character_flag = khagan_finishing_nerge
+					}
+				}
+
+				character_event = { id = TOG.181 }
+			}
+		}
+	}
+}
+
 character_event = {
 	id = TOG.181
 	desc = EVTDESC_TOG_181
