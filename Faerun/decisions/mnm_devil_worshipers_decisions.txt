@@ -6,49 +6,49 @@
 
 targeted_decisions = {
 
-	#Power: Summon familiar
+	# Power: Summon familiar
 	devil_worshipers_summon_familiar = {
-		is_in_society = yes
-
 		filter = self
 		ai_target_filter = self
 		ai_check_interval = 12
 
+		is_in_society = yes
+
 		potential = {
-			prisoner = no
-			is_incapable = no
-			character = FROM
-			has_dlc = "Mystics"
-			society_rank >= 2
 			society_member_of = the_satanists
+			society_rank >= 2
+			is_incapable = no
+			prisoner = no
 		}
 
 		allow = {
+			has_society_currency_major_trigger = yes
+
 			custom_tooltip = {
 				text = devil_worshipers_summon_familiar_cd_tooltip
+
 				NOT = { has_character_modifier = summon_familiar_cooldown }
 			}
-			has_society_currency_major_trigger = yes
 		}
 
 		effect = {
 			increase_visibility_effect = yes
-			hidden_effect = {
-				add_character_modifier = {
-					name = summon_familiar_cooldown
-					years = 5
-					hidden = yes
-				}
-				character_event = { id = MNM.7815 }
-			}
 			detract_society_currency_major_effect = yes
+
+			add_character_modifier = {
+				name = summon_familiar_cooldown
+				years = 5
+				hidden = yes
+			}
+
+			character_event = { id = MNM.7815 }
 		}
 
 		ai_will_do = {
 			factor = 1
-			modifier = {
-				factor = 0
-				OR = {
+
+			trigger = {
+				NOR = {
 					has_character_modifier = wolf_familiar
 					has_character_modifier = cat_familiar
 					has_character_modifier = owl_familiar
@@ -640,43 +640,301 @@ targeted_decisions = {
 		}
 	}
 
-	#Action: Demonic impregnation
-	DW_demonic_impregnation = {
-		only_playable = yes
+	# Action: Sacrifice prisoner
+	prisoner_dark_sacrifice = {
+		filter = court
+		ai_target_filter = court
+		ai_check_interval = 12
+
 		is_in_society = yes
+		only_playable = yes
+
+		from_potential = {
+			society_member_of = the_satanists
+			is_adult = yes
+			prisoner = no
+			is_incapable = no
+		}
+
+		potential = {
+			prisoner = yes
+			host = { character = FROM }
+			#NOT = { has_character_flag = demon_child_non_pagan }
+		}
+
+		allow = {
+			diplomatic_immunity = no
+		}
+
+		effect = {
+			death = { death_reason = death_missing }
+
+			FROM = {
+				show_scope_change = no
+
+				save_event_target_as = satanist
+				increase_visibility_minor_effect = yes
+				minor_soul_corruption_effect = yes
+
+				hidden_effect = { murder_bloodline_check_effect = yes }
+
+				# Head of Religion
+				if = {
+					limit = {
+						ROOT = { controls_religion = yes }
+					}
+
+					character_event = { id = MNM.7500 }
+
+					# Check quests to resolve, add extra currency and play special sound effect
+					if = { # Priestly
+						limit = { has_quest = quest_the_devil_worshipers_sacrifice_holy_person }
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_holy_person
+						add_society_currency_major_effect = yes
+					}
+
+					else_if = { # Virgin
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_virgin
+							ROOT = { is_virgin_trigger = yes }
+						}
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_virgin
+						add_society_currency_major_effect = yes
+					}
+
+					else_if = { # Ruler
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_ruler
+							ROOT = { is_landed = yes }
+						}
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_ruler
+						add_society_currency_major_effect = yes
+					}
+
+					else = { # No quest so add default
+						add_society_currency_medium_effect = yes
+					}
+				}
+
+				# Holy Man
+				else_if = {
+					limit = {
+						ROOT = {
+							OR = {
+								is_priest = yes
+								is_ascetic_trigger = yes
+								z_divine_caster = yes
+								z_monk = yes
+								AND = {
+									is_landed = yes
+									OR = {
+										government = theocracy_government
+										government = divine_feudal_government
+										government = theocratic_feudal_government
+									}
+								}
+							}
+						}
+					}
+
+					character_event = { id = MNM.7500 }
+
+					# Check quests to resolve, add extra currency and play special sound effect
+					if = { # Priestly
+						limit = { has_quest = quest_the_devil_worshipers_sacrifice_holy_person }
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_holy_person
+						add_society_currency_medium_effect = yes
+					}
+
+					else_if = { # Virgin
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_virgin
+							ROOT = { is_virgin_trigger = yes }
+						}
+						clr_quest = quest_the_devil_worshipers_sacrifice_virgin
+						add_society_currency_medium_effect = yes
+					}
+
+					else_if = { # Ruler
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_ruler
+							ROOT = { is_landed = yes }
+						}
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_ruler
+						add_society_currency_medium_effect = yes
+					}
+
+					else = { # No quest so add default
+						add_society_currency_minor_effect = yes
+					}
+				}
+
+				# Regular character
+				else = {
+					if = {
+						limit = { ROOT = { is_adult = no } }
+						character_event = { id = MNM.7503 }
+					}
+					else_if = {
+						limit = { ROOT = { is_virgin_trigger = yes } }
+						character_event = { id = MNM.7504 }
+					}
+					else = {
+						character_event = { id = MNM.7505 }
+					}
+
+					# Check quests to resolve, add extra currency and play special sound effect
+					if = { # Virgin
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_virgin
+							ROOT = { is_virgin_trigger = yes }
+						}
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_virgin
+						add_society_currency_minor_effect = yes
+					}
+
+					else_if = { # Ruler
+						limit = {
+							has_quest = quest_the_devil_worshipers_sacrifice_ruler
+							ROOT = { is_landed = yes }
+						}
+
+						clr_quest = quest_the_devil_worshipers_sacrifice_ruler
+						add_society_currency_minor_effect = yes
+					}
+
+					else = { # No quest so add default
+						add_society_currency_trivial_effect = yes
+					}
+				}
+			}
+
+			# CleanSlate: There exists a devil_worshippers_sacrifice_child sound_effect, but it is unused in vanilla
+			if = {
+				limit = {
+					OR = {
+						controls_religion = yes
+						is_priest = yes
+						is_ascetic_trigger = yes
+						z_divine_caster = yes
+						z_monk = yes
+						AND = {
+							is_landed = yes
+							government = theocracy_government
+						}
+					}
+				}
+
+				trigger_switch = {
+					on_trigger = is_female
+
+					yes = { FROM = { sound_effect = devil_worshippers_sacrifice_holy_woman } }
+					no = { FROM = { sound_effect = devil_worshippers_sacrifice_holy_man } }
+				}
+			}
+
+			else_if = {
+				limit = { is_virgin_trigger = yes }
+
+				trigger_switch = {
+					on_trigger = is_female
+
+					yes = { FROM = { sound_effect = devil_worshippers_sacrifice_virgin_female } }
+					no = { FROM = { sound_effect = devil_worshippers_sacrifice_virgin_male } }
+				}
+			}
+
+			else_if = {
+				limit = { trait = dwarf }
+
+				trigger_switch = {
+					on_trigger = is_female
+
+					yes = { FROM = { sound_effect = devil_worshippers_sacrifice_dwarf_female } }
+					no = { FROM = { sound_effect = devil_worshippers_sacrifice_dwarf_male } }
+				}
+			}
+
+			else = {
+				trigger_switch = {
+					on_trigger = is_female
+
+					yes = { FROM = { sound_effect = devil_worshippers_sacrifice_ruler_female } }
+					no = { FROM = { sound_effect = devil_worshippers_sacrifice_ruler_male } }
+				}
+			}
+
+			long_character_event = { id = MNM.7506 }
+		}
+
+		ai_will_do = {
+			factor = 0.01
+
+			mult_modifier = {
+				factor = 50
+
+				OR = {
+					is_landed = yes
+					is_priest = yes
+					is_ascetic_trigger = yes
+					is_virgin_trigger = yes
+				}
+			}
+		}
+	}
+
+	# Action: Demonic impregnation
+	DW_demonic_impregnation = {
 		filter = court_including_me
 		ai_target_filter = court_including_me
 		ai_check_interval = 120
 
+		is_in_society = yes
+		only_playable = yes
+
 		from_potential = {
-			has_dlc = "Mystics"
-			is_playable = yes
+			society_member_of = the_satanists
+
+			trigger_if = {
+				limit = { has_quest = quest_the_devil_worshipers_demonic_impregnation }
+				society_rank >= 3
+			}
+			trigger_else = {
+				society_rank >= 4
+			}
+
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
-			society_member_of = the_satanists
-			OR = {
-				AND = {
-					society_rank >= 3
-					has_quest = quest_the_devil_worshipers_demonic_impregnation
-				}
-				society_rank >= 4
-			}
 		}
 
 		potential = {
-			host = { character = FROM }
 			is_female = yes
+			host = { character = FROM }
 			is_pregnant = no
+			is_adult = yes
 			is_infertile_race = no
-			OR = {
-				character = FROM
-				FROM = { has_quest = quest_the_devil_worshipers_demonic_impregnation }
+
+			FROM = {
+				OR = {
+					character = ROOT
+					has_quest = quest_the_devil_worshipers_demonic_impregnation
+				}
 			}
 		}
 
 		allow = {
 			FROM = { has_society_currency_major_trigger = yes }
+			society_member_of = the_satanists
+			is_female = yes
+			is_pregnant = no
+			NOT = { has_character_flag = menopause }
 			FROM = {
 				OR = {
 					NOT = { # prevent spam
@@ -688,31 +946,25 @@ targeted_decisions = {
 					has_quest = quest_the_devil_worshipers_demonic_impregnation # or has the quest
 				}
 			}
-			is_female = yes
-			is_pregnant = no
-			society_member_of = the_satanists
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.01 #Slow down
-			}
-			modifier = {
-				factor = 100
-				has_quest = quest_the_devil_worshipers_demonic_impregnation
-			}
 		}
 
 		effect = {
 			FROM = {
+				show_scope_change = no
+
 				increase_visibility_effect = yes
+				detract_society_currency_major_effect = yes
+
+				character_event = { id = MNM.7507 }
 			}
-			detract_society_currency_major_effect = yes
-			hidden_effect = { #ROOT is target, FROM is doer
-				FROM = {
-					character_event = { id = MNM.7507 }
-				}
+		}
+
+		ai_will_do = {
+			factor = 0.01
+
+			mult_modifier = {
+				factor = 100
+				has_quest = quest_the_devil_worshipers_demonic_impregnation
 			}
 		}
 	}
