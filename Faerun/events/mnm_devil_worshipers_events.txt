@@ -5799,7 +5799,10 @@ character_event = {
 				save_event_target_as = desecration_holder
 
 				if = {
-					limit = { is_abroad = no }
+					limit = {
+						is_abroad = no
+						is_powerful = no
+					}
 
 					random = {
 						chance = 50
@@ -6675,6 +6678,7 @@ society_quest_event = {
 	# }
 # }
 
+
 ###########################################
 # Member Interaction Events
 # Fired from 'on_society_bi_yearly_pulse'
@@ -6687,187 +6691,173 @@ society_quest_event = {
 ###########################################
 character_event = {
 	id = MNM.20000
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-	is_in_society = yes
-	
-	trigger = {
-		is_devil_worshiper_trigger = yes
-		NOT = { is_inaccessible_trigger = yes }
-		NOT = { trait = celibate }
-		is_ill = no
-	}
-	
-	weight_multiplier = {
-		factor = 1
-		modifier = {
-			factor = 2.0
-			trait = lustful
-		}
-		modifier = {
-			factor = 1.5
-			trait = hedonist
-		}
-		modifier = {
-			factor = 3.0
-			has_focus = focus_seduction
-		}
-		modifier = {
-			factor = 0.5
-			trait = chaste
-		}
-		modifier = {
-			factor = 0.25
-			has_character_flag = had_an_orgy
-		}
-	}
-	
-	immediate = {
-		# First look for someone at court
-		society = {
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					NOT = { trait = celibate }
-					OR = {
-						is_female = no
-						is_pregnant = no
-						is_ill = no
-					}
-					NOT = { character = ROOT }
-					in_command = no
-					host = { character = ROOT }
-				}
-				character_event = { id = MNM.20001 }
-				break = yes
-			}
-			
-			# Then look for someone in the same realm
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					NOT = { trait = celibate }
-					OR = {
-						is_female = no
-						is_pregnant = no
-						is_ill = no
-					}
-					NOT = { character = ROOT }
-					in_command = no
-					same_realm = yes
-				}
-				character_event = { id = MNM.20001 }
-				break = yes
-			}
-			
-			# Then look abroad...
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					NOT = { trait = celibate }
-					OR = {
-						is_female = no
-						is_pregnant = no
-						is_ill = no
-					}
-					NOT = { character = ROOT }
-					in_command = no
-					is_within_diplo_range = ROOT
-				}
-				character_event = { id = MNM.20001 }
-			}
-		}
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20001
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20002 } }
-	}
-}
-
-# Satanic Orgy - Invitation
-character_event = {
-	id = MNM.20002
 	picture = GFX_evt_sultan
 	border = GFX_event_normal_frame_intrigue
-	
+	portrait = event_target:satanic_orgiast
+
 	desc = {
-		text = EVTDESC_MNM_20002
+		text = EVTDESC_MNM_20000
 		trigger = {
-			FROM = {
+			event_target:satanic_orgiast = {
 				NOT = { host = { character = ROOT } }
 			}
 		}
 	}
 	desc = {
-		text = EVTDESC_MNM_20002_COURT
+		text = EVTDESC_MNM_20000_COURT
 		trigger = {
-			FROM = {
+			event_target:satanic_orgiast = {
 				host = { character = ROOT }
 			}
 		}
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	only_playable = yes
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+		is_inaccessible_trigger = no
+		NOT = { trait = celibate }
+		is_ill = no
+
+		society = {
+			any_society_member = {
+				ai = yes
+				in_command = no
+				is_ill = no
+				is_inaccessible_or_incapable_trigger = no
+				is_within_diplo_range = ROOT
+
+				trigger_if = {
+					limit = { is_female = yes }
+					is_pregnant = no
+					NOT = { has_character_flag = menopause }
+				}
+
+				NOR = {
+					character = ROOT
+					trait = celibate
+					trait = asexual
+				}
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 2.0
+			trait = lustful
+		}
+		mult_modifier = {
+			factor = 1.5
+			trait = hedonist
+		}
+		mult_modifier = {
+			factor = 3.0
+			has_focus = focus_seduction
+		}
+		mult_modifier = {
+			factor = 0.5
+			trait = chaste
+		}
+		mult_modifier = {
+			factor = 0.5
+			trait = asexual
+		}
+		mult_modifier = {
+			factor = 0.25
+			has_character_flag = had_an_orgy
+		}
+	}
+
+	immediate = {
+		society = {
+			random_society_member = {
+				limit = {
+					ai = yes
+					in_command = no
+					is_ill = no
+					is_inaccessible_or_incapable_trigger = no
+					is_within_diplo_range = ROOT
+
+					trigger_if = {
+						limit = { is_female = yes }
+						is_pregnant = no
+						NOT = { has_character_flag = menopause }
+					}
+
+					NOR = {
+						character = ROOT
+						trait = celibate
+						trait = asexual
+					}
+				}
+
+				preferred_limit = {
+					host = { character = ROOT } # First look for someone at court
+				}
+
+				preferred_limit = {
+					same_realm = ROOT # Then look for someone in the same realm
+				}
+
+				preferred_limit = {
+					ROOT = {
+						is_genetically_compatible_with_PREV = yes
+					}
+				}
+
+				# Then look abroad...
+				save_event_target_as = satanic_orgiast
+			}
+		}
+	}
 
 	option = {
 		name = EVTOPTA_MNM_20002 # Of course
-		ai_chance = {
-			factor = 100
+
+		character_event = {
+			id = MNM.20004
+			days = 3
+			tooltip = EVT_MNM_20003_TT
 		}
-		
-		FROM = { character_event = { id = MNM.20003 tooltip = EVT_TT_20003 } }
+
+		ai_chance = { factor = 100 }
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20002 # No way!
+
+		detract_society_currency_minor_effect = yes
+
+		reverse_opinion = {
+			name = opinion_coward
+			who = event_target:satanic_orgiast
+			years = 5
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 200
 				trait = chaste
 			}
-			modifier = {
+			mult_modifier = {
+				factor = 200
+				trait = asexual
+			}
+			mult_modifier = {
 				factor = 50
 				trait = craven
 			}
 		}
-		
-		detract_society_currency_minor_effect = yes
-		reverse_opinion = { who = FROM modifier = opinion_coward years = 5 }
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20003
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		save_event_target_as = sex_partner
-		FROM = { character_event = { id = MNM.20004 days = 3 } }
 	}
 }
 
@@ -6876,96 +6866,145 @@ character_event = {
 	id = MNM.20004
 	picture = GFX_evt_bad_news
 	border = GFX_event_normal_frame_intrigue
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		set_character_flag = had_an_orgy
-	
-		random = {
-			chance = 50
-			
-			unprotected_sex_effect_event_target = yes
-			set_character_flag = orgy_sex
-			
-			# Hetero
-			if = {
-				limit = {
-					NOT = { same_sex = FROM }
-				}
-				if = {
-					limit = {
-						trait = homosexual
-					}
-					random = {
-						chance = 50
-						set_character_flag = orgy_lose_homo_trait
-					}
+	portrait = event_target:satanic_orgiast
+
+	desc = {
+		text = EVTDESC_MNM_20004
+		picture = GFX_evt_sultan
+		trigger = {
+			NOT = { has_character_flag = orgy_sex }
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20004_SEX
+		picture = GFX_evt_sultan
+		trigger = {
+			has_character_flag = orgy_sex
+
+			trigger_if = {
+				limit = { same_sex = event_target:satanic_orgiast }
+				OR = {
+					trait = homosexual
+					trait = bisexual
 				}
 			}
-			
+			trigger_else = {
+				NOT = { trait = homosexual }
+			}
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20004_ODD_SEX
+		trigger = {
+			has_character_flag = orgy_sex
+
+			trigger_if = {
+				limit = { same_sex = event_target:satanic_orgiast }
+				NOR = {
+					trait = homosexual
+					trait = bisexual
+				}
+			}
+			trigger_else = {
+				trait = homosexual
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_character_flag = had_an_orgy
+		event_target:satanic_orgiast = { save_event_target_as = sex_partner }
+
+		random = {
+			chance = 50
+
+			unprotected_sex_effect_event_target = yes
+			set_character_flag = orgy_sex
+
 			# Homo
 			if = {
 				limit = {
-					same_sex = FROM
+					same_sex = event_target:satanic_orgiast
+					NOR = {
+						trait = homosexual
+						trait = bisexual
+					}
 				}
-				if = {
-					limit = {
-						NOT = { trait = homosexual }
-					}
-					random = {
-						chance = 25
-						set_character_flag = orgy_gain_homo_trait
-					}
+
+				random = {
+					chance = 25
+					set_character_flag = orgy_gain_homo_trait
 				}
 			}
-			
+			# Hetero
+			else_if = {
+				limit = {
+					is_opposite_sex = event_target:satanic_orgiast
+					trait = homosexual
+				}
+
+				random = {
+					chance = 50
+					set_character_flag = orgy_lose_homo_trait
+				}
+			}
+
 			# Gain Lover?
 			if = {
 				limit = {
-					NOT = { is_lover = FROM }
+					NOT = { is_lover = event_target:satanic_orgiast }
+
 					OR = {
 						has_character_flag = orgy_lose_homo_trait
 						has_character_flag = orgy_gain_homo_trait
-						AND = {
-							same_sex = FROM
-							trait = homosexual
+
+						trigger_if = {
+							limit = { same_sex = event_target:satanic_orgiast }
+							OR = {
+								trait = homosexual
+								trait = bisexual
+							}
 						}
-						AND = {
-							NOT = { same_sex = FROM }
+						trigger_else = {
 							NOT = { trait = homosexual }
 						}
 					}
 				}
+
 				random = {
 					chance = 50
 					set_character_flag = orgy_lover
 				}
 			}
 		}
-		
+
 		random_list = {
 			100 = { # Become more lustful
-				modifier = {
-					factor = 0
-					trait = lustful
+				trigger = {
+					NOT = { trait = lustful }
 				}
+
 				set_character_flag = orgy_sex_lustify
 			}
+
 			100 = { # Gain the "Robust" trait
-				modifier = {
-					factor = 0
-					is_strong_non_congenital_trait_upgradeable_trigger = no
+				trigger = {
+					is_strong_non_congenital_trait_upgradeable_trigger = yes
 				}
-				set_character_flag = orgy_gain_robust
+
+				set_character_flag = orgy_gain_brawny
 			}
-			100 = { # Gain the "feeble" trait
-				modifier = {
-					factor = 0
-					is_strong_non_congenital_trait_downgradeable_trigger = no
+
+			100 = { # Gain the "Feeble" trait
+				trigger = {
+					is_strong_non_congenital_trait_downgradeable_trigger = yes
 				}
-				set_character_flag = orgy_gain_feeble
+
+				set_character_flag = orgy_gain_frail
 			}
+
 			50 = { # Gain the "Cannibal" trait
 				trigger = {
 					NOT = { trait = cannibal_trait }
@@ -6974,79 +7013,45 @@ character_event = {
 
 				set_character_flag = orgy_cannibal
 			}
+
 			100 = { # Gain a demonic blessing
-				modifier = {
-					factor = 0
-					OR = {
+				trigger = {
+					NOR = {
 						has_character_modifier = satyric_blessing
 						has_character_modifier = blessing_of_lilith
 					}
 				}
+
 				set_character_flag = orgy_blessing
 			}
 		}
-		
+
 		# Random courtier is ritually murdered
 		random = {
 			chance = 20
+
 			random_courtier = {
 				limit = {
-					NOR = {
-						character = ROOT
-						character = FROM
-						is_married = ROOT
-						is_close_relative = ROOT
-					}
 					is_adult = yes
 					prisoner = no
 					is_ruler = no
-					NOT = { same_society_as = ROOT }
+					is_powerful = no
+
+					NOR = {
+						character = ROOT
+						character = event_target:satanic_orgiast
+						is_married = ROOT
+						is_close_relative = ROOT
+						same_society_as = ROOT
+					}
 				}
+
 				ROOT = { set_character_flag = orgy_murder }
 				save_event_target_as = orgy_casualty
-				death = { death_reason = death_murder_unknown killer = ROOT }
-			}
-		}
-	}
-	
-	desc = { 
-		text = EVTDESC_MNM_20004
-		picture = GFX_evt_sultan
-		trigger = {
-			NOT = { has_character_flag = orgy_sex }
-		}
-	}
-	
-	desc = { 
-		text = EVTDESC_MNM_20004_SEX
-		picture = GFX_evt_sultan
-		trigger = {
-			has_character_flag = orgy_sex
-			OR = {
-				AND = {
-					same_sex = FROM
-					trait = homosexual
-				}
-				AND = {
-					NOT = { same_sex = FROM }
-					NOT = { trait = homosexual }
-				}
-			}
-		}
-	}
-	
-	desc = { 
-		text = EVTDESC_MNM_20004_ODD_SEX
-		trigger = {
-			has_character_flag = orgy_sex
-			OR = {
-				AND = {
-					same_sex = FROM
-					NOT = { trait = homosexual }
-				}
-				AND = {
-					NOT = { same_sex = FROM }
-					trait = homosexual
+
+				death = {
+					death_reason = death_murder_unknown
+					killer = ROOT
 				}
 			}
 		}
@@ -7055,16 +7060,15 @@ character_event = {
 	option = {
 		name = {
 			text = EVTOPTA_MNM_20004_CANNIBAL
-			trigger = {
-				has_character_flag = orgy_cannibal
-			}
+			trigger = { has_character_flag = orgy_cannibal }
 		}
 		name = {
 			text = EVTOPTA_MNM_20004_GOOD # I feel good!
 			trigger = {
 				NOT = { has_character_flag = orgy_cannibal }
+
 				OR = {
-					has_character_flag = orgy_gain_robust
+					has_character_flag = orgy_gain_brawny
 					has_character_flag = orgy_blessing
 				}
 			}
@@ -7073,177 +7077,191 @@ character_event = {
 			text = EVTOPTA_MNM_20004_BAD # I feel drained...
 			trigger = {
 				NOT = { has_character_flag = orgy_cannibal }
-				has_character_flag = orgy_gain_feeble
+				has_character_flag = orgy_gain_frail
 			}
 		}
 		name = {
 			text = EVTOPTA_MNM_20004_CHANGE
 			trigger = {
 				NOT = { has_character_flag = orgy_cannibal }
+
 				OR = {
 					has_character_flag = orgy_gain_homo_trait
 					has_character_flag = orgy_lose_homo_trait
 				}
 			}
 		}
-		
 		name = {
 			text = EVTOPTA_MNM_20004
 			trigger = {
 				NOR = {
 					has_character_flag = orgy_cannibal
-					has_character_flag = orgy_gain_robust
+					has_character_flag = orgy_gain_brawny
 					has_character_flag = orgy_blessing
-					has_character_flag = orgy_gain_feeble
+					has_character_flag = orgy_gain_frail
 					has_character_flag = orgy_gain_homo_trait
 					has_character_flag = orgy_lose_homo_trait
 				}
 			}
 		}
-		
+
 		# Dark Power gain
 		add_society_currency_minor_effect = yes
-		#Realms religions do not have the same association between homosexuality and devil worship
-		#if = { 
-		#	limit = { has_character_flag = orgy_gain_homo_trait }
-		#	add_trait = homosexual
-		#}
-		#
-		#if = {
-		#	limit = { has_character_flag = orgy_lose_homo_trait }
-		#	remove_trait = homosexual
-		#}
-		
+
+		if = {
+			limit = { has_character_flag = orgy_gain_homo_trait }
+			clr_character_flag = orgy_gain_homo_trait
+			add_trait = bisexual
+		}
+		else_if = {
+			limit = { has_character_flag = orgy_lose_homo_trait }
+			clr_character_flag = orgy_lose_homo_trait
+			remove_trait = homosexual
+			add_trait = bisexual
+		}
+
 		if = {
 			limit = { has_character_flag = orgy_lover }
+
+			clr_character_flag = orgy_lover
+
 			if = {
-				limit = { NOT = { is_rival = FROM } }
-				FROM = { save_event_target_as = new_lover }
+				limit = { is_rival = event_target:satanic_orgiast }
+				remove_rival = event_target:satanic_orgiast
+			}
+			else = {
+				event_target:satanic_orgiast = { save_event_target_as = new_lover }
 				new_lover_effect = yes
 			}
-			
-			if = {
-				limit = { is_rival = FROM }
-				remove_rival = FROM
+		}
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			orgy_sex_lustify = {
+				clr_character_flag = orgy_sex_lustify
+				add_trait_partially_silently_lustful_effect = yes
+			}
+
+			orgy_gain_brawny = {
+				clr_character_flag = orgy_gain_brawny
+				upgrade_strong_non_congenital_trait_effect = yes
+			}
+
+			orgy_gain_frail = {
+				clr_character_flag = orgy_gain_frail
+				downgrade_strong_non_congenital_trait_effect = yes
+			}
+
+			orgy_cannibal = {
+				clr_character_flag = orgy_cannibal
+				add_trait = cannibal_trait
+			}
+
+			orgy_blessing = {
+				clr_character_flag = orgy_blessing
+
+				if = {
+					limit = { is_female = yes }
+
+					add_character_modifier = {
+						name = blessing_of_lilith
+						duration = -1
+					}
+				}
+				else = {
+					add_character_modifier = {
+						name = satyric_blessing
+						duration = -1
+					}
+				}
 			}
 		}
-		
-		if = {
-			limit = { has_character_flag = orgy_sex_lustify }
-			if = {
-				limit = { NOT = { trait = chaste } }
-				add_trait = lustful
-			}
-			if = {
-				limit = { trait = chaste }
-				remove_trait = chaste
-			}
-		}
-		
+
 		# Impregnated by unspecified participant
 		if = {
 			limit = {
 				is_female = yes
-				fertility = 0.4
+				is_infertile_race = no
+				fertility >= 0
 				is_pregnant = no
-				NOT = {
+
+				NOR = {
 					has_character_flag = orgy_sex
+					has_character_flag = menopause
 				}
-				society = { any_society_member = { is_female = no prisoner = no fertility = 1 } }
-			}
-			hidden_tooltip = {
-				random = {
-					chance = 25
-					society = {
-						random_society_member = {
-							limit = {
-								is_female = no
-								prisoner = no
-								fertility = 1
-							}
-							save_event_target_as = impregnator
+
+				society = {
+					any_society_member = {
+						is_female = no
+						prisoner = no
+						ROOT = {
+							is_genetically_compatible_with_PREV = yes
 						}
 					}
-					impregnate_cuckoo = event_target:impregnator
-					set_character_flag = orgy_impregnated
 				}
 			}
-		}
-		
-		if = {
-			limit = { has_character_flag = orgy_gain_robust }
-			upgrade_strong_non_congenital_trait_effect = yes
-		}
-		
-		if = {
-			limit = { has_character_flag = orgy_gain_feeble }
-			downgrade_strong_non_congenital_trait_effect = yes
-		}
-		
-		if = {
-			limit = { has_character_flag = orgy_cannibal }
-			add_trait = cannibal_trait
-		}
-		
-		if = {
-			limit = { has_character_flag = orgy_blessing }
-			if = {
-				limit = { is_female = yes }
-				add_character_modifier = {
-					modifier = blessing_of_lilith
-					days = -1
+
+			hidden_effect = {
+				society = {
+					random_society_member = {
+						limit = {
+							is_female = no
+							prisoner = no
+							ROOT = {
+								is_genetically_compatible_with_PREV = yes
+							}
+						}
+
+						preferred_limit = {
+							fertility >= 1
+						}
+
+						save_event_target_as = sex_partner
+					}
 				}
-			}
-			if = {
-				limit = { is_female = no }
-				add_character_modifier = {
-					modifier = satyric_blessing
-					days = -1
-				}
+
+				unprotected_sex_effect_event_target = yes
 			}
 		}
-		
+
+		clr_character_flag = orgy_sex
+
 		# Friend gained / Rivalry lost
 		if = {
+			limit = { is_rival = event_target:satanic_orgiast }
+			remove_rival = event_target:satanic_orgiast
+		}
+		else_if = {
 			limit = {
 				NOR = {
-					is_lover = FROM
-					is_friend = FROM
-					is_rival = FROM
+					is_lover = event_target:satanic_orgiast
+					is_friend = event_target:satanic_orgiast
 				}
-				random = 75
+
+				random < 25 # 25% chance
 			}
-			add_friend = FROM
+
+			add_friend = event_target:satanic_orgiast
 		}
+
 		if = {
-			limit = {
-				is_rival = FROM
-			}
-			remove_rival = FROM
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = orgy_murder
-			}
+			limit = { has_character_flag = orgy_murder }
+			clr_character_flag = orgy_murder
+
 			event_target:orgy_casualty = {
-				tooltip = {
-					death = { death_reason = death_murder_unknown killer = ROOT }
-				}
+				show_scope_change = no
+
 				show_portrait = yes
+
+				tooltip = {
+					death = {
+						death_reason = death_murder_unknown
+						killer = ROOT
+					}
+				}
 			}
 		}
-		
-		clr_character_flag = orgy_sex
-		clr_character_flag = orgy_lose_homo_trait
-		clr_character_flag = orgy_gain_homo_trait
-		clr_character_flag = orgy_lover
-		clr_character_flag = orgy_sex_lustify
-		clr_character_flag = orgy_gain_robust
-		clr_character_flag = orgy_gain_feeble
-		clr_character_flag = orgy_cannibal
-		clr_character_flag = orgy_blessing
-		clr_character_flag = orgy_murder
 	}
 }
 
@@ -7252,144 +7270,15 @@ character_event = {
 # Fired from on_society_bi_yearly_pulse
 ###########################################
 character_event = {
-	id = MNM.20010
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-	is_in_society = yes
-	
-	trigger = {
-		is_devil_worshiper_trigger = yes
-		NOT = { is_inaccessible_trigger = yes }
-		is_ill = no
-	}
-	
-	weight_multiplier = {
-		factor = 1
-		modifier = {
-			factor = 1.25
-			trait = impaler
-		}
-		modifier = {
-			factor = 1.25
-			trait = cruel
-		}
-		modifier = {
-			factor = 1.25
-			trait = arbitrary
-		}
-		modifier = {
-			factor = 1.25
-			trait = socializer
-		}
-		modifier = {
-			factor = 1.25
-			trait = drunkard
-		}
-		modifier = {
-			factor = 1.25
-			trait = gluttonous
-		}
-		modifier = {
-			factor = 3.0
-			has_focus = focus_carousing
-		}
-		modifier = {
-			factor = 0.5
-			trait = temperate
-		}
-		modifier = {
-			factor = 0.5
-			trait = just
-		}
-		modifier = {
-			factor = 0.25
-			trait = kind
-		}
-		modifier = {
-			factor = 0.25
-			has_character_flag = had_a_night_at_the_town
-		}
-	}
-	
-	immediate = {
-		# First look for someone at court
-		society = {
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					host = { character = ROOT }
-				}
-				character_event = { id = MNM.20011 }
-				break = yes
-			}
-			
-			# Then look for someone in the same realm
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					same_realm = yes
-				}
-				character_event = { id = MNM.20011 }
-				break = yes
-			}
-			
-			# Then look abroad...
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					is_within_diplo_range = ROOT
-				}
-				character_event = { id = MNM.20011 }
-			}
-		}
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20011
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20012 } }
-	}
-}
-
-# Satanic Night at the Town - Invitation
-character_event = {
 	id = MNM.20012
-	picture = GFX_evt_shady_meeting #GFX_evt_council
+	picture = GFX_evt_shady_meeting # GFX_evt_council
 	border = GFX_event_normal_frame_intrigue
-	
+	portrait = event_target:satanic_reveler
+
 	desc = {
 		text = EVTDESC_MNM_20012
 		trigger = {
-			FROM = {
+			event_target:satanic_reveler = {
 				NOT = { host = { character = ROOT } }
 			}
 		}
@@ -7397,71 +7286,169 @@ character_event = {
 	desc = {
 		text = EVTDESC_MNM_20012_COURT
 		trigger = {
-			FROM = {
+			event_target:satanic_reveler = {
 				host = { character = ROOT }
 			}
 		}
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	only_playable = yes
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+		is_inaccessible_trigger = no
+		is_ill = no
+
+		society = {
+			any_society_member = {
+				ai = yes
+				is_ill = no
+				in_command = no
+				is_inaccessible_or_incapable_trigger = no
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 1.25
+			trait = impaler
+		}
+		mult_modifier = {
+			factor = 1.25
+			trait = cruel
+		}
+		mult_modifier = {
+			factor = 1.25
+			trait = arbitrary
+		}
+		mult_modifier = {
+			factor = 1.25
+			trait = socializer
+		}
+		mult_modifier = {
+			factor = 1.25
+			trait = drunkard
+		}
+		mult_modifier = {
+			factor = 1.25
+			trait = gluttonous
+		}
+		mult_modifier = {
+			factor = 3.0
+			has_focus = focus_carousing
+		}
+		mult_modifier = {
+			factor = 0.5
+			trait = temperate
+		}
+		mult_modifier = {
+			factor = 0.5
+			trait = just
+		}
+		mult_modifier = {
+			factor = 0.25
+			trait = kind
+		}
+		mult_modifier = {
+			factor = 0.25
+			has_character_flag = had_a_night_at_the_town
+		}
+	}
+
+	immediate = {
+		society = {
+			random_society_member = {
+				limit = {
+					ai = yes
+					is_ill = no
+					in_command = no
+					is_inaccessible_or_incapable_trigger = no
+					is_within_diplo_range = ROOT
+					NOT = { character = ROOT }
+				}
+
+				preferred_limit = {
+					host = { character = ROOT } # First look for someone at court
+				}
+
+				preferred_limit = {
+					same_realm = ROOT # Then look for someone in the same realm
+				}
+
+				# Then look abroad...
+				save_event_target_as = satanic_reveler
+			}
+		}
+	}
 
 	option = {
 		name = EVTOPTA_MNM_20012 # Of course
-		ai_chance = {
-			factor = 100
+
+		if = {
+			limit = {
+				OR = {
+					trait = arbitrary
+					trait = wroth
+					trait = cruel
+					trait = impaler
+					trait = lunatic
+					trait = possessed
+				}
+			}
+
+			character_event = {
+				id = MNM.20014
+				days = 1
+				tooltip = EVT_MNM_20013_TT
+			}
 		}
-		
-		FROM = { character_event = { id = MNM.20013 tooltip = EVT_TT_20013 portrait = no } }
+		else = {
+			character_event = {
+				id = MNM.20021
+				days = 2
+				tooltip = EVT_MNM_20013_TT
+			}
+		}
+
+		ai_chance = { factor = 100 }
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20012 # No way!
+
+		detract_society_currency_minor_effect = yes
+
+		reverse_opinion = {
+			name = opinion_coward
+			who = event_target:satanic_reveler
+			years = 5
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 20
 				trait = temperate
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = kind
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = just
 			}
 		}
-		
-		detract_society_currency_minor_effect = yes
-		reverse_opinion = { who = FROM modifier = opinion_coward years = 5 }
-	}
-}
-
-# Next step decided
-character_event = {
-	id = MNM.20013
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		if = {
-			limit = {
-				FROM = {
-					OR = {
-						trait = arbitrary
-						trait = wroth
-						trait = cruel
-						trait = impaler
-						trait = lunatic
-						trait = possessed
-					}
-				}
-			}
-			FROM = { character_event = { id = MNM.20014 days = 1 } }
-			break = yes
-		}
-	
-		FROM = { character_event = { id = MNM.20021 days = 2 } }
 	}
 }
 
@@ -7470,29 +7457,53 @@ character_event = {
 	id = MNM.20014
 	picture = GFX_evt_tribal_lands
 	border = GFX_event_normal_frame_intrigue
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		set_character_flag = had_a_night_at_the_town
-	}
-	
+	portrait = event_target:satanic_reveler
+
 	desc = {
 		text = EVTDESC_MNM_20014
 		picture = GFX_evt_stone_church
 		trigger = {
-			society_member_of = the_satanists
+			is_tribal = no
 		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20014_NOMAD
+		picture = GFX_evt_nomad_camp
+		trigger = {
+			is_tribal = yes
+			is_faerun_horse_nomad_culture = yes
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20014_BACCHANALIS
+		picture = GFX_evt_bacchants_initiation
+		trigger = {
+			is_tribal = yes
+			is_faerun_horse_nomad_culture = no
+		}
+	}
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_character_flag = had_a_night_at_the_town
 	}
 
 	option = {
 		name = EVTOPTA_MNM_20014 # Head for the town
-		FROM = { character_event = { id = MNM.20020 days = 2 portrait = no } }
+		character_event = {
+			id = MNM.20021
+			days = 2
+		}
 	}
-	
+
 	option = {
 		name = EVTOPTB_MNM_20014 # Home Invasion
-		character_event = { id = MNM.20015 days = 2 tooltip = EVT_TT_20015 }
+		character_event = {
+			id = MNM.20015
+			days = 2
+			tooltip = EVT_TT_20015
+		}
 	}
 }
 
@@ -7501,485 +7512,314 @@ character_event = {
 	id = MNM.20015
 	picture = GFX_evt_burning_house
 	border = GFX_event_normal_frame_intrigue
-	
+
+	desc = {
+		text = EVTDESC_MNM_20015
+		picture = GFX_evt_impalement
+		trigger = {
+			is_tribal = no
+			NOT = { has_character_flag = home_invasion_buddy_dies }
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20015_DEATH
+		picture = GFX_evt_impalement
+		trigger = {
+			is_tribal = no
+			has_character_flag = home_invasion_buddy_dies
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20015_B
+		picture = GFX_evt_bacchants_initiation
+		trigger = {
+			is_tribal = yes
+			NOT = { has_character_flag = home_invasion_buddy_dies }
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20015_DEATH_B
+		picture = GFX_evt_bacchants_initiation
+		trigger = {
+			is_tribal = yes
+			has_character_flag = home_invasion_buddy_dies
+		}
+	}
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		# Chance of a bad effect
 		random = {
 			chance = 25
+
 			random_list = {
-				100 = { # Buddy dies
-					modifier = {
-						factor = 0
-						FROMFROM = {
-							is_ruler = yes
+				25 = { # Buddy dies
+					trigger = {
+						event_target:satanic_reveler = {
+							is_ruler = no
+							is_powerful = no
 						}
 					}
+
 					set_character_flag = home_invasion_buddy_dies
 				}
-				100 = { # Wounded
-					modifier = {
-						factor = 0
-						trait = wounded
+
+				25 = { # Wounded
+					trigger = {
+						NOT = { trait = wounded }
 					}
+
 					set_character_flag = home_invasion_wounded
 				}
-				100 = { # Become Arbitrary
-					modifier = {
-						factor = 0
-						trait = arbitrary
+
+				25 = { # Become Arbitrary
+					trigger = {
+						NOT = { trait = arbitrary }
 					}
+
 					set_character_flag = home_invasion_gain_arbitrary
 				}
-				100 = { # Become Cannibal
+
+				25 = { # Become Cannibal
 					trigger = {
 						NOT = { trait = cannibal_trait }
 						cannibal_race_trigger = no
 					}
-					
+
 					set_character_flag = home_invasion_gain_cannibal
 				}
 			}
 		}
-		
+
 		# Increased ambition?
 		if = {
 			limit = {
 				NOT = { trait = ambitious }
 			}
+
 			random = {
 				chance = 25
 				set_character_flag = home_invasion_inc_ambition
 			}
 		}
-		
+
 		# Increased cruelty? (Cruel and Impaler)
 		if = {
 			limit = {
 				OR = {
 					NOT = { trait = cruel }
-					NOT = { lifestyle_traits = 1 }
+					lifestyle_traits < 1
 				}
 			}
+
 			random = {
 				chance = 50
 				set_character_flag = home_invasion_inc_cruelty
 			}
 		}
-		
-		# Remove stress?
-		if = {
-			limit = {
-				trait = stressed
-			}
-			random = {
-				chance = 25
+
+		# Remove stress or depression?
+		random = {
+			chance = 25
+
+			if = {
+				limit = { trait = stressed }
 				set_character_flag = home_invasion_remove_stress
 			}
-		}
-		
-		# Remove depression?
-		if = {
-			limit = {
-				trait = depressed
-				NOT = { trait = stressed }
-			}
-			random = {
-				chance = 25
+			else_if = {
+				limit = { trait = depressed }
 				set_character_flag = home_invasion_remove_depression
 			}
 		}
-		
+
 		# Chance of peasant revolt in case you leave the scene intact
 		if = {
 			limit = {
 				location = {
-					NAND = {
-						has_empty_holding = yes
-						owner = {
-							is_nomadic = yes
-						}
-					}
-					
-					any_province_holding = {
-						NOT = { holding_type = nomad }
+					OR = {
+						has_castle = yes
+						has_city = yes
+						has_temple = yes
+						has_tribal = yes
 					}
 				}
 			}
+
 			random = {
 				chance = 50
 				set_character_flag = peasants_revolt
 			}
 		}
 	}
-	
-	desc =  {
-		trigger = {
-			has_dlc = "Reapers"
-			NOT = { has_character_flag = home_invasion_buddy_dies }
-		}
-		picture = GFX_evt_impalement
-		text = EVTDESC_MNM_20015
-	}
-	desc =  {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-			NOT = { has_character_flag = home_invasion_buddy_dies }
-		}
-		text = EVTDESC_MNM_20015
-	}
-	desc =  {
-		trigger = {
-			has_dlc = "Reapers"
-			has_character_flag = home_invasion_buddy_dies
-		}
-		picture = GFX_evt_impalement
-		text = EVTDESC_MNM_20015_DEATH
-	}
-	desc =  {
-		trigger = {
-			NOT = { has_dlc = "Reapers" }
-			has_character_flag = home_invasion_buddy_dies
-		}
-		text = EVTDESC_MNM_20015_DEATH
-	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20015 # Burn everything! No one must know.
-		
 		add_society_currency_minor_effect = yes
-		
-		# Buddy dies
-		if = {
-			limit = {
-				has_character_flag = home_invasion_buddy_dies
-			}
-			FROMFROM = {
-				death = { death_reason = death_accident }
-			}
-		}
-		
-		# Wounded
-		if = {
-			limit = {
-				has_character_flag = home_invasion_wounded
-			}
-			add_trait = wounded
-		}
-		
-		# Become Arbitrary
-		if = {
-			limit = {
-				has_character_flag = home_invasion_gain_arbitrary
-			}
-			if = {
-				limit = {
-					NOT = { trait = just }
-				}
-				add_trait = arbitrary
-			}
-			if = {
-				limit = {
-					trait = just
-				}
-				remove_trait = just
-			}
-		}
-		
-		# Cannibal
-		if = {
-			limit = {
-				has_character_flag = home_invasion_gain_cannibal
-			}
-			add_trait = cannibal_trait
-		}
-		
-		# Ambition
-		if = {
-			limit = {
-				has_character_flag = home_invasion_inc_ambition
-			}
-			if = {
-				limit = {
-					NOT = { trait = content }
-				}
-				add_trait = ambitious
-			}
-			if = {
-				limit = {
-					trait = content
-				}
-				remove_trait = content
-			}
-		}
-		
-		# Increase Cruelty
-		if = {
-			limit = {
-				has_character_flag = home_invasion_inc_cruelty
-			}
-			if = {
-				limit = {
-					trait = cruel
-					NOT = { lifestyle_traits = 1 }
-				}
-				add_trait = impaler
-			}
-			if = {
-				limit = {
-					NOT = { trait = kind }
-					NOT = { trait = cruel }
-				}
-				add_trait = cruel
-			}
-			if = {
-				limit = {
-					trait = kind
-				}
-				remove_trait = kind
-			}
-		}
-		
-		# Relieve Stress
-		if = {
-			limit = {
-				has_character_flag = home_invasion_remove_stress
-			}
-			remove_trait = stressed
-		}
-		
-		# Cure Depression
-		if = {
-			limit = {
-				has_character_flag = home_invasion_remove_depression
-			}
-			remove_trait = depressed
-		}
-		
-		# Friend gained / Rivalry lost
-		if = {
-			limit = {
-				NOT = { has_character_flag = home_invasion_buddy_dies }
-				NOT = { is_friend = FROMFROM }
-			}
-			if = {
-				limit = {
-					NOR = {
-						is_lover = FROMFROM
-						is_friend = FROMFROM
-						is_rival = FROMFROM
-					}
-				}
-				add_friend = FROMFROM
-			}
-			if = {
-				limit = {
-					is_rival = FROMFROM
-				}
-				remove_rival = FROMFROM
-			}
-		}
-		
-		clr_character_flag = home_invasion_buddy_dies
-		clr_character_flag = home_invasion_wounded
-		clr_character_flag = home_invasion_gain_arbitrary
-		clr_character_flag = home_invasion_gain_cannibal
-		clr_character_flag = home_invasion_inc_ambition
-		clr_character_flag = home_invasion_inc_cruelty
-		clr_character_flag = home_invasion_remove_stress
-		clr_character_flag = home_invasion_remove_depression
-		clr_character_flag = peasants_revolt
 	}
-	
+
 	option = {
-		name = EVTOPTB_MNM_20015 # Leave it as a monument (risk of revolt)
-		
+		name = {
+			text = EVTOPTB_MNM_20015 # Leave it as a monument (risk of revolt)
+			trigger = { is_tribal = no }
+		}
+		name = {
+			text = EVTOPTB_MNM_20015_B # Leave it as a monument (risk of revolt)
+			trigger = { is_tribal = yes }
+		}
+
 		add_society_currency_medium_effect = yes
-		
-		# Buddy dies
-		if = {
-			limit = {
-				has_character_flag = home_invasion_buddy_dies
-			}
-			FROMFROM = {
-				death = { death_reason = death_accident }
-			}
-		}
-		
-		# Wounded
-		if = {
-			limit = {
-				has_character_flag = home_invasion_wounded
-			}
-			add_trait = wounded
-		}
-		
-		# Become Arbitrary
-		if = {
-			limit = {
-				has_character_flag = home_invasion_gain_arbitrary
-			}
-			if = {
-				limit = {
-					NOT = { trait = just }
-				}
-				add_trait = arbitrary
-			}
-			if = {
-				limit = {
-					trait = just
-				}
-				remove_trait = just
-			}
-		}
-		
-		# Cannibal
-		if = {
-			limit = {
-				has_character_flag = home_invasion_gain_cannibal
-			}
-			add_trait = cannibal_trait
-		}
-		
-		# Ambition
-		if = {
-			limit = {
-				has_character_flag = home_invasion_inc_ambition
-			}
-			if = {
-				limit = {
-					NOT = { trait = content }
-				}
-				add_trait = ambitious
-			}
-			if = {
-				limit = {
-					trait = content
-				}
-				remove_trait = content
-			}
-		}
-		
-		# Increase Cruelty
-		if = {
-			limit = {
-				has_character_flag = home_invasion_inc_cruelty
-			}
-			if = {
-				limit = {
-					trait = cruel
-					NOT = { lifestyle_traits = 1 }
-				}
-				add_trait = impaler
-			}
-			if = {
-				limit = {
-					NOT = { trait = kind }
-					NOT = { trait = cruel }
-				}
-				add_trait = cruel
-			}
-			if = {
-				limit = {
-					trait = kind
-				}
-				remove_trait = kind
-			}
-		}
-		
-		# Relieve Stress
-		if = {
-			limit = {
-				has_character_flag = home_invasion_remove_stress
-			}
-			remove_trait = stressed
-		}
-		
-		# Cure Depression
-		if = {
-			limit = {
-				has_character_flag = home_invasion_remove_depression
-			}
-			remove_trait = depressed
-		}
-		
+
 		# Blessing of Berith
 		if = {
 			limit = {
 				NOT = { has_character_modifier = blessing_of_berith }
 			}
+
 			add_character_modifier = {
-				modifier = blessing_of_berith
+				name = blessing_of_berith
 				years = 5
 			}
 		}
-		
+
+		if = {
+			limit = { has_character_flag = peasants_revolt }
+
+			character_event = {
+				id = MNM.20017
+				days = 3
+				tooltip = EVT_MNM_20016_TT
+			}
+		}
+		else = {
+			character_event = {
+				id = MNM.20016
+				days = 3
+				tooltip = EVT_MNM_20016_TT
+			}
+		}
+	}
+
+	after = {
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			# Buddy dies
+			home_invasion_buddy_dies = {
+				event_target:satanic_reveler = {
+					show_scope_change = no
+
+					death = { death_reason = death_accident }
+				}
+			}
+
+			# Wounded
+			home_invasion_wounded = {
+				clr_character_flag = home_invasion_wounded
+				add_trait = wounded
+			}
+
+			# Become Arbitrary
+			home_invasion_gain_arbitrary = {
+				clr_character_flag = home_invasion_gain_arbitrary
+				add_trait_partially_silently_arbitrary_effect = yes
+			}
+
+			# Cannibal
+			home_invasion_gain_cannibal = {
+				clr_character_flag = home_invasion_gain_cannibal
+				add_trait = cannibal_trait
+			}
+		}
+
+		# Ambition
+		if = {
+			limit = { has_character_flag = home_invasion_inc_ambition }
+			clr_character_flag = home_invasion_inc_ambition
+			add_trait_partially_silently_ambitious_effect = yes
+		}
+
+		# Increase Cruelty
+		if = {
+			limit = { has_character_flag = home_invasion_inc_cruelty }
+			clr_character_flag = home_invasion_inc_cruelty
+
+			if = {
+				limit = {
+					trait = cruel
+					lifestyle_traits < 1
+				}
+
+				add_trait = impaler
+			}
+
+			add_trait_partially_silently_cruel_effect = yes
+		}
+
+		# Relieve Stress
+		if = {
+			limit = { has_character_flag = home_invasion_remove_stress }
+			clr_character_flag = home_invasion_remove_stress
+			remove_trait = stressed
+		}
+		# Cure Depression
+		else_if = {
+			limit = { has_character_flag = home_invasion_remove_depression }
+			clr_character_flag = home_invasion_remove_depression
+			remove_trait = depressed
+		}
+
 		# Friend gained / Rivalry lost
 		if = {
 			limit = {
-				NOT = { has_character_flag = home_invasion_buddy_dies }
-				NOT = { is_friend = FROMFROM }
+				NOR = {
+					has_character_flag = home_invasion_buddy_dies
+					is_friend = event_target:satanic_reveler
+				}
 			}
+
 			if = {
+				limit = { is_rival = event_target:satanic_reveler }
+				remove_rival = event_target:satanic_reveler
+			}
+			else_if = {
 				limit = {
 					NOR = {
-						is_lover = FROMFROM
-						is_friend = FROMFROM
-						is_rival = FROMFROM
+						is_lover = event_target:satanic_reveler
+						is_friend = event_target:satanic_reveler
 					}
 				}
-				add_friend = FROMFROM
-			}
-			if = {
-				limit = {
-					is_rival = FROMFROM
-				}
-				remove_rival = FROMFROM
+
+				add_friend = event_target:satanic_reveler
 			}
 		}
-		
-		if = {
-			limit = { NOT = { has_character_flag = peasants_revolt } }
-			character_event = { id = MNM.20016 days = 3 tooltip = EVT_TT_20016 }
-		}
-		
-		if = {
-			limit = { has_character_flag = peasants_revolt }
-			clr_character_flag = peasants_revolt
-			character_event = { id = MNM.20017 days = 3 tooltip = EVT_TT_20016 }
-		}
-		
+
+		clr_character_flag = peasants_revolt
 		clr_character_flag = home_invasion_buddy_dies
-		clr_character_flag = home_invasion_wounded
-		clr_character_flag = home_invasion_gain_arbitrary
-		clr_character_flag = home_invasion_gain_cannibal
-		clr_character_flag = home_invasion_inc_ambition
-		clr_character_flag = home_invasion_inc_cruelty
-		clr_character_flag = home_invasion_remove_stress
-		clr_character_flag = home_invasion_remove_depression
 	}
 }
 
 # Home Invasion - Demonic Monument outcome - increased revolt risk
 character_event = {
 	id = MNM.20016
+	desc = EVTDESC_MNM_20016
 	picture = GFX_evt_peasants
 	border = GFX_event_normal_frame_intrigue
-	
-	desc = EVTDESC_MNM_20016
-	
+	portrait = event_target:satanic_reveler
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		location = {
+			show_scope_change = no
+
 			add_province_modifier = {
-				modifier = rumors_of_witchcraft
+				name = rumors_of_witchcraft
 				years = 3
 			}
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20016
 	}
@@ -7988,13 +7828,13 @@ character_event = {
 # Home Invasion - Demonic Monument outcome - rebellion
 character_event = {
 	id = MNM.20017
+	desc = EVTDESC_MNM_20017
 	picture = GFX_evt_peasants
 	border = GFX_event_normal_frame_intrigue
-	
-	desc = EVTDESC_MNM_20017
-	
+	portrait = event_target:satanic_reveler
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		location = {
 			set_province_flag = force_peasant_revolt
@@ -8002,46 +7842,34 @@ character_event = {
 			clr_province_flag = force_peasant_revolt
 		}
 	}
-	
+
 	option = {
-		name = EVTOPTA_MNM_20017
-		trigger = {
-			location = {
-				owner = {
-					OR = {
-						character = ROOT
-						is_liege_or_above = ROOT
+		name = {
+			text = EVTOPTA_MNM_20017
+			trigger = {
+				location = {
+					owner = {
+						OR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
 					}
 				}
 			}
 		}
-	}
-	
-	option = {
-		name = EVTOPTA_MNM_20017_OTHER
-		trigger = {
-			location = {
-				owner = {
-					NOR = {
-						character = ROOT
-						is_liege_or_above = ROOT
+		name = {
+			text = EVTOPTA_MNM_20017_OTHER
+			trigger = {
+				location = {
+					owner = {
+						NOR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+						}
 					}
 				}
 			}
 		}
-	}
-}
-
-
-# Night at the tavern - Bounce
-character_event = {
-	id = MNM.20020
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20021 } }
 	}
 }
 
@@ -8050,78 +7878,87 @@ character_event = {
 	id = MNM.20021
 	picture = GFX_evt_brothel
 	border = GFX_event_normal_frame_intrigue
-	
+	portrait = event_target:satanic_reveler
+
+	desc = {
+		text = EVTDESC_MNM_20021
+		trigger = {
+			NOT = { has_character_flag = nt_rivalry }
+		}
+	}
+	desc = {
+		text = EVTDESC_MNM_20021_RIVALRY
+		trigger = {
+			has_character_flag = nt_rivalry
+		}
+	}
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		# Gain Wroth?
 		if = {
 			limit = {
 				NOT = { trait = wroth }
 			}
+
 			random = {
 				chance = 25
 				set_character_flag = nt_gain_wroth
 			}
 		}
-		
+
 		# Gain Cruel?
 		if = {
 			limit = {
 				NOT = { trait = cruel }
 			}
+
 			random = {
 				chance = 50
 				set_character_flag = nt_gain_cruel
 			}
 		}
-		
-		# Remove stress?
-		if = {
-			limit = {
-				trait = stressed
-			}
-			random = {
-				chance = 25
+
+		# Remove stress or depression?
+		random = {
+			chance = 25
+
+			if = {
+				limit = { trait = stressed }
 				set_character_flag = nt_remove_stress
 			}
-		}
-		
-		# Remove depression?
-		if = {
-			limit = {
-				trait = depressed
-				NOT = { trait = stressed }
-			}
-			random = {
-				chance = 25
+			else_if = {
+				limit = { trait = depressed }
 				set_character_flag = nt_remove_depression
 			}
 		}
-		
+
 		# Friendship or Rivalry?
 		if = {
 			limit = {
-				NOT = { is_lover = FROM }
+				NOR = { is_lover = event_target:satanic_reveler }
 			}
+
 			random_list = {
 				100 = {
-					modifier = {
-						factor = 0
-						is_friend = FROM
+					trigger = {
+						NOT = { is_friend = event_target:satanic_reveler } # CleanSlate: So if they were your friend, they always move towards becoming your rival and vice versa? Is that intended?
 					}
+
 					set_character_flag = nt_bonding
 				}
+
 				20 = {
-					modifier = {
-						factor = 0
-						is_rival = FROM
+					trigger = {
+						NOT = { is_rival = event_target:satanic_reveler }
 					}
+
 					set_character_flag = nt_rivalry
 				}
 			}
 		}
-		
+
 		# Oops, I drank the beer.
 		random = {
 			chance = 20
@@ -8129,267 +7966,204 @@ character_event = {
 			smart_02x_score = yes
 			dumb_5x_score = yes
 
-			modifier = {
+			mult_modifier = {
 				factor = 2.0
 				trait = drunkard
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2.0
 				trait = hedonist
 			}
-			
+
 			set_character_flag = nt_drank_the_beer
 		}
 	}
-	
-	desc = {
-		trigger = {
-			NOT = { has_character_flag = nt_rivalry }
-		}
-		text = EVTDESC_MNM_20021
-	}
-	
-	desc = {
-		trigger = {
-			has_character_flag = nt_rivalry
-		}
-		text = EVTDESC_MNM_20021_RIVALRY
-	}
-	
+
 	option = {
 		name = {
+			text = EVTOPTA_MNM_20021
+			trigger = {
+				NOR = {
+					has_character_flag = nt_drank_the_beer
+					has_character_flag = nt_rivalry
+				}
+			}
+		}
+		name = {
+			text = EVTOPTA_MNM_20021_RIVALRY
 			trigger = {
 				has_character_flag = nt_rivalry
 				NOT = { has_character_flag = nt_drank_the_beer }
 			}
-			text = EVTOPTA_MNM_20021_RIVALRY
 		}
-		
 		name = {
-			trigger = {
-				NOT = { has_character_flag = nt_drank_the_beer }
-				NOT = { has_character_flag = nt_rivalry }
-			}
-			text = EVTOPTA_MNM_20021
-		}
-		
-		name = {
-			trigger = {
-				has_character_flag = nt_drank_the_beer
-			}
 			text = EVTOPTA_MNM_20021_OOPS
+			trigger = { has_character_flag = nt_drank_the_beer }
 		}
-		
+
 		add_society_currency_minor_effect = yes
-		
+
 		# Gain Wroth
 		if = {
-			limit = {
-				has_character_flag = nt_gain_wroth
-			}
-			if = {
-				limit = {
-					NOT = { trait = patient }
-				}
-				add_trait = wroth
-			}
-			if = {
-				limit = {
-					trait = patient
-				}
-				remove_trait = patient
-			}
+			limit = { has_character_flag = nt_gain_wroth }
+			clr_character_flag = nt_gain_wroth
+			add_trait_partially_silently_wroth_effect = yes
 		}
-		
+
 		# Gain Cruel
 		if = {
-			limit = {
-				has_character_flag = nt_gain_cruel
-			}
-			if = {
-				limit = {
-					NOT = { trait = kind }
-				}
-				add_trait = cruel
-			}
-			if = {
-				limit = {
-					trait = kind
-				}
-				remove_trait = kind
-			}
+			limit = { has_character_flag = nt_gain_cruel }
+			clr_character_flag = nt_gain_cruel
+			add_trait_partially_silently_cruel_effect = yes
 		}
-		
+
 		# Relieve Stress
 		if = {
-			limit = {
-				has_character_flag = nt_remove_stress
-			}
+			limit = { has_character_flag = nt_remove_stress }
+			clr_character_flag = nt_remove_stress
 			remove_trait = stressed
 		}
-		
 		# Cure Depression
-		if = {
-			limit = {
-				has_character_flag = nt_remove_depression
-			}
+		else_if = {
+			limit = { has_character_flag = nt_remove_depression }
+			clr_character_flag = nt_remove_depression
 			remove_trait = depressed
 		}
-		
+
 		# Friend gained
 		if = {
-			limit = {
-				has_character_flag = nt_bonding
-			}
+			limit = { has_character_flag = nt_bonding }
+
+			clr_character_flag = nt_bonding
+
 			if = {
-				limit = {
-					NOR = {
-						is_lover = FROM
-						is_friend = FROM
-						is_rival = FROM
-					}
-				}
-				add_friend = FROM
+				limit = { is_rival = event_target:satanic_reveler }
+				remove_rival = event_target:satanic_reveler
 			}
-			if = {
+			else_if = {
 				limit = {
-					is_rival = FROM
+					NOT = { is_friend = event_target:satanic_reveler }
 				}
-				remove_rival = FROM
+
+				add_friend = event_target:satanic_reveler
 			}
 		}
-		
+
 		# Rival gained
-		if = {
-			limit = {
-				has_character_flag = nt_rivalry
-			}
+		else_if = {
+			limit = { has_character_flag = nt_rivalry }
+
+			clr_character_flag = nt_rivalry
+
 			if = {
-				limit = {
-					NOR = {
-						is_friend = FROM
-						is_rival = FROM
-					}
-				}
-				add_rival = FROM
+				limit = { is_friend = event_target:satanic_reveler }
+				remove_friend = event_target:satanic_reveler
 			}
-			if = {
+			else_if = {
 				limit = {
-					is_friend = FROM
+					NOT = { is_rival = event_target:satanic_reveler }
 				}
-				remove_friend = FROM
+
+				add_rival = event_target:satanic_reveler
 			}
 		}
-		
+
 		if = {
-			limit = {
-				has_character_flag = nt_drank_the_beer
+			limit = { has_character_flag = nt_drank_the_beer }
+
+			clr_character_flag = nt_drank_the_beer
+
+			character_event = {
+				id = MNM.20022
+				days = 1
+				tooltip = EVT_MNM_20022_TT
 			}
-			character_event = { id = MNM.20022 days = 1 tooltip = EVT_TT_20022 }
 		}
-		
-		clr_character_flag = nt_gain_wroth
-		clr_character_flag = nt_gain_cruel
-		clr_character_flag = nt_remove_stress
-		clr_character_flag = nt_remove_depression
-		clr_character_flag = nt_bonding
-		clr_character_flag = nt_rivalry
-		clr_character_flag = nt_drank_the_beer
 	}
 }
 
 # Debauchery at the Tavern - Drank the drugged beer
 character_event = {
 	id = MNM.20022
+	desc = EVTDESC_MNM_20022
 	picture = GFX_evt_drunk
 	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		random_list = {
+			100 = { set_character_flag = nt_grow_dumber }
+
 			100 = {
-				modifier = {
-					factor = 0
-					trait = drunkard
+				trigger = {
+					NOT = { trait = drunkard }
 				}
+
 				set_character_flag = nt_gain_drunkard
 			}
+
 			25 = {
-				modifier = {
-					factor = 0
-					trait = lunatic
+				trigger = {
+					NOT = { trait = lunatic }
 				}
+
 				set_character_flag = nt_gain_lunatic
 			}
+
 			100 = {
-				set_character_flag = nt_grow_dumber
-			}
-			100 = {
-				modifier = {
-					factor = 0
-					has_character_modifier = hallucinating
+				trigger = {
+					NOT = { has_character_modifier = hallucinating }
 				}
+
 				set_character_flag = nt_bad_modifier
 			}
 		}
 	}
-	
-	desc = EVTDESC_MNM_20022
-	
+
 	option = {
 		name = EVTOPTA_MNM_20022
-		
-		# Become a drunkard
-		if = {
-			limit = {
-				has_character_flag = nt_gain_drunkard
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			nt_gain_drunkard = { # Become a drunkard
+				clr_character_flag = nt_gain_drunkard
+				add_trait = drunkard
 			}
-			add_trait = drunkard
-		}
-		
-		#Go insane
-		if = {
-			limit = {
-				has_character_flag = nt_gain_lunatic
+
+			nt_gain_lunatic = { # Go insane
+				clr_character_flag = nt_gain_lunatic
+				add_trait = lunatic
 			}
-			add_trait = lunatic
-		}
-		
-		#Brain damage
-		if = {
-			limit = {
-				has_character_flag = nt_grow_dumber
-			}
-			if = {
-				limit = {
-					is_smart_non_congenital_trait_downgradeable_trigger = yes
+
+			nt_bad_modifier = { # Poisoned
+				clr_character_flag = nt_bad_modifier
+
+				add_character_modifier = {
+					name = hallucinating
+					months = 4
 				}
-				downgrade_smart_non_congenital_trait_effect = yes
 			}
-			else_if = {
-				limit = {
-					is_smart_congenital_trait_downgradeable_trigger = yes
+
+			# Brain damage
+			nt_grow_dumber = {
+				clr_character_flag = nt_grow_dumber
+
+				if = {
+					limit = {
+						is_smart_non_congenital_trait_downgradeable_trigger = yes
+					}
+					downgrade_smart_non_congenital_trait_effect = yes
 				}
-				downgrade_smart_congenital_trait_effect = yes
+				else_if = {
+					limit = {
+						is_smart_congenital_trait_downgradeable_trigger = yes
+					}
+					downgrade_smart_congenital_trait_effect = yes
+				}
 			}
 		}
-		
-		# Poisoned
-		if = {
-			limit = {
-				has_character_flag = nt_bad_modifier
-			}
-			add_character_modifier = {
-				name = hallucinating
-				days = 120
-			}
-		}
-		
-		clr_character_flag = nt_gain_drunkard
-		clr_character_flag = nt_gain_lunatic
-		clr_character_flag = nt_grow_dumber
-		clr_character_flag = nt_bad_modifier
 	}
 }
 
