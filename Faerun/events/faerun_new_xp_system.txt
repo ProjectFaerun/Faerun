@@ -23,6 +23,40 @@ character_event = {
 	immediate = {
 		if = {
 			limit = {
+				NOT = { has_character_flag = aristocrat_init }
+				z_aristocrat = yes
+			}
+			set_character_flag = aristocrat_init
+			trigger_switch = {
+				on_trigger = trait
+				aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_basic_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_basic_xp } } }
+				trained_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_trained_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_trained_xp } } }
+				journeyman_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_journeyman_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_journeyman_xp } } }
+				expert_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_expert_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_expert_xp } } }
+				master_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_master_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_master_xp } } }
+				renowned_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_renowned_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_renowned_xp } } }
+				legendary_aristocrat = { if = { limit = { z_multiclass = yes } set_variable = { which = aristocrat_xp which = global_legendary_xp_multiclass } } else = { set_variable = { which = aristocrat_xp which = global_legendary_xp } } }
+			}
+		}
+		if = {
+			limit = {
+				NOT = { has_character_flag = artificer_init }
+				z_artificer = yes
+			}
+			set_character_flag = artificer_init
+			trigger_switch = {
+				on_trigger = trait
+				artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_basic_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_basic_xp } } }
+				trained_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_trained_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_trained_xp } } }
+				journeyman_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_journeyman_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_journeyman_xp } } }
+				expert_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_expert_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_expert_xp } } }
+				master_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_master_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_master_xp } } }
+				renowned_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_renowned_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_renowned_xp } } }
+				legendary_artificer = { if = { limit = { z_multiclass = yes } set_variable = { which = artificer_xp which = global_legendary_xp_multiclass } } else = { set_variable = { which = artificer_xp which = global_legendary_xp } } }
+			}
+		}
+		if = {
+			limit = {
 				NOT = { has_character_flag = barbarian_init }
 				z_barbarian = yes
 			}
@@ -311,13 +345,403 @@ character_event = {
 			}
 		}
 
+		# aristocrat block
+		if = {
+			limit = {
+				z_aristocrat = yes
+				NOT = { trait = legendary_aristocrat }
+			}
+
+			if = {
+				limit = {
+					has_ambition = obj_cls_aristocrat
+				}
+				change_variable = { which = aristocrat_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_trained_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_trained_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = aristocrat
+							add_trait = trained_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl1
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+				trained_aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_journeyman_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_journeyman_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = trained_aristocrat
+							add_trait = journeyman_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl2
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = { #lolth test
+							limit = {
+								religion = lolth_cult
+								trait = creature_drow
+								NOT = { has_character_flag = lolth_tested_flag }
+							}
+							character_event = { id = conv.20 days = 150 random = 60 }
+						}
+					}
+				}
+				journeyman_aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_expert_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_expert_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = journeyman_aristocrat
+							add_trait = expert_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl3
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+				expert_aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_master_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_master_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = expert_aristocrat
+							add_trait = master_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl4
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+				master_aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_renowned_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_renowned_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = master_aristocrat
+							add_trait = renowned_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl5
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+				renowned_aristocrat = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = aristocrat_xp which >= global_legendary_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = aristocrat_xp which >= global_legendary_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = renowned_aristocrat
+							add_trait = legendary_aristocrat
+						}
+						else = {
+							set_character_flag = class_upgrading_aristocratlvl6
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+			}
+		}
+		# Artificer block
+		if = {
+			limit = {
+				z_artificer = yes
+				NOT = { trait = legendary_artificer }
+			}
+
+			if = {
+				limit = {
+					has_minor_title = title_magic_apprentice
+					liege = { z_artificer = yes }
+				}
+				change_variable = { which = artificer_xp value = 15 }
+			}
+			if = {
+				limit = {
+					has_ambition = obj_cls_artificer
+				}
+				change_variable = { which = artificer_xp value = 10 }
+			}
+			#Now to check for level up
+			trigger_switch = {
+				on_trigger = trait
+				artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_trained_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_trained_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = artificer
+							add_trait = trained_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl1
+							set_character_flag = class_upgrading_trigger_flag
+						}
+					}
+				}
+				trained_artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_journeyman_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_journeyman_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = trained_artificer
+							add_trait = journeyman_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl2
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = { #lolth test
+							limit = {
+								religion = lolth_cult
+								trait = creature_drow
+								NOT = { has_character_flag = lolth_tested_flag }
+							}
+							character_event = { id = conv.20 days = 150 random = 60 }
+						}
+						if = {
+							limit = { 
+								has_minor_title = title_magic_apprentice 
+								trigger_if = {
+									limit = { trait = loyal }
+
+									liege = { trait = journeyman_artificer }
+								}
+							}
+
+							remove_title = title_magic_apprentice
+						}
+					}
+				}
+				journeyman_artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_expert_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_expert_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = journeyman_artificer
+							add_trait = expert_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl3
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = {
+							limit = { 
+								has_minor_title = title_magic_apprentice 
+								trigger_if = {
+									limit = { trait = loyal }
+
+									liege = { trait = expert_artificer }
+								}
+							}
+
+							remove_title = title_magic_apprentice
+						}
+					}
+				}
+				expert_artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_master_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_master_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = expert_artificer
+							add_trait = master_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl4
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = {
+							limit = { 
+								has_minor_title = title_magic_apprentice 
+								trigger_if = {
+									limit = { trait = loyal }
+
+									liege = { trait = master_artificer }
+								}
+							}
+
+							remove_title = title_magic_apprentice
+						}
+					}
+				}
+				master_artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_renowned_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_renowned_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = master_artificer
+							add_trait = renowned_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl5
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = {
+							limit = { 
+								has_minor_title = title_magic_apprentice 
+								trigger_if = {
+									limit = { trait = loyal }
+
+									liege = { trait = renowned_artificer }
+								}
+							}
+
+							remove_title = title_magic_apprentice
+						}
+					}
+				}
+				renowned_artificer = {
+					if = {
+						limit = {
+							trigger_if = {
+								limit = { z_multiclass = yes }
+								check_variable = { which = artificer_xp which >= global_legendary_xp_multiclass }
+							}
+							trigger_else = {
+								check_variable = { which = artificer_xp which >= global_legendary_xp }
+							}
+						}
+						if = {
+							limit = { ai = yes }
+							remove_trait = renowned_artificer
+							add_trait = legendary_artificer
+						}
+						else = {
+							set_character_flag = class_upgrading_artificerlvl6
+							set_character_flag = class_upgrading_trigger_flag
+						}
+						if = {
+							limit = {
+								OR = {
+									culture = netherese
+									culture = shadovar
+									trait = patron_shar
+								}
+							}
+							change_variable = {
+								which = global_counter_shadow
+								value = 1
+							}
+						}
+						if = {
+							limit = { 
+								has_minor_title = title_magic_apprentice
+							}
+
+							remove_title = title_magic_apprentice
+						}
+					}
+				}
+			}
+		}
 		#Barbarian block
 		if = {
 			limit = {
 				z_barbarian = yes
 				NOT = { trait = legendary_barbarian }
-			}
-			
+			}	
 			if = {
 				limit = {
 					has_ambition = obj_cls_barbarian
@@ -469,7 +893,7 @@ character_event = {
 				}
 			}
 		}
-		#Bard block
+		# Bard block
 		if = {
 			limit = {
 				z_bard = yes
@@ -2877,6 +3301,24 @@ character_event = {
 
 	option = {
 		name = TBXP.3.OPT
+		trigger_switch = {
+			on_trigger = has_character_flag
+			class_upgrading_aristocratlvl1 = { add_trait = trained_aristocrat }
+			class_upgrading_aristocratlvl2 = { add_trait = journeyman_aristocrat }
+			class_upgrading_aristocratlvl3 = { add_trait = expert_aristocrat }
+			class_upgrading_aristocratlvl4 = { add_trait = master_aristocrat }
+			class_upgrading_aristocratlvl5 = { add_trait = renowned_aristocrat }
+			class_upgrading_aristocratlvl6 = { add_trait = legendary_aristocrat }
+		}
+		trigger_switch = {
+			on_trigger = has_character_flag
+			class_upgrading_artificerlvl1 = { add_trait = trained_artificer }
+			class_upgrading_artificerlvl2 = { add_trait = journeyman_artificer }
+			class_upgrading_artificerlvl3 = { add_trait = expert_artificer }
+			class_upgrading_artificerlvl4 = { add_trait = master_artificer }
+			class_upgrading_artificerlvl5 = { add_trait = renowned_artificer }
+			class_upgrading_artificerlvl6 = { add_trait = legendary_artificer }
+		}
 		trigger_switch = {
 			on_trigger = has_character_flag
 			class_upgrading_bardlvl1 = { add_trait = trained_bard }
