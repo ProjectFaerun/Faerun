@@ -904,7 +904,7 @@ character_event = {
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
 	portrait = event_target:satanists_inductor
-	desc = EVTDESC_MNM_7015_ALT
+	desc = EVTDESC_MNM_7015
 
 	is_triggered_only = yes
 
@@ -8172,130 +8172,18 @@ character_event = {
 # Fired from on_society_bi_yearly_pulse
 ###########################################
 
-character_event = {
-	id = MNM.20030
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-	is_in_society = yes
-	
-	trigger = {
-		is_devil_worshiper_trigger = yes
-		NOT = { is_inaccessible_trigger = yes }
-		is_ill = no
-	}
-	
-	weight_multiplier = {
-		factor = 1
-
-		smart_2x_score = yes
-		dumb_05x_score = yes
-
-		modifier = {
-			factor = 2.0
-			society_rank >= 3
-		}
-		modifier = {
-			factor = 0.5
-			society_rank == 1
-		}
-		modifier = {
-			factor = 3.0
-			OR = {
-				has_focus = focus_scholarship
-				has_focus = focus_theology
-			}
-		}
-		modifier = {
-			factor = 3.0
-			trait = mystic
-		}
-		modifier = {
-			factor = 0.25
-			has_character_flag = had_a_grand_demon_summoning
-		}
-	}
-	
-	immediate = {
-		# First look for someone at court
-		society = {
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					host = { character = ROOT }
-				}
-				character_event = { id = MNM.20031 }
-				break = yes
-			}
-			
-			# Then look for someone in the same realm
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					same_realm = yes
-				}
-				character_event = { id = MNM.20031 }
-				break = yes
-			}
-			
-			# Then look abroad...
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					is_within_diplo_range = ROOT
-				}
-				character_event = { id = MNM.20031 }
-			}
-		}
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20031
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { narrative_event = { id = MNM.20032 } }
-	}
-}
-
 # Demon Summoning - Planning
 narrative_event = {
 	id = MNM.20032
+	title = EVTTITLE_MNM_20034
 	picture = GFX_evt_shadowy_cabal
 	border = GFX_event_narrative_frame_intrigue
-	
-	title = EVTTITLE_MNM_20034
-	
+	portrait = event_target:demon_summoner
+
 	desc = {
 		text = EVTDESC_MNM_20032
 		trigger = {
-			FROM = {
+			event_target:demon_summoner = {
 				NOT = { host = { character = ROOT } }
 			}
 		}
@@ -8303,680 +8191,754 @@ narrative_event = {
 	desc = {
 		text = EVTDESC_MNM_20032_COURT
 		trigger = {
-			FROM = {
+			event_target:demon_summoner = {
 				host = { character = ROOT }
 			}
 		}
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	only_playable = yes
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+		is_inaccessible_trigger = no
+		is_ill = no
+
+		society = {
+			any_society_member = {
+				ai = yes
+				in_command = no
+				is_ill = no
+				is_inaccessible_or_incapable_trigger = no
+				is_within_diplo_range = ROOT
+				NOT = { character = ROOT }
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		smart_2x_score = yes
+		dumb_05x_score = yes
+
+		mult_modifier = {
+			factor = 2.0
+			society_rank >= 3
+		}
+		mult_modifier = {
+			factor = 0.5
+			society_rank == 1
+		}
+		mult_modifier = {
+			factor = 3.0
+			OR = {
+				has_focus = focus_scholarship
+				has_focus = focus_theology
+			}
+		}
+		mult_modifier = {
+			factor = 3.0
+			trait = mystic
+		}
+		mult_modifier = {
+			factor = 0.25
+			has_character_flag = had_a_grand_demon_summoning
+		}
+	}
+
+	immediate = {
+		society = {
+			random_society_member = {
+				limit = {
+					ai = yes
+					in_command = no
+					is_ill = no
+					is_inaccessible_or_incapable_trigger = no
+					is_within_diplo_range = ROOT
+					NOT = { character = ROOT }
+				}
+
+				preferred_limit = {
+					host = { character = ROOT } # First look for someone at court
+				}
+
+				preferred_limit = {
+					same_realm = ROOT # Then look for someone in the same realm
+				}
+
+				# Then look abroad...
+				save_event_target_as = demon_summoner
+			}
+		}
+	}
 
 	option = {
 		name = EVTOPTA_MNM_20032 # Unlimited Power!
+
+		set_character_flag = had_a_grand_demon_summoning
+
+		narrative_event = {
+			id = MNM.20034
+			days = 3
+			tooltip = EVT_TT_20033
+		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 50
 				trait = ambitious
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 50
 				trait = mystic
 			}
 		}
-		
-		set_character_flag = had_a_grand_demon_summoning
-		
-		FROM = { character_event = { id = MNM.20033 tooltip = EVT_TT_20033 portrait = no } }
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20032 # Let's think this through
+
+		detract_society_currency_minor_effect = yes
+
+		reverse_opinion = {
+			name = opinion_coward
+			who = event_target:demon_summoner
+			years = 5
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 50
 				trait = craven
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 25
 				trait = content
 			}
 		}
-		
-		detract_society_currency_minor_effect = yes
-		reverse_opinion = { who = FROM modifier = opinion_coward years = 5 }
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20033
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { narrative_event = { id = MNM.20034 days = 3  } }
 	}
 }
 
 # Demon Summoning - The Ritual
 narrative_event = {
 	id = MNM.20034
+	title = EVTTITLE_MNM_20034
 	picture = GFX_evt_magic_ritual
 	border = GFX_event_narrative_frame_intrigue
-	
-	title = EVTTITLE_MNM_20034
-	
+	portrait = event_target:demon_summoner
+
+	desc = {
+		text = EVTDESC_MNM_20034
+		trigger = {
+			NOT = { has_character_flag = ds_disaster }
+		}
+	}
+	desc = {
+		text = EVTOPTA_MNM_20034_DISASTER
+		trigger = { has_character_flag = ds_disaster }
+	}
+
+	is_triggered_only = yes
+
 	immediate = {
 		hidden_effect = {
 			random_list = {
 				100 = { # Stewardship Demon
-					modifier = {
-						factor = 0
-						has_character_modifier = blessing_of_mammon
-						NOR = {
-							trait = indulgent_wastrel
-							trait = thrifty_clerk
-							trait = fortune_builder
+					trigger = {
+						trigger_if = {
+							limit = { has_character_modifier = blessing_of_mammon }
+
+							OR = {
+								trait = indulgent_wastrel
+								trait = thrifty_clerk
+								trait = fortune_builder
+							}
 						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						OR = {
-							trait = indulgent_wastrel
-							trait = thrifty_clerk
-							trait = fortune_builder
-							trait = midas_touched
-						}
+						has_education_stewardship_trigger = yes
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						OR = {
 							has_focus = focus_rulership
 							has_focus = focus_business
 						}
 					}
+
 					set_character_flag = ds_STE
 				}
+
 				100 = { # Diplomacy Demon
-					modifier = {
-						factor = 0
-						has_character_modifier = blessing_of_belial
-						NOR = {
-							trait = naive_appeaser
-							trait = underhanded_rogue
-							trait = charismatic_negotiator
+					trigger = {
+						trigger_if = {
+							limit = { has_character_modifier = blessing_of_belial }
+
+							OR = {
+								trait = naive_appeaser
+								trait = underhanded_rogue
+								trait = charismatic_negotiator
+							}
 						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						OR = {
-							trait = naive_appeaser
-							trait = underhanded_rogue
-							trait = charismatic_negotiator
-							trait = grey_eminence
-						}
+						has_education_diplomacy_trigger = yes
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						OR = {
 							has_focus = focus_family
 							has_focus = focus_carousing
 						}
 					}
+
 					set_character_flag = ds_DIP
 				}
+
 				100 = { # Martial Demon
-					modifier = {
-						factor = 0
-						has_character_modifier = blessing_of_azazel
-						NOR = {
-							trait = misguided_warrior
-							trait = tough_soldier
-							trait = skilled_tactician
+					trigger = {
+						trigger_if = {
+							limit = { has_character_modifier = blessing_of_azazel }
+
+							OR = {
+								trait = misguided_warrior
+								trait = tough_soldier
+								trait = skilled_tactician
+							}
 						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						OR = {
-							trait = misguided_warrior
-							trait = tough_soldier
-							trait = skilled_tactician
-							trait = brilliant_strategist
-						}
+						has_education_martial_trigger = yes
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						OR = {
 							has_focus = focus_war
 							has_focus = focus_hunting
 						}
 					}
+
 					set_character_flag = ds_MAR
 				}
+
 				100 = { # Intrigue Demon
-					modifier = {
-						factor = 0
-						NOT = {
-							any_rival = {
-								always = yes
+					trigger = {
+						OR = {
+							num_of_rivals > 0
+
+							trigger_if = {
+								limit = { has_character_modifier = blessing_of_vetis }
+
+								OR = {
+									trait = amateurish_plotter
+									trait = flamboyant_schemer
+									trait = intricate_webweaver
+								}
 							}
 						}
-						has_character_modifier = blessing_of_vetis
-						NOR = {
-							trait = amateurish_plotter
-							trait = flamboyant_schemer
-							trait = intricate_webweaver
-						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						OR = {
-							trait = amateurish_plotter
-							trait = flamboyant_schemer
-							trait = intricate_webweaver
-							trait = elusive_shadow
-						}
+						has_education_intrigue_trigger = yes
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						OR = {
 							has_focus = focus_seduction
 							has_focus = focus_intrigue
 						}
 					}
+
 					random_rival = {
-						ROOT = { set_character_flag = ds_kill_a_rival_1 }
+						limit = {
+							is_powerful = no
+						}
+
 						save_event_target_as = rival_1
 					}
+
 					random_rival = {
 						limit = {
 							NOT = { character = event_target:rival_1 }
+							is_powerful = no
 						}
-						ROOT = { set_character_flag = ds_kill_a_rival_2 }
+
 						save_event_target_as = rival_2
 					}
+
 					set_character_flag = ds_INT
 				}
+
 				100 = { # Learning Demon
-					modifier = {
-						factor = 0
-						has_character_modifier = blessing_of_avnas
-						NOR = {
-							trait = detached_priest
-							trait = martial_cleric
-							trait = scholarly_theologian
-							is_smart_non_congenital_trigger = yes
+					trigger = {
+						trigger_if = {
+							limit = { has_character_modifier = blessing_of_avnas }
+
+							OR = {
+								trait = detached_priest
+								trait = martial_cleric
+								trait = scholarly_theologian
+								is_smart_non_congenital_trigger = no
+							}
 						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						OR = {
-							trait = detached_priest
-							trait = martial_cleric
-							trait = scholarly_theologian
-							trait = mastermind_theologian
-						}
+						has_education_learning_trigger = yes
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
 						OR = {
 							has_focus = focus_scholarship
 							has_focus = focus_theology
 						}
 					}
+
 					set_character_flag = ds_LEA
 				}
-				100 = { # Disaster!
 
+				100 = { # Disaster!
 					smart_02x_score = yes
 					dumb_5x_score = yes
 
-					modifier = {
+					mult_modifier = {
 						factor = 0.5
 						trait = mystic
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 3.0
 						trait = inbred
 					}
+
 					random_list = {
+						100 = { set_character_flag = ds_stupid }
+						100 = { set_character_flag = ds_illness }
+
 						100 = {
-							set_character_flag = ds_illness
-						}
-						100 = {
-							modifier = {
-								factor = 0
-								location = {
-									has_disease = yes
-								}
+							trigger = {
+								location = { has_disease = no }
 							}
+
 							set_character_flag = ds_epidemic
 						}
+
 						100 = {
-							modifier = {
-								factor = 0
-								OR = {
-									is_female = yes
-									trait = eunuch
-								}
+							trigger = {
+								is_female = no
+								NOT = { trait = eunuch }
+								is_infertile_race = no
 							}
+
 							set_character_flag = ds_eunuch
 						}
+
 						100 = {
-							set_character_flag = ds_stupid
-						}
-						100 = {
-							modifier = {
-								factor = 0
-								has_character_modifier = known_witch
+							trigger = {
+								NOT = { has_character_modifier = known_witch }
 							}
+
 							set_character_flag = ds_exposure
 						}
+
 						100 = {
-							modifier = {
-								factor = 0
-								is_rival = FROM
+							trigger = {
+								NOT = { is_rival = event_target:demon_summoner }
 							}
+
 							set_character_flag = ds_rivalry
 						}
+
 						100 = {
-							modifier = {
-								factor = 0
-								trait = possessed
+							trigger = {
+								NOT = { trait = possessed }
 							}
+
 							set_character_flag = ds_possess
 						}
 					}
-					
+
 					set_character_flag = ds_disaster
 				}
 			}
 		}
 	}
-	
-	desc = {
-		trigger = {
-			NOT = { has_character_flag = ds_disaster }
-		}
-		text = EVTDESC_MNM_20034
-	}
-	desc = {
-		trigger = {
-			has_character_flag = ds_disaster
-		}
-		text = EVTOPTA_MNM_20034_DISASTER
-	}
 
-	is_triggered_only = yes
-	
 	option = {
 		name = EVTOPTA_MNM_20034
+
 		trigger = {
 			NOT = { has_character_flag = ds_disaster }
 		}
-		
+
 		add_society_currency_minor_effect = yes
-		
 		increase_visibility_effect = yes
-		
-		# Stewardship Boon
-		if = {
-			limit = {
-				has_character_flag = ds_STE
-			}
-			if = {
-				limit = {
-					has_character_modifier = blessing_of_mammon
-				}
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			# Stewardship Boon
+			ds_STE = {
 				if = {
-					limit = { trait = fortune_builder }
-					hidden_tooltip = { remove_trait = fortune_builder }
-					add_trait = midas_touched
+					limit = { has_character_modifier = blessing_of_mammon }
+
+					trigger_switch = {
+						on_trigger = trait
+
+						fortune_builder = {
+							hidden_effect = { remove_trait = fortune_builder }
+							add_trait = midas_touched
+						}
+
+						thrifty_clerk = {
+							hidden_effect = { remove_trait = thrifty_clerk }
+							add_trait = fortune_builder
+						}
+
+						indulgent_wastrel = {
+							hidden_effect = { remove_trait = indulgent_wastrel }
+							add_trait = thrifty_clerk
+						}
+					}
 				}
-				if = {
-					limit = { trait = thrifty_clerk }
-					hidden_tooltip = { remove_trait = thrifty_clerk }
-					add_trait = fortune_builder
-				}
-				if = {
-					limit = { trait = indulgent_wastrel }
-					hidden_tooltip = { remove_trait = indulgent_wastrel }
-					add_trait = thrifty_clerk
-				}
-			}
-			if = {
-				limit = {
-					NOT = { has_character_modifier = blessing_of_mammon }
-				}
-				add_character_modifier = {
-					modifier = blessing_of_mammon
-					days = -1
-				}
-			}
-		}
-		
-		# Diplomacy Boon
-		if = {
-			limit = {
-				has_character_flag = ds_DIP
-			}
-			if = {
-				limit = {
-					has_character_modifier = blessing_of_belial
-				}
-				if = {
-					limit = { trait = charismatic_negotiator }
-					hidden_tooltip = { remove_trait = charismatic_negotiator }
-					add_trait = grey_eminence
-				}
-				if = {
-					limit = { trait = underhanded_rogue }
-					hidden_tooltip = { remove_trait = underhanded_rogue }
-					add_trait = charismatic_negotiator
-				}
-				if = {
-					limit = { trait = naive_appeaser }
-					hidden_tooltip = { remove_trait = naive_appeaser }
-					add_trait = underhanded_rogue
+				else = {
+					add_character_modifier = {
+						name = blessing_of_mammon
+						duration = -1
+					}
 				}
 			}
-			if = {
-				limit = {
-					NOT = { has_character_modifier = blessing_of_belial }
+
+			# Diplomacy Boon
+			ds_DIP = {
+				if = {
+					limit = { has_character_modifier = blessing_of_belial }
+
+					trigger_switch = {
+						on_trigger = trait
+
+						charismatic_negotiator = {
+							hidden_effect = { remove_trait = charismatic_negotiator }
+							add_trait = grey_eminence
+						}
+
+						underhanded_rogue = {
+							hidden_effect = { remove_trait = underhanded_rogue }
+							add_trait = charismatic_negotiator
+						}
+
+						naive_appeaser = {
+							hidden_effect = { remove_trait = naive_appeaser }
+							add_trait = underhanded_rogue
+						}
+					}
 				}
-				add_character_modifier = {
-					modifier = blessing_of_belial
-					days = -1
+				else = {
+					add_character_modifier = {
+						name = blessing_of_belial
+						duration = -1
+					}
 				}
 			}
-		}
-		
-		# Martial Boon
-		if = {
-			limit = {
-				has_character_flag = ds_MAR
-			}
-			if = {
-				limit = {
-					has_character_modifier = blessing_of_azazel
-				}
+
+			# Martial Boon
+			ds_MAR = {
 				if = {
-					limit = { trait = skilled_tactician }
-					hidden_tooltip = { remove_trait = skilled_tactician }
-					add_trait = brilliant_strategist
+					limit = { has_character_modifier = blessing_of_azazel }
+
+					trigger_switch = {
+						on_trigger = trait
+
+						skilled_tactician = {
+							hidden_effect = { remove_trait = skilled_tactician }
+							add_trait = brilliant_strategist
+						}
+
+						tough_soldier = {
+							hidden_effect = { remove_trait = tough_soldier }
+							add_trait = skilled_tactician
+						}
+
+						misguided_warrior = {
+							hidden_effect = { remove_trait = misguided_warrior }
+							add_trait = tough_soldier
+						}
+					}
 				}
-				if = {
-					limit = { trait = tough_soldier }
-					hidden_tooltip = { remove_trait = tough_soldier }
-					add_trait = skilled_tactician
-				}
-				if = {
-					limit = { trait = misguided_warrior }
-					hidden_tooltip = { remove_trait = misguided_warrior }
-					add_trait = tough_soldier
-				}
-			}
-			if = {
-				limit = {
-					NOT = { has_character_modifier = blessing_of_azazel }
-				}
-				add_character_modifier = {
-					modifier = blessing_of_azazel
-					days = -1
+				else = {
+					add_character_modifier = {
+						name = blessing_of_azazel
+						duration = -1
+					}
 				}
 			}
-		}
-		
-		# Intrigue Boon
-		if = {
-			limit = {
-				has_character_flag = ds_INT
-			}
-			if = {
-				limit = {
-					has_character_modifier = blessing_of_vetis
-				}
+
+			# Intrigue Boon
+			ds_INT = {
 				if = {
-					limit = { trait = intricate_webweaver }
-					hidden_tooltip = { remove_trait = intricate_webweaver }
-					add_trait = elusive_shadow
+					limit = { has_character_modifier = blessing_of_vetis }
+
+					trigger_switch = {
+						on_trigger = trait
+
+						intricate_webweaver = {
+							hidden_effect = { remove_trait = intricate_webweaver }
+							add_trait = elusive_shadow
+						}
+
+						flamboyant_schemer = {
+							hidden_effect = { remove_trait = flamboyant_schemer }
+							add_trait = intricate_webweaver
+						}
+
+						amateurish_plotter = {
+							hidden_effect = { remove_trait = amateurish_plotter }
+							add_trait = flamboyant_schemer
+						}
+					}
 				}
-				if = {
-					limit = { trait = flamboyant_schemer }
-					hidden_tooltip = { remove_trait = flamboyant_schemer }
-					add_trait = intricate_webweaver
-				}
-				if = {
-					limit = { trait = amateurish_plotter }
-					hidden_tooltip = { remove_trait = amateurish_plotter }
-					add_trait = flamboyant_schemer
-				}
-			}
-			if = {
-				limit = {
-					NOT = { has_character_modifier = blessing_of_vetis }
-				}
-				add_character_modifier = {
-					modifier = blessing_of_vetis
-					days = -1
+				else = {
+					add_character_modifier = {
+						name = blessing_of_vetis
+						duration = -1
+					}
 				}
 			}
-		}
-		
-		# Learning Boon
-		if = {
-			limit = {
-				has_character_flag = ds_LEA
-			}
-			if = {
-				limit = {
-					has_character_modifier = blessing_of_avnas
-				}
+
+			# Learning Boon
+			ds_LEA = {
 				if = {
-					limit = { trait = scholarly_theologian }
-					hidden_tooltip = { remove_trait = scholarly_theologian }
-					add_trait = mastermind_theologian
-					set_character_flag = ds_better_ed
+					limit = { has_character_modifier = blessing_of_avnas }
+
+					trigger_switch = {
+						on_trigger = trait
+
+						scholarly_theologian = {
+							hidden_effect = { remove_trait = scholarly_theologian }
+							add_trait = mastermind_theologian
+							set_character_flag = ds_better_ed
+						}
+
+						martial_cleric = {
+							hidden_effect = { remove_trait = martial_cleric }
+							add_trait = scholarly_theologian
+							set_character_flag = ds_better_ed
+						}
+
+						detached_priest = {
+							hidden_effect = { remove_trait = detached_priest }
+							add_trait = martial_cleric
+							set_character_flag = ds_better_ed
+						}
+					}
+
+					if = {
+						limit = {
+							NOT = { has_character_flag = ds_better_ed }
+						}
+						upgrade_smart_non_congenital_trait_effect = yes
+					}
+
+					clr_character_flag = ds_better_ed
 				}
-				if = {
-					limit = { trait = martial_cleric }
-					hidden_tooltip = { remove_trait = martial_cleric }
-					add_trait = scholarly_theologian
-					set_character_flag = ds_better_ed
-				}
-				if = {
-					limit = { trait = detached_priest }
-					hidden_tooltip = { remove_trait = detached_priest }
-					add_trait = martial_cleric
-					set_character_flag = ds_better_ed
-				}
-				if = {
-					limit = { NOT = { has_character_flag = ds_better_ed } }
-					upgrade_smart_non_congenital_trait_effect = yes
-				}
-				
-				clr_character_flag = ds_better_ed
-			}
-			if = {
-				limit = {
-					NOT = { has_character_modifier = blessing_of_avnas }
-				}
-				add_character_modifier = {
-					modifier = blessing_of_avnas
-					days = -1
+				else = {
+					add_character_modifier = {
+						name = blessing_of_avnas
+						duration = -1
+					}
 				}
 			}
 		}
-		
-		clr_character_flag = ds_INT
-		clr_character_flag = ds_STE
-		clr_character_flag = ds_MAR
-		clr_character_flag = ds_DIP
-		clr_character_flag = ds_LEA
-		clr_character_flag = ds_kill_a_rival_1
-		clr_character_flag = ds_kill_a_rival_2
 	}
 
 	option = {
-		trigger = {
-			has_character_flag = ds_disaster
-		}
-		
 		name = {
 			text = EVTOPTA_MNM_20034_ILLNESS
-			trigger = {
-				has_character_flag = ds_illness
-			}
+			trigger = { has_character_flag = ds_illness }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_EPIDEMIC
-			trigger = {
-				has_character_flag = ds_epidemic
-			}
+			trigger = { has_character_flag = ds_epidemic }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_EUNUCH
-			trigger = {
-				has_character_flag = ds_eunuch
-			}
+			trigger = { has_character_flag = ds_eunuch }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_STUPID
-			trigger = {
-				has_character_flag = ds_stupid
-			}
+			trigger = { has_character_flag = ds_stupid }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_EXPOSURE
-			trigger = {
-				has_character_flag = ds_exposure
-			}
+			trigger = { has_character_flag = ds_exposure }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_POSSESS
-			trigger = {
-				has_character_flag = ds_possess
-			}
+			trigger = { has_character_flag = ds_possess }
 		}
 		name = {
 			text = EVTOPTA_MNM_20034_RIVALRY
-			trigger = {
-				has_character_flag = ds_rivalry
-			}
+			trigger = { has_character_flag = ds_rivalry }
 		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_illness
-			}
-			if = {
-				limit = {
-					has_dlc = "Reapers"
+
+		trigger = { has_character_flag = ds_disaster }
+
+		trigger_switch = {
+			on_trigger = has_character_flag
+
+			ds_illness = {
+				if = {
+					limit = { has_dlc = "Reapers" }
+					add_trait = cancer
 				}
-				add_trait = cancer
 			}
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_epidemic
-			}
-			location = {
-				spawn_disease = typhoid_fever
-			}
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_eunuch
-			}
-			add_trait = eunuch
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_stupid
-			}
-			if = {
-				limit = {
-					is_smart_non_congenital_trait_downgradeable_trigger = yes
+
+			ds_epidemic = {
+				location = {
+					show_scope_change = no
+					spawn_disease = typhoid_fever
 				}
-				downgrade_smart_non_congenital_trait_effect = yes
 			}
-			else_if = {
-				limit = {
-					is_smart_congenital_trait_downgradeable_trigger = yes
+
+			ds_eunuch = {
+				add_trait = eunuch
+			}
+
+			ds_stupid = {
+				if = {
+					limit = {
+						is_smart_non_congenital_trait_downgradeable_trigger = yes
+					}
+					downgrade_smart_non_congenital_trait_effect = yes
 				}
-				downgrade_smart_congenital_trait_effect = yes
+				else_if = {
+					limit = {
+						is_smart_congenital_trait_downgradeable_trigger = yes
+					}
+					downgrade_smart_congenital_trait_effect = yes
+				}
 			}
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_exposure
-			}
-			if = {
-				limit = {
-					NOR = {
-						has_character_modifier = suspected_witch
-						has_character_modifier = known_witch
+
+			ds_exposure = {
+				if = {
+					limit = { has_character_modifier = suspected_witch }
+					remove_character_modifier = suspected_witch
+
+					add_character_modifier = {
+						name = known_witch
+						duration = -1
 					}
 				}
+				else_if = {
+					limit = {
+						NOT = { has_character_modifier = known_witch }
+					}
+					add_character_modifier = {
+						name = suspected_witch
+						duration = -1
+					}
+				}
+			}
+
+			ds_possess = {
+				add_trait = possessed
+
 				add_character_modifier = {
-					name = suspected_witch
+					name = voice_of_satan
 					duration = -1
 				}
 			}
-			else_if = {
-				limit = { has_character_modifier = suspected_witch }
-				remove_character_modifier = suspected_witch
-				add_character_modifier = {
-					name = known_witch
-					duration = -1
-				}
-			}
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_possess
-			}
-			add_trait = possessed
-			add_character_modifier = {
-				name = voice_of_satan
-				duration = -1
-			}
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = ds_rivalry
-			}
-			if = {
-				limit = {
-					NOR ={
-						is_lover = FROM
-						is_friend = FROM
+
+			ds_rivalry = {
+				if = {
+					limit = {
+						NOR = {
+							is_lover = event_target:demon_summoner
+							is_friend = event_target:demon_summoner
+						}
 					}
+
+					add_rival = event_target:demon_summoner
 				}
-				add_rival = FROM
-			}
-			if = {
-				limit = {
-					is_lover = FROM
+
+				if = {
+					limit = { is_lover = event_target:demon_summoner }
+					remove_lover = event_target:demon_summoner
 				}
-				remove_lover = FROM
-			}
-			if = {
-				limit = {
-					is_friend = FROM
+
+				if = {
+					limit = { is_friend = event_target:demon_summoner }
+					remove_friend = event_target:demon_summoner
 				}
-				remove_friend = FROM
 			}
 		}
-		
+	}
+
+	option = {
+		name = EVTOPTA_MNM_20034_KILL_RIVAL_1
+
+		trigger = {
+			event_target:rival_1 = { always = yes }
+		}
+
+		add_society_currency_minor_effect = yes
+		increase_visibility_effect = yes
+
+		event_target:rival_1 = {
+			show_scope_change = no
+
+			tooltip = {
+				death = {
+					death_reason = death_murder_unknown
+					killer = ROOT
+				}
+			}
+
+			character_event = { id = MNM.20035 }
+		}
+	}
+
+	option = {
+		name = EVTOPTA_MNM_20034_KILL_RIVAL_2
+
+		trigger = {
+			event_target:rival_2 = { always = yes }
+		}
+
+		add_society_currency_minor_effect = yes
+		increase_visibility_effect = yes
+
+		event_target:rival_2 = {
+			show_scope_change = no
+
+			tooltip = {
+				death = {
+					death_reason = death_murder_unknown
+					killer = ROOT
+				}
+			}
+
+			character_event = { id = MNM.20035 }
+		}
+	}
+
+	after = {
 		clr_character_flag = ds_disaster
 		clr_character_flag = ds_illness
 		clr_character_flag = ds_epidemic
@@ -8985,67 +8947,30 @@ narrative_event = {
 		clr_character_flag = ds_exposure
 		clr_character_flag = ds_possess
 		clr_character_flag = ds_rivalry
-	}
-	
-	option = {
-		name = EVTOPTA_MNM_20034_KILL_RIVAL_1
-		trigger = {
-			has_character_flag = ds_kill_a_rival_1
-		}
-		
-		add_society_currency_minor_effect = yes
-		
-		increase_visibility_effect = yes
-		
-		event_target:rival_1 = {
-			tooltip = {
-				death = { death_reason = death_murder_unknown killer = ROOT }
-			}
-			character_event = { id = MNM.20035 }
-		}
-		
 		clr_character_flag = ds_INT
-		clr_character_flag = ds_kill_a_rival_1
-		clr_character_flag = ds_kill_a_rival_2
-	}
-	
-	option = {
-		name = EVTOPTA_MNM_20034_KILL_RIVAL_2
-		trigger = {
-			has_character_flag = ds_kill_a_rival_2
-		}
-		
-		add_society_currency_minor_effect = yes
-		
-		increase_visibility_effect = yes
-		
-		event_target:rival_2 = {
-			tooltip = {
-				death = { death_reason = death_murder_unknown killer = ROOT }
-			}
-			character_event = { id = MNM.20035 }
-		}
-		
-		clr_character_flag = ds_INT
-		clr_character_flag = ds_kill_a_rival_1
-		clr_character_flag = ds_kill_a_rival_2
+		clr_character_flag = ds_STE
+		clr_character_flag = ds_MAR
+		clr_character_flag = ds_DIP
+		clr_character_flag = ds_LEA
 	}
 }
 
 # Demon Summoning - Rival is killed
 character_event = {
 	id = MNM.20035
+	desc = EVTDESC_MNM_20035
 	picture = GFX_evt_magic_ritual
 	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	
+
 	immediate = {
-		death = { death_reason = death_murder_unknown killer = FROM }
+		death = {
+			death_reason = death_murder_unknown
+			killer = FROM
+		}
 	}
-	
-	desc = EVTDESC_MNM_20035
-	
+
 	option = {
 		name = EVTOPTA_MNM_20035
 	}
