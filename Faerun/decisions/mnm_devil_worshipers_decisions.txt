@@ -724,7 +724,6 @@ targeted_decisions = {
 					limit = {
 						ROOT = {
 							OR = {
-								is_priest = yes
 								is_ascetic_trigger = yes
 								z_divine_caster = yes
 								z_monk = yes
@@ -732,6 +731,7 @@ targeted_decisions = {
 									is_landed = yes
 									OR = {
 										government = theocracy_government
+										government = baron_theocracy_government
 										government = divine_feudal_government
 										government = theocratic_feudal_government
 									}
@@ -969,60 +969,58 @@ targeted_decisions = {
 		}
 	}
 
-	#Action: Prolong Life/Absorb Lifeforce
+	# Action: Prolong Life/Absorb Lifeforce
 	DW_prolong_life = {
-		only_playable = yes
-		is_in_society = yes
 		filter = dynasty
 		ai_target_filter = dynasty
-		ai_check_interval = 6
+		ai_check_interval = 12
+
+		is_in_society = yes
+		only_playable = yes
 
 		from_potential = {
-			has_dlc = "Mystics"
-			is_playable = yes
+			society_rank == 4
+			society_member_of = the_satanists
 			is_adult = yes
 			prisoner = no
 			is_incapable = no
-			society_member_of = the_satanists
-			society_rank == 4
 		}
 
 		potential = {
-			host = { character = FROM }
 			is_child_of = FROM
-			NOT = { age = 16 }
-			NOT = { has_character_flag = demon_child_non_pagan }
+			is_adult = no
+			host = { character = FROM }
+			#NOT = { has_character_flag = demon_child_non_pagan }
 		}
 
 		allow = {
 			FROM = { has_society_currency_major_trigger = yes }
 		}
 
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 0.05 #Slow down
+		effect = {
+			FROM = {
+				show_scope_change = no
+
+				increase_visibility_effect = yes
+				detract_society_currency_major_effect = yes
+
+				character_event = { id = MNM.7509 }
 			}
-			modifier = {
+		}
+
+		ai_will_do = {
+			factor = 0.05
+
+			trigger = {
+				NOT = { has_character_modifier = stolen_life_major }
+			}
+
+			mult_modifier = {
 				factor = 10
 				NOR = {
 					has_character_modifier = stolen_life_minor
 					has_character_modifier = stolen_life_medium
 					has_character_modifier = stolen_life_major
-				}
-			}
-			modifier = {
-				factor = 0
-				has_character_modifier = stolen_life_major
-			}
-		}
-
-		effect = {
-			FROM = { increase_visibility_effect = yes }
-			FROM = { detract_society_currency_major_effect = yes }
-			hidden_effect = { #ROOT is target, FROM is doer
-				FROM = {
-					character_event = { id = MNM.7509 }
 				}
 			}
 		}
@@ -1267,71 +1265,88 @@ targeted_decisions = {
 }
 
 title_decisions = {
-	#Execute desecrate temple mission
-
+	# Execute desecrate temple mission
 	devil_worshiper_desecrate_temple_decision = {
-		only_playable = yes
-
+		# filter = realm_owned # CleanSlate: Nonfunctional
 		ai_target_filter = realm_owned
 		ai_check_interval = 12
 
+		is_in_society = yes
+		only_playable = yes
+
 		from_potential = {
-			prisoner = no
-			NOT = { trait = incapable }
 			has_dlc = "Mystics"
-			has_quest = quest_devil_worshipers_desecrate_temple
-			NOT = { has_character_flag = desecration_in_progress }
 			society_member_of = the_satanists
+			has_quest = quest_devil_worshipers_desecrate_temple
+			prisoner = no
+			is_incapable = no
+			NOT = { has_character_flag = desecration_in_progress }
 		}
 
 		potential = {
-			OR = {
-				tier = BARON
-				tier = COUNT
-			}
+			lower_real_tier_than = DUKE
+
 			OR = {
 				is_quest_target_of = FROM
-				location = { capital_holding = { is_quest_target_of = FROM } }
+
+				location = {
+					capital_holding = {
+						is_quest_target_of = FROM
+					}
+				}
 			}
-			FROM = { NOT = { has_character_flag = desecration_in_progress } }
 		}
 
 		allow = {
 			FROM = { has_quest = quest_devil_worshipers_desecrate_temple }
+
 			OR = {
 				is_quest_target_of = FROM
-				location = { capital_holding = { is_quest_target_of = FROM } }
+
+				location = {
+					capital_holding = {
+						is_quest_target_of = FROM
+					}
+				}
 			}
 		}
 
 		effect = {
-			FROM = {
-				increase_visibility_minor_effect = yes
-				custom_tooltip = {
-					text = devil_worshiper_desecrate_temple_decision_tt
-				}
-				set_character_flag = desecration_in_progress
+			custom_tooltip = { text = devil_worshiper_desecrate_temple_decision_tt }
 
-				ROOT = {
-					if = {
-						limit = {
-							owner = { character = FROM }
-						}
+			FROM = {
+				show_scope_change = no
+
+				increase_visibility_minor_effect = yes
+
+				if = {
+					limit = { has_landed_title = ROOT }
+
+					ROOT = {
+						show_scope_change = no
+
 						add_holding_modifier = {
 							name = desecrated_temple
 							years = 5
 						}
-						FROM = {
-							sound_effect = devil_worshippers_desecrate_temple
-							clr_quest = quest_devil_worshipers_desecrate_temple
-							add_society_currency_medium_effect = yes
-							break = yes
-						}
+					}
+
+					sound_effect = devil_worshippers_desecrate_temple
+					clr_quest = quest_devil_worshipers_desecrate_temple
+					add_society_currency_medium_effect = yes
+				}
+
+				else = {
+					set_character_flag = desecration_in_progress
+
+					character_event = {
+						id = MNM.7112
+						days = 7
 					}
 				}
-				hidden_effect = { character_event = { id = MNM.7112 days = 7 } }
 			}
 		}
+
 		ai_will_do = {
 			factor = 1
 		}
