@@ -7688,14 +7688,14 @@ character_event = {
 			character_event = {
 				id = MNM.20017
 				days = 3
-				tooltip = EVT_MNM_20016_TT
+				tooltip = EVT_TT_20016
 			}
 		}
 		else = {
 			character_event = {
 				id = MNM.20016
 				days = 3
-				tooltip = EVT_MNM_20016_TT
+				tooltip = EVT_TT_20016
 			}
 		}
 	}
@@ -8981,262 +8981,220 @@ character_event = {
 # Fired from on_society_bi_yearly_pulse
 ###########################################
 
-character_event = {
-	id = MNM.20040
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	only_playable = yes
-	only_capable = yes
-	prisoner = no
-	is_in_society = yes
-	
-	trigger = {
-		is_devil_worshiper_trigger = yes
-		NOT = { is_inaccessible_trigger = yes }
-		is_ill = no
-		in_command = no
-	}
-	
-	weight_multiplier = {
-		factor = 1
-		modifier = {
-			factor = 1.75
-			has_focus = focus_theology
-		}
-		
-		modifier = {
-			factor = 1.75
-			OR = {
-				trait = detached_priest
-				trait = martial_cleric
-				trait = scholarly_theologian
-				trait = mastermind_theologian
-			}
-		}
-		
-		modifier = {
-			factor = 0.25
-			has_character_flag = impersonated_priests
-		}
-	}
-	
-	immediate = {
-		# First look for someone at court
-		society = {
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					NOT = { same_sex = ROOT } # One of us can always masquerade as a local priest
-					host = { character = ROOT }
-				}
-				save_event_target_as = dw_buddy
-				character_event = { id = MNM.20041 }
-				break = yes
-			}
-			
-			# Then look for someone in the same realm
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					NOT = { same_sex = ROOT } # One of us can always masquerade as a local priest
-					same_realm = yes
-				}
-				save_event_target_as = dw_buddy
-				character_event = { id = MNM.20041 }
-				break = yes
-			}
-			
-			# Then look abroad...
-			random_society_member = {
-				limit = {
-					ai = yes
-					is_incapable = no
-					prisoner = no
-					NOT = { is_inaccessible_trigger = yes }
-					is_ill = no
-					NOT = { character = ROOT }
-					in_command = no
-					NOT = { same_sex = ROOT } # One of us can always masquerade as a local priest
-					is_within_diplo_range = ROOT
-				}
-				save_event_target_as = dw_buddy
-				character_event = { id = MNM.20041 }
-			}
-		}
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20041
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = {
-			random_realm_province = {
-				limit = {
-					any_neighbor_province = {
-						has_owner = yes
-						owner = {
-							NOR = {
-								character = PREVPREVPREV
-								is_liege_or_above = PREVPREVPREV
-								character = event_target:dw_buddy
-								is_liege_or_above = event_target:dw_buddy
-							}
-						}
-					}
-				}
-				random_neighbor_province = {
-					limit = {
-						has_owner = yes
-						owner = {
-							NOR = {
-								character = PREVPREVPREV
-								is_liege_or_above = PREVPREVPREV
-								character = event_target:dw_buddy
-								is_liege_or_above = event_target:dw_buddy
-							}
-						}
-					}
-					province_event = { id = MNM.20042 }
-				}
-			}
-		}
-	}
-}
-
-province_event = {
-	id = MNM.20042
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROMFROM = { character_event = { id = MNM.20043 } }
-	}
-}
-
 # Impersonating Priests - Planning
 character_event = {
 	id = MNM.20043
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from = yes
-	
+	portrait = event_target:dw_buddy
+
 	desc = {
 		text = EVTDESC_MNM_20043
 		trigger = {
-			FROMFROM = {
+			event_target:dw_buddy = {
 				NOT = { host = { character = ROOT } }
 			}
 		}
 	}
-	
 	desc = {
 		text = EVTDESC_MNM_20043_COURT
 		trigger = {
-			FROMFROM = {
+			event_target:dw_buddy = {
 				host = { character = ROOT }
 			}
 		}
 	}
 
-	is_triggered_only = yes
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
+	only_playable = yes
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		society_member_of = the_satanists
+		is_inaccessible_trigger = no
+		is_ill = no
+		in_command = no
+
+		society = {
+			any_society_member = {
+				ai = yes
+				in_command = no
+				is_ill = no
+				is_inaccessible_or_incapable_trigger = no
+				is_within_diplo_range = ROOT
+			}
+		}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 1.75
+			has_focus = focus_theology
+		}
+
+		mult_modifier = {
+			factor = 1.75
+			has_education_learning_trigger = yes
+		}
+
+		mult_modifier = {
+			factor = 0.25
+			has_character_flag = impersonated_priests
+		}
+	}
+
+	immediate = {
+		society = {
+			random_society_member = {
+				limit = {
+					ai = yes
+					in_command = no
+					is_ill = no
+					is_inaccessible_or_incapable_trigger = no
+					is_within_diplo_range = ROOT
+				}
+
+				preferred_limit = {
+					is_opposite_sex = ROOT # One of us can always masquerade as a local priest
+					host = { character = ROOT } # First look for someone at court
+				}
+
+				preferred_limit = {
+					is_opposite_sex = ROOT # One of us can always masquerade as a local priest
+					same_realm = ROOT # Then look for someone in the same realm
+				}
+
+				preferred_limit = {
+					is_opposite_sex = ROOT # One of us can always masquerade as a local priest
+				}
+
+				save_event_target_as = dw_buddy
+			}
+		}
+
+		random_realm_province = {
+			limit = {
+				held_under_PREV = yes
+
+				any_neighbor_province = {
+					has_owner = yes
+
+					owner = {
+						NOR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+							character = event_target:dw_buddy
+							is_vassal_or_below_of = event_target:dw_buddy
+						}
+					}
+				}
+			}
+
+			random_neighbor_province = {
+				limit = {
+					has_owner = yes
+
+					owner = {
+						NOR = {
+							character = ROOT
+							is_vassal_or_below_of = ROOT
+							character = event_target:dw_buddy
+							is_vassal_or_below_of = event_target:dw_buddy
+						}
+					}
+				}
+
+				preferred_limit = {
+					NOT = { religion_group = atheist_group }
+				}
+
+				save_event_target_as = target_province
+			}
+		}
+	}
 
 	option = {
 		name = EVTOPTA_MNM_20043 # Yes
+
+		set_character_flag = impersonated_priests
+
+		character_event = {
+			id = MNM.20045
+			days = 2
+			tooltip = EVT_TT_20044
+		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 20
 				has_focus = focus_theology
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
-				OR = {
-					trait = detached_priest
-					trait = martial_cleric
-					trait = scholarly_theologian
-					trait = mastermind_theologian
-				}
+				has_education_learning_trigger = yes
 			}
 		}
-		
-		set_character_flag = impersonated_priests
-		
-		FROMFROM = { character_event = { id = MNM.20044 tooltip = EVT_TT_20044 portrait = no } }
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20043 # Bad idea...
+
+		detract_society_currency_minor_effect = yes
+
+		reverse_opinion = {
+			name = opinion_coward
+			who = event_target:dw_buddy
+			years = 5
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 50
 				trait = craven
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 25
 				trait = content
 			}
 		}
-		
-		detract_society_currency_minor_effect = yes
-		reverse_opinion = { who = FROMFROM modifier = opinion_coward years = 5 }
-	}
-}
-
-# Bounce
-character_event = {
-	id = MNM.20044
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20045 days = 2 } }
 	}
 }
 
 # Impersonating Priests - The Fun Begins
 character_event = {
 	id = MNM.20045
+	desc = EVTDESC_MNM_20045
 	picture = GFX_evt_secluded_in_prayer # GFX_evt_bishop
 	border = GFX_event_normal_frame_intrigue
-	
+	portrait = event_target:dw_buddy
+
 	is_triggered_only = yes
-	
-	immediate = {
-	}
-	
-	desc = EVTDESC_MNM_20045
-	
+
 	option = {
 		name = EVTOPTA_MNM_20045 # Firebrand preaching to the peasants (Agitation)
+
+		character_event = {
+			id = MNM.20048
+			days = 7
+			tooltip = EVT_TT_20046
+		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = zealous
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				OR = {
 					trait = temperate
@@ -9245,19 +9203,25 @@ character_event = {
 				}
 			}
 		}
-		
-		FROMFROMFROM = { province_event = { id = MNM.20046 tooltip = EVT_TT_20046 } }
 	}
-	
+
 	option = {
 		name = EVTOPTB_MNM_20045 # Depraved feast
+
+		character_event = {
+			id = MNM.20049
+			days = 3
+			tooltip = EVT_TT_20047
+		}
+
 		ai_chance = {
 			factor = 100
-			modifier = {
+
+			mult_modifier = {
 				factor = 10
 				trait = cynical
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				OR = {
 					trait = gluttonous
@@ -9268,380 +9232,263 @@ character_event = {
 				}
 			}
 		}
-		FROMFROMFROM = { province_event = { id = MNM.20047 tooltip = EVT_TT_20047 } }
-	}
-	
-}
-
-# Province Bounce - Agitation 
-province_event = {
-	id = MNM.20046
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20048 days = 7 } }
 	}
 }
 
-# Province Bounce - Depraved Feast 
-province_event = {
-	id = MNM.20047
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20049 days = 3 } }
-	}
-}
-
-# Impersonating Priests - Agitation 
+# Impersonating Priests - Agitation
 character_event = {
 	id = MNM.20048
+	desc = EVTDESC_MNM_20048
 	picture = GFX_evt_heretic
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:dw_buddy
+
 	is_triggered_only = yes
-	
+
+	prisoner = no
+	only_capable = yes
+
 	trigger = {
-		FROMFROMFROM = {
-			is_alive = yes
-			prisoner = no
-			is_incapable = no
-		}
-		FROMFROM = {
+		event_target:dw_buddy = {
 			is_alive = yes
 			prisoner = no
 			is_incapable = no
 		}
 	}
-	
+
 	immediate = {
 		if = {
-			limit = {
-				FROM = {
-					has_heresies = yes
-					is_heretic = no
-				}
-			}
-			set_character_flag = ip_heresy
-		}
-		
-		if = {
 			limit = { NOT = { trait = deceitful } }
+
 			random = {
 				chance = 25
 				set_character_flag = ip_deceitful
 			}
 		}
+
 		if = {
 			limit = { NOT = { trait = gregarious } }
+
 			random = {
 				chance = 50
 				set_character_flag = ip_gregarious
 			}
 		}
-		
+
 		if = {
 			limit = {
 				NOR = {
-					is_friend = FROMFROMFROM
-					is_lover = FROMFROMFROM
+					is_friend = event_target:dw_buddy
+					is_lover = event_target:dw_buddy
 				}
 			}
+
 			random_list = {
-				85 = { 
-					set_character_flag = ip_friendify
-				}
+				85 = { set_character_flag = ip_friendify }
+
 				15 = {
-					modifier = {
-						factor = 0
-						FROMFROMFROM = { trait = honest }
+					trigger = {
+						event_target:dw_buddy = {
+							NOT = { trait = honest }
+						}
 					}
-					modifier = {
+
+					mult_modifier = {
 						factor = 2
-						FROMFROMFROM = { trait = deceitful }
+						event_target:dw_buddy = { trait = deceitful }
 					}
-					modifier = {
+					mult_modifier = {
 						factor = 2
-						FROMFROMFROM = { trait = cruel }
+						event_target:dw_buddy = { trait = cruel }
 					}
-					FROMFROMFROM = { character_event = { id = MNM.20051 days = 7 } } # Rivalry
+
+					character_event = { id = MNM.20052 days = 7 } # Rivalry
 				}
 			}
 		}
 	}
-	
-	desc = EVTDESC_MNM_20048
-	
+
 	option = {
 		name = EVTOPTA_MNM_20048
-		
-		if = {
-			limit = {
-				has_character_flag = ip_heresy
-			}
-			FROM = {
-				add_province_modifier = {
-					modifier = heretic_stronghold
-					years = 3
-				}
-				become_heretic = yes
-				province_event = { id = MNM.20050 } # Notify lieges
+
+		event_target:target_province = {
+			show_scope_change = no
+
+			add_province_modifier = {
+				name = religious_unrest
+				years = 5
 			}
 		}
-		
+
 		if = {
-			limit = {
-				NOT = { has_character_flag = ip_heresy }
-			}
-			FROM = {
-				add_province_modifier = {
-					modifier = religious_unrest
-					years = 5
-				}
-			}
+			limit = { has_character_flag = ip_deceitful }
+			clr_character_flag = ip_deceitful
+			add_trait_partially_silently_deceitful_effect = yes
 		}
-		
+
 		if = {
-			limit = {
-				has_character_flag = ip_deceitful
-			}
-			if = {
-				limit = {
-					NOT = { trait = honest }
-					NOT = { trait = deceitful }
-				}
-				add_trait = deceitful
-			}
-			if = {
-				limit = {
-					trait = honest
-				}
-				remove_trait = honest
-			}
+			limit = { has_character_flag = ip_gregarious }
+			clr_character_flag = ip_gregarious
+			add_trait_partially_silently_gregarious_effect = yes
 		}
-		
-		if = {
-			limit = {
-				has_character_flag = ip_gregarious
-			}
-			if = {
-				limit = {
-					NOT = { trait = shy }
-					NOT = { trait = gregarious }
-				}
-				add_trait = gregarious
-			}
-			if = {
-				limit = {
-					trait = shy
-				}
-				remove_trait = shy
-			}
-		}
-		
+
 		# Friend gained / Rivalry lost
 		if = {
-			limit = {
-				has_character_flag = ip_friendify
-			}
+			limit = { has_character_flag = ip_friendify }
+			clr_character_flag = ip_friendify
+
 			if = {
-				limit = {
-					NOT = {
-						is_rival = FROMFROMFROM
-					}
-				}
-				add_friend = FROMFROMFROM
+				limit = { is_rival = event_target:dw_buddy }
+				remove_rival = event_target:dw_buddy
 			}
-			if = {
-				limit = {
-					is_rival = FROMFROMFROM
-				}
-				remove_rival = FROMFROMFROM
+			else = {
+				add_friend = event_target:dw_buddy
 			}
 		}
-		
+
 		add_society_currency_minor_effect = yes
-		
-		clr_character_flag = ip_heresy
-		clr_character_flag = ip_deceitful
-		clr_character_flag = ip_gregarious
-		clr_character_flag = ip_friendify
 	}
 }
 
-# Impersonating Priests - Depraved Feast 
+# Impersonating Priests - Depraved Feast
 character_event = {
 	id = MNM.20049
+	desc = EVTDESC_MNM_20049
 	picture = GFX_evt_pope_feast
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:dw_buddy
+
 	is_triggered_only = yes
-	
+
+	prisoner = no
+	only_capable = yes
+
 	trigger = {
-		FROMFROMFROM = {
-			is_alive = yes
-			prisoner = no
-			is_incapable = no
-		}
-		FROMFROM = {
+		event_target:dw_buddy = {
 			is_alive = yes
 			prisoner = no
 			is_incapable = no
 		}
 	}
-	
+
 	immediate = {
 		if = {
 			limit = { NOT = { trait = deceitful } }
+
 			random = {
 				chance = 25
 				set_character_flag = ip_deceitful
 			}
 		}
+
 		if = {
 			limit = { NOT = { trait = gluttonous } }
+
 			random = {
 				chance = 10
 				set_character_flag = ip_gluttonous
 			}
 		}
 	}
-	
-	desc = EVTDESC_MNM_20049
-	
+
 	option = {
 		name = EVTOPTA_MNM_20049
-		
+
 		if = {
-			limit = {
-				ai = no
-			}
-			religion_authority = {
-				modifier = decadent_clergy
-				years = 10
+			limit = { ai = no }
+
+			event_target:target_province = {
+				show_scope_change = no
+
+				religion_authority = {
+					name = decadent_clergy
+					years = 10
+				}
 			}
 		}
-		
+
+		if = {
+			limit = { has_character_flag = ip_deceitful }
+			clr_character_flag = ip_deceitful
+			add_trait_partially_silently_deceitful_effect = yes
+		}
+
+		if = {
+			limit = { has_character_flag = ip_gluttonous }
+			clr_character_flag = ip_gluttonous
+			add_trait_partially_silently_gluttonous_effect = yes
+		}
+
 		# Friend gained / Rivalry lost
 		if = {
+			limit = { is_rival = event_target:dw_buddy }
+			remove_rival = event_target:dw_buddy
+		}
+		else_if = {
 			limit = {
 				NOR = {
-					is_lover = FROM
-					is_friend = FROM
-					is_rival = FROM
+					is_lover = event_target:dw_buddy
+					is_friend = event_target:dw_buddy
 				}
 			}
-			add_friend = FROM
+
+			add_friend = event_target:dw_buddy
 		}
-		if = {
-			limit = {
-				is_rival = FROM
-			}
-			remove_rival = FROM
-		}
-		
+
 		add_society_currency_minor_effect = yes
-		
-		clr_character_flag = ip_deceitful
-		clr_character_flag = ip_gluttonous
-	}
-}
 
-# Province: notify lieges of heresy
-province_event = {
-	id = MNM.20050
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		owner = {
-			top_liege = {
-				if = {
-					limit = {
-						NOT = { character = PREV }
-					}
-					character_event = { id = 39400 days = 2 }
-				}
-				any_vassal = {
-					limit = {
-						OR = {
-							is_parent_religion = ROOT
-							religion = ROOT
-						}
-					}
-					character_event = { id = 39400 days = 2 }
-				}
-			}
-		}
-	}
-}
-
-# Agitation - Rivalry aftermath bounce
-character_event = {
-	id = MNM.20051
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = { character_event = { id = MNM.20052 } }
 	}
 }
 
 # Agitation - Rivalry aftermath
 character_event = {
 	id = MNM.20052
+	desc = EVTDESC_MNM_20052
 	picture = GFX_evt_suspicious_noble
 	border = GFX_event_normal_frame_intrigue
-	
+	portrait = event_target:dw_buddy
+
 	is_triggered_only = yes
-	
+
 	immediate = {
-		FROMFROMFROM = {
-			save_event_target_as = local_province
+		event_target:target_province = {
 			owner = {
 				save_event_target_as = local_ruler
 			}
 		}
 	}
-	
-	desc = EVTDESC_MNM_20052
-	
+
 	option = {
 		name = EVTOPTA_MNM_20052
-		add_rival = FROM
+
+		hidden_effect = {
+			remove_friend = event_target:local_ruler
+			remove_lover = event_target:local_ruler
+		}
+
+		add_rival = event_target:dw_buddy
+		add_rival = event_target:local_ruler
+
 		event_target:local_ruler = {
 			character_event = { id = MNM.20053 days = 3 }
-			hidden_tooltip = {
-				remove_friend = ROOT
-				remove_lover = ROOT
-			}
 		}
-		add_rival = event_target:local_ruler
 	}
 }
 
 # Agitation - Rivalry aftermath - local ruler notified
 character_event = {
 	id = MNM.20053
+	desc = EVTDESC_MNM_20053
 	picture = GFX_evt_heretic
 	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	
-	desc = EVTDESC_MNM_20053
-	
+
+	ai = no
+
 	option = {
 		name = EVTOPTA_MNM_20053
+
 		tooltip = { add_rival = FROM }
 	}
 }
