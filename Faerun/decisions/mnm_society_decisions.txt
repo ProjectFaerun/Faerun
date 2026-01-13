@@ -1308,18 +1308,17 @@ targeted_decisions = {
 
 targeted_decisions = {
 
+	# Shared abduct decision
 	decision_abduct = {
 		filter = realm
-		ai_target_filter = realm
-
-		only_playable = yes
 		ai = no
 
 		from_potential = {
 			OR = {
-				is_devil_worshiper_trigger = yes
+				society_member_of = the_satanists
 				is_member_of_any_assassin_guild_trigger = yes
 			}
+
 			is_incapable = no
 			prisoner = no
 			NOT = { has_any_opinion_modifier = opinion_abducting }
@@ -1327,43 +1326,46 @@ targeted_decisions = {
 
 		potential = {
 			ai = yes
-			NOT = { character = FROM }
 			is_patrician = no
-			OR = {
-				lower_tier_than = DUKE
-				is_ruler = no
+			is_within_diplo_range = FROM
+
+			trigger_if = {
+				limit = { is_landed = yes }
+				lower_real_tier_than = DUKE
 			}
-			OR = {
+
+			trigger_if = {
+				limit = {
+					father = { always = yes }
+				}
+
 				father_even_if_dead = {
-					lower_tier_than = DUKE
+					lower_real_tier_than = DUKE
 					is_patrician = no
 					ai = yes
 				}
-				NOT = {
-					father = {
-						always = yes
-					}
-				}
 			}
-			OR = {
+
+			trigger_if = {
+				limit = {
+					mother = { always = yes }
+				}
+
 				mother_even_if_dead = {
-					lower_tier_than = DUKE
+					lower_real_tier_than = DUKE
 					is_patrician = no
 					ai = yes
-				}
-				NOT = {
-					mother = {
-						always = yes
-					}
 				}
 			}
-			OR = {
+
+			trigger_if = {
+				limit = { is_married = yes }
+
 				spouse = {
-					lower_tier_than = DUKE
+					lower_real_tier_than = DUKE
 					is_patrician = no
 					ai = yes
 				}
-				is_married = no
 			}
 		}
 
@@ -1372,113 +1374,115 @@ targeted_decisions = {
 			NOT = { war_with = FROM }
 			NOT = { same_society_as = FROM }
 			prisoner = no
-			OR = {
-				AND = {
-					is_landed = no
-					FROM = {
-						has_society_currency_tiny_trigger = yes
+
+			FROM = {
+				trigger_if = {
+					limit = {
+						ROOT = {
+							is_ruler = no
+							is_powerful = no
+						}
 					}
+
+					has_society_currency_tiny_trigger = yes
 				}
-				AND = {
-					is_landed = yes
-					NOT = {
-						higher_tier_than = BARON
+				trigger_else_if = {
+					limit = {
+						ROOT = {
+							real_tier = BARON
+							is_powerful = no
+						}
 					}
-					FROM = {
-						has_society_currency_minor_trigger = yes
-					}
+
+					has_society_currency_minor_trigger = yes
 				}
-				AND = {
-					higher_tier_than = BARON
-					FROM = {
-						has_society_currency_medium_trigger = yes
-					}
+				trigger_else = {
+					has_society_currency_medium_trigger = yes
 				}
 			}
-			is_within_diplo_range = FROM
 		}
 
 		effect = {
-			if = {
-				limit = {
-					NOT = {
-						is_ruler = yes
+			save_event_target_as = abduction_target
+
+			FROM = {
+				show_scope_change = no
+
+				if = {
+					limit = {
+						ROOT = {
+							is_ruler = no
+							is_powerful = no
+						}
 					}
-				}
-				FROM = {
+
 					detract_society_currency_tiny_effect = yes
 				}
-			}
-			if = {
-				limit = {
-					is_ruler = yes
-					lower_tier_than = COUNT
-				}
-				FROM = {
+				else_if = {
+					limit = {
+						ROOT = {
+							real_tier = BARON
+							is_powerful = no
+						}
+					}
+
 					detract_society_currency_minor_effect = yes
 				}
-			}
-			if = {
-				limit = {
-					higher_tier_than = BARON
-				}
-				FROM = {
+				else = {
 					detract_society_currency_medium_effect = yes
 				}
-			}
-			hidden_tooltip = {
-				FROM = {
-					any_opinion_modifier_target = {
-						limit = {
-							reverse_has_opinion_modifier = {
-								who = PREV
-								modifier = opinion_abducting
-							}
-						}
-						reverse_remove_opinion = {
-							who = PREV
-							modifier = opinion_abducting
-						}
-					}
+
+				hidden_effect = {
 					opinion = {
+						name = opinion_abducting
 						who = ROOT
-						modifier = opinion_abducting
-						months = 12000
+						years = 1000
 					}
-					character_event = { id = MNM.20070 days = 1 }
+				}
+
+				character_event = {
+					id = MNM.20070
+					days = 1
 				}
 			}
 		}
+
 		ai_will_do = {
-			factor = 0 		# 1 = 100% chance every month (for each allowed target!)
+			factor = 0
 		}
 	}
 
 	stop_abduct_decision = {
 		filter = self
-		ai_target_filter = self
+
 		ai = no
 
 		potential = {
+			has_any_opinion_modifier = opinion_abducting
+
 			OR = {
-				is_devil_worshiper_trigger = yes
+				society_member_of = the_satanists
 				is_member_of_any_assassin_guild_trigger = yes
 			}
-			has_any_opinion_modifier = opinion_abducting
 		}
 
 		effect = {
 			random_opinion_modifier_target = {
 				limit = {
-					ROOT = {
-						has_opinion_modifier = {
-							who = PREV
-							modifier = opinion_abducting
-						}
+					reverse_has_opinion_modifier = {
+						name = opinion_abducting
+						who = ROOT
 					}
 				}
-				save_event_target_as = target_abduction
-				ROOT = { character_event = { id = MNM.20100 tooltip = stop_abduct_decision_tt } }
+
+				save_event_target_as = abduction_target
+
+				ROOT = {
+					character_event = {
+						id = MNM.20100
+						tooltip = stop_abduct_decision_tt
+					}
+				}
 			}
 		}
 
@@ -1488,31 +1492,29 @@ targeted_decisions = {
 	}
 
 	stop_abduct_decision_target = {
-		filter = all
-		ai_target_filter = realm
 		ai = no
 
 		from_potential = {
+			has_any_opinion_modifier = opinion_abducting
+
 			OR = {
-				is_devil_worshiper_trigger = yes
+				society_member_of = the_satanists
 				is_member_of_any_assassin_guild_trigger = yes
 			}
-			has_any_opinion_modifier = opinion_abducting
 		}
 
 		potential = {
-			FROM = {
-				has_opinion_modifier = {
-					who = ROOT
-					modifier = opinion_abducting
-				}
+			reverse_has_opinion_modifier = {
+				name = opinion_abducting
+				who = FROM
 			}
 		}
 
 		effect = {
-			save_event_target_as = target_abduction
-			hidden_tooltip = {
-				FROM = { character_event = { id = MNM.20100 } }
+			save_event_target_as = abduction_target
+
+			FROM = {
+				character_event = { id = MNM.20100 }
 			}
 		}
 

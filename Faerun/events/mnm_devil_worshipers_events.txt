@@ -9499,123 +9499,132 @@ character_event = {
 # Fired from on_society_bi_yearly_pulse
 ###########################################
 
-character_event = {
-	id = MNM.20060
-	hide_window = yes
-	
-	is_triggered_only = yes
-	
+narrative_event = {
+	id = MNM.20061
+	title = EVTTITLE_MNM_20061
+	desc = EVTDESC_MNM_20061
+	picture = GFX_evt_lunatic
+	border = GFX_event_narrative_frame_intrigue
+
+	is_triggered_only = yes # on_society_bi_yearly_pulse, random_events
+
 	only_playable = yes
 	only_capable = yes
 	prisoner = no
-	
+
 	trigger = {
-		is_devil_worshiper_trigger = yes
-		NOT = { has_character_modifier = in_seclusion }
-		NOT = { trait = in_hiding }
+		society_member_of = the_satanists
+		in_seclusion = no
 		is_ill = no
+		NOT = { trait = in_hiding }
+
 		society = {
 			any_society_member = {
+				ai = yes
+				in_seclusion = no
 				is_incapable = no
 				prisoner = no
-				NOT = { has_character_modifier = in_seclusion }
-				NOT = { trait = in_hiding }
 				is_ill = no
-				NOT = { character = ROOT }
-				OR = {
-					is_rival = ROOT
-					ROOT = { trait = lunatic }
-					ROOT = { trait = possessed }
+
+				ROOT = {
+					OR = {
+						is_rival = PREV
+						trait = lunatic
+						trait = possessed
+					}
 				}
-				NOT = {
+
+				NOR = {
+					character = ROOT
+					trait = in_hiding
+
 					reverse_has_opinion_modifier = {
+						name = opinion_nemesis
 						who = ROOT
-						modifier = opinion_nemesis
 					}
 				}
 			}
 		}
 	}
-	
+
 	weight_multiplier = {
 		factor = 1
-		modifier = {
+
+		mult_modifier = {
 			factor = 1.25
 			OR = {
 				trait = lunatic
 				trait = possessed
 			}
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.25
 			trait = cruel
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.25
 			trait = impaler
 		}
-		modifier = {
+		mult_modifier = {
 			factor = 1.25
 			trait = deceitful
 		}
 	}
-	
+
 	immediate = {
+		save_event_target_as = dw_schemer
 		society = {
 			random_society_member = {
 				limit = {
 					ai = yes
+					in_seclusion = no
 					is_incapable = no
 					prisoner = no
-					NOT = { has_character_modifier = in_seclusion }
-					NOT = { trait = in_hiding }
 					is_ill = no
-					NOT = { character = ROOT }
-					OR = {
-						is_rival = ROOT
-						ROOT = { trait = lunatic }
-						ROOT = { trait = possessed }
+
+					ROOT = {
+						OR = {
+							is_rival = PREV
+							trait = lunatic
+							trait = possessed
+						}
 					}
-					NOT = {
+
+					NOR = {
+						character = ROOT
+						trait = in_hiding
+
 						reverse_has_opinion_modifier = {
+							name = opinion_nemesis
 							who = ROOT
-							modifier = opinion_nemesis
 						}
 					}
 				}
 				save_event_target_as = dw_buddy
-				ROOT = { narrative_event = { id = MNM.20061 } }
 			}
 		}
 	}
-}
-
-# Infernal Choir - Planning
-narrative_event = {
-	id = MNM.20061
-	picture = GFX_evt_lunatic
-	border = GFX_event_narrative_frame_intrigue
-	
-	title = EVTTITLE_MNM_20061
-	desc = EVTDESC_MNM_20061
-
-	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_MNM_20061 # Do it!
-		ai_chance = {
-			factor = 100
-		}
-		
+
 		set_character_flag = had_infernal_choir
-		
-		event_target:dw_buddy = { character_event = { id = MNM.20062 days = 3 tooltip = EVT_TT_20062 portrait = no } }
+
+		event_target:dw_buddy = {
+			show_scope_change = no
+
+			character_event = {
+				id = MNM.20062
+				days = 3
+				tooltip = EVT_TT_20062
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20061 # Not a good idea
-		ai_chance = {
-			factor = 0
-		}
+
+		ai_chance = { factor = 0 }
 	}
 }
 
@@ -9624,89 +9633,113 @@ character_event = {
 	id = MNM.20062
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-	
+
 	desc = {
 		text = EVTDESC_MNM_20012
 		trigger = {
 			NOT = { trait = paranoid }
 		}
 	}
-	
 	desc = {
 		text = EVTDESC_MNM_20012_PARANOID
-		trigger = {
-			trait = paranoid
-		}
+		trigger = { trait = paranoid }
 	}
 
 	is_triggered_only = yes
 
 	option = {
 		name = EVTOPTA_MNM_20012 # Of course
+
 		trigger = {
 			NOT = { trait = paranoid }
 		}
-		ai_chance = {
-			factor = 100
+
+		event_target:dw_schemer = {
+			show_scope_change = no
+
+			narrative_event = {
+				id = MNM.20064
+				days = 3
+				tooltip = EVT_TT_20013
+			}
 		}
-		
-		FROM = { narrative_event = { id = MNM.20064 days = 3 tooltip = EVT_TT_20013 portrait = no } }
+
+		ai_chance = { factor = 100 }
 	}
+
 	option = {
 		name = EVTOPTC_MNM_20062 # I knew it!
-		trigger = {
-			trait = paranoid
-		}
 		tooltip_info = paranoid
-		
-		ai_chance = {
-			factor = 1000
-		}
-		
+
+		trigger = { trait = paranoid }
+
 		set_character_flag = dw_double_cross
-		FROM = { narrative_event = { id = MNM.20064 tooltip = EVT_TT_20064 days = 3 portrait = no } }
+
+		event_target:dw_schemer = {
+			show_scope_change = no
+
+			narrative_event = {
+				id = MNM.20064
+				days = 3
+				tooltip = EVT_TT_20064
+			}
+		}
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20012 # No way!
+
 		trigger = {
 			NOT = { trait = paranoid }
 		}
-		
+
+		detract_society_currency_minor_effect = yes
+
+		reverse_opinion = {
+			name = opinion_coward
+			who = event_target:dw_schemer
+			years = 5
+		}
+
+		event_target:dw_schemer = {
+			character_event = {
+				id = MNM.20063
+				days = 3
+			}
+		}
+
 		ai_chance = {
 			factor = 1
-			modifier = {
+
+			mult_modifier = {
 				factor = 20
 				trait = temperate
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = kind
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 10
 				trait = just
 			}
 		}
-		
-		detract_society_currency_minor_effect = yes
-		reverse_opinion = { who = FROM modifier = opinion_coward years = 5 }
-		
-		FROM = { character_event = { id = MNM.20063 days = 3 } }
 	}
 }
 
 # Rival declined
 character_event = {
 	id = MNM.20063
+	# title = EVTTITLE_MNM_20061
+	desc = EVTDESC_MNM_20063
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-	desc = EVTDESC_MNM_20063
-	title = EVTTITLE_MNM_20061
-	
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_MNM_20063
+
 		detract_society_currency_minor_effect = yes
 	}
 }
@@ -9714,197 +9747,186 @@ character_event = {
 # Rival accepts the invitation
 narrative_event = {
 	id = MNM.20064
-	picture = GFX_evt_sacrifice #GFX_evt_witch_burning
-	border = GFX_event_narrative_frame_intrigue
-	
 	title = EVTTITLE_MNM_20061
-	
-	desc = { 
+	picture = GFX_evt_sacrifice # GFX_evt_witch_burning
+	border = GFX_event_narrative_frame_intrigue
+
+	desc = {
 		text = EVTDESC_MNM_20064
-		trigger = { FROM = { is_female = no } }
 		sound = boiled_alive_male_01
+		trigger = { event_target:dw_buddy = { is_female = no } }
 	}
-	desc = { 
+	desc = {
 		text = EVTDESC_MNM_20064
-		trigger = { FROM = { is_female = no } }
 		sound = boiled_alive_male_02
+		trigger = { event_target:dw_buddy = { is_female = no } }
 	}
-	desc = { 
+	desc = {
 		text = EVTDESC_MNM_20064
-		trigger = { FROM = { is_female = yes } }
 		sound = boiled_alive_female_01
+		trigger = { event_target:dw_buddy = { is_female = yes } }
 	}
-	desc = { 
+	desc = {
 		text = EVTDESC_MNM_20064
-		trigger = { FROM = { is_female = yes } }
 		sound = boiled_alive_female_02
+		trigger = { event_target:dw_buddy = { is_female = yes } }
 	}
-	
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		if = {
-			limit =  { 
-				FROM = { has_character_flag = dw_double_cross }
+			limit = {
+				event_target:dw_buddy = { has_character_flag = dw_double_cross }
 			}
-			FROM = { clr_character_flag = dw_double_cross }
+
+			event_target:dw_buddy = { clr_character_flag = dw_double_cross }
+
 			random_courtier = {
 				limit = {
 					ai = yes
 					prisoner = no
-					age = 6
+					age >= 6
+					is_powerful = no
+				}
+
+				preferred_limit = {
 					OR = {
 						is_close_relative = ROOT
 						is_married = ROOT
 						is_consort = ROOT
 					}
 				}
+
 				save_event_target_as = dw_real_victim
-				ROOT = { set_character_flag = dw_double_cross }
-			}
-			if = {
-				limit =  { 
-					NOT = { has_character_flag = dw_double_cross }
-				}
-				random_courtier = {
-					limit = {
-						ai = yes
-						prisoner = no
-						age = 6
-					}
-					save_event_target_as = dw_real_victim
-					ROOT = { set_character_flag = dw_double_cross }
-				}
 			}
 		}
-		
+
 		if = {
-			limit =  {
-				NOT = { has_character_flag = dw_double_cross }
+			limit = {
+				NOT = { event_target:dw_real_victim = { always = yes } }
 			}
-			FROM = { narrative_event = { id = MNM.20065 } }
+
+			event_target:dw_buddy = { narrative_event = { id = MNM.20065 } }
 		}
-		
+
 		if = {
-			limit =  {
+			limit = {
 				NOT = { trait = poet }
 			}
+
 			random = {
 				chance = 33
 				set_character_flag = dw_gain_poet
 			}
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20064
-		
+
 		tooltip = {
-			FROM = {
+			event_target:dw_buddy = {
+				show_scope_change = no
+
 				death = {
-					death_reason = death_vanished killer = ROOT
+					death_reason = death_vanished
+					killer = ROOT
 				}
 			}
 		}
-		
+
 		add_society_currency_medium_effect = yes
-		
+
 		# Increase Cruelty
 		if = {
 			limit = {
 				trait = cruel
-				NOT = { lifestyle_traits = 1 }
+				lifestyle_traits < 1
 			}
+
 			add_trait = impaler
 		}
+
+		add_trait_partially_silently_cruel_effect = yes
+
 		if = {
-			limit = {
-				NOT = { trait = kind }
-				NOT = { trait = cruel }
-			}
-			add_trait = cruel
-		}
-		if = {
-			limit = {
-				trait = kind
-			}
-			remove_trait = kind
-		}
-		
-		if = {
-			limit =  {
-				has_character_flag = dw_double_cross
-			}
-			event_target:dw_real_victim = { character_event = { id = MNM.20066 days = 3 } }
-			clr_character_flag = dw_double_cross
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = dw_gain_poet
-			}
+			limit = { has_character_flag = dw_gain_poet }
+			clr_character_flag = dw_gain_poet
 			add_trait = poet
 		}
-		
-		clr_character_flag = dw_gain_poet
+
+		if = {
+			limit = {
+				event_target:dw_real_victim = { always = yes }
+			}
+
+			event_target:dw_real_victim = {
+				character_event = {
+					id = MNM.20066
+					days = 3
+				}
+			}
+		}
 	}
 }
 
 # Rival dies horribly
 narrative_event = {
 	id = MNM.20065
-	picture = GFX_evt_sacrifice #GFX_evt_witch_burning
-	border = GFX_event_narrative_frame_intrigue
-	
 	title = EVTTITLE_MNM_20061
-	
-	desc = { 
+	picture = GFX_evt_sacrifice # GFX_evt_witch_burning
+	border = GFX_event_narrative_frame_intrigue
+
+	desc = {
 		text = EVTDESC_MNM_20065
-		trigger = { is_female = no }
 		sound = boiled_alive_male_01
-	}
-	desc = { 
-		text = EVTDESC_MNM_20065
 		trigger = { is_female = no }
+	}
+	desc = {
+		text = EVTDESC_MNM_20065
 		sound = boiled_alive_male_02
+		trigger = { is_female = no }
 	}
-	desc = { 
+	desc = {
 		text = EVTDESC_MNM_20065
-		trigger = { is_female = yes }
 		sound = boiled_alive_female_01
-	}
-	desc = { 
-		text = EVTDESC_MNM_20065
 		trigger = { is_female = yes }
-		sound = boiled_alive_female_02
 	}
-	
+	desc = {
+		text = EVTDESC_MNM_20065
+		sound = boiled_alive_female_02
+		trigger = { is_female = yes }
+	}
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		death = {
-			death_reason = death_vanished killer = FROM
+			death_reason = death_vanished
+			killer = event_target:dw_schemer
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20065
 	}
 }
 
-# Rival replaced with close relative - Bounce through the real victim
+# Rival replaced with close relative
 character_event = {
 	id = MNM.20066
+
 	hide_window = yes
-	
 	is_triggered_only = yes
-	
+
 	immediate = {
-		FROMFROM = { narrative_event = { id = MNM.20067 } }
-		FROM = { character_event = { id = MNM.20068 } }
-		
+		event_target:dw_buddy = { narrative_event = { id = MNM.20067 } }
+		event_target:dw_schemer = { character_event = { id = MNM.20068 } }
+
 		death = {
-			death_reason = death_vanished killer = FROM
+			death_reason = death_vanished
+			killer = event_target:dw_schemer
 		}
 	}
 }
@@ -9912,45 +9934,48 @@ character_event = {
 # Rival replaced with close relative!
 narrative_event = {
 	id = MNM.20067
-	picture = GFX_evt_sacrifice #GFX_evt_witch_burning
-	border = GFX_event_narrative_frame_intrigue
-	
 	title = EVTTITLE_MNM_20061
-	
-	show_from_from = yes
-	
-	desc = { 
+	picture = GFX_evt_sacrifice # GFX_evt_witch_burning
+	border = GFX_event_narrative_frame_intrigue
+	portrait = event_target:dw_schemer
+
+	desc = {
 		text = EVTDESC_MNM_20067
-		trigger = { event_target:dw_real_victim = { is_female = no } }
 		sound = boiled_alive_male_01
-	}
-	desc = { 
-		text = EVTDESC_MNM_20067
 		trigger = { event_target:dw_real_victim = { is_female = no } }
+	}
+	desc = {
+		text = EVTDESC_MNM_20067
 		sound = boiled_alive_male_02
+		trigger = { event_target:dw_real_victim = { is_female = no } }
 	}
-	desc = { 
+	desc = {
 		text = EVTDESC_MNM_20067
-		trigger = { event_target:dw_real_victim = { is_female = yes } }
 		sound = boiled_alive_female_01
-	}
-	desc = { 
-		text = EVTDESC_MNM_20067
 		trigger = { event_target:dw_real_victim = { is_female = yes } }
-		sound = boiled_alive_female_02
 	}
-	
+	desc = {
+		text = EVTDESC_MNM_20067
+		sound = boiled_alive_female_02
+		trigger = { event_target:dw_real_victim = { is_female = yes } }
+	}
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_MNM_20067
+
 		tooltip = {
 			event_target:dw_real_victim = {
+				show_scope_change = no
+
 				death = {
-					death_reason = death_vanished killer = FROMFROM
+					death_reason = death_vanished
+					killer = event_target:dw_schemer
 				}
 			}
 		}
+
 		add_society_currency_medium_effect = yes
 	}
 }
@@ -9958,71 +9983,57 @@ narrative_event = {
 # You realize what your rival has done!
 character_event = {
 	id = MNM.20068
+	desc = EVTDESC_MNM_20068
 	picture = GFX_evt_lunatic
 	border = GFX_event_normal_frame_intrigue
-	
-	title = EVTTITLE_MNM_20061
-	desc = EVTDESC_MNM_20068
-	
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		if = {
 			limit = {
 				NOT = { trait = lunatic }
 			}
+
 			random = {
 				chance = 34
 				set_character_flag = gain_lunatic
 			}
 		}
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20068
+
 		opinion = {
-			who = FROMFROMFROM
-			modifier = opinion_nemesis
+			name = opinion_nemesis
+			who = event_target:dw_buddy
 			years = 100
 		}
-		hidden_tooltip = {
-			FROMFROMFROM = {
-				opinion = {
-					who = ROOT
-					modifier = opinion_nemesis
-					years = 100
-				}
+
+		hidden_effect = {
+			reverse_opinion = {
+				name = opinion_nemesis
+				who = event_target:dw_buddy
+				years = 100
 			}
 		}
-		
+
+		add_trait_partially_silently_paranoid_effect = yes
+
 		if = {
-			limit = {
-				NOT = { trait = paranoid }
-				NOT = { trait = trusting }
-			}
-			add_trait = paranoid
-		}
-		if = {
-			limit = {
-				trait = trusting
-			}
-			remove_trait = trusting
-		}
-		
-		if = {
-			limit = {
-				has_character_flag = gain_lunatic
-			}
+			limit = { has_character_flag = gain_lunatic }
+			clr_character_flag = gain_lunatic
 			add_trait = lunatic
 		}
-		
-		clr_character_flag = gain_lunatic
 	}
 }
+
 
 ###########################################
 # Abduction Decision - Hidden start
 # Fired from decision_abduct
+# Used by both the assassins and devil worshippers
 ###########################################
 
 # Abduction Start
@@ -10031,173 +10042,206 @@ character_event = {
 	desc = EVTDESC_MNM_20070
 	picture = GFX_evt_shady_meeting
 	border = GFX_event_normal_frame_intrigue
-	
-	capable_only = yes
-	prisoner = no
-	
-	is_triggered_only = yes
-	
-	immediate = {
-		FROM = {
-			save_event_target_as = target_abduction
-		}
-		save_event_target_as = target_kidnapper
-	}
-	
+
+	is_triggered_only = yes # decision_abduct, mnm_society_decisions.txt
+
 	option = {
 		name = EXCELLENT
-		character_event = { id = MNM.20080 days = 20 random = 20 tooltip = EVTTOOLTIP_MNM_20080 }
+
+		character_event = {
+			id = MNM.20080
+			days = 20
+			random = 20
+			tooltip = EVTTOOLTIP_MNM_20080
+		}
 	}
 }
 
 # Hidden 'outcome tombola' event for the "Abduct" decision
 character_event = {
 	id = MNM.20080
+
 	hide_window = yes
-	
 	is_triggered_only = yes
-	
+
+	only_capable = yes
+	prisoner = no
+
+	trigger = {
+		OR = {
+			society_member_of = the_satanists
+			is_member_of_any_assassin_guild_trigger = yes
+		}
+
+		has_opinion_modifier = {
+			who = event_target:abduction_target
+			name = opinion_abducting
+		}
+	}
+
+	fail_trigger_effect = {
+		character_event = { id = MNM.20100 } # Clear out any flags, etc
+	}
+
 	immediate = {
 		if = {
 			limit = {
-				OR = {
-					prisoner = yes # I have become imprisoned
-					trait = incapable # I have become incapable
-					AND = {
-						is_devil_worshiper_trigger = no
-						NOT = { society_member_of = eldreth_veluuthra }
-					}
-				}
-			}
-			character_event = { id = MNM.20100 } # Clear out any flags, etc
-			break = yes # Stop execution here
-		}
-		
-		if = {
-			limit = {
-				FROMFROM = {
+				event_target:abduction_target = {
 					is_alive = no
 				}
 			}
-			
+
 			character_event = { id = MNM.20101 }
-			break = yes
 		}
-		
-		if = {
+		else_if = {
 			limit = {
-				FROMFROM = {
+				event_target:abduction_target = {
 					prisoner = yes
 				}
 			}
+
 			character_event = { id = MNM.20102 }
-			break = yes
 		}
-		
-		if = {
+		else_if = {
 			limit = {
-				FROMFROM = {
+				event_target:abduction_target = {
 					same_society_as = ROOT
 				}
 			}
+
 			character_event = { id = MNM.20104 }
-			break = yes
 		}
-		
-		if = {
-			limit = {
-				NOT = {
-					has_opinion_modifier = {
-						who = FROMFROM
-						modifier = opinion_abducting
+		else = {
+			repeat_event = { # Fire again with no scope changes
+				id = MNM.20080
+				days = 30
+				random = 30
+			}
+
+			if = {
+				limit = {
+					event_target:abduction_target = {
+						is_inaccessible_trigger = no
+						is_pilgrim = no
 					}
 				}
-			}
-			break = yes # I have stopped spying on this character
-		}
-		
-		repeat_event = { id = MNM.20080 days = 30 random = 30 } # Fire again with no scope changes
-		
-		if = {
-			limit = {
-				FROMFROM = {
-					is_inaccessible_trigger = yes
-				}
-			}
-			break = yes
-		}
-		
-		random_list = {
-			10000 = { # No luck yet
-				modifier = {
-					factor = 0.75
-					has_character_modifier = wol_schemer_1
-				}
-				modifier = {
-					factor = 0.5
-					has_character_modifier = wol_schemer_2
-				}
-				modifier = {
-					factor = 0.2
-					trait = schemer
-				}
-				modifier = {
-					factor = 0.5
-					FROMFROM = { trait = trusting }
-				}
-				modifier = {
-					factor = 1.5
-					FROMFROM = { has_character_modifier = wol_schemer_1 }
-				}
-				modifier = {
-					factor = 3.0
-					FROMFROM = { has_character_modifier = wol_schemer_2 }
-				}
-				modifier = {
-					factor = 5.0
-					FROMFROM = { trait = schemer }
-				}
-				modifier = {
-					factor = 3.0
-					FROMFROM = { trait = paranoid }
-				}
-				modifier = {
-					factor = 1.5
-					FROMFROM = { tier = BARON }
-				}
-				modifier = {
-					factor = 2.0
-					FROMFROM = { tier = COUNT }
-				}
-				modifier = {
-					factor = 3 #Makes sure it's very hard to abduct the same person twice
-					FROMFROM = {
-						OR = {
-							has_opinion_modifier = {
-								who = ROOT
-								modifier = opinion_attempted_abduction
-							}
-							has_opinion_modifier = {
-								who = ROOT
-								modifier = opinion_abducted
+
+				random_list = {
+					10000 = { # No luck yet
+						mult_modifier = {
+							factor = 0.75
+							has_character_modifier = wol_schemer_1
+						}
+						mult_modifier = {
+							factor = 0.5
+							has_character_modifier = wol_schemer_2
+						}
+						mult_modifier = {
+							factor = 0.2
+							trait = schemer
+						}
+						mult_modifier = {
+							factor = 0.5
+							event_target:abduction_target = { trait = trusting }
+						}
+						mult_modifier = {
+							factor = 1.5
+							event_target:abduction_target = { has_character_modifier = wol_schemer_1 }
+						}
+						mult_modifier = {
+							factor = 3.0
+							event_target:abduction_target = { has_character_modifier = wol_schemer_2 }
+						}
+						mult_modifier = {
+							factor = 5.0
+							event_target:abduction_target = { trait = schemer }
+						}
+						mult_modifier = {
+							factor = 3.0
+							event_target:abduction_target = { trait = paranoid }
+						}
+						mult_modifier = {
+							factor = 1.5
+							event_target:abduction_target = { real_tier = BARON }
+						}
+						mult_modifier = {
+							factor = 2.0
+							event_target:abduction_target = { real_tier = COUNT }
+						}
+						mult_modifier = {
+							factor = 3 # Makes sure it's very hard to abduct the same person twice
+							OR = {
+								reverse_has_opinion_modifier = {
+									name = opinion_attempted_abduction
+									who = event_target:abduction_target
+								}
+								reverse_has_opinion_modifier = {
+									name = opinion_abducted
+									who = event_target:abduction_target
+								}
 							}
 						}
+						mult_modifier = {
+							factor = 0.25
+							event_target:abduction_target = {
+								is_ruler = no
+								vassal_of = ROOT
+							}
+						}
+						mult_modifier = {
+							factor = 1.5
+							event_target:abduction_target = {
+								OR = {
+									trait = rogue
+									trait = trained_rogue
+									trait = journeyman_rogue
+									trait = shadow
+									trait = trained_shadow
+									trait = journeyman_shadow
+								}
+							}
+						}
+						mult_modifier = {
+							factor = 2.0
+							event_target:abduction_target = {
+								OR = {
+									trait =	expert_rogue
+									trait =	master_rogue
+									trait = expert_shadow
+									trait = master_shadow
+									z_legendary_class = yes
+									z_renowned_class = yes
+								}
+							}
+						}
+						mult_modifier = {
+							factor = 2.0
+							event_target:abduction_target = {
+								OR = {
+									trait =	renowned_rogue
+									trait = legendary_rogue
+									trait = renowned_shadow
+									trait = legendary_shadow
+								}
+							}
+						}
+						mult_modifier = {
+							factor = 3
+							event_target:abduction_target = {
+								is_powerful = yes
+							}
+						}
+
+						random = {
+							chance = 25
+							character_event = { id = MNM.20103 } # Time to give up?
+						}
+					}
+
+					10000 = { # Success!
+						character_event = { id = MNM.20081 }
 					}
 				}
-				modifier = {
-					factor = 0.25
-					FROMFROM = {
-						is_ruler = no
-						liege = { character = ROOT }
-					}
-				}
-				random = {
-					chance = 25
-					character_event = { id = MNM.20103 } # Time to give up?
-				}
-			}
-			10000 = { # Success!
-				character_event = { id = MNM.20081 }
 			}
 		}
 	}
@@ -10208,43 +10252,43 @@ character_event = {
 	id = MNM.20081
 	picture = GFX_evt_bandits
 	border = GFX_event_normal_frame_intrigue
-	
-	is_triggered_only = yes
-	
+
 	desc = {
-		text = EVTDESC_MNM_20081 
+		text = EVTDESC_MNM_20081
 		trigger = {
-			FROMFROMFROM = {
-				age = 14
-			}
+			event_target:abduction_target = { age >= 14 }
 		}
 	}
-	
 	desc = {
 		text = EVTDESC_MNM_20081_CHILD
 		picture = GFX_evt_child_play
 		trigger = {
-			FROMFROMFROM = {
-				NOT = { age = 14 }
-			}
+			event_target:abduction_target = { age < 14 }
 		}
 	}
-	
+
+	is_triggered_only = yes
+
 	option = {
 		name = EVTOPTA_MNM_20081
-		ai_chance = {
-			factor = 100
-		}
+
 		increase_visibility_effect = yes
-		FROMFROMFROM = {
-			character_event = { id = MNM.20082 days = 3 tooltip = EVTTOOLTIP_MNM_20081 }
+
+		event_target:abduction_target = {
+			show_scope_change = no
+
+			character_event = {
+				id = MNM.20082
+				days = 3
+				tooltip = EVTTOOLTIP_MNM_20081
+			}
 		}
+
+		ai_chance = { factor = 10 }
 	}
+
 	option = {
 		name = EVTOPTB_MNM_20081
-		ai_chance = {
-			factor = 10
-		}
 	}
 }
 
@@ -10253,153 +10297,143 @@ character_event = {
 	id = MNM.20082
 	picture = GFX_evt_bandits
 	border = GFX_event_normal_frame_intrigue
-	
-	is_triggered_only = yes
-	
+
 	desc = {
 		text = EVTDESC_WOL_2121
 		picture = GFX_evt_child_play
-		trigger = {
-			age = 14
-		}
+		trigger = { age >= 14 }
 	}
-	
 	desc = {
 		text = EVTDESC_MNM_20082_CHILD
-		picture = GFX_evt_children_talking
+		picture = GFX_evt_child_talking
 		trigger = {
-			NOT = { age = 14 }
-			age = 4
+			age < 14
+			age >= 4
 		}
 	}
-	
 	desc = {
 		text = EVTDESC_MNM_20082_BABY
-		picture = GFX_evt_children_talking
-		trigger = {
-			NOT = { age = 4 }
-		}
+		picture = GFX_evt_child_talking
+		trigger = { age < 4 }
 	}
-	
+
+	is_triggered_only = yes
+
 	immediate = {
 		random = {
 			chance = 75
-			modifier = {
-				factor = 0.1 #Makes sure it's very hard to abduct the same person twice
+
+			mult_modifier = {
+				factor = 0.1 # Makes sure it's very hard to abduct the same person twice
 				OR = {
 					has_opinion_modifier = {
 						who = FROM
-						modifier = opinion_attempted_abduction
+						name = opinion_attempted_abduction
 					}
+
 					has_opinion_modifier = {
 						who = FROM
-						modifier = opinion_abducted
+						name = opinion_abducted
 					}
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 0.1
-				age = 14
+				age >= 14
+
 				OR = {
 					has_character_modifier = seduced_loyal_bodyguard
 					has_character_modifier = seduced_loyal_spy_maid
 				}
 			}
-			modifier = {
+			mult_modifier = {
 				factor = 2.0
 				trait = trusting
 			}
-			
+			mult_modifier = {
+				factor = 0.2
+				is_powerful = yes
+			}
+
 			set_character_flag = abduction_success
 		}
 	}
-	
+
 	option = {
 		name = {
 			text = EVTOPT_WOL_2121_CAUGHT
-			trigger = {
-				age = 14
-			}
+			trigger = { age >= 14 }
 		}
 		name = {
 			text = EVTOPT_MNM_20082_CHILD_CAUGHT
 			trigger = {
-				NOT = { age = 14 }
-				age = 4
+				age < 14
+				age >= 4
 			}
 		}
 		name = {
 			text = EVTOPT_MNM_20082_BABY_CAUGHT
-			trigger = {
-				NOT = { age = 4 }
-			}
+			trigger = { age < 4 }
 		}
-		
+
 		trigger = { has_character_flag = abduction_success }
-		
+
 		imprison = FROM
 
 		opinion = {
+			name = opinion_abducted
 			who = FROM
-			modifier = opinion_abducted
 			years = 50
 		}
-		
-		hidden_effect = {
-			FROM = {
-				character_event = { id = MNM.20083 }
-			}
+
+		FROM = {
+			character_event = { id = MNM.20083 }
 		}
-		
+
 		clr_character_flag = abduction_success
 	}
-	
+
 	option = {
 		name = {
 			text = EVTOPT_WOL_2121
-			trigger = {
-				age = 14
-			}
+			trigger = { age >= 14 }
 		}
 		name = {
 			text = EVTOPT_MNM_20082_CHILD
 			trigger = {
-				NOT = { age = 14 }
-				age = 4
+				age < 14
+				age >= 4
 			}
 		}
 		name = {
 			text = EVTOPT_MNM_20082_BABY
-			trigger = {
-				NOT = { age = 4 }
-			}
+			trigger = { age < 4 }
 		}
-		
+
 		trigger = { NOT = { has_character_flag = abduction_success } }
-		
+
 		if = {
 			limit = {
 				is_incapable = no
-				age = 4
+				age >= 4
+
 				OR = {
 					trait = paranoid
-					random = 50
+					random < 50
 				}
 			}
-			custom_tooltip = {
-				text = EVTTOOLTIP_MNM_20082_PERP
-			}
+
+			custom_tooltip = { text = EVTTOOLTIP_MNM_20082_PERP }
+
 			opinion = {
+				name = opinion_attempted_abduction
 				who = FROM
-				modifier = opinion_attempted_abduction
 				years = 10
 			}
 		}
-		
-		hidden_effect = {
-			FROM = {
-				character_event = { id = MNM.20084 }
-			}
+
+		FROM = {
+			character_event = { id = MNM.20084 }
 		}
 	}
 }
@@ -10407,24 +10441,23 @@ character_event = {
 # Target gets abducted!
 character_event = {
 	id = MNM.20083
+	desc = EVTDESC_MNM_20083
 	picture = GFX_evt_into_the_dungeon
 	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	
-	desc = EVTDESC_MNM_20083
-	
+
 	immediate = {
 		character_event = { id = MNM.20100 }
 	}
-	
+
 	option = {
 		name = EXCELLENT
 
 		tooltip = {
 			reverse_opinion = {
-				who = FROM
-				modifier = opinion_abducted
+				name = opinion_abducted
+				who = event_target:abduction_target
 				years = 50
 			}
 		}
@@ -10434,20 +10467,19 @@ character_event = {
 # Abduction fails
 character_event = {
 	id = MNM.20084
+	desc = EVTDESC_MNM_20084
 	picture = GFX_evt_bandits
 	border = GFX_event_normal_frame_intrigue
-	
+
 	is_triggered_only = yes
-	
-	desc = EVTDESC_MNM_20084
-	
+
 	option = {
 		name = EVTOPTA_MNM_20084
 
 		tooltip = {
 			reverse_opinion = {
-				who = FROM
-				modifier = opinion_attempted_abduction
+				name = opinion_attempted_abduction
+				who = event_target:abduction_target
 				years = 10
 			}
 		}
@@ -10457,16 +10489,16 @@ character_event = {
 # End of "Abduction" events to clear out flags, etc
 character_event = {
 	id = MNM.20100
+
 	hide_window = yes
-	
 	is_triggered_only = yes
-	
+
 	immediate = {
 		remove_opinion = {
-			who = event_target:target_abduction
-			modifier = opinion_abducting
+			name = opinion_abducting
+			who = event_target:abduction_target
 		}
-		
+
 		clear_delayed_event = { id = MNM.20080 }
 	}
 }
@@ -10474,19 +10506,17 @@ character_event = {
 # My target has died!
 character_event = {
 	id = MNM.20101
-	
 	desc = EVTDESC_MNM_20101
 	picture = GFX_evt_death
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:abduction_target
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		character_event = { id = MNM.20100 }
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20101
 	}
@@ -10495,68 +10525,59 @@ character_event = {
 # My target has been imprisoned!
 character_event = {
 	id = MNM.20102
-	
 	desc = EVTDESC_MNM_20102
 	picture = GFX_evt_into_the_dungeon
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:abduction_target
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		character_event = { id = MNM.20100 }
 	}
-	
+
 	option = {
-		name = EVTOPTA_MNM_20102
+		name = VERY_WELL
 	}
 }
 
 # My efforts are not bearing fruit. Give up?
 character_event = {
 	id = MNM.20103
-	
 	desc = EVTDESC_MNM_20103
 	picture = GFX_evt_eavesdropping
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:abduction_target
+
 	is_triggered_only = yes
-	
+
 	option = {
 		name = EVTOPTA_WOL_2065 # Give up
-		ai_chance = {
-			factor = 10
-		}
+
 		character_event = { id = MNM.20100 }
 	}
-	
+
 	option = {
 		name = EVTOPTB_MNM_20103 # Keep at it
-		ai_chance = {
-			factor = 100
-		}
+
+		ai_chance = { factor = 10 }
 	}
 }
 
 # My target has joined my Society
 character_event = {
 	id = MNM.20104
-	
 	desc = EVTDESC_MNM_20104
 	picture = GFX_evt_shadowy_cabal
 	border = GFX_event_normal_frame_intrigue
-	
-	show_from_from_from = yes
-	
+	portrait = event_target:abduction_target
+
 	is_triggered_only = yes
-	
+
 	immediate = {
 		character_event = { id = MNM.20100 }
 	}
-	
+
 	option = {
 		name = EVTOPTA_MNM_20101
 	}
