@@ -145,16 +145,17 @@ character_event = {
 
     	# To keep scopes straight...
     	save_event_target_as = home_commander
-    	if = {  #work around: in rare edge cases, the flank leader will belong to a flank which has fled, while the commander already *died* and code fails to update this.
-    		limit = {
-    			FROM = {
-    				character = yes
-    				is_alive = yes
-    				is_dying = no
-    			}
-    		}
+		if = {  #work around: in rare edge cases, the flank leader will belong to a flank which has fled, while the commander already *died* and code fails to update this.
+			limit = {
+				FROM = {
+					character = yes
+					is_alive = yes
+					is_dying = no
+					NOT = { character = ROOT }
+				}
+			}
 			FROM = { save_event_target_as = enemy_commander } #note: might not always exist
-    	}
+		}
 		FROMFROM = { save_event_target_as = enemy_liege } #note: might be the same character as enemy_commander
 		location = {
 			save_event_target_as = battlefield_location
@@ -4162,7 +4163,13 @@ character_event = {
 	is_triggered_only = yes
 
 	trigger = {
-		event_target:enemy_commander = { always = yes } #There has to be an opponent...
+		event_target:enemy_commander = { #There has to be an opponent...
+			always = yes 
+			NOR = { 
+				character = ROOT 
+				is_vassal_or_below_of = ROOT
+			}
+		} 
 		has_dlc = "Holy Fury"
 	}
 
