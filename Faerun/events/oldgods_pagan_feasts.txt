@@ -1286,7 +1286,1277 @@ character_event = {
 	# }
 # }
 
-### Romuva Užgavenes Festival - removed for Faerun
+### Romuva Užgavenes Festival
+
+# Invitations Sent (Liege)
+character_event = {
+	id = TOG.750
+	desc = EVTDESC_TOG_750
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes # hold_uzgavenes, minor_decisions.txt
+	hide_from = yes
+
+	option = {
+		name = EVTOPTA_TOG_700
+
+		any_vassal = {
+			limit = {
+				block_general_event_trigger = no
+				war = no
+			}
+
+			character_event = {
+				id = TOG.751
+				tooltip = EVTTOOLTIP_TOG_751
+			}
+		}
+
+		character_event = {
+			id = TOG.753
+			days = 10
+		}
+	}
+}
+
+# Invitations Received (Vassals)
+character_event = {
+	id = TOG.751
+	desc = EVTDESC_TOG_751
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_TOG_701
+
+		trigger = { religion = qukoku }
+
+		set_character_flag = attending_uzgavenes
+		set_character_flag = do_not_disturb
+
+		character_event = {
+			id = TOG.899 # Safety catch flag clearing
+			days = 100
+		}
+	}
+
+	option = {
+		name = EVTOPTB_TOG_701
+
+		trigger = { religion = qukoku }
+
+		FROM = {
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.752
+				days = 5
+				tooltip = DIPLOWINDOW_REJECT
+			}
+
+			opinion = {
+				name = opinion_refused_uzgavenes
+				who = ROOT
+			}
+		}
+	}
+}
+
+# Invitation Refused (Liege)
+character_event = {
+	id = TOG.752
+	desc = EVTDESC_TOG_752
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_702
+
+		tooltip = {
+			opinion = {
+				name = opinion_refused_uzgavenes
+				who = FROM
+			}
+		}
+	}
+}
+
+# Celebration Begins (Liege)
+character_event = {
+	id = TOG.753
+	desc = EVTDESC_TOG_753
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = EVTOPTA_TOG_753
+
+		custom_tooltip = {
+			text = uzgavenes_begins
+
+			any_vassal = {
+				limit = { has_character_flag = attending_uzgavenes }
+				character_event = { id = TOG.754 }
+			}
+
+			character_event = {
+				id = TOG.755
+				days = 10
+			}
+		}
+	}
+}
+
+# Celebration Begins (Vassals)
+character_event = {
+	id = TOG.754
+	desc = EVTDESC_TOG_754
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_753
+
+		custom_tooltip = { text = uzgavenes_begins }
+	}
+}
+
+# Feast Begins (Liege)
+character_event = {
+	id = TOG.755
+	desc = EVTDESC_TOG_755
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = EVTOPTA_TOG_705
+
+		custom_tooltip = {
+			text = feast_begins
+
+			set_character_flag = attending_uzgavenes
+
+			set_variable = {
+				which = local_uzgavenes_events
+				value = 0
+			}
+
+			character_event = {
+				id = TOG.759 # Blot events tombola
+				days = 3
+			}
+
+			any_vassal = {
+				limit = { has_character_flag = attending_uzgavenes }
+
+				set_character_flag = uzgavenes_feast_vassal
+				character_event = { id = TOG.756 }
+
+				opinion = {
+					name = opinion_held_blot
+					who = ROOT
+				}
+			}
+		}
+	}
+}
+
+character_event = {
+	id = TOG.759
+
+	is_triggered_only = yes
+	hide_window = yes
+
+	trigger = {
+		check_variable = {
+			which = local_blot_feast_events
+			value < 4
+		}
+	}
+
+	immediate = {
+		change_variable = {
+			which = local_blot_feast_events
+			value = 1
+		}
+
+		random_list = {
+			10 = {
+				trigger = {
+					any_vassal = {
+						trait = drunkard
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					NOT = { has_character_flag = feast_drunkard }
+				}
+
+				random_vassal = {
+					limit = {
+						trait = drunkard
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					character_event = { id = TOG.770 }
+				}
+			}
+
+			10 = {
+				trigger = {
+					any_vassal = {
+						trait = gluttonous
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					num_of_vassals >= 2
+					NOT = { has_character_flag = feast_gluttonous }
+				}
+
+				random_vassal = {
+					limit = {
+						trait = gluttonous
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					character_event = { id = TOG.773 }
+				}
+			}
+
+			10 = {
+				trigger = {
+					any_vassal = {
+						trait = lunatic
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					NOT = { has_character_flag = feast_lunatic }
+				}
+
+				random_vassal = {
+					limit = {
+						trait = lunatic
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					character_event = { id = TOG.776 }
+				}
+			}
+
+			10 = {
+				trigger = {
+					any_vassal = {
+						trait = lustful
+						is_female = no
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					NOT = { has_character_flag = feast_lustful }
+				}
+
+				random_vassal = {
+					limit = {
+						trait = lustful
+						is_female = no
+						has_character_flag = uzgavenes_feast_vassal
+					}
+
+					character_event = { id = TOG.778 }
+				}
+			}
+
+			10 = {
+				trigger = {
+					any_vassal = {
+						has_character_flag = uzgavenes_feast_vassal
+
+						liege = {
+							any_vassal = {
+								has_character_flag = uzgavenes_feast_vassal
+
+								opinion = {
+									who = PREVPREV
+									value >= 20
+								}
+
+								NOT = { character = PREVPREV }
+							}
+						}
+					}
+
+					NOT = { has_character_flag = feast_friendship }
+				}
+
+				random_vassal = {
+					limit = {
+						has_character_flag = uzgavenes_feast_vassal
+						liege = {
+							any_vassal = {
+								has_character_flag = uzgavenes_feast_vassal
+								opinion = {
+									who = PREVPREV
+									value >= 20
+								}
+
+								NOT = { character = PREVPREV }
+							}
+						}
+					}
+
+					character_event = { id = TOG.781 }
+				}
+			}
+
+			10 = {
+				trigger = {
+					NOT = { has_character_flag = feast_homosexual }
+
+					any_vassal = {
+						trait = homosexual
+						has_lover = no
+						has_character_flag = uzgavenes_feast_vassal
+
+						liege = {
+							any_vassal = {
+								trait = homosexual
+								same_sex = PREVPREV
+								has_lover = no
+								has_character_flag = uzgavenes_feast_vassal
+
+								opinion = {
+									who = PREVPREV
+									value >= 0
+								}
+
+								NOT = { character = PREVPREV }
+							}
+						}
+					}
+				}
+
+				random_vassal = {
+					limit = {
+						trait = homosexual
+						has_lover = no
+						has_character_flag = uzgavenes_feast_vassal
+
+						liege = {
+							any_vassal = {
+								trait = homosexual
+								same_sex = PREVPREV
+								has_lover = no
+								has_character_flag = uzgavenes_feast_vassal
+
+								opinion = {
+									who = PREVPREV
+									value >= 0
+								}
+
+								NOT = { character = PREVPREV }
+							}
+						}
+					}
+
+					character_event = { id = TOG.784 }
+				}
+			}
+		}
+
+		repeat_event = {
+			id = TOG.759
+			days = 5
+		}
+	}
+
+	fail_trigger_effect = {
+		character_event = {
+			id = TOG.757 # Feast ends
+			days = 7
+		}
+	}
+}
+
+# Feast Begins (Vassal)
+character_event = {
+	id = TOG.756
+	desc = EVTDESC_TOG_756
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_705
+
+		custom_tooltip = { text = feast_begins }
+	}
+}
+
+# Feast Ends (Liege)
+character_event = {
+	id = TOG.757
+	desc = EVTDESC_TOG_757
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = EVTOPTA_TOG_707
+
+		any_vassal = {
+			show_scope_change = no
+
+			limit = { has_character_flag = attending_uzgavenes }
+
+			opinion = {
+				name = opinion_uzgavenes
+				who = ROOT
+			}
+
+			character_event = { id = TOG.758 }
+		}
+
+		add_character_modifier = {
+			name = held_uzgavenes_timer
+			years = 5
+			hidden = yes
+		}
+
+		prestige = 100
+		piety = 100
+
+		clr_character_flag = holding_uzgavenes
+		clr_character_flag = attending_uzgavenes
+		clr_character_flag = feast_drunkard
+		clr_character_flag = feast_gluttonous
+		clr_character_flag = feast_lunatic
+		clr_character_flag = feast_lustful
+		clr_character_flag = feast_homosexual
+		clr_character_flag = do_not_disturb
+	}
+}
+
+# Feast Ends (Vassal)
+character_event = {
+	id = TOG.758
+	desc = EVTDESC_TOG_758
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_TOG_707
+
+		clr_character_flag = attending_uzgavenes
+		clr_character_flag = uzgavenes_feast_vassal
+		clr_character_flag = feast_drunkard
+		clr_character_flag = feast_gluttonous
+		clr_character_flag = feast_lunatic
+		clr_character_flag = feast_lustful
+		clr_character_flag = feast_friendship
+		clr_character_flag = feast_homosexual
+		clr_character_flag = do_not_disturb
+	}
+}
+
+### Ukon juhla Feast Events
+
+# Drunkard (Guest)
+character_event = {
+	id = TOG.770
+	desc = EVTDESC_TOG_650
+	picture = GFX_evt_drunk
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	option = {
+		name = EVTOPTA_TOG_650
+		tooltip_info = drunkard
+
+		liege = {
+			show_scope_change = no
+
+			if = {
+				limit = { trait = drunkard }
+
+				opinion = {
+					name = opinion_drinking_buddy
+					who = ROOT
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_feast_scandal
+					who = ROOT
+				}
+			}
+
+			set_character_flag = feast_drunkard
+			character_event = { id = TOG.771 }
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = {
+					has_character_flag = uzgavenes_feast_vassal
+					NOT = { character = ROOT }
+				}
+
+				if = {
+					limit = { trait = drunkard }
+
+					opinion = {
+						name = opinion_drinking_buddy
+						who = ROOT
+					}
+				}
+				else = {
+					opinion = {
+						name = opinion_feast_scandal
+						who = ROOT
+					}
+				}
+
+				character_event = { id = TOG.771 }
+			}
+		}
+	}
+}
+
+# Drunkard (Host and Other Guests)
+character_event = {
+	id = TOG.771
+	desc = EVTDESC_TOG_651
+	picture = GFX_evt_drunk
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_TOG_651
+
+		trigger = {
+			NOT = { trait = drunkard }
+		}
+
+		tooltip = {
+			opinion = {
+				name = opinion_feast_scandal
+				who = FROM
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_TOG_651
+		tooltip_info = drunkard
+
+		trigger = { trait = drunkard }
+
+		tooltip = {
+			opinion = {
+				name = opinion_drinking_buddy
+				who = FROM
+			}
+		}
+	}
+}
+
+# Gluttonous (Guest)
+character_event = {
+	id = TOG.773
+	desc = EVTDESC_TOG_653
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	immediate = {
+		liege = {
+			set_character_flag = feast_gluttonous
+
+			random_vassal = {
+				limit = {
+					NOT = { character = ROOT }
+				}
+
+				save_event_target_as = glutton_victim
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_653
+		tooltip_info = gluttonous
+
+		event_target:glutton_victim = {
+			show_scope_change = no
+
+			character_event = {
+				id = TOG.774
+				tooltip = EVTTOOLTIP_TOG_654
+			}
+
+			opinion = {
+				name = opinion_vomit
+				who = ROOT
+			}
+		}
+
+		liege = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_feast_scandal
+				who = ROOT
+			}
+
+			character_event = { id = TOG.775 }
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = {
+					has_character_flag = uzgavenes_feast_vassal
+
+					NOR = {
+						character = ROOT
+						character = event_target:glutton_victim
+					}
+				}
+
+				opinion = {
+					name = opinion_feast_scandal
+					who = ROOT
+				}
+
+				character_event = { id = TOG.775 }
+			}
+		}
+	}
+}
+
+# Gluttonous (Victim)
+character_event = {
+	id = TOG.774
+	desc = EVTDESC_TOG_654
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_654
+
+		tooltip = {
+			opinion = {
+				name = opinion_vomit
+				who = FROM
+			}
+		}
+	}
+}
+
+# Gluttonous (Host and Other Guests)
+character_event = {
+	id = TOG.775
+	desc = EVTDESC_TOG_655
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_655
+
+		tooltip = {
+			opinion = {
+				name = opinion_feast_scandal
+				who = FROM
+			}
+		}
+	}
+}
+
+# Lunatic (Guest)
+character_event = {
+	id = TOG.776
+	desc = EVTDESC_TOG_656
+	picture = GFX_evt_lunatic
+	border = GFX_event_normal_frame_religion
+
+	hide_from = yes
+	is_triggered_only = yes
+
+	option = {
+		name = EVTOPTA_TOG_656
+		tooltip_info = lunatic
+
+		liege = {
+			show_scope_change = no
+
+			if = {
+				limit = { trait = lunatic }
+
+				opinion = {
+					name = opinion_feast_friend
+					who = ROOT
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_feast_scandal
+					who = ROOT
+				}
+			}
+
+			set_character_flag = feast_lunatic
+			character_event = { id = TOG.777 }
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = {
+					has_character_flag = uzgavenes_feast_vassal
+					NOT = { character = ROOT }
+				}
+
+				if = {
+					limit = { trait = lunatic }
+
+					opinion = {
+						name = opinion_feast_friend
+						who = ROOT
+					}
+				}
+				else = {
+					opinion = {
+						name = opinion_feast_scandal
+						who = ROOT
+					}
+				}
+
+				character_event = { id = TOG.777 }
+			}
+		}
+	}
+}
+
+# Lunatic (Host and Other Guests)
+character_event = {
+	id = TOG.777
+	desc = EVTDESC_TOG_657
+	picture = GFX_evt_lunatic
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_657
+
+		trigger = {
+			NOT = { trait = lunatic }
+		}
+
+		tooltip = {
+			opinion = {
+				name = opinion_feast_scandal
+				who = ROOT
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_TOG_657
+		tooltip_info = lunatic
+
+		trigger = { trait = lunatic }
+
+		tooltip = {
+			opinion = {
+				name = opinion_feast_friend
+				who = ROOT
+			}
+		}
+	}
+}
+
+# Lustful (Guest)
+character_event = {
+	id = TOG.778
+	desc = EVTDESC_TOG_658
+	picture = GFX_evt_brothel
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+	hide_from = yes
+
+	immediate = {
+		liege = {
+			set_character_flag = feast_lustful
+		}
+	}
+
+	option = {
+		name = {
+			text = EVTOPTA_TOG_658
+			trigger = { is_married = no }
+		}
+		name = {
+			text = EVTOPTB_TOG_658
+			trigger = { is_married = yes }
+		}
+
+		tooltip_info = lustful
+
+		liege = {
+			show_scope_change = no
+
+			if = {
+				limit = { trait = lustful }
+
+				opinion = {
+					name = opinion_lustful_buddy
+					who = ROOT
+				}
+			}
+			else = {
+				opinion = {
+					name = opinion_feast_scandal
+					who = ROOT
+				}
+			}
+
+			character_event = { id = TOG.779 }
+
+			any_vassal = {
+				show_scope_change = no
+
+				limit = {
+					has_character_flag = uzgavenes_feast_vassal
+					NOT = { character = ROOT }
+				}
+
+				if = {
+					limit = { trait = lustful }
+
+					opinion = {
+						name = opinion_lustful_buddy
+						who = ROOT
+					}
+				}
+				else = {
+					opinion = {
+						name = opinion_feast_scandal
+						who = ROOT
+					}
+				}
+
+				character_event = { id = TOG.779 }
+			}
+		}
+
+		any_spouse = {
+			show_scope_change = no
+
+			opinion = {
+				name = opinion_mad_as_hell
+				who = ROOT
+				years = 1
+			}
+
+			character_event = { id = TOG.779 }
+		}
+	}
+}
+
+# Lustful (Host and Other Guests)
+character_event = {
+	id = TOG.779
+	desc = EVTDESC_TOG_659
+	picture = GFX_evt_brothel
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	ai = no
+
+	option = {
+		name = EVTOPTA_TOG_659
+
+		trigger = {
+			NOR = {
+				trait = lustful
+				is_married = FROM
+			}
+		}
+
+		tooltip = {
+			opinion = {
+				name = opinion_feast_scandal
+				who = FROM
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_TOG_659
+		tooltip_info = lustful
+
+		trigger = {
+			trait = lustful
+			NOT = { is_married = FROM }
+		}
+
+		tooltip = {
+			opinion = {
+				name = opinion_lustful_buddy
+				who = FROM
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTC_TOG_659
+
+		trigger = { is_married = FROM }
+
+		tooltip = {
+			opinion = {
+				name = opinion_mad_as_hell
+				who = FROM
+				years = 1
+			}
+		}
+	}
+}
+
+# Friendship Formed (Guest 1)
+character_event = {
+	id = TOG.781
+	desc = EVTDESC_TOG_661
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	immediate = {
+		liege = {
+			set_character_flag = feast_friendship
+
+			random_vassal = {
+				limit = {
+					has_character_flag = uzgavenes_feast_vassal
+
+					opinion = {
+						who = ROOT
+						value >= 20
+					}
+
+					NOT = { character = ROOT }
+				}
+
+				save_event_target_as = other_vassal_guest
+				character_event = { id = TOG.782 }
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_661
+
+		reverse_opinion = {
+			name = opinion_feast_friend
+			who = event_target:other_vassal_guest
+		}
+
+		opinion = {
+			name = opinion_feast_friend
+			who = event_target:other_vassal_guest
+		}
+	}
+}
+
+# Friendship Formed (Guest 2)
+character_event = {
+	id = TOG.782
+	desc = EVTDESC_TOG_661
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+
+	is_triggered_only = yes
+
+	immediate = {
+		# For localisation in event description
+		FROM = {
+			save_event_target_as = other_vassal_guest
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_661
+
+		tooltip = {
+			reverse_opinion = {
+				name = opinion_feast_friend
+				who = FROM
+			}
+
+			opinion = {
+				name = opinion_feast_friend
+				who = FROM
+			}
+		}
+	}
+}
+
+# Homosexual lovers (Guest 1)
+character_event = {
+	id = TOG.784
+	desc = EVTDESC_TOG_664
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+	portrait = event_target:second_homosexual_guest
+
+	is_triggered_only = yes
+
+	immediate = {
+		save_event_target_as = first_homosexual_guest
+
+		liege = {
+			set_character_flag = feast_homosexual
+
+			random_vassal = {
+				limit = {
+					trait = homosexual
+					same_sex = ROOT
+					has_character_flag = uzgavenes_feast_vassal
+
+					opinion = {
+						who = ROOT
+						value >= 0
+					}
+
+					NOT = { character = ROOT }
+				}
+
+				save_event_target_as = second_homosexual_guest
+				save_event_target_as = other_homosexual_guest # For loc
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_664
+		tooltip_info = homosexual
+
+		event_target:second_homosexual_guest = {
+			character_event = { id = TOG.785 }
+		}
+
+		add_lover = event_target:second_homosexual_guest
+		FROM = { save_event_target_as = new_lover }
+		new_lover_effect = yes
+
+		random = {
+			chance = 50
+
+			custom_tooltip = { text = EVTTOOLTIP_TOG_669 }
+		}
+	}
+}
+
+# Homosexual lovers (Guest 2)
+character_event = {
+	id = TOG.785
+	desc = EVTDESC_TOG_664
+	picture = GFX_evt_viking_throneroom_oldgods
+	border = GFX_event_normal_frame_religion
+	portrait = event_target:first_homosexual_guest
+
+	is_triggered_only = yes
+
+	immediate = {
+		FROM = {
+			save_event_target_as = other_homosexual_guest # For loc
+		}
+	}
+
+	option = {
+		name = EVTOPTA_TOG_664
+		tooltip_info = homosexual
+
+		# random = {
+			# chance = 50
+
+			# custom_tooltip = {
+				# text = EVTTOOLTIP_TOG_669
+
+				# character_event = { id = TOG.789 }
+				# FROM = { character_event = { id = TOG.789 } }
+
+				# liege = {
+					# character_event = { id = TOG.790 }
+
+					# any_vassal = {
+						# limit = {
+							# has_character_flag = uzgavenes_feast_vassal
+
+							# NOR = {
+								# character = event_target:first_homosexual_guest
+								# character = event_target:second_homosexual_guest
+							# }
+						# }
+
+						# character_event = { id = TOG.790 }
+					# }
+				# }
+			# }
+		# }
+
+		tooltip = {
+			FROM = { save_event_target_as = new_lover }
+			new_lover_effect = yes
+		}
+	}
+}
+
+# Homosexual Caught
+# character_event = {
+	# id = TOG.789
+	# desc = EVTDESC_TOG_669
+	# picture = GFX_evt_viking_throneroom_oldgods
+	# border = GFX_event_normal_frame_religion
+
+	# is_triggered_only = yes
+
+	# option = {
+		# name = EVTOPTA_TOG_669
+
+		# liege = {
+			# show_scope_change = no
+
+			# if = {
+				# limit = { trait = homosexual }
+
+				# opinion = {
+					# name = opinion_homosexual_sympathy
+					# who = ROOT
+				# }
+			# }
+			# else = {
+				# opinion = {
+					# name = opinion_feast_scandal
+					# who = ROOT
+				# }
+			# }
+
+			# any_vassal = {
+				# show_scope_change = no
+
+				# limit = {
+					# has_character_flag = uzgavenes_feast_vassal
+					# NOT = { character = ROOT }
+				# }
+
+				# if = {
+					# limit = { trait = homosexual }
+
+					# opinion = {
+						# name = opinion_homosexual_sympathy
+						# who = ROOT
+					# }
+				# }
+				# else = {
+					# opinion = {
+						# name = opinion_feast_scandal
+						# who = ROOT
+					# }
+				# }
+			# }
+		# }
+	# }
+# }
+
+# # Homosexuals Caught (Host and Other Guests)
+# character_event = {
+	# id = TOG.790
+	# desc = EVTDESC_TOG_670
+	# picture = GFX_evt_viking_throneroom_oldgods
+	# border = GFX_event_normal_frame_religion
+
+	# is_triggered_only = yes
+
+	# ai = no
+
+	# option = {
+		# name = EVTOPTA_TOG_670
+
+		# trigger = {
+			# NOT = { trait = homosexual }
+		# }
+
+		# tooltip = {
+			# opinion = {
+				# name = opinion_feast_scandal
+				# who = event_target:first_homosexual_guest
+			# }
+
+			# opinion = {
+				# name = opinion_feast_scandal
+				# who = event_target:second_homosexual_guest
+			# }
+		# }
+	# }
+
+	# option = {
+		# name = EVTOPTB_TOG_670
+		# tooltip_info = homosexual
+
+		# trigger = { trait = homosexual }
+
+		# tooltip = {
+			# opinion = {
+				# name = opinion_homosexual_sympathy
+				# who = event_target:first_homosexual_guest
+			# }
+
+			# opinion = {
+				# name = opinion_homosexual_sympathy
+				# who = event_target:second_homosexual_guest
+			# }
+		# }
+	# }
+# }
 
 ### Slavic Jarilo Festival
 
@@ -2807,10 +4077,13 @@ character_event = {
 		clr_character_flag = do_not_disturb
 		clr_character_flag = holding_ukon_juhla
 		clr_character_flag = holding_jarilo
+		clr_character_flag = holding_uzgavenes
 		clr_character_flag = attending_ukon_juhla
 		clr_character_flag = attending_jarilo
+		clr_character_flag = attending_uzgavenes
 		clr_character_flag = jarilo_feast_vassal
 		clr_character_flag = ukon_juhla_feast_vassal
+		clr_character_flag = uzgavenes_feast_vassal
 		clr_character_flag = feast_drunkard
 		clr_character_flag = feast_gluttonous
 		clr_character_flag = feast_lunatic
