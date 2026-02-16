@@ -6,196 +6,175 @@
 namespace = HFP
 
 ### Testing events ###
-character_event = { #On-death event to log commander deaths in game.
-    id = HFP.10997
-    hide_window = yes
-    is_triggered_only = yes
+character_event = { # on_death event to log commander deaths in game.
+	id = HFP.10997
 
-    trigger = {
-    	has_character_flag = commanders_have_died_for_me
-    }
-
-    immediate = {
-    	log = "BATTLE EVENTS: Commanders dead for ME (during my lifetime): [Root.my_commander_deaths_in_battle.GetValue] individual characters."
-    	log = "BATTLE EVENTS: Commanders dead, in TOTAL: [global_deaths_in_battle.GetValue] individual characters."
-    }
-}
-
-
-character_event = { #TEST event to set correct paths - how? Fire on the ("ENEMY") LIEGE of a commander for testing
-    id = HFP.10998
-    hide_window = yes
-    is_triggered_only = yes
-    immediate = {
-    	random_courtier_or_vassal = {
-    		limit = {
-	    		#has_minor_title = title_commander
-	    		is_landed = yes
-	    		#trait = duelist #For testing!
-    		}
-	    	character_event = { id = HFP.10999 days = 1 } #finds and send the event to commander
-    	}
-    }
-}
-character_event = { #TEST event to set correct paths - fires for a commander (Can also be used to test being a commander)
-	id = HFP.10999
+	is_triggered_only = yes # on_death
 	hide_window = yes
-	is_triggered_only = yes
-	immediate = {
-		any_player = {
-			character_event = { id = HFP.11000 days = 1 } #send tombola to a player (with the correct scopes in place)
-			#character_event = { id = MIL.500 days = 1 } #send tombola to a player (with the correct scopes in place). (Milla's debug event)
 
-#    		random_vassal = { #For testing: In vassal scope so I can check the instant death notification from a killed commander.
-#    			limit = { trait = duelist }
-#	    		character_event = { id = HFP.11000 days = 1 } #send tombola to a player (with the correct scopes in place)
-#    		}
-		}
+	has_character_flag = commanders_have_died_for_me
+
+	immediate = {
+		log = "BATTLE EVENTS: Commanders dead for ME (during my lifetime): [Root.my_commander_deaths_in_battle.GetValue] individual characters."
+		log = "BATTLE EVENTS: Commanders dead, in TOTAL: [global_deaths_in_battle.GetValue] individual characters."
 	}
 }
-
 
 ####################################################################################
 #### Tombola for battle events - fires for a commander leading a unit in battle ####
 ####################################################################################
 character_event = {
-    id = HFP.11000
-    is_triggered_only = yes
+	id = HFP.11000
+
+	is_triggered_only = yes # on_combat_pulse, random_events
 	hide_window = yes
 
-    trigger = {
-    	is_alive = yes
-    	NOT = { has_character_flag = battle_event_in_progess }
-    	OR = { #you can't be fighting null-character
-    		FROM = { always = yes character = yes NOT = { character = ROOT } }
-    		FROMFROM = { always = yes character = yes NOT = { character = ROOT } }
+	trigger = {
+		is_alive = yes
+		NOT = { has_character_flag = battle_event_in_progess }
 
-#    		location = { #An attempt to combat the "null-character" fights
-#    			ROOT = {
-#    				any_current_enemy = {
-#    					any_unit = {
-#    						location = {
-#    							province = PREVPREVPREVPREV
-#    						}
-#    					}
-#    				}
-#    			}
-#    		}
-    	}
-#    	log = "BATTLE EVENT: FROM yields enemy commander: [From.GetBestName] "
-#    	log = "BATTLE EVENT: FROMFROM yields enemy liege: [FromFrom.GetBestName] "
-#    	log = "BATTLE EVENT: ROOT is: [Root.GetBestName]"
-    }
-    fail_trigger_effect = {
-#    	log = "BATTLE EVENT: FROM and FROMFROM are both empty."
-#    	log = "BATTLE EVENT: ROOT was: [Root.GetBestName]"
-    	change_variable = { which = global_combat_pulse_failed_to_find_leader value = 1 }
-#		if = {
-#			limit = {
-#				NOR = {
-#					FROM = { always = yes }
-#	    			FROMFROM = { always = yes }
-#	    			location = { #An attempt to combat the "null-character" fights
-#		    			ROOT = {
-#		    				any_current_enemy = {
-#		    					any_unit = {
-#		    						location = {
-#		    							province = PREVPREVPREVPREV
-#		    						}
-#		    					}
-#		    				}
-#		    			}
-#		    		}
-#				}
-#			}
-#			change_variable = { which = global_combat_pulse_failed_to_find_leader value = 1 }
-#		}
-#		else_if = {
-#			limit = {
-#				NOR = {
-#					FROM = { always = yes }
-#	    			FROMFROM = { always = yes }
-#				}
-#    			location = { #An attempt to combat the "null-character" fights
-#	    			ROOT = {
-#	    				any_current_enemy = {
-#	    					any_unit = {
-#	    						location = {
-#	    							province = PREVPREVPREVPREV
-#	    						}
-#	    					}
-#	    				}
-#	    			}
-#	    		}
-#			}
-#			change_variable = { which = global_combat_pulse_found_back_up value = 1 }
-#		}
-    }
+		# You can't be fighting null-character
+		OR = {
+			FROM = { always = yes }
+			FROMFROM = { always = yes }
 
-    immediate = {
-    	if = { #Quick fix to reduce the amount of time the AI gets the events
-    		limit = { ai = yes }
-    		random = {
-    			chance = 75
-    			break = yes
-    		}
-    	}
+			# An attempt to combat the "null-character" fights
+	#		location = {
+	#			ROOT = {
+	#				any_current_enemy = {
+	#					any_unit = {
+	#						location = {
+	#							province = PREVPREVPREVPREV
+	#						}
+	#					}
+	#				}
+	#			}
+	#		}
+		}
 
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+	#	log = "BATTLE EVENT: FROM yields enemy commander: [From.GetBestName] "
+	#	log = "BATTLE EVENT: FROMFROM yields enemy liege: [FromFrom.GetBestName] "
+	#	log = "BATTLE EVENT: ROOT is: [Root.GetBestName]"
+	}
 
-    	# To keep scopes straight...
-    	save_event_target_as = home_commander
-		if = {  #work around: in rare edge cases, the flank leader will belong to a flank which has fled, while the commander already *died* and code fails to update this.
+	fail_trigger_effect = {
+	#	log = "BATTLE EVENT: FROM and FROMFROM are both empty."
+	#	log = "BATTLE EVENT: ROOT was: [Root.GetBestName]"
+
+		change_variable = {
+			which = global_combat_pulse_failed_to_find_leader
+			value = 1
+		}
+
+	#	if = {
+	#		limit = {
+	#			NOR = {
+	#				FROM = { always = yes }
+	#				FROMFROM = { always = yes }
+	#			}
+	#
+	#			if = {
+	#				limit = {
+	#					location = { # An attempt to combat the "null-character" fights
+	#						ROOT = {
+	#							any_current_enemy = {
+	#								any_unit = {
+	#									location = {
+	#										province = PREVPREVPREVPREV
+	#									}
+	#								}
+	#							}
+	#						}
+	#					}
+	#				}
+	#
+	#				change_variable = {
+	#					which = global_combat_pulse_failed_to_find_leader
+	#					value = 1
+	#				}
+	#			}
+	#			else = {
+	#				change_variable = {
+	#					which = global_combat_pulse_found_back_up
+	#					value = 1
+	#				}
+	#			}
+	#		}
+	#	}
+	}
+
+	weight_multiplier = {
+		factor = 1
+
+		mult_modifier = {
+			factor = 0.25
+			ai = yes # Quick fix to reduce the amount of time the AI gets the events
+		}
+	}
+
+	immediate = {
+		disallow_new_battle_events_effect = yes # to keep the tombola from spamming you...
+
+		# To keep scopes straight...
+		save_event_target_as = home_commander
+
+		# Workaround: in rare edge cases, the flank leader will belong to a flank which has fled, while the commander already *died* and code fails to update this
+		if = {
 			limit = {
 				FROM = {
 					character = yes
 					is_alive = yes
 					is_dying = no
-					NOT = { character = ROOT }
 				}
 			}
-			FROM = { save_event_target_as = enemy_commander } #note: might not always exist
+
+			FROM = { save_event_target_as = enemy_commander }
 		}
-		FROMFROM = { save_event_target_as = enemy_liege } #note: might be the same character as enemy_commander
-		location = {
-			save_event_target_as = battlefield_location
-		}
-		capital_scope = {
-			save_event_target_as = home_capital_province
-		}
-		if = { #In case the enemy-liege is not found (hacky work-around):
+
+		FROMFROM = { save_event_target_as = enemy_liege } # Note: might be the same character as enemy_commander
+		location = { save_event_target_as = battlefield_location }
+		capital_scope = { save_event_target_as = home_capital_province }
+
+		# In case the enemy-liege is not found (hacky work-around)
+		if = {
 			limit = { NOT = { event_target:enemy_liege = { always = yes } } }
-			FROM = { save_event_target_as = enemy_liege } #note: FROM is saved twice, as different targets, for sake of loc.
+
+			FROM = { save_event_target_as = enemy_liege } # Note: FROM is saved twice, as different targets, for sake of loc
 			log = "BATTLE EVENT: Retargeting: [enemy_liege.GetTitledFirstName] is the 'enemy liege' AND commander."
 			log = "BATTLE EVENT: Retargeting: [Root.GetBestName] is ROOT."
 		}
-		if = { #In case the enemy-liege is STILL not found: an attempt to combat the "null-character" fights...
+
+		# In case the enemy-liege is STILL not found: an attempt to combat the "null-character" fights...
+		if = {
 			limit = { NOT = { event_target:enemy_liege = { always = yes } } }
+
 			location = {
-    			ROOT = {
-    				random_current_enemy = {
-    					preferred_limit = {
-	    					any_unit = {
-	    						location = {
-	    							province = PREVPREVPREVPREV
-	    						}
-	    					}
-    					}
-						save_event_target_as = enemy_liege #for sake of loc.
-    				}
-    			}
-    		}
-    		log = "BATTLE EVENT: Retargeting: [enemy_liege.GetTitledFirstName] is the new RANDOMLY PICKED ALMOST 'enemy liege'. [Root.GetTitledFirstName] is ROOT."
+				ROOT = {
+					random_current_enemy = {
+						preferred_limit = {
+							any_unit = {
+								location = {
+									province = PREVPREVPREVPREV
+								}
+							}
+						}
+
+						save_event_target_as = enemy_liege # for sake of loc
+					}
+				}
+			}
+
+			log = "BATTLE EVENT: Retargeting: [enemy_liege.GetTitledFirstName] is the new RANDOMLY PICKED ALMOST 'enemy liege'. [Root.GetTitledFirstName] is ROOT."
 		}
 
-		#Special handling for loc:
-		#REQUIRED event targets for setting up duel evaluation! NOTE: not strictly duels here, but used for loc. [Don't copy this to anywhere else].
-    	save_event_target_as = combatant_1 #the person receiving the first event...
-    	event_target:enemy_commander = { save_event_target_as = combatant_2 } #the target of the battle...
+		# Special handling for loc:
+		# REQUIRED event targets for setting up duel evaluation! NOTE: not strictly duels here, but used for loc. [Don't copy this to anywhere else].
+		save_event_target_as = combatant_1 # The person receiving the first event...
+		event_target:enemy_commander = { save_event_target_as = combatant_2 } # The target of the battle...
 
-    	random_list = {
+		random_list = {
 			##### Warrior Lodge exclusive ######
-			10 = {
+			20 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
@@ -204,6 +183,7 @@ character_event = {
 					}
 					NOT = { any_artifact = { has_artifact_flag = battlefield_loot } }
 				}
+
 				good_soldier_outcome_score = yes
 
 				if = {
@@ -216,16 +196,19 @@ character_event = {
 					character_event = { id = frbarb.1 }
 				}
 			}
-			10 = {
+
+			20 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
 						is_member_of_any_warrior_lodge_trigger = yes
 						z_barbarian = yes
 					}
-					has_nickname = no
+					can_apply_average_nickname_trigger = yes
 				}
+
 				good_soldier_outcome_score = yes
+
 				character_event = { id = HFP.11027 } # Pick a nickname!
 			}
 
