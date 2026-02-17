@@ -212,22 +212,29 @@ character_event = {
 				character_event = { id = HFP.11027 } # Pick a nickname!
 			}
 
-			5 = {
+			10 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
 						is_member_of_any_warrior_lodge_trigger = yes
 						z_barbarian = yes
 					}
-					event_target:enemy_commander = { always = yes } #There has to be an opponent...
+					event_target:enemy_commander = { always = yes } # There has to be an opponent...
 					NOT = { has_character_modifier = battle_events_1_cooldown }
 				}
+
 				good_soldier_outcome_score = yes
 
-				add_character_modifier = { name = battle_events_1_cooldown duration = 365 hidden = yes }
+				add_character_modifier = {
+					name = battle_events_1_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				character_event = { id = HFP.11028 } # You decapitate your enemy, and take their skull as a trophy.
 			}
-			10 = {
+
+			20 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
@@ -236,36 +243,48 @@ character_event = {
 					}
 					is_strong_non_congenital_trait_upgradeable_trigger = yes
 				}
+
 				good_soldier_outcome_score = yes
+
 				character_event = { id = HFP.11034 } # You become Brawny.
 			}
-			10 = {
+
+			20 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
 						is_member_of_any_warrior_lodge_trigger = yes
 						z_barbarian = yes
 					}
+					NOT = { has_character_modifier = battle_events_2_cooldown }
+
 					any_unit_leader = {
-			       		always = yes
-			       		NOT = { character = ROOT }
-			       		root_potentially_interested_in_rivaling_this_trigger = no
-			    	}
-			    	NOT = { has_character_modifier = battle_events_2_cooldown }
+						NOT = { character = ROOT }
+						root_potentially_interested_in_rivaling_this_trigger = no
+					}
 				}
+
 				bad_soldier_outcome_score = yes
 
-				add_character_modifier = { name = battle_events_2_cooldown duration = 365 hidden = yes }
-				character_event = { id = HFP.11036 }  # You are impressed by fellow commander
+				add_character_modifier = {
+					name = battle_events_2_cooldown
+					years = 1
+					hidden = yes
+				}
+
+				character_event = { id = HFP.11036 } # You are impressed by fellow commander
 			}
-			10 = {
+
+			20 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
 						is_member_of_any_warrior_lodge_trigger = yes
 						z_barbarian = yes
 					}
-					event_target:home_capital_province = { #If something cool happened at your capital once and you haven't already addressed it...
+
+					# If something cool happened at your capital once and you haven't already addressed it...
+					event_target:home_capital_province = {
 						OR = {
 							AND = {
 								persistent_event_target:local_dead_commander_target = { always = yes }
@@ -273,45 +292,57 @@ character_event = {
 							}
 							AND = {
 								persistent_event_target:local_inspiring_commander_target = { always = yes }
-			        			ROOT = { NOT = { has_character_modifier = proud_role_model } }
+								ROOT = { NOT = { has_character_modifier = proud_role_model } }
 							}
 							AND = {
 								persistent_event_target:local_fearsome_commander_target = { always = yes }
-			        			ROOT = { NOT = { has_character_modifier = center_of_attention } }
+								ROOT = { NOT = { has_character_modifier = center_of_attention } }
 							}
 						}
 					}
+
 					NOT = { has_character_modifier = battle_events_3_cooldown }
 				}
 
-				add_character_modifier = { name = battle_events_3_cooldown duration = 365 hidden = yes }
+				add_character_modifier = {
+					name = battle_events_3_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				character_event = { id = HFP.11037 } # You reminisce about previous battles (hooked from previous events)
 			}
-			3 = {
+
+			6 = {
 				trigger = {
 					has_dlc = "Holy Fury"
 					OR = {
 						is_member_of_any_warrior_lodge_trigger = yes
 						z_barbarian = yes
 					}
+
 					OR = {
-						has_nickname = no
+						can_apply_average_nickname_trigger = yes
 						trait = depressed
 						trait = stressed
 					}
 				}
+
 				good_soldier_outcome_score = yes
-				character_event = { id = HFP.11038 }  # An event where you gain a nickname/lose stressed/depressed
+
+				character_event = { id = HFP.11038 } # An event where you gain a nickname/lose stressed/depressed
 			}
 
-    		#### INJURIES...
-			10 = {
+			#### INJURIES...
+			20 = {
 				trigger = {
 					NOT = { trait = berserker }
-					NOT = { is_indomitable_trigger = yes }  #The "Indomitable" power blocks "very bad stuff"
+					is_indomitable_trigger = no # The "Indomitable" power blocks "very bad stuff"
 				}
+
 				bad_soldier_outcome_score = yes
 				warrior_lodge_risk_reduction_score = yes
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -327,20 +358,24 @@ character_event = {
 					}
 					factor = 0.65
 				}
-				random = { #Fix to the quick fix
-	    			chance = 75
-	    			break = yes
-	    			allow_new_battle_events_effect = yes
-	    		}
-
-				character_event = { id = HFP.11001 } # Killed (remake of 242)
-			}
-			15 = {
-				trigger = {
-					NOT = { trait = wounded }
-					NOT = { trait = berserker }
-					is_alive = yes
+				# Fix to the quick fix
+				if = {
+					limit = { random < 75 }
+					allow_new_battle_events_effect = yes
 				}
+				else = {
+					character_event = { id = HFP.11001 } # Killed (remake of 242)
+				}
+			}
+
+			30 = {
+				trigger = {
+					NOR = {
+						trait = wounded
+						trait = berserker
+					}
+				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -358,21 +393,30 @@ character_event = {
 				}
 				bad_soldier_outcome_score = yes
 				warrior_lodge_risk_reduction_score = yes
+
 				character_event = { id = HFP.11010 } # Become Wounded/Bruised (choose injury or gain Craven/lose Brave + lose prestige)
 			}
-			15 = {
+
+			30 = {
 				trigger = {
-					NOT = { trait = maimed }
-					NAND = {
-						trait = one_eyed
-						trait = one_handed
-						trait = one_legged
-						trait = grounded
-						trait = disfigured
-					}
 					NOT = { trait = berserker }
-					is_alive = yes
+
+					trigger_if = {
+						limit = { has_dlc = "Reapers" }
+
+						NAND = { # CleanSlate: What about mangled and blinded?
+							trait = one_eyed
+							trait = one_handed
+							trait = one_legged
+							trait = grounded
+							trait = disfigured
+						}
+					}
+					trigger_else = {
+						NOT = { trait = maimed }
+					}
 				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -390,15 +434,17 @@ character_event = {
 				}
 				bad_soldier_outcome_score = yes
 				warrior_lodge_risk_reduction_score = yes
+
 				character_event = { id = HFP.11011 } # Maimed (randomly selected maiming, if has RIP. Otherwise, Maimed.)
 			}
-			10 = {
+
+			5 = {
 				trigger = {
-					NOT = { trait = incapable }
+					is_incapable = no
 					immortal = no
-					is_alive = yes
-					NOT = { is_indomitable_trigger = yes } #The "Indomitable" power blocks "very bad stuff"
+					is_indomitable_trigger = no # The "Indomitable" power blocks "very bad stuff"
 				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -416,25 +462,25 @@ character_event = {
 				}
 				bad_soldier_outcome_score = yes
 				warrior_lodge_risk_reduction_score = yes
-				random = { #Fix to the quick fix
-	    			chance = 75
-	    			break = yes
-	    			allow_new_battle_events_effect = yes
-	    		}
-				character_event = { id = HFP.11012 } # Serious head-injury (remake of 245). Chance to become Disfigured (if has RIP) or Incapable.
+
+				character_event = { id = HFP.11012 } # Serious head-injury (remake of 245). Chance to become Disfigured (if has RIP) or Incapable
 			}
-			15 = {
+
+			30 = {
 				trigger = {
 					event_target:enemy_commander = {
 						is_alive = yes
-						NOT = { has_character_flag = about_to_challenge_enemy_commander } #So this isn't about to fire the other way around
+						NOT = { has_character_flag = about_to_challenge_enemy_commander } # So this isn't about to fire the other way around
 					}
+
 					NOT = { has_character_modifier = battle_events_4_cooldown }
+
 					NAND = {
-						NOT = { has_pet_animal_trigger = yes } #the event is purely negative without the pet to sacrifice
+						has_pet_animal_trigger = no # The event is purely negative without the pet to sacrifice
 						is_indomitable_trigger = yes
 					}
 				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -453,24 +499,34 @@ character_event = {
 				bad_soldier_outcome_score = yes
 				warrior_lodge_risk_reduction_score = yes
 
-				additive_modifier = { #For the more varied versions...
+				additive_modifier = { # For the more varied versions...
+					value = 10
 					has_pet_animal_trigger = yes
-					value = 5
 				}
 
-				add_character_modifier = { name = battle_events_4_cooldown duration = 365 hidden = yes }
-				set_character_flag = about_to_challenge_enemy_commander
+				add_character_modifier = {
+					name = battle_events_4_cooldown
+					years = 1
+					hidden = yes
+				}
 
+				set_character_flag = about_to_challenge_enemy_commander
 				character_event = { id = HFP.11025 } # Your pet to the rescue (otherwise something else)!
 			}
 
 			####  GENERAL IMPROVEMENTS (traits/tech/skill)...
-			25 = {
+			50 = {
 				trigger = {
-					event_target:enemy_commander = { is_alive = yes ai = yes } #There has to be an opponent (who is AI)...
-					NOT = { has_character_modifier = battle_events_9_cooldown }
 					ai = no
+					NOT = { has_character_modifier = battle_events_9_cooldown }
+
+					# There has to be an opponent (who is AI)...
+					event_target:enemy_commander = {
+						is_alive = yes
+						ai = yes
+					}
 				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
@@ -489,20 +545,26 @@ character_event = {
 				good_soldier_outcome_score = yes
 				bad_soldier_outcome_enemy_commander_score = yes
 
-				add_character_modifier = { name = battle_events_9_cooldown duration = 365 hidden = yes }
+				add_character_modifier = {
+					name = battle_events_9_cooldown
+					years = 1
+					hidden = yes
+				}
+
 				character_event = { id = HFP.11050 } # You spot an enemy (likely to be way worse than you): easy pickings!
 			}
 
-			25 = {
+			50 = {
 				trigger = {
-					is_alive = yes
 					OR = {
 						trait = misguided_warrior
 						trait = tough_soldier
 						trait = skilled_tactician
 					}
+
 					NOT = { has_character_modifier = battle_events_5_cooldown }
 				}
+
 				modifier = {
 					OR = {
 						z_fighter = yes
