@@ -221,9 +221,10 @@ character_event = {
 							is_dumb_non_congenital_trigger = yes
 							trait = trusting
 							trait = zealous
-							AND = { 
-								trait = cynical 
+							AND = {
+								trait = cynical
 								religion = ROOT
+								NOT = { religion = faithless }
 							}
 						}
 					}
@@ -2326,22 +2327,18 @@ character_event = {
 				set_character_flag = flag_antagonized_option_cruel
 			}
 			20 = {
-				modifier = { 
-					factor = 0
-					NOT = { trait = cynical }
-				}	
-				modifier = { #Try to pick opposite traits if any are available
-					factor = 0
-					FROM = { NOT = { religion = ROOT } }
+				trigger = {
+					trait = cynical
+					religion = ROOT
+					NOR = {
+						religion = faithless
+						has_character_flag = flag_antagonized_option_cynical
+					}
 				}
 				modifier = { #Try to pick opposite traits if any are available
 					factor = 1.5
 					FROM = { trait = zealous religion = ROOT }
 				}
-				modifier = { 
-					factor = 0
-					has_character_flag = flag_antagonized_option_cynical
-				}		
 				set_character_flag = flag_antagonized_option_cynical
 			}
 			10 = {
@@ -2841,6 +2838,11 @@ character_event = {
 				factor = 1.75
 				ROOT = { attribute_diff = { character = FROM attribute = combat_rating  value = 20 } }
 			}
+			mult_modifier = {
+				factor = 0.25
+				is_powerful = yes
+				FROM = { is_powerful = no }
+			}
 		}
 	}
 	option = { #Special option. - Wroth character starts duel!
@@ -2910,6 +2912,11 @@ character_event = {
 			modifier = { 
 				factor = 1.75
 				ROOT = { attribute_diff = { character = FROM attribute = combat_rating  value = 20 } }
+			}
+			mult_modifier = {
+				factor = 0.5
+				is_powerful = yes
+				FROM = { is_powerful = no }
 			}
 		}
 	}
@@ -2983,12 +2990,16 @@ character_event = {
 	option = { #Special option. - Cynical character is unimpressed.
 		name = EVTOPTDHF22022
 		custom_tooltip = { text = tooltip_22022_D }
-		trigger = { 
+		trigger = {
 			NOT = { trait = lunatic }
 			trait = cynical
-			FROM = { 
+			FROM = {
 				has_character_flag = flag_antagonize_slander_zealous 
-			} 
+			}
+			OR = {
+				is_powerful = no
+				FROM = { is_powerful = yes }
+			}
 		}
 		tooltip_info = cynical
 		opinion = { 
@@ -3003,6 +3014,12 @@ character_event = {
 	}
 	option = { #Take in slander.
 		name = EVTOPTEHF22022
+		trigger = {
+			OR = {
+				is_powerful = no
+				FROM = { is_powerful = yes }
+			}
+		}
 		opinion = { 
 			modifier = opinion_antagonized_2
 			who = FROM
@@ -3061,6 +3078,22 @@ character_event = {
 		hidden_tooltip = { random_antagonizer_slander_roll_effect = yes }
 		ai_chance = { factor = 30 }
 	}
+
+	option = { #Beneath your concern.
+		name = EVTOPTDHF22022
+		trigger = {
+			is_powerful = yes
+			FROM = { is_powerful = no }
+		}
+		opinion = {
+			modifier = opinion_antagonized_1
+			who = FROM
+			years = 10
+		}
+		hidden_tooltip = { FROM = { character_event = { id = HF.22023 } } }
+		ai_chance = { factor = 100 }
+	}
+
 	after = { 
 		clr_character_flag = flag_antagonized_option_kinslayer
 		clr_character_flag = flag_antagonized_option_excommunicated
