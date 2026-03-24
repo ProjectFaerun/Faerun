@@ -2244,75 +2244,109 @@ character_event = {
 
 ### BATTLE EVENT: Maimed in action (fired from HFP.11000)
 character_event = {
-	id = HFP.11011 #("inspired" by 244)
+	id = HFP.11011 # "inspired" by 244
 	title = the_battle_at_location
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 	sound = lose_battle
 
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { trait = maimed }
-		NAND = {
-			trait = one_eyed
-			trait = one_handed
-			trait = one_legged
-			trait = disfigured
+	desc = {
+		text = EVTDESC_HFP_11011_A
+		trigger = { has_character_flag = desc_A }
+	}
+	desc = {
+		text = EVTDESC_HFP_11011_B_1 # Default variant B
+		trigger = {
+			has_character_flag = desc_B
+			NOT = { event_target:enemy_commander = { always = yes } }
 		}
-		NOT = { trait = berserker }
-		is_alive = yes
+	}
+	desc = {
+		text = EVTDESC_HFP_11011_B_2 # Second variant: makes sure to fetch the correct culture for the enemy commander, if they exist
+		trigger = {
+			has_character_flag = desc_B
+			event_target:enemy_commander = { always = yes }
+		}
+	}
+	desc = {
+		text = EVTDESC_HFP_11011_C
+		trigger = { has_character_flag = desc_C }
 	}
 
+	is_triggered_only = yes
+
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_negative_effect = yes
+		set_battle_duels_option_flag_effect = yes
+
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				disallow_new_battle_events_effect = yes # To keep the tombola from spamming your potential target...
+			}
+		}
+
+		hidden_effect = {
+			save_beloved_character_effect = yes # event_target:my_beloved (might be platonic, children, etc)
+		}
+
+		random_list = {
+			33 = { set_character_flag = desc_A }
+			33 = { set_character_flag = desc_B }
+			33 = { set_character_flag = desc_C }
+		}
 
 		if = {
-			limit = { event_target:enemy_commander = { is_alive = yes ai = yes } }
-			disallow_new_battle_events_effect = yes #to keep the tombola from spamming your potential target...
-		}
-		hidden_effect = { save_beloved_character_effect = yes } #event_target:my_beloved (might be platonic, children, etc)
-		randomize_ABC_desc_flag_effect = yes
-		set_battle_duels_option_flag_effect = yes
-		if = {
-			limit = { has_dlc = Reapers }
-			random_list = { #Randomize injured body part.
-				10 = { #the eyes
+			limit = { has_dlc = "Reapers" }
+
+			# Randomize injured body part.
+			random_list = {
+				10 = {
 					trigger = { NOT = { trait = blinded } }
-					if = { limit = { trait = one_eyed }
+
+					if = {
+						limit = { trait = one_eyed }
 						set_character_flag = injury_both_eyes
 					}
 					else = {
 						set_character_flag = injury_eye
 					}
 				}
+
 				10 = {
 					trigger = {
 						NOR = {
 							race_is_handless = yes
-							trait = one_handed 
-						} 
+							trait = one_handed
+						}
 					}
 					set_character_flag = injury_hand
 				}
+
 				10 = {
 					trigger = {
 						NOR = { 
 							race_is_legless = yes
-							trait = one_legged 
+							trait = one_legged
 						}
 					}
 					set_character_flag = injury_leg
 				}
+
 				3 = {
 					trigger = { NOT = { trait = disfigured } }
 					set_character_flag = injury_face
 				}
+
 				1 = {
 					trigger = { NOT = { trait = mangled } }
 					set_character_flag = injury_mangled_body
 				}
+
 				3 = {
 					trigger = {
 						NOR = {
@@ -2322,265 +2356,291 @@ character_event = {
 					}
 					set_character_flag = injury_flight
 				}
-				10 = { #Only in case you already have ALL the other maimed traits?
-					trigger = {
-						trait = blinded
-						trait = one_handed
-						trait = one_legged
-						trait = disfigured
-						trait = mangled
-					}
+
+				fallback = { # Only in case you already have ALL the other maimed traits?
 					set_character_flag = injury_could_be_lethal
 				}
 			}
 		}
-		else = { #without Reapers, chance to get the old trait...
+		else = { # Without Reapers, chance to get the old trait...
 			set_character_flag = injury_maimed
 		}
+
 		set_character_flag = skip_wounded_trait
 
 		random_artifact = {
 			limit = { is_artifact_equipped = yes }
-			preferred_limit = {
-				artifact_type = military_strategy_guide
-			}
-			preferred_limit = {
-				has_artifact_flag = combat_weapon
-			}
-			preferred_limit = {
-				has_artifact_flag = armor
-			}
+
+			preferred_limit = { artifact_type = military_strategy_guide }
+			preferred_limit = { has_artifact_flag = combat_weapon }
+			preferred_limit = { has_artifact_flag = armor }
 			preferred_limit = {
 				has_artifact_flag = about_martial
 				has_artifact_flag = book
 				has_artifact_flag = created
 			}
-			preferred_limit = {
-				quality = 1
-			}
-			preferred_limit = {
-				quality = 2
-			}
-			preferred_limit = {
-				quality = 3
-			}
+			preferred_limit = { quality >= 1 }
+			preferred_limit = { quality >= 2 }
+			preferred_limit = { quality >= 3 }
+
 			save_event_target_as = equipped_artifact
 		}
 	}
 
-	desc = {
-		text = EVTDESC_HFP_11011_A
-		trigger = { has_character_flag = desc_A }
-	}
-	desc = {
-		text = EVTDESC_HFP_11011_B #Default variant B
-		trigger = {
-			has_character_flag = desc_B
-			NOT = {
-				event_target:enemy_commander = {
-					always = yes
-				}
-			}
-		}
-	}
-	desc = {
-		text = EVTDESC_HFP_11011_C
-		trigger = { has_character_flag = desc_C }
-	}
-
-	option = { #Special option: High Combat-rating only (no enemy commander present)
-		tooltip_info = combat_rating
+	option = { # Special option: High Combat-rating only (no enemy commander present)
 		name = EVTOPT_HFP_11011_A
-		apply_duel_wounded_effect = yes  #Milder than other options
-		add_blood_splatter_effect = yes
-
-		ai_chance = {
-            factor = 300
-        }
+		tooltip_info = combat_rating
 
 		trigger = {
 			has_character_flag = high_PCS_opt
+
+			NOT = { event_target:enemy_commander = { always = yes } }
 		}
+
+		apply_duel_wounded_effect = yes # Milder than other options
+		add_blood_splatter_effect = yes
+		allow_new_battle_events_effect = yes
+
+		ai_chance = { factor = 300 }
 	}
-	option = { #Special option: Duel enemy commander instead (if you have great combat rating)
+
+	option = { # Special option: Duel enemy commander instead (if you have great combat rating)
 		tooltip_info_custom = available_because_duels
 		name = EVTOPT_HFP_11011_C
-		duel_enemy_commander_effect = yes
-		pacifists_lose_piety_effect = yes
-
-        ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
 
 		trigger = {
 			has_character_flag = duel_enemy_opt
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
-	}
-	option = { #Special option: Duel enemy commander instead (but you have terrible Combat Rating - blocks option above + gives Brave)
-		name = EVTOPT_HFP_11011_C
-		tooltip_info_custom = available_because_duels_bad
+
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
 
-		if = {
-			limit = { trait = craven }
-			remove_trait = craven
-		}
-		else = {
-			add_trait = brave
-		}
-
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
+			factor = 50
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	option = { # Special option: Duel enemy commander instead (but you have terrible Combat Rating - blocks option above + gives Brave)
+		name = EVTOPT_HFP_11011_C
+		tooltip_info_custom = available_because_duels_bad
 
 		trigger = {
 			has_character_flag = duel_enemy_opt_gain_brave
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
-	}
-	option = { #Special option: Duel enemy commander instead (you are Brave already - unlocks dueling regardless, but should block the two above)
-		name = EVTOPT_HFP_11011_C
-		tooltip_info = brave
+
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
+			factor = 50
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	option = { # Special option: Duel enemy commander instead (you are Brave already - unlocks dueling regardless, but should block the two above)
+		name = EVTOPT_HFP_11011_C
+		tooltip_info = brave
 
 		trigger = {
 			has_character_flag = duel_enemy_opt_is_brave
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
+
+		duel_enemy_commander_effect = yes
+		pacifists_lose_piety_effect = yes
+		add_trait_partially_silently_brave_effect = yes
+
+		ai_chance = {
+			factor = 50
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
 	}
-	option = { #Special option: I distract them with song!
-        tooltip_info_custom = because_bloodline_tt
+
+	option = { # Special option: I distract them with song!
 		name = {
-			text = EVTOPT_HFP_11011_Bard_1 #I'll try to remember this...! *run*
+			text = EVTOPT_HFP_11011_Bard_1 # I'll try to remember this...! *run*
 			trigger = { has_character_flag = desc_A }
 		}
 		name = {
-			text = EVTOPT_HFP_11011_Bard_2 #"Wait, have you heard the one about [enemy culture] [small animal]?"
+			text = EVTOPT_HFP_11011_Bard_2 # "Wait, have you heard the one about [enemy culture] [small animal]?"
 			trigger = { has_character_flag = desc_B }
 		}
 		name = {
-			text = EVTOPT_HFP_11011_Bard_3 #Come to hear me sing, have you?
+			text = EVTOPT_HFP_11011_Bard_3 # Come to hear me sing, have you?
 			trigger = { has_character_flag = desc_C }
 		}
+		tooltip_info_custom = because_bloodline_tt
+
+		trigger = {
+			any_owned_bloodline = {
+				has_bloodline_flag = bloodline_battle_bards # Only for Battle Bard Bloodlines
+				bloodline_is_active_for = PREV
+			}
+		}
+
 		trigger_switch = {
 			on_trigger = has_character_flag
+
 			desc_A = {
-				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_1_TT } #run away
+				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_1_TT } # Run away
 				prestige = -50
 			}
+
 			desc_B = {
-				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_2_TT } #talk your way out
+				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_2_TT } # Talk your way out
 				apply_duel_wounded_effect = yes
 			}
+
 			desc_C = {
-				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_3_TT } #BATTLE HYMN ATTACK!!
+				custom_tooltip = { text = EVTOPT_HFP_11011_Bard_3_TT } # BATTLE HYMN ATTACK!!
 				prestige = 15
 			}
 		}
 
 		allow_new_battle_events_effect = yes
 
-		ai_chance = {
-            factor = 100
-        }
-        trigger = { any_owned_bloodline = { has_bloodline_flag = bloodline_battle_bards bloodline_is_active_for = PREV } } #Only for Battle Bard Bloodlines
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+
+		ai_chance = { factor = 100 }
 	}
 
-	option = { #Special option: if has an equipped artifact
+	option = { # Special option: if has an equipped artifact
+		name = EVTOPT_HFP_11011_B # Wait, take this artifact and spare me!
 		tooltip_info_custom = reason_has_equipped_artifact
-		name = EVTOPT_HFP_11011_B #Wait, take this artifact and spare me!
 
-		#You throw the [equipped_artifact] to the ground...
+		trigger = {
+			event_target:equipped_artifact = { always = yes }
+
+			# Either someone is alive to give it to, OR, it's something that is allowed to be destroyed...
+			OR = {
+				event_target:enemy_commander = { is_alive = yes }
+				event_target:enemy_liege = { is_alive = yes }
+
+				event_target:equipped_artifact = {
+					is_indestructible = no
+					NOT = { has_artifact_flag = flag_considering_donation }
+				}
+			}
+		}
+
+		# You throw the [equipped_artifact] to the ground...
 		if = {
 			limit = {
-				event_target:equipped_artifact = { has_artifact_flag = combat_weapon }
+				event_target:equipped_artifact = {
+					has_artifact_flag = combat_weapon
+				}
 			}
+
 			custom_tooltip = { text = EVTOPT_HFP_11011_B_TT_weapon }
 		}
 		else_if = {
 			limit = {
-				event_target:equipped_artifact = { has_artifact_flag = armor }
+				event_target:equipped_artifact = {
+					has_artifact_flag = armor
+				}
 			}
+
 			custom_tooltip = { text = EVTOPT_HFP_11011_B_TT_armor }
 		}
 		else = {
 			custom_tooltip = { text = EVTOPT_HFP_11011_B_TT_fallback }
 		}
 
-		if = { #If there is an enemy commander, give them the artifact...
+		if = { # If there is an enemy commander, give them the artifact...
 			limit = {
 				event_target:enemy_commander = { is_alive = yes }
 			}
+
 			event_target:equipped_artifact = {
 				show_scope_change = no
-				set_artifact_flag = stolen_from@ROOT #Hook-in: Alex, for stolen artifact CB?
+
+				set_artifact_flag = stolen_from@ROOT # Hook-in: Alex, for stolen artifact CB?
+
 				transfer_artifact = {
 					from = ROOT
 					to = event_target:enemy_commander
 				}
 			}
-			event_target:enemy_commander = { character_event = { id = HFP.11018 } }
+
+			event_target:enemy_commander = {
+				character_event = { id = HFP.11018 }
+			}
 		}
-		else_if = { #Else, if there is an enemy LIEGE, give them the artifact...
+		else_if = { # Else, if there is an enemy LIEGE, give them the artifact...
 			limit = {
 				event_target:enemy_liege = { is_alive = yes }
 			}
+
 			event_target:equipped_artifact = {
-				set_artifact_flag = stolen_from@ROOT #Hook-in: Alex, for stolen artifact CB?
 				show_scope_change = no
+
+				set_artifact_flag = stolen_from@ROOT # Hook-in: Alex, for stolen artifact CB?
+
 				transfer_artifact = {
 					from = ROOT
 					to = event_target:enemy_liege
 				}
 			}
-			event_target:enemy_liege = { character_event = { id = HFP.11018 } }
+
+			event_target:enemy_liege = {
+				character_event = { id = HFP.11018 }
+			}
 		}
-		else = { #Else, just destroy it
-			custom_tooltip = { text = artifact_is_removed_tt }
-			hidden_effect = {
+		else = { # Else, just destroy it
+			custom_tooltip = {
+				text = artifact_is_removed_tt
+
 				event_target:equipped_artifact = {
 					destroy_artifact = yes
 				}
@@ -2589,66 +2649,63 @@ character_event = {
 
 		allow_new_battle_events_effect = yes
 
-		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 1.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0.5
-                trait = greedy
-            }
-            modifier = {
-                factor = 2
-				any_artifact = {
-					is_dueling_weapon_artifact_and_equipped = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
 				}
-            }
-        }
+				allow_new_battle_events_effect = yes
+			}
+		}
 
-		trigger = {
-			event_target:equipped_artifact = { always = yes }
-			OR = { #Either someone is alive to give it to, OR, it's something that is allowed to be destroyed...
-				event_target:enemy_commander = { is_alive = yes }
-				event_target:enemy_liege = { is_alive = yes }
-				event_target:equipped_artifact = {
-					NOR = {
-						is_indestructible = yes
-						has_artifact_flag = flag_considering_donation
-					}
-				}
+		ai_chance = {
+			factor = 50
+
+			mult_modifier = {
+				factor = 1.5
+				trait = craven
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 2
+				any_artifact = { is_dueling_weapon_artifact_and_equipped = yes }
 			}
 		}
 	}
 
 	option = {
 		name = CURSES
+
 		apply_selected_duel_injury_effect = yes
 		add_blood_splatter_effect = yes
 
-		if = { #opinion malus with the enemy commander if relevant...
+		if = { # Opinion malus with the enemy commander if relevant...
 			limit = {
 				event_target:enemy_commander = { always = yes }
 			}
+
 			opinion = {
-                modifier = opinion_injured_me_in_battle
-                who = event_target:enemy_commander
-                months = 180
-            }
+				name = opinion_injured_me_in_battle
+				who = event_target:enemy_commander
+				years = 15
+			}
 		}
-		else = { #otherwise, highlight the enemy liege...
+		else = { # Otherwise, highlight the enemy liege...
 			show_portrait = event_target:enemy_liege
 		}
 
-		if = { #show the portrait of the person you're talking about...
-			limit = {
-				has_character_flag = desc_A
-			}
+		if = { # Show the portrait of the person you're talking about...
+			limit = { has_character_flag = desc_A }
 			show_portrait = event_target:my_beloved
 		}
 
-		add_battle_PTSD_effect = yes #sends delayed follow-up event
+		add_battle_PTSD_effect = yes # Sends delayed follow-up event
 
 		hidden_effect = {
 			if = {
@@ -2656,8 +2713,9 @@ character_event = {
 					is_member_of_any_warrior_lodge_trigger = yes
 					event_target:enemy_commander = { is_member_of_any_warrior_lodge_trigger = yes }
 				}
+
 				save_persistent_event_target = {
-					name = maimed_me_in_battle_target			#Hook-in: Warrior Lodges (disliked_target_selection_score)
+					name = maimed_me_in_battle_target # Hook-in: Warrior Lodges (disliked_target_selection_score)
 					scope = event_target:enemy_commander
 				}
 			}
@@ -2665,30 +2723,44 @@ character_event = {
 
 		allow_new_battle_events_effect = yes
 
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 3
-                trait = craven
-            }
-        }
+			factor = 50
+
+			mult_modifier = {
+				factor = 3
+				trait = craven
+			}
+		}
 	}
+
 	after = {
-		clr_ABC_desc_flag_effect = yes
 		clr_character_flag = skip_wounded_trait
 		clr_character_flag = injury_both_eyes
-    	clr_character_flag = injury_eye
-    	clr_character_flag = injury_hand
-    	clr_character_flag = injury_leg
-    	clr_character_flag = injury_flight
-    	clr_character_flag = injury_face
-    	clr_character_flag = injury_mangled_body
-    	clr_character_flag = injury_maimed
-	    clr_character_flag = injury_could_be_lethal
-	    clr_character_flag = high_PCS_opt
-	    clr_character_flag = duel_enemy_opt
-    	clr_character_flag = duel_enemy_opt_gain_brave
-	    clr_character_flag = duel_enemy_opt_is_brave
+		clr_character_flag = injury_eye
+		clr_character_flag = injury_hand
+		clr_character_flag = injury_leg
+		clr_character_flag = injury_flight
+		clr_character_flag = injury_face
+		clr_character_flag = injury_mangled_body
+		clr_character_flag = injury_maimed
+		clr_character_flag = injury_could_be_lethal
+		clr_character_flag = high_PCS_opt
+		clr_character_flag = duel_enemy_opt
+		clr_character_flag = duel_enemy_opt_gain_brave
+		clr_character_flag = duel_enemy_opt_is_brave
+		clr_character_flag = desc_A
+		clr_character_flag = desc_B
+		clr_character_flag = desc_C
 	}
 }
 
