@@ -1054,234 +1054,271 @@ character_event = {
 						can_have_shieldmaidens_trigger = yes
 						is_member_of_any_warrior_lodge_trigger = yes
 					}
-					age = 16
-					NOT = { trait = incapable }
 
 					any_courtier_or_vassal = {
 						trait = shieldmaiden
-						NOT = { trait = incapable }
-						prisoner = no
 						has_minor_title = title_commander
+						is_incapable = no
+						prisoner = no
 					}
+
+					is_adult = yes
+					is_incapable = no
 				}
+
 				character_event = { id = 79001 } # Shieldmaiden saves liege, but she is injured (small chain, fired for liege who is ROOT)
 				log = "fired OLD battle EVENT 79001"
 			}
 
-			# SCRYING VISIONS (2)
-			50 = {
+			5 = {
 				trigger = {
-			    	has_dlc = "Mystics"
-			    	is_alive = yes
-			    	can_have_more_leadership_traits = yes
-			    	OR = {
-			    		NOT = { trait = experimenter }
-			    		NOT = { trait = unyielding_leader }
-			    		NOT = { trait = inspiring_leader }
-			    	}
+					is_ruler = yes
+					NOT = { trait = craven }
+					health_traits < 1
+					independent = no
+
+					liege = {
+						any_vassal = {
+							at_location = ROOT
+							in_command = yes
+							in_battle = yes
+							health_traits < 1
+
+							opinion = {
+								who = ROOT
+								value >= -30
+							}
+
+							opinion = {
+								who = ROOT
+								value < 30
+							}
+
+							NOR = {
+								war_with = ROOT
+								character = ROOT
+							}
+						}
+					}
+				}
+
+				mult_modifier = {
+					factor = 2
+					trait = brave
+				}
+
+				character_event = { id = 6910 } # Save someone's life at the battlefield...  become very good friend.
+				log = "fired OLD battle EVENT 6910"
+			}
+
+			# SCRYING VISIONS (2)
+			100 = {
+				trigger = {
 					has_battle_omen_modifier_trigger = yes
-			    }
-			    good_soldier_outcome_score = yes
-			    modifier = {
+					has_dlc = "Mystics"
+					can_have_more_leadership_traits = yes
+
+					NAND = {
+						trait = experimenter
+						trait = unyielding_leader
+						trait = inspiring_leader
+					}
+				}
+
+				good_soldier_outcome_score = yes
+
+				mult_modifier = {
 					factor = 2.5
 					has_character_modifier = good_battle_omen
 				}
-			    modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					has_character_modifier = bad_battle_omen
 				}
+
 				character_event = { id = MNM.1202 }  # Scrying vision inspires greatness
 				log = "fired OLD battle EVENT MNM.1202"
 			}
-			50 = {
+
+			100 = {
 				trigger = {
-			    	has_dlc = "Mystics"
-			    	is_alive = yes
-			    	has_battle_omen_modifier_trigger = yes
-			    }
+					has_battle_omen_modifier_trigger = yes
+					has_dlc = "Mystics"
+				}
+
 				bad_soldier_outcome_score = yes
-			    modifier = {
+
+				mult_modifier = {
 					factor = 2.5
 					has_character_modifier = bad_battle_omen
 				}
-			    modifier = {
+
+				mult_modifier = {
 					factor = 0.9
 					has_character_modifier = good_battle_omen
 				}
+
 				character_event = { id = MNM.1203 } # Scrying vision injury
 				log = "fired OLD battle EVENT MNM.1203"
 			}
 
-			1 = {
-				trigger = {
-					is_alive = yes
-					NOT = { is_indomitable_trigger = yes }
-				}
+			2 = {
+				trigger = { is_indomitable_trigger = no }
+
 				character_event = { id = HFP.30200 }
 			}
 		}
-    }
+	}
 }
-
 
 ### BATTLE EVENT: Killed in action (fired from HFP.11000)
 character_event = {
 	id = HFP.11001
 	title = the_battle_at_location
+	desc = EVTDESC_HFP_11001_A
+	desc = EVTDESC_HFP_11001_B
+	desc = EVTDESC_HFP_11001_C
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 	sound = lose_battle
 
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = { trait = berserker }
-	}
-
-	desc = {
-		text = EVTDESC_HFP_11001_A
-		trigger = { has_character_flag = desc_A }
-	}
-	desc = {
-		text = EVTDESC_HFP_11001_B
-		trigger = { has_character_flag = desc_B }
-	}
-	desc = {
-		text = EVTDESC_HFP_11001_C
-		trigger = { has_character_flag = desc_C }
-	}
-
 	immediate = {
-		hidden_effect = {
-			disallow_new_battle_events_effect = yes #to keep the tombola from spamming you... (if MP)
-			#Find someone to think of in dying moment...
-			save_beloved_character_effect = yes
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you... (if MP)
+		save_beloved_character_effect = yes # Find someone to think of in dying moment...
 
-			random_rival = {
-				save_event_target_as = random_rival_target #For loc and extra fun
-			}
-			randomize_ABC_desc_flag_effect = yes #picks a desc-text flag...
+		random_rival = {
+			save_event_target_as = random_rival_target # For loc and extra fun
+		}
 
-			#Sets up weapons for localization...
-			set_dueling_weapon_effect = yes
-			event_target:enemy_commander = { set_dueling_weapon_effect = yes }
+		# Sets up weapons for localization...
+		set_dueling_weapon_effect = yes
+		event_target:enemy_commander = { set_dueling_weapon_effect = yes }
 
-			if = { #In case there was an artifact available for fighting with (it might be lost to the enemy)...
-				limit = { event_target:dueling_weapon_1 = { always = yes } }
-				set_character_flag = dropped_weapon
-			}
-			### Saved in tombola:
-			# event_target:home_commander
-			# event_target:enemy_commander (originally FROM)
-			# event_target:enemy_liege (originally FROMFROM)
-			# event_target:battlefield_location (location of battle)
+		# In case there was an artifact available for fighting with (it might be lost to the enemy)...
+		if = {
+			limit = { event_target:dueling_weapon_1 = { always = yes } }
+			set_character_flag = dropped_weapon
+		}
 
-			### Saved in *this* event:
-			# event_target:home_liege (liege of home_commander, if there is one)
+		### Saved in tombola:
+		# event_target:home_commander
+		# event_target:enemy_commander (originally FROM)
+		# event_target:enemy_liege (originally FROMFROM)
+		# event_target:battlefield_location (location of battle)
+
+		### Saved in *this* event:
+		# event_target:home_liege (liege of home_commander, if there is one)
+
+		if = {
+			limit = { independent = no }
 
 			liege = {
-				if = {
-					limit = { NOT = { character = ROOT } }
-					save_event_target_as = home_liege
-					character_event = { id = HFP.11002 } # Send notification to home_liege...
-				}
+				save_event_target_as = home_liege
+				character_event = { id = HFP.11002 } # Send notification to home_liege...
 			}
+		}
 
-			event_target:enemy_liege = { #the LIEGE of the commander on the opposing side
-				if = {
-					limit = {
-						NOR = { #if they are not below you, or YOU...
-							is_vassal_or_below = ROOT
-							character = ROOT
-						}
-					}
-					set_character_flag = temp_battle_kill_242
-
-					if = {
-						limit = { ROOT = { has_character_flag = dropped_weapon } }
-						if = { #If there is a commander:
-							limit = { event_target:enemy_commander = { always = yes } }
-							# Do nothing. This will be handled by the commander (further down).
-						}
-						else = { #If there *was* no enemy commander, we need to deal with the dropped weapon...
-							character_event = { id = HFP.11004 } # Send choice event about taking the weapon from the dead commander...
-						}
-					}
-
-					else = { #If a dropped weapon is *not* involved (most common)...
-						if = {
-							limit = {
-								OR = {
-									AND = { #if there is a commander, and you are not that commander...
-										event_target:enemy_commander = { always = yes }
-										enemy_commander_and_liege_are_different_characters = yes
-									}
-									event_target:enemy_commander = { always = no } #Or there is no commander...
-								}
-							}
-							character_event = { id = HFP.11005 } # Send regular notification of killing this commander...
-						}
-					}
-				}
-			}
-			event_target:enemy_commander = { #the commander of the opposing side
-				if = {
-					limit = {
-						NOR = {
-							has_character_flag = temp_battle_kill_242
-							is_vassal_or_below = ROOT
-							character = ROOT
-						}
-					}
-					##### For tiered rewards...
-					if = {
-						limit = { duelist_skill_compared_to_prev_high_group_trigger = yes }
-						set_character_flag = fought_worse_warrior@ROOT #For later effects...
-					}
-					else_if = {
-						limit = { duelist_skill_compared_to_prev_low_group_trigger = yes }
-						set_character_flag = fought_great_warrior@ROOT #For later effects...
-					}
-					else = {
-						set_character_flag = fought_even_warrior@ROOT #For later effects...
-					}
-					#####
-
-					if = {
-						limit = { ROOT = { has_character_flag = dropped_weapon } }
-						character_event = { id = HFP.11003 } # Send choice event about taking the weapon from the dead commander (then forward to enemy liege)...
-					}
-					else = { #If a dropped weapon is *not* involved (most common)...
-						character_event = { id = HFP.11005 } # Send notification of killing this commander...
-					}
-				}
-			}
-			event_target:enemy_liege = {
-				clr_character_flag = temp_battle_kill_242 #For handling old TOG-events...
-			}
+		event_target:enemy_liege = { # The LIEGE of the commander on the opposing side
 			if = {
 				limit = {
-					multiplayer = yes
+					NOR = { # If they are not below you, or YOU...
+						is_vassal_or_below_of = ROOT
+						character = ROOT
+					}
 				}
-				set_character_flag = is_battlefield_duel
-				debug_battle_death_counter_effect = yes #for debug purposes
+
+				set_character_flag = temp_battle_kill_242
+
 				if = {
-					limit = { #If it does *not* make sense that the enemy_commander killed home_commander...
-						OR = {
-							is_liege_or_above = event_target:enemy_commander
-							event_target:enemy_commander = { character = ROOT }
+					limit = { ROOT = { has_character_flag = dropped_weapon } }
+
+					# If there *was* no enemy commander, we need to deal with the dropped weapon...
+					if = {
+						limit = {
 							NOT = { event_target:enemy_commander = { always = yes } }
 						}
+
+						character_event = { id = HFP.11004 } # Send choice event about taking the weapon from the dead commander...
 					}
-					death = {
-						death_reason = death_battle
+				}
+				else = { # If a dropped weapon is *not* involved (most common)...
+					if = {
+						limit = {
+							# If there is a commander, and you are not that commander...
+							trigger_if = {
+								limit = { event_target:enemy_commander = { always = yes } }
+								enemy_commander_and_liege_are_different_characters = yes
+							}
+						}
+
+						character_event = { id = HFP.11005 } # Send regular notification of killing this commander...
 					}
-					break = yes
 				}
-				death = {
-					death_reason = death_battle
-					killer = event_target:enemy_commander
+			}
+		}
+
+		event_target:enemy_commander = { # The commander of the opposing side
+			if = {
+				limit = {
+					NOR = {
+						has_character_flag = temp_battle_kill_242
+						is_vassal_or_below_of = ROOT
+						character = ROOT
+					}
 				}
+
+				##### For tiered rewards..., for later effects...
+
+				if = {
+					limit = { duelist_skill_compared_to_prev_high_group_trigger = yes }
+					set_character_flag = fought_worse_warrior@ROOT
+				}
+				else_if = {
+					limit = { duelist_skill_compared_to_prev_low_group_trigger = yes }
+					set_character_flag = fought_great_warrior@ROOT
+				}
+				else = {
+					set_character_flag = fought_even_warrior@ROOT
+				}
+
+				#####
+
+				if = {
+					limit = { ROOT = { has_character_flag = dropped_weapon } }
+					character_event = { id = HFP.11003 } # Send choice event about taking the weapon from the dead commander (then forward to enemy liege)...
+				}
+				else = { # If a dropped weapon is *not* involved (most common)...
+					character_event = { id = HFP.11005 } # Send notification of killing this commander...
+				}
+			}
+		}
+
+		event_target:enemy_liege = {
+			clr_character_flag = temp_battle_kill_242 # For handling old TOG-events...
+		}
+
+		# Actual death
+		set_character_flag = is_battlefield_duel
+		debug_battle_death_counter_effect = yes # For debug purposes
+
+		if = {
+			limit = { # If it does *not* make sense that the enemy_commander killed home_commander...
+				OR = {
+					is_vassal_or_below_of = event_target:enemy_commander
+					character = event_target:enemy_commander
+					NOT = { event_target:enemy_commander = { always = yes } }
+				}
+			}
+
+			death = { death_reason = death_battle }
+		}
+		else = {
+			death = {
+				death_reason = death_battle
+				killer = event_target:enemy_commander
 			}
 		}
 	}
@@ -1290,109 +1327,112 @@ character_event = {
 		name = {
 			text = ALAS
 			trigger = {
-				OR = {
-					AND = {
-						NOR = {
+				trigger_if = {
+					limit = { event_target:random_rival_target = { always = yes } }
+
+					trigger_if = {
+						limit = {
+							OR = {
+								trait = kind
+								is_pious_trigger = yes
+							}
+						}
+
+						NOT = { trait = cruel }
+						is_impious_trigger = no
+					}
+					trigger_else = {
+						OR = {
 							trait = cruel
 							is_impious_trigger = yes
 						}
-						OR = {
-							trait = kind
-							is_pious_trigger = yes
-						}
 					}
-					AND = {
-						OR = {
-							trait = cruel
-							is_impious_trigger = yes
-						}
-						NOR = {
-							trait = kind
-							is_pious_trigger = yes
-						}
-					}
-					event_target:random_rival_target = { always = no }
 				}
+
 				NOR = {
 					is_lover = event_target:my_beloved
-					is_father = event_target:my_beloved
-					is_mother = event_target:my_beloved
+					is_parent_of = event_target:my_beloved
 					is_child_of = event_target:my_beloved
+					is_married = event_target:my_beloved
 				}
 			}
 		}
-
 		name = {
-			text = EVTOPTA_HFP_10001_kind #I should've made peace with <Rival>
+			text = EVTOPTA_HFP_10001_kind # I should've made peace with <Rival>
 			trigger = {
 				event_target:random_rival_target = { always = yes }
-				NOR = {
-					trait = cruel
-					is_impious_trigger = yes
-				}
+
 				OR = {
 					trait = kind
 					is_pious_trigger = yes
 				}
+
 				NOR = {
+					trait = cruel
+					is_impious_trigger = yes
 					is_lover = event_target:my_beloved
-					is_father = event_target:my_beloved
-					is_mother = event_target:my_beloved
+					is_parent_of = event_target:my_beloved
 					is_child_of = event_target:my_beloved
+					is_married = event_target:my_beloved
 				}
 			}
 		}
 		name = {
-			text = EVTOPTA_HFP_10001_cruel #<Rival> outlived me?!
+			text = EVTOPTA_HFP_10001_cruel # <Rival> outlived me?!
 			trigger = {
 				event_target:random_rival_target = { always = yes }
+
 				OR = {
 					trait = cruel
 					is_impious_trigger = yes
 				}
+
 				NOR = {
 					trait = kind
 					is_pious_trigger = yes
-				}
-				NOR = {
 					is_lover = event_target:my_beloved
-					is_father = event_target:my_beloved
-					is_mother = event_target:my_beloved
+					is_parent_of = event_target:my_beloved
 					is_child_of = event_target:my_beloved
+					is_married = event_target:my_beloved
 				}
 			}
 		}
 		name = {
-			text = EVTOPTA_HFP_10001_lover #Tell "my_beloved" that I love him/her...
+			text = EVTOPTA_HFP_10001_lover # Tell "my_beloved" that I love him/her...
 			trigger = {
 				OR = {
 					is_lover = event_target:my_beloved
-					is_father = event_target:my_beloved
-					is_mother = event_target:my_beloved
+					is_parent_of = event_target:my_beloved
 					is_child_of = event_target:my_beloved
+					is_married = event_target:my_beloved
 				}
 			}
 		}
 
-		#For portraits and tooltips...
+		# For portraits and tooltips...
 		if = {
 			limit = {
 				OR = {
 					is_lover = event_target:my_beloved
-					is_father = event_target:my_beloved
-					is_mother = event_target:my_beloved
+					is_parent_of = event_target:my_beloved
 					is_child_of = event_target:my_beloved
+					is_married = event_target:my_beloved
 				}
 			}
+
 			show_portrait = event_target:my_beloved
 		}
+
 		if = {
 			limit = { event_target:home_liege = { always = yes } }
+
 			custom_tooltip = { text = home_liege_will_be_notified_of_death_tt }
 			show_portrait = event_target:home_liege
 		}
+
 		if = {
 			limit = { event_target:enemy_commander = { always = yes } }
+
 			if = {
 				limit = { has_character_flag = dropped_weapon }
 				custom_tooltip = { text = enemy_commander_looms_over_your_artifact_tt }
@@ -1400,65 +1440,76 @@ character_event = {
 			else = {
 				custom_tooltip = { text = enemy_commander_looms_over_you_tt }
 			}
+
 			show_portrait = event_target:enemy_commander
 		}
+
 		if = {
 			limit = {
 				event_target:random_rival_target = { always = yes }
-				OR = {
-					AND = {
-						NOR = { trait = cruel is_impious_trigger = yes }
-						OR = { trait = kind is_pious_trigger = yes }
+
+				trigger_if = {
+					limit = {
+						OR = {
+							trait = kind
+							is_pious_trigger = yes
+						}
 					}
-					AND = {
-						NOR = { trait = kind is_pious_trigger = yes }
-						OR = { trait = cruel is_impious_trigger = yes }
+
+					NOT = { trait = cruel }
+					is_impious_trigger = no
+				}
+				trigger_else = {
+					OR = {
+						trait = cruel
+						is_impious_trigger = yes
 					}
 				}
 			}
+
 			show_portrait = event_target:random_rival_target
 		}
-		if = { #This is currently a little too common maybe?
+
+		if = { # This is currently a little too common maybe?
 			limit = {
 				is_landed = yes
 				is_member_of_any_warrior_lodge_trigger = yes
 			}
+
 			event_target:home_capital_province = {
 				show_scope_change = no
+
 				add_province_modifier = {
 					name = province_mourning_warrior_death
-					duration = 365
+					years = 1
 				}
+
 				save_persistent_event_target = {
-					name = local_dead_commander_target		#Hook-in: Warrior Lodges
+					name = local_dead_commander_target # Hook-in: Warrior Lodges
 					scope = event_target:home_commander
 				}
 			}
 		}
-		### Actual death (if not MP)
-		if = {
-			limit = {
-				multiplayer = no
-			}
+
+		tooltip = {
 			if = {
-				limit = { #If it does *not* make sense that the enemy_commander killed home_commander...
+				limit = { # If it does *not* make sense that the enemy_commander killed home_commander...
 					OR = {
-						is_liege_or_above = event_target:enemy_commander
-						event_target:enemy_commander = { character = ROOT }
+						is_vassal_or_below_of = event_target:enemy_commander
+						character = event_target:enemy_commander
 						NOT = { event_target:enemy_commander = { always = yes } }
 					}
 				}
+
+				death = { death_reason = death_battle }
+			}
+			else = {
 				death = {
 					death_reason = death_battle
+					killer = event_target:enemy_commander
 				}
-				break = yes
+
 			}
-			death = {
-				death_reason = death_battle
-				killer = event_target:enemy_commander
-			}
-			set_character_flag = is_battlefield_duel
-			debug_battle_death_counter_effect = yes #for debug purposes
 		}
 	}
 }
@@ -1467,90 +1518,103 @@ character_event = {
 character_event = {
 	id = HFP.11002
 	title = commander_lost
-	desc = EVTDESC_HFP_11002 #Based on: EVTDESC253
+	desc = EVTDESC_HFP_11002 # Based on: EVTDESC253
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 	sound = lose_battle
 
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
+	option = { # DEFAULT
+		name = EVTOPTA_HFP_11002 # Another one bites the dust
 
-	option = { #DEFAULT
-		name = EVTOPTA_HFP_11002 #Another one bites the dust
+		trigger = {
+			NOT = { is_lover = event_target:home_commander }
+		}
+
 		prestige = -10
-
-		trigger = { NOT = { is_lover = event_target:home_commander } }
 	}
+
 	option = {
 		name = EVTOPTB_HFP_11002 # I will avenge you, my beloved!
-		prestige = -10
-		add_character_modifier = {
-			name = seeking_vengeance
-			duration = 1000
-		}
 
-		show_portrait = event_target:enemy_commander #if empty, I assume it'll show nothing? (For some reason does not currently work to put after the limit below.)
-
-		if = {
-			limit = {
-				event_target:home_commander = { killer = { character = event_target:enemy_commander } }
-			}
-
-			tooltip = {
-				event_target:enemy_commander = {
-					prestige = 15
-				}
-			}
-			add_rival = event_target:enemy_commander
-		}
-
-		trigger = { #If you had some kind of close relationship with them (and it makes sense)...BUT not lovers.
-			NOT = { is_lover = event_target:home_commander }
+		trigger = {
+			# If you had some kind of close relationship with them (and it makes sense)...BUT not lovers.
 			event_target:home_commander = {
 				OR = {
 					is_child_of = ROOT
-					any_spouse = {
-						character = ROOT
-					}
-					is_mother = ROOT
-					is_father = ROOT
-					any_sibling = {
-						character = ROOT
-					}
+					is_married = ROOT
+					is_parent_of = ROOT
+					sibling = ROOT
 				}
+
 				root_potentially_interested_in_rivaling_this_trigger = no
+				NOT = { is_lover = ROOT }
 			}
-			event_target:enemy_commander = { is_alive = yes }
-		}
-	}
-	option = {
-		name = 253_lover #Nooo, my sweet love!
-		prestige = -10
-		add_character_modifier = {
-			name = grieving_over_warrior_lover
-			duration = 1000
+
+			event_target:enemy_commander = {
+				is_alive = yes
+			}
 		}
 
-		show_portrait = event_target:enemy_commander #same reasoning as option above.
+		prestige = -10
+
+		add_character_modifier = {
+			name = seeking_vengeance
+			days = 1000
+		}
 
 		if = {
 			limit = {
-				event_target:home_commander = { killer = { character = event_target:enemy_commander } }
-				event_target:enemy_commander = { is_alive = yes }
+				event_target:home_commander = {
+					killer = { character = event_target:enemy_commander }
+				}
 			}
 
 			tooltip = {
 				event_target:enemy_commander = {
+					show_scope_change = no
+
 					prestige = 15
 				}
 			}
+
 			add_rival = event_target:enemy_commander
 		}
-		trigger = {
-			is_lover = event_target:home_commander
+	}
+
+	option = {
+		name = 253_lover # Nooo, my sweet love!
+
+		trigger = { is_lover = event_target:home_commander }
+
+		prestige = -10
+
+		add_character_modifier = {
+			name = grieving_over_warrior_lover
+			days = 1000
+		}
+
+
+		if = {
+			limit = {
+				event_target:home_commander = {
+					killer = {
+						character = event_target:enemy_commander
+						is_alive = yes
+					}
+				}
+			}
+
+			tooltip = {
+				event_target:enemy_commander = {
+					show_scope_change = no
+
+					prestige = 15
+				}
+			}
+
+			add_rival = event_target:enemy_commander
 		}
 	}
 }
@@ -1559,131 +1623,143 @@ character_event = {
 character_event = {
 	id = HFP.11003
 	title = commander_slain
-	picture = GFX_evt_battle
 	desc = EVTDESC_HFP_11003
+	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 
 	is_triggered_only = yes
 
-	trigger = {
-		character = yes
-		is_alive = yes
-		is_dying = no
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
-	option = { #I'll take that
+	option = { # I'll take that
 		name = EVTOPTA_HFP_10003
 
-		event_target:dueling_weapon_1 = { #the dropped weapon (during testing, will be inherited first)
+		# The dropped weapon (during testing, will be inherited first)
+		event_target:dueling_weapon_1 = {
 			show_scope_change = no
-			owner = {
-				show_scope_change = no
-				event_target:dueling_weapon_1 = {
-					show_scope_change = no
-					transfer_artifact = {
-						from = event_target:home_commander #not actually, but the tooltip will say so. It will *actually* come from the "owner", which might at this point be the heir of the dead commander...
-						to = ROOT
-					}
+
+			transfer_artifact = {
+				from = event_target:home_commander # Not actually, but the tooltip will say so. It will *actually* come from the "owner", which might at this point be the heir of the dead commander...
+				to = ROOT
+			}
+		}
+
+		if = {
+			limit = { enemy_commander_and_liege_are_different_characters = yes }
+
+			event_target:enemy_liege = {
+				character_event = {
+					id = HFP.11005 # Liege gets generic notification about death...
+					days = 1
 				}
 			}
 		}
-		hidden_effect = {
-        	if = {
-        		limit = { enemy_commander_and_liege_are_different_characters = yes }
-				event_target:enemy_liege = {
-					character_event = { id = HFP.11005 days = 1 } #Liege gets generic notification about death...
-				}
-			}
-		}
+
 		ai_chance = {
-            factor = 10
-            modifier = {
-                factor = 1.5
-                trait = greedy
-            }
-            modifier = {
-                factor = 1.5
-                trait = proud
-            }
-            modifier = {
-                factor = 1.5
-                is_evil_trigger = yes
-            }
-            modifier = {
-                factor = 2
-				any_artifact = {
-					is_dueling_weapon_artifact_and_equipped = no
-				}
-            }
-        }
+			factor = 1
+
+			mult_modifier = {
+				factor = 1.5
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_evil_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 2
+				any_artifact = { is_dueling_weapon_artifact_and_equipped = no }
+			}
+		}
 	}
-	option = { #I'll give it to my liege
+
+	option = { # I'll give it to my liege
 		name = EVTOPTB_HFP_10003
 
-		tooltip = {
-			reverse_opinion = {
-                who = event_target:enemy_liege
-                modifier = opinion_grateful
-                years = 3
-            }
-        }
+		trigger = { enemy_commander_and_liege_are_different_characters = yes }
 
 		event_target:enemy_liege = {
-			character_event = { id = HFP.11004 days = 1 } #Give liege the same option you got...
+			show_scope_change = no
+
+			tooltip = {
+				opinion = {
+					name = opinion_grateful
+					who = ROOT
+					years = 3
+				}
+			}
+
+			character_event = {
+				id = HFP.11004 # Give liege the same option you got...
+				days = 1
+			}
 		}
 
 		ai_chance = {
-            factor = 10
-            modifier = {
-                factor = 1.5
-                trait = charitable
-            }
-            modifier = {
-                factor = 1.5
-                trait = kind
-            }
-            modifier = {
-                factor = 1.5
-                trait = just
-            }
-            modifier = {
-                factor = 1.5
-				any_artifact = {
-					is_dueling_weapon_artifact_and_equipped = yes
-				}
-            }
-        }
-        trigger = { enemy_commander_and_liege_are_different_characters = yes }
-	}
-	option = { #I won't steal from the dead
-		name = EVTOPTC_HFP_10003
-		piety = 30
+			factor = 1
 
-		ai_chance = {
-            factor = 10
-            modifier = {
-                factor = 1.5
-                is_benevolent_trigger = yes
-            }
-            modifier = {
-                factor = 2
-                is_pious_trigger = yes
-            }
-        }
+			mult_modifier = {
+				factor = 1.5
+				trait = charitable
+			}
 
-        hidden_effect = {
-        	if = {
-        		limit = { enemy_commander_and_liege_are_different_characters = yes }
-				event_target:enemy_liege = {
-					character_event = { id = HFP.11005 days = 1 } #Liege gets generic notification about death...
-				}
+			mult_modifier = {
+				factor = 1.5
+				trait = kind
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = just
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				any_artifact = { is_dueling_weapon_artifact_and_equipped = yes }
 			}
 		}
 	}
+
+	option = { # I won't steal from the dead
+		name = EVTOPTC_HFP_10003
+
+		piety = 30
+
+		if = {
+			limit = { enemy_commander_and_liege_are_different_characters = yes }
+
+			event_target:enemy_liege = {
+				character_event = {
+					id = HFP.11005 # Liege gets generic notification about death...
+					days = 1
+				}
+			}
+		}
+
+		ai_chance = {
+			factor = 1
+
+			mult_modifier = {
+				factor = 1.5
+				is_benevolent_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 2
+				is_pious_trigger = yes
+			}
+		}
+	}
+
 	after = {
 		apply_opinion_reward_effect = yes
 		allow_new_battle_events_effect = yes
@@ -1691,115 +1767,113 @@ character_event = {
 }
 
 # Follow-up: Enemy LIEGE is informed that the commander of the opposing forces has been killed AND dropped a weapon
-#(either a follow-up from HFP.11003, or from HFP.11001 (for the killed commander) if no friendly commander was present)
+# (either a follow-up from HFP.11003, or from HFP.11001 (for the killed commander) if no friendly commander was present)
 character_event = {
 	id = HFP.11004
 	title = commander_slain
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 
+	desc = { # If there was a commander...
+		text = EVTDESC_HFP_11004_A
+		trigger = { event_target:enemy_commander = { always = yes } }
+	}
+	desc = { # Else, if the event was sent directly to you...
+		text = EVTDESC_HFP_11004_B
+		trigger = { NOT = { event_target:enemy_commander = { always = yes } } }
+	}
+
 	is_triggered_only = yes
 
-	desc = { #If there was a commander...
-		trigger = { event_target:enemy_commander = { always = yes } }
-		text = EVTDESC_HFP_11004_A
-	}
-	desc = { #Else, if the event was sent directly to you...
-		trigger = { NOT = { event_target:enemy_commander = { always = yes } } }
-		text = EVTDESC_HFP_11004_B
-	}
-
-	trigger = {
-		is_alive = yes
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
-	option = { #I'll take that
+	option = { # I'll take that
 		name = EVTOPTA_HFP_10003
-		event_target:dueling_weapon_1 = { #the dropped weapon (during testing, will be inherited first)
+
+		# The dropped weapon (during testing, will be inherited first)
+		event_target:dueling_weapon_1 = {
 			show_scope_change = no
-			owner = {
-				show_scope_change = no
-				event_target:dueling_weapon_1 = {
-					show_scope_change = no
-					transfer_artifact = {
-						from = PREV
-						to = ROOT
-					}
-				}
+
+			transfer_artifact = {
+				from = owner
+				to = ROOT
 			}
 		}
+
 		ai_chance = {
-            factor = 10
-            modifier = {
-                factor = 1.5
-                trait = greedy
-            }
-            modifier = {
-                factor = 1.5
-                trait = proud
-            }
-            modifier = {
-                factor = 1.5
-                is_evil_trigger = yes
-            }
-            modifier = {
-                factor = 2
-				any_artifact = {
-					is_dueling_weapon_artifact_and_equipped = no
-				}
-            }
-        }
+			factor = 1
+
+			mult_modifier = {
+				factor = 1.5
+				trait = greedy
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				trait = proud
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_evil_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 2
+				any_artifact = { is_dueling_weapon_artifact_and_equipped = no }
+			}
+		}
 	}
-	option = { #I won't steal from the dead
+
+	option = { # I won't steal from the dead
 		name = EVTOPTC_HFP_10003
+
 		piety = 30
+
 		ai_chance = {
-            factor = 10
-            modifier = {
-                factor = 1.5
-                is_benevolent_trigger = yes
-            }
-            modifier = {
-                factor = 1.5
-                is_pious_trigger = yes
-            }
-        }
+			factor = 1
+
+			mult_modifier = {
+				factor = 1.5
+				is_benevolent_trigger = yes
+			}
+
+			mult_modifier = {
+				factor = 1.5
+				is_pious_trigger = yes
+			}
+		}
 	}
+
 	after = {
-        apply_opinion_reward_effect = yes
-        allow_new_battle_events_effect = yes
+		apply_opinion_reward_effect = yes
+		allow_new_battle_events_effect = yes
 	}
 }
 
 # Follow-up: Enemy liege *or* commander is informed that the commander of the opposing forces has been killed.
-#(Sent from HFP.11001 (from the killed commander) if no weapon was dropped)
+# (sent from HFP.11001 (from the killed commander) if no weapon was dropped)
 character_event = {
 	id = HFP.11005
 	title = commander_slain
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 
+	desc = { # If you are the enemy liege...
+		text = EVTDESC_HFP_11005_A
+		trigger = { character = event_target:enemy_liege }
+	}
+	desc = { # If you are the enemy commander...
+		text = EVTDESC_HFP_11005_B
+		trigger = { character = event_target:enemy_commander }
+	}
+
 	is_triggered_only = yes
 
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-	}
-
-	desc = { #If you are the enemy liege...
-		trigger = { event_target:enemy_liege = { character = ROOT } }
-		text = EVTDESC_HFP_11005_A
-	}
-	desc = { #If you are the enemy commander...
-		trigger = { event_target:enemy_commander = { character = ROOT } }
-		text = EVTDESC_HFP_11005_B
-	}
-
-	trigger = {
-		is_alive = yes
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
 	option = {
@@ -1815,107 +1889,12 @@ character_event = {
 
 ### BATTLE EVENT: Generic Wounded in action (fired from HFP.11000)
 character_event = {
-	id = HFP.11010 #("inspired" by 243)
+	id = HFP.11010 # "inspired" by 243
 	title = the_battle_at_location
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 	sound = lose_battle
-	hide_from = yes
 
-	is_triggered_only = yes
-
-	trigger = {
-		NOT = { trait = wounded }
-		NOT = { trait = berserker }
-		is_alive = yes
-	}
-
-	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-		# battle_commander_counter_negative_effect = yes
-
-		if = {
-			limit = { event_target:enemy_commander = { is_alive = yes ai = yes } }
-			disallow_new_battle_events_effect = yes #to keep the tombola from spamming your potential target...
-		}
-		random_list = {
-			10 = { set_character_flag = desc_A }
-			10 = {
-				trigger = { event_target:enemy_commander = { always = no } }
-				set_character_flag = desc_B
-			}
-			10 = { set_character_flag = desc_C }
-		}
-
-		set_battle_duels_option_flag_effect = yes
-		set_character_flag = skip_wounded_trait
-		random_list = { #Randomize bruised body part.
-			10 = { #the eyes
-				trigger = { NOT = { trait = blinded } }
-				if = { limit = { trait = one_eyed }
-					set_character_flag = injury_both_eyes
-				}
-				else = {
-					set_character_flag = injury_eye
-				}
-			}
-			10 = {
-				trigger = {
-					NOR = {
-						race_is_handless = yes
-						trait = one_handed 
-					} 
-				}
-				set_character_flag = injury_hand
-			}
-			10 = {
-				trigger = {
-					NOR = { 
-						race_is_legless = yes
-						trait = one_legged 
-					}
-				}
-				set_character_flag = injury_leg
-			}
-			3 = {
-				trigger = { NOT = { trait = disfigured } }
-				set_character_flag = injury_face
-			}
-			1 = {
-				trigger = { NOT = { trait = mangled } }
-				set_character_flag = injury_mangled_body
-			}
-			3 = {
-				trigger = {
-					NOR = {
-						trait = grounded
-						race_can_fly = no
-					}
-				}
-				set_character_flag = injury_flight
-			}
-			10 = { #Only in case you already have ALL the other maimed traits?
-				trigger = {
-					trait = blinded
-					OR = {
-						trait = one_handed
-						race_is_handless = yes
-					}
-					OR = {
-						trait = one_legged
-						race_is_legless = yes
-					}
-					trait = disfigured
-					trait = mangled
-					OR = {
-						trait = grounded
-						race_can_fly = no
-					}
-				}
-				set_character_flag = injury_could_be_lethal
-			}
-		}
-	}
 	desc = {
 		text = EVTDESC_HFP_11010_A
 		trigger = { has_character_flag = desc_A }
@@ -1929,111 +1908,203 @@ character_event = {
 		trigger = { has_character_flag = desc_C }
 	}
 
-	option = { #Special option: High Combat-rating only (no enemy commander present)
-		tooltip_info = combat_rating
-		name = EVTOPT_HFP_11010_C
-		prestige = 15
-		pacifists_lose_piety_effect = yes
+	is_triggered_only = yes
+	hide_from = yes
 
-		ai_chance = {
-            factor = 300
-        }
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+		#battle_commander_counter_negative_effect = yes
+
+		# For consistency between description and event options
+		random_list = {
+			33 = { set_character_flag = desc_A }
+			33 = { set_character_flag = desc_B }
+			33 = { set_character_flag = desc_C }
+		}
+
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				disallow_new_battle_events_effect = yes # To keep the tombola from spamming your potential target...
+			}
+		}
+
+		set_battle_duels_option_flag_effect = yes
+		set_character_flag = skip_wounded_trait
+
+		# Randomize bruised body part
+		random_list = {
+			10 = {
+				trigger = { NOT = { trait = blinded } }
+
+				if = {
+					limit = { trait = one_eyed }
+					set_character_flag = injury_both_eyes
+				}
+				else = {
+					set_character_flag = injury_eye
+				}
+			}
+
+			10 = {
+				trigger = {
+					NOR = {
+						race_is_handless = yes
+						trait = one_handed
+					}
+				}
+				set_character_flag = injury_hand
+			}
+
+			10 = {
+				trigger = {
+					NOR = { 
+						race_is_legless = yes
+						trait = one_legged
+					}
+				}
+				set_character_flag = injury_leg
+			}
+
+			3 = {
+				trigger = { NOT = { trait = disfigured } }
+				set_character_flag = injury_face
+			}
+
+			1 = {
+				trigger = { NOT = { trait = mangled } }
+				set_character_flag = injury_mangled_body
+			}
+
+			3 = {
+				trigger = {
+					NOR = {
+						trait = grounded
+						race_can_fly = no
+					}
+				}
+				set_character_flag = injury_flight
+			}
+
+			fallback = { # Only in case you already have ALL the other maimed traits?
+				set_character_flag = injury_could_be_lethal
+			}
+		}
+	}
+
+	option = { # Special option: High Combat-rating only (no enemy commander present)
+		name = EVTOPT_HFP_11010_C
+		tooltip_info = combat_rating
 
 		trigger = {
 			has_character_flag = high_PCS_opt
+
+			NOT = { event_target:enemy_commander = { always = yes } }
 		}
-	}
-	option = { #Special option: Duel enemy commander instead (if you have great combat rating)
-		tooltip_info_custom = available_because_duels
-		name = EVTOPT_HFP_11011_C
 
-		duel_enemy_commander_effect = yes
+		prestige = 15
 		pacifists_lose_piety_effect = yes
+		allow_new_battle_events_effect = yes
 
-		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
+		ai_chance = { factor = 6 }
+	}
+
+	option = { # Special option: Duel enemy commander instead (if you have great combat rating)
+		name = EVTOPT_HFP_11011_C
+		tooltip_info_custom = available_because_duels
 
 		trigger = {
 			has_character_flag = duel_enemy_opt
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
-	}
-	option = { #Special option: Duel enemy commander instead (but you have terrible Combat Rating - blocks option above + gives Brave)
-		name = EVTOPT_HFP_11011_C
-		tooltip_info_custom = available_because_duels_bad
+
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
 
-		if = {
-			limit = { trait = craven }
-			remove_trait = craven
-		}
-		else = {
-			add_trait = brave
-		}
-
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0.5
-                trait = craven
-            }
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
+			factor = 50
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	option = { # Special option: Duel enemy commander instead (but you have terrible Combat Rating - blocks option above + gives Brave)
+		name = EVTOPT_HFP_11011_C
+		tooltip_info_custom = available_because_duels_bad
 
 		trigger = {
 			has_character_flag = duel_enemy_opt_gain_brave
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
-	}
-	option = { #Special option: Duel enemy commander instead (you are Brave already - unlocks dueling regardless, but should block the two above)
-		name = EVTOPT_HFP_11011_C
-		tooltip_info = brave
+
 		duel_enemy_commander_effect = yes
 		pacifists_lose_piety_effect = yes
-
-		add_trait_silently_brave_effect = yes
-		remove_trait_silently_craven_effect = yes
+		add_trait_partially_silently_brave_effect = yes
 
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
+			factor = 1
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+
+			mult_modifier = {
+				factor = 0.5
+				trait = craven
+			}
+		}
+	}
+
+	option = { # Special option: Duel enemy commander instead (you are Brave already - unlocks dueling regardless, but should block the two above)
+		name = EVTOPT_HFP_11011_C
+		tooltip_info = brave
 
 		trigger = {
 			has_character_flag = duel_enemy_opt_is_brave
-			event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
 		}
+
+		duel_enemy_commander_effect = yes
+		pacifists_lose_piety_effect = yes
+		add_trait_partially_silently_brave_effect = yes
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+		}
 	}
 
-	option = { #Special option: I distract them with song!
-        tooltip_info_custom = because_bloodline_tt
+	option = { # Special option: I distract them with song!
 		name = {
-			text = EVTOPT_HFP_11010_Bard_1 #I must survive...
+			text = EVTOPT_HFP_11010_Bard_1 # I must survive...
 			trigger = { has_character_flag = desc_A }
 		}
 		name = {
@@ -2041,89 +2112,133 @@ character_event = {
 			trigger = { has_character_flag = desc_B }
 		}
 		name = {
-			text = EVTOPT_HFP_11010_Bard_3 #I will write songs, mocking you!
+			text = EVTOPT_HFP_11010_Bard_3 # I will write songs, mocking you!
 			trigger = { has_character_flag = desc_C }
 		}
+
+		tooltip_info_custom = because_bloodline_tt
+
+		trigger = {
+			any_owned_bloodline = {
+				has_bloodline_flag = bloodline_battle_bards # Only for Battle Bard Bloodlines
+				bloodline_is_active_for = PREV
+			}
+		}
+
 		if = {
 			limit = { has_character_flag = desc_C }
 			custom_tooltip = { text = EVTOPT_HFP_11010_Bard_3_TT }
 		}
 
 		prestige = 15
-
 		allow_new_battle_events_effect = yes
 
-		ai_chance = {
-            factor = 100
-        }
-        trigger = { any_owned_bloodline = { has_bloodline_flag = bloodline_battle_bards bloodline_is_active_for = PREV } } #Only for Battle Bard Bloodlines
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+
+		ai_chance = { factor = 2 }
 	}
 
-	option = { #I accept injury
+	option = { # I accept injury
 		name = EVTOPT_HFP_11010_A
+
 		apply_duel_wounded_effect = yes
 		add_blood_splatter_effect = yes
 		pacifists_lose_piety_effect = yes
+
 		random = {
 			chance = 80
-			add_trait_brave_effect = yes
-			remove_trait_craven_effect = yes
+			add_trait_partially_brave_effect = yes
 		}
+
 		allow_new_battle_events_effect = yes
+
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+
 		ai_chance = {
-            factor = 50
-            modifier = {
-                factor = 3
-                trait = craven
-            }
-        }
+			factor = 1
+
+			mult_modifier = {
+				factor = 3
+				trait = craven
+			}
+		}
 	}
 
-	option = { #I will do nothing/escape somehow (lose brave/gain craven)
+	option = { # I will do nothing/escape somehow (lose brave/gain craven)
 		name = {
-			text = EVTOPT_HFP_11010_B_1 #hide
+			text = EVTOPT_HFP_11010_B_1 # Hide
 			trigger = { has_character_flag = desc_A }
 		}
 		name = {
-			text = EVTOPT_HFP_11010_B_2 #run
+			text = EVTOPT_HFP_11010_B_2 # Run
 			trigger = { has_character_flag = desc_B }
 		}
 		name = {
-			text = EVTOPT_HFP_11010_B_3 #play dead/distract
+			text = EVTOPT_HFP_11010_B_3 # Play dead/distract
 			trigger = { has_character_flag = desc_C }
 		}
+
 		random = {
 			chance = 50
-			add_trait_craven_effect = yes
-			remove_trait_brave_effect = yes
+			add_trait_partially_craven_effect = yes
 		}
+
 		prestige = -50
+		allow_new_battle_events_effect = yes
+
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
 
 		ai_chance = {
-            factor = 100
-            bad_soldier_outcome_score = yes
-        }
-        allow_new_battle_events_effect = yes
-	}
-	after = {
-		clr_ABC_desc_flag_effect = yes
+			factor = 2
 
+			bad_soldier_outcome_score = yes
+		}
+	}
+
+	after = {
 		clr_character_flag = skip_wounded_trait
 		clr_character_flag = injury_both_eyes
-    	clr_character_flag = injury_eye
-    	clr_character_flag = injury_hand
-    	clr_character_flag = injury_leg
-    	clr_character_flag = injury_face
-    	clr_character_flag = injury_flight
-    	clr_character_flag = injury_mangled_body
-    	clr_character_flag = injury_maimed
-	    clr_character_flag = injury_could_be_lethal
+		clr_character_flag = injury_eye
+		clr_character_flag = injury_hand
+		clr_character_flag = injury_leg
+		clr_character_flag = injury_face
+		clr_character_flag = injury_flight
+		clr_character_flag = injury_mangled_body
+		clr_character_flag = injury_maimed
+		clr_character_flag = injury_could_be_lethal
 
-	    clr_character_flag = high_PCS_opt
-	    clr_character_flag = duel_enemy_opt
-    	clr_character_flag = duel_enemy_opt_gain_brave
-	    clr_character_flag = duel_enemy_opt_is_brave
+		clr_character_flag = high_PCS_opt
+		clr_character_flag = duel_enemy_opt
+		clr_character_flag = duel_enemy_opt_gain_brave
+		clr_character_flag = duel_enemy_opt_is_brave
 
+		clr_character_flag = desc_A
+		clr_character_flag = desc_B
+		clr_character_flag = desc_C
 	}
 }
 
