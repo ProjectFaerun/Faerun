@@ -2831,9 +2831,9 @@ character_event = {
 
 ### BATTLE EVENT: Character skill improves (fired from HFP.11000)
 character_event = {
-	id = HFP.11013 #( remake of 246)
+	id = HFP.11013 # remake of 246
 	title = the_battle_at_location
-	desc = EVTDESC_HFP_11013_A #EVTDESC246
+	desc = EVTDESC_HFP_11013_A # EVTDESC246
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
 	sound = win_battle
@@ -2841,33 +2841,26 @@ character_event = {
 	is_triggered_only = yes
 	hide_from = yes
 
-	trigger = {
-		is_alive = yes
-		OR = {
-			trait = misguided_warrior
-			trait = tough_soldier
-			trait = skilled_tactician
-		}
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = {
 		name = EVTOPTB_HFP_11013
 
-		#Because bragging
-		add_trait = proud
-		upgrade_education_effect = yes
-		allow_new_battle_events_effect = yes
+		# Because bragging
+		add_trait_fully_silently_proud_effect = yes
 	}
+
 	option = {
 		name = EVTOPTA_HFP_11013
 
-		#Because not bragging
-		add_trait = humble
+		# Because not bragging
+		add_trait_fully_silently_humble_effect = yes
+	}
+
+	after = {
 		upgrade_education_effect = yes
 		allow_new_battle_events_effect = yes
 	}
@@ -2875,7 +2868,7 @@ character_event = {
 
 ### BATTLE EVENT: Flat improvement to martial skill (fired from HFP.11000)
 character_event = {
-	id = HFP.11014#247
+	id = HFP.11014 # 247
 	title = the_battle_at_location
 	desc = EVTDESC_HFP_11014_A
 	picture = GFX_evt_battle
@@ -2885,91 +2878,92 @@ character_event = {
 	is_triggered_only = yes
 	hide_from = yes
 
-	trigger = {
-		is_alive = yes
-		NOT = { martial = 10 }
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = {
 		name = EVTOPTA_HFP_11014
+
 		change_martial = 1
-		allow_new_battle_events_effect = yes
 	}
+
 	option = {
 		name = EVTOPTB_HFP_11014
 
-		if = {
-			limit = { trait = proud }
-			remove_trait = proud
-		}
-		else = {
-			add_trait = humble
-		}
+		add_trait_partially_silently_humble_effect = yes
 
 		if = {
 			limit = { is_landed = yes }
+
 			event_target:home_capital_province = {
 				show_scope_change = no
+
 				add_province_modifier = {
-		            modifier = province_team_spirit
-		            months = 24
-		        }
-		        save_persistent_event_target = {
-					name = local_inspiring_commander_target		#Hook-in: Warrior Lodges
+					name = province_team_spirit
+					years = 2
+				}
+
+				save_persistent_event_target = {
+					name = local_inspiring_commander_target # Hook-in: Warrior Lodges
 					scope = event_target:home_commander
 				}
 			}
 		}
-
-		if = { #Liege (if there is one) is notified of this bonus
-			limit = {
-				is_landed = no
+		else_if = {
+			limit = { # Liege (if there is one) is notified of this bonus
 				event_target:home_liege = { always = yes }
 			}
+
 			event_target:home_liege = {
 				character_event = { id = HFP.11015 }
 			}
 		}
+	}
+
+	after = {
 		allow_new_battle_events_effect = yes
 	}
 }
 
 # Follow-up: Liege gets notified about commander doing well, inspiring troops!
 character_event = {
-    id = HFP.11015
-    title = the_battle_at_location
-    desc = EVTDESC_HFP_11015
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
+	id = HFP.11015
+	title = the_battle_at_location
+	desc = EVTDESC_HFP_11015
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
 
-    trigger = {
+	is_triggered_only = yes
+
+	trigger = {
 		FROM = { is_alive = yes }
-    }
-
-    immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
 	}
 
-    option = {
-        name = EVTOPTA_HFP_11015
-        capital_scope = {
-        	add_province_modifier = {
-	            modifier = province_team_spirit
-	            months = 24
-	        }
-        	save_persistent_event_target = {
-				name = local_inspiring_commander_target		#Hook-in: Warrior Lodges
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11015
+
+		capital_scope = {
+			show_scope_change = no
+
+			add_province_modifier = {
+				name = province_team_spirit
+				years = 2
+			}
+
+			save_persistent_event_target = {
+				name = local_inspiring_commander_target	# Hook-in: Warrior Lodges
 				scope = event_target:home_commander
 			}
-        }
-        allow_new_battle_events_effect = yes
-    }
+		}
+
+		allow_new_battle_events_effect = yes
+	}
 }
 
 ### BATTLE EVENT: Tech Increase in Capital (fired from HFP.11000)
@@ -2979,52 +2973,50 @@ character_event = {
 	desc = EVTDESC_HFP_11016
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
+	portrait = event_target:invited_character
 
 	is_triggered_only = yes
-	#hide_from = yes
-
-	trigger = {
-		is_alive = yes
-		is_landed = yes
-		OR = {
-			trait = brilliant_strategist
-			trait = skilled_tactician
-		}
-		event_target:home_capital_province = {
-			NOT = { has_province_modifier = war_knowledge }
-		}
-	}
+	hide_new = yes
 
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # to keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 		spawn_good_commander_effect = yes
 	}
 
 	option = {
-		name = EVTOPTA_HFP_11016 #Yes, these are excellent news!
+		name = EVTOPTA_HFP_11016 # Yes, this is excellent news!
+
 		scaled_wealth = {
-		    value = -0.5
-		    min = -45
-		    max = -500
+			value = -0.5
+			min = -45
+			max = -500
 		}
+
 		military_techpoints = 30
+
 		event_target:home_capital_province = {
 			show_scope_change = no
+
 			add_province_modifier = {
 				name = war_knowledge
 				years = 10
 			}
 		}
+
 		hidden_effect = { event_target:invited_character = { leave_court_and_die_effect = yes } }
-		allow_new_battle_events_effect = yes
 	}
-	option = { #We need to focus on the short term benefits right now
+
+	option = { # We need to focus on the short term benefits right now
 		name = EVTOPTB_HFP_11016
+
 		custom_tooltip = { text = a_commander_joins_your_court_tt }
 		show_portrait = event_target:invited_character
 
 		pacifists_lose_piety_effect = yes
+	}
+
+	after = {
 		allow_new_battle_events_effect = yes
 	}
 }
@@ -3041,26 +3033,25 @@ character_event = {
 	hide_from = yes
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-		can_have_more_leadership_traits = yes
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = {
 		name = EVTOPTK96500 # Jungle Terrain Specialization
+
 		trigger = {
 			location = { terrain = jungle }
 			NOT = { trait = jungle_terrain_leader }
 		}
+
 		add_trait = jungle_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTL96500 # War elephants
+
 		trigger = {
 			location = {
 				OR = {
@@ -3070,108 +3061,142 @@ character_event = {
 			}
 			NOT = { trait = war_elephant_leader }
 		}
+
 		add_trait = war_elephant_leader
 	}
+
 	option = {
 		name = EVTOPTM96500 # WINTER Terrain Specialization
+
 		trigger = {
 			location = { is_winter = yes }
 			NOT = { trait = winter_soldier }
 		}
+
 		add_trait = winter_soldier
 	}
+
 	option = {
 		name = EVTOPTA96500 # Rough Terrain Specialization
+
 		trigger = {
-			OR = {
-				location = { terrain = forest }
-				location = { terrain = hills }
+			location = {
+				OR = {
+					terrain = forest
+					terrain = hills
+				}
 			}
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = rough_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTB96500 # Flat Terrain Specialization
+
 		trigger = {
-			OR = {
-				location = { terrain = plains }
-				location = { terrain = farmlands }
-				location = { terrain = steppe }
+			location = {
+				OR = {
+					terrain = plains
+					terrain = farmlands
+					terrain = steppe
+				}
 			}
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = flat_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTC96500 # Mountain Terrain Specialization
+
 		trigger = {
 			location = { terrain = mountain }
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = mountain_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTD96500 # Desert Terrain Leader
+
 		trigger = {
 			location = { terrain = desert }
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = desert_terrain_leader
 	}
-	option = {
-		name = EVTOPTF96500 # Light Infantry
-		trigger = {
-			NOT = {
-				trait = cavalry_leader
-				trait = heavy_infantry_leader
-				trait = light_foot_leader
-			}
-		}
-		add_trait = light_foot_leader
-	}
-	option = {
-		name = EVTOPTG96500 # Heavy Infantry
-		trigger = {
-			NOT = {
-				trait = cavalry_leader
-				trait = heavy_infantry_leader
-				trait = light_foot_leader
-			}
-		}
-		add_trait = heavy_infantry_leader
-	}
+
 	option = {
 		name = EVTOPTE96500 # Cavalry
+
 		trigger = {
-			NOT = {
+			NOR = {
 				trait = cavalry_leader
 				trait = heavy_infantry_leader
 				trait = light_foot_leader
 			}
 		}
+
 		add_trait = cavalry_leader
 	}
+
+	option = {
+		name = EVTOPTF96500 # Light Infantry
+
+		trigger = {
+			NOR = {
+				trait = cavalry_leader
+				trait = heavy_infantry_leader
+				trait = light_foot_leader
+			}
+		}
+
+		add_trait = light_foot_leader
+	}
+
+	option = {
+		name = EVTOPTG96500 # Heavy Infantry
+
+		trigger = {
+			NOR = {
+				trait = cavalry_leader
+				trait = heavy_infantry_leader
+				trait = light_foot_leader
+			}
+		}
+
+		add_trait = heavy_infantry_leader
+	}
+
 	after = {
 		allow_new_battle_events_effect = yes
 	}
@@ -3186,97 +3211,100 @@ character_event = {
 
 	is_triggered_only = yes
 
-	trigger = {
-		is_alive = yes
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
 	desc = {
 		text = EVTDESC_HFP_11018_A_weapon
 		trigger = {
-			event_target:enemy_commander = { character = ROOT }
+			character = event_target:enemy_commander
 			event_target:equipped_artifact = { has_artifact_flag = combat_weapon }
 		}
 	}
 	desc = {
 		text = EVTDESC_HFP_11018_A_armor
 		trigger = {
-			event_target:enemy_commander = { character = ROOT }
+			character = event_target:enemy_commander
 			event_target:equipped_artifact = { has_artifact_flag = armor }
 		}
 	}
 	desc = {
 		text = EVTDESC_HFP_11018_A_other
 		trigger = {
-			event_target:enemy_commander = { character = ROOT }
+			character = event_target:enemy_commander
 			event_target:equipped_artifact = {
-				NOT = { has_artifact_flag = armor }
-				NOT = { has_artifact_flag = combat_weapon }
+				NOR = {
+					has_artifact_flag = armor
+					has_artifact_flag = combat_weapon
+				}
 			}
 		}
 	}
 	desc = {
 		text = EVTDESC_HFP_11018_B_weapon
 		trigger = {
-			event_target:enemy_liege = { character = ROOT }
-			NOT = { event_target:enemy_commander = { character = ROOT } }
+			character = event_target:enemy_liege
+			NOT = { character = event_target:enemy_commander }
 			event_target:equipped_artifact = { has_artifact_flag = combat_weapon }
 		}
 	}
 	desc = {
 		text = EVTDESC_HFP_11018_B_armor
 		trigger = {
-			event_target:enemy_liege = { character = ROOT }
-			NOT = { event_target:enemy_commander = { character = ROOT } }
+			character = event_target:enemy_liege
+			NOT = { character = event_target:enemy_commander }
 			event_target:equipped_artifact = { has_artifact_flag = armor }
 		}
 	}
 	desc = {
 		text = EVTDESC_HFP_11018_B_other
 		trigger = {
-			event_target:enemy_liege = { character = ROOT }
-			NOT = { event_target:enemy_commander = { character = ROOT } }
+			character = event_target:enemy_liege
+			NOT = { character = event_target:enemy_commander }
+
 			event_target:equipped_artifact = {
-				NOT = { has_artifact_flag = armor }
-				NOT = { has_artifact_flag = combat_weapon }
+				NOR = {
+					has_artifact_flag = armor
+					has_artifact_flag = combat_weapon
+				}
 			}
 		}
 	}
 
-	option = { #I... Someone pick that up!
+	option = { # I... Someone pick that up!
 		name = EVTOPTA_HFP_10018
+
+		trigger = { character = event_target:enemy_commander }
 
 		custom_tooltip = { text = EVTOPTA_HFP_10018_tt }
 		add_blood_splatter_effect = yes
-		allow_new_battle_events_effect = yes
-
-		trigger = { event_target:enemy_commander = { character = ROOT } } #If you are the enemy commander
 	}
 
 	option = {
 		name = {
-			text = EVTOPTB_HFP_10018_high_quality #What a lunatic! I'll take that
+			text = EVTOPTB_HFP_10018_high_quality # What a lunatic! I'll take that
 			trigger = {
-				event_target:equipped_artifact = { quality > 3 }
+				event_target:equipped_artifact = { quality >= 4 }
 			}
 		}
 		name = {
-			text = EVTOPTB_HFP_10018 #I shall take that, thank you
+			text = EVTOPTB_HFP_10018 # I shall take that, thank you
 			trigger = {
-				event_target:equipped_artifact = { NOT = { quality > 3 } }
+				event_target:equipped_artifact = { quality < 4 }
 			}
 		}
 
-        custom_tooltip = { text = EVTOPTA_HFP_10018_tt }
-        allow_new_battle_events_effect = yes
+		trigger = { # If you are the enemy liege, AND not the commander
+			character = event_target:enemy_liege
+			NOT = { character = event_target:enemy_commander }
+		}
 
-        trigger = { #If you are the enemy liege, AND not the commander
-        	event_target:enemy_liege = { character = ROOT }
-        	NOT = { event_target:enemy_commander = { character = ROOT } }
-        }
+		custom_tooltip = { text = EVTOPTA_HFP_10018_tt }
+	}
+
+	after = {
+		allow_new_battle_events_effect = yes
 	}
 }
 
@@ -3289,11 +3317,12 @@ character_event = {
 
 	is_triggered_only = yes
 
+	has_character_flag = has_PTSD
+	war = no
+
 	trigger = {
 		is_alive = yes
 		is_landed = yes
-		has_character_flag = has_PTSD
-		war = no
 	}
 
 	fail_trigger_effect = {
@@ -3301,9 +3330,13 @@ character_event = {
 			limit = {
 				is_landed = yes
 				has_character_flag = has_PTSD
-				war = yes #it's just this one that failed!
 			}
-			repeat_event = { id = HFP.11019 days = 365 random = 50 } #PTSD follow up (try again in a year)
+
+			repeat_event = {
+				id = HFP.11019 # PTSD follow up (try again in a year)
+				years = 1
+				random = 50
+			}
 		}
 		else = {
 			clr_character_flag = has_PTSD
@@ -3311,23 +3344,22 @@ character_event = {
 	}
 
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_negative_effect = yes
 
 		random_list = {
-			10 = {
-				trigger = {
-					num_of_children = 1
-				}
+			33 = {
+				trigger = { has_living_children = yes }
 				set_character_flag = desc_A
 			}
-			10 = {
-				set_character_flag = desc_B
-			}
-			10 = {
-				trigger = { #To make sure you're not the cause of the war?
-					NOT = { event_target:home_liege = { character = ROOT } }
+
+			33 = { set_character_flag = desc_B }
+
+			33 = {
+				trigger = { # To make sure you're not the cause of the war?
+					NOT = { character = event_target:home_liege }
 				}
+
 				set_character_flag = desc_C
 			}
 		}
@@ -3337,92 +3369,107 @@ character_event = {
 		text = EVTDESC_HFP_11019_A # I can't be near my children
 		trigger = { has_character_flag = desc_A }
 	}
+	desc = EVTDESC_HFP_11019_B # I'm not really here
 	desc = {
-		text = EVTDESC_HFP_11019_B #I'm not really here
-		trigger = { has_character_flag = desc_B }
-	}
-	desc = {
-		text = EVTDESC_HFP_11019_C #Survivor's guilt
-		trigger = { has_character_flag = desc_C }
+		text = EVTDESC_HFP_11019_C # Survivor's guilt
+		trigger = { NOT = { character = event_target:home_liege } }
 	}
 
 
-	option = { #Act out (#Scenario A: I can't be near my children)
-		name = EVTOPTA_HFP_11019_1 #I need a drink
-		add_trait = drunkard
-		add_trait = cynical
+	option = { # Act out (Scenario A: I can't be near my children)
+		name = EVTOPTA_HFP_11019_1 # I need a drink
+
 		trigger = { has_character_flag = desc_A }
+
+		add_trait_silently_drunkard_effect = yes
+		add_trait_partially_silently_cynical_effect = yes
 	}
-	option = { #Try to cope (#Scenario A: I can't be near my children)
-		name = EVTOPTA_HFP_11019_2 #I do NOT have nightmares, servant! How dare you?
-		add_trait = depressed
+
+	option = { # Try to cope (Scenario A: I can't be near my children)
+		name = EVTOPTA_HFP_11019_2 # I do NOT have nightmares, servant! How dare you?
+
 		trigger = { has_character_flag = desc_A }
+
+		add_trait_silently_depressed_effect = yes
 	}
-	option = { #Act out (Scenario A (last option) or B (top option if so))
-		name = EVTOPTF_HFP_11019 #I can never be close to anyone.
-		add_trait = celibate
+
+	option = { # Act out (Scenario A (last option) or B (top option if so))
+		name = EVTOPTF_HFP_11019 # I can never be close to anyone.
+
 		trigger = {
 			OR = {
 				has_character_flag = desc_A
 				has_character_flag = desc_B
 			}
 		}
-	}
-	option = { #Try to cope (#Scenario B: I'm not really here)
-		name = EVTOPTB_HFP_11019_2 #Some solitude is what's needed
-		add_trait = depressed
-		trigger = { has_character_flag = desc_B }
-	}
-	option = { #Act out (#Scenario B: I'm not really here)
-		name = EVTOPTB_HFP_11019_1 #I need to feel alive again
-		add_trait = lustful
-		add_trait = drunkard
-		trigger = { has_character_flag = desc_B }
-	}
-	option = { #Act out (#Scenario C: Survivor's guilt)
-		name = EVTOPTC_HFP_11019_1 #It should've been me who died
-		custom_tooltip = { text = EVTOPTC_HFP_11019_1_TT }
-		death = {
-			death_reason = death_suicide
-		}
-		trigger = { has_character_flag = desc_C ai = no }
-	}
-	option = { #Try to cope (Scenario C: Survivor's guilt)
-		name = EVTOPTC_HFP_11019_2 #Some people will always want me dead
-		add_trait = cynical
-		add_trait = depressed
-		trigger = { has_character_flag = desc_C }
+
+		add_trait_silently_celibate_effect = yes
 	}
 
-	option = { #Act out in anger (A, B, or C)
-		name = EVTOPTD_HFP_11019 #Enough of these nonsense FEELINGS
-		add_trait = wroth
-		add_trait = stressed
+	option = { # Try to cope (Scenario B: I'm not really here)
+		name = EVTOPTB_HFP_11019_2 # Some solitude is what's needed
+
+		trigger = { has_character_flag = desc_B }
+
+		add_trait_silently_depressed_effect = yes
+	}
+
+	option = { # Act out (Scenario B: I'm not really here)
+		name = EVTOPTB_HFP_11019_1 # I need to feel alive again
+
+		trigger = { has_character_flag = desc_B }
+
+		add_trait_partially_silently_lustful_effect = yes
+		add_trait_silently_drunkard_effect = yes
+	}
+
+	option = { # Act out (Scenario C: Survivor's guilt)
+		name = EVTOPTC_HFP_11019_1 # It should've been me who died
+
+		trigger = { has_character_flag = desc_C }
+
+		custom_tooltip = { text = EVTOPTC_HFP_11019_1_TT }
+		death = { death_reason = death_suicide }
+	}
+
+	option = { # Try to cope (Scenario C: Survivor's guilt)
+		name = EVTOPTC_HFP_11019_2 # Some people will always want me dead
+
+		trigger = { has_character_flag = desc_C }
+
+		add_trait_partially_silently_cynical_effect = yes
+		add_trait_silently_depressed_effect = yes
+	}
+
+	option = { # Act out in anger (A, B, or C)
+		name = EVTOPTD_HFP_11019 # Enough of these nonsense FEELINGS
+
+		add_trait_partially_silently_wroth_effect = yes
+		add_trait_silently_stressed_effect = yes
 		pacifists_lose_piety_effect = yes
+
 		random = {
 			chance = 15
-			add_trait = depressed
-			hidden_effect = {
-				character_event = {
-					id = 38288 #Notify Depressed
-				}
-			}
+			add_trait_depressed_effect = yes
 		}
 	}
-	option = { #For WL members only: comfort hunting
-		name = EVTOPTE_HFP_11019 #Enough of these nonsense FEELINGS
+
+	option = { # For WL members only: comfort hunting
+		name = EVTOPTE_HFP_11019 # Enough of these nonsense FEELINGS
 		tooltip_info_custom = available_due_to_warrior_lodge
-		piety =-5
-		trigger = {
-			is_member_of_any_warrior_lodge_trigger = yes
-		}
+
+		trigger = { is_member_of_any_warrior_lodge_trigger = yes }
+
+		piety = -5
 	}
+
 	after = {
-		clr_ABC_desc_flag_effect = yes
+		clr_character_flag = desc_A
+		clr_character_flag = desc_B
+		clr_character_flag = desc_C
 		allow_new_battle_events_effect = yes
 	}
 }
-
 
 ### BATTLE EVENT: Gain Commander trait 2 (fired from HFP.11000)
 character_event = {
@@ -3433,46 +3480,49 @@ character_event = {
 	border = GFX_event_normal_frame_war
 	sound = win_battle
 
+	is_triggered_only = yes
 	hide_from = yes
 
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-		can_have_more_leadership_traits = yes
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = { # Organizer
 		name = EVTOPTA_HFP_11020
+
 		trigger = { NOT = { trait = organizer } }
+
 		add_trait = organizer
 	}
+
 	option = { # Experimenter
 		name = EVTOPTB_HFP_11020
+
 		trigger = { NOT = { trait = experimenter } }
+
 		add_trait = experimenter
 	}
+
 	option = { # Holy Warrior
 		name = EVTOPTC_HFP_11020
+
 		trigger = {
 			trait = zealous
-			NOT = {
-				trait = holy_warrior
-				trait = cynical
-			}
+			NOT = { trait = holy_warrior }
 		}
+
 		add_trait = holy_warrior
 	}
+
 	option = { # Unyielding
 		name = EVTOPTD_HFP_11020
+
 		trigger = { NOT = { trait = unyielding_leader } }
+
 		add_trait = unyielding_leader
 	}
+
 	after = {
 		allow_new_battle_events_effect = yes
 	}
@@ -3487,29 +3537,29 @@ character_event = {
 	border = GFX_event_normal_frame_war
 	sound = win_battle
 
+	is_triggered_only = yes
 	hide_from = yes
 
-	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-		can_have_more_leadership_traits = yes
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = {
 		name = EVTOPTA_HFP_11021 # Aggressive
+
 		pacifists_lose_piety_effect = yes
+
 		trigger = {
-			NOT = { trait = defensive_leader }
-			NOT = { trait = aggressive_leader }
+			NOR = {
+				trait = defensive_leader
+				trait = aggressive_leader
+			}
 		}
+
 		add_trait = aggressive_leader
 	}
+
 	option = { # Defensive
 		name = {
 			text = EVTOPTB_HFP_11021
@@ -3520,21 +3570,31 @@ character_event = {
 			trigger = { government = nomadic_government }
 		}
 		trigger = {
-			NOT = { trait = defensive_leader }
-			NOT = { trait = aggressive_leader }
+			NOR = {
+				trait = defensive_leader
+				trait = aggressive_leader
+			}
 		}
+
 		add_trait = defensive_leader
 	}
+
 	option = {
 		name = EVTOPTC_HFP_11021 # Inspiring
+
 		trigger = { NOT = { trait = inspiring_leader } }
+
 		add_trait = inspiring_leader
 	}
+
 	option = { # Trickster
 		name = EVTOPTD_HFP_11021
+
 		trigger = { NOT = { trait = trickster } }
+
 		add_trait = trickster
 	}
+
 	after = {
 		add_blood_splatter_effect = yes
 		allow_new_battle_events_effect = yes
@@ -3550,101 +3610,127 @@ character_event = {
 	border = GFX_event_normal_frame_war
 	sound = win_battle
 
-	hide_from = yes
 	is_triggered_only = yes
-
-	trigger = {
-		is_alive = yes
-		can_have_more_leadership_traits = yes
-	}
+	hide_from = yes
 
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 	}
 
 	option = {
 		name = EVTOPTA_HFP_11022 # Rough Terrain Specialization
+
 		trigger = {
-			OR = {
-				location = { terrain = forest }
-				location = { terrain = hills }
+			location = {
+				OR = {
+					terrain = forest
+					terrain = hills
+				}
 			}
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = rough_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTA_HFP_11022 # Flat Terrain Specialization
+
 		trigger = {
-			OR = {
-				location = { terrain = plains }
-				location = { terrain = farmlands }
-				location = { terrain = steppe }
+			location = {
+				OR = {
+					terrain = plains
+					terrain = farmlands
+					terrain = steppe
+				}
 			}
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = flat_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTA_HFP_11022 # Mountain Terrain Specialization
+
 		trigger = {
 			location = { terrain = mountain }
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = mountain_terrain_leader
 	}
+
 	option = {
 		name = EVTOPTA_HFP_11022 # Desert Terrain Leader
+
 		trigger = {
 			location = { terrain = desert }
-			NOT = {
+
+			NOR = {
 				trait = rough_terrain_leader
 				trait = flat_terrain_leader
 				trait = mountain_terrain_leader
 				trait = desert_terrain_leader
 			}
 		}
+
 		add_trait = desert_terrain_leader
 	}
+
 	option = { # Flanker
 		name = EVTOPTB_HFP_11022
+
 		trigger = { NOT = { trait = flanker } }
+
 		add_trait = flanker
 	}
+
 	option = { # Narrow flank leader
 		name = EVTOPTC_HFP_11022
+
 		trigger = {
-			OR = {
-				location = { terrain = mountain }
-				location = { terrain = hills }
-				location = { terrain = forest }
+			location = {
+				OR = {
+					terrain = mountain
+					terrain = hills
+					terrain = forest
+				}
 			}
+
 			NOT = { trait = narrow_flank_leader }
 		}
+
 		add_trait = narrow_flank_leader
 	}
+
 	option = { # Siege leader
 		name = EVTOPTD_HFP_11022
+
 		trigger = {
 			siege = { is_attacker = yes }
 			NOT = { trait = siege_leader }
 		}
+
 		add_trait = siege_leader
 	}
 
@@ -3661,40 +3747,32 @@ character_event = {
 	picture = GFX_evt_torture
 	border = GFX_event_normal_frame_war
 
-	capable_only = yes
-	war = yes
-
 	is_triggered_only = yes
 
-	trigger = {
-		in_command = yes
-		has_job_title = job_marshal
-		trait = cruel
-	}
-
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
 	option = {
-		name = EVTOPTA_HFP_11023_A #You're just a boy! I can't do this
+		name = EVTOPTA_HFP_11023_A # You're just a boy! I can't do this
+
 		remove_trait = cruel
-		allow_new_battle_events_effect = yes
 		prestige = -20
 	}
+
 	option = {
-		name = EVTOPTA_HFP_11023_B #You're just a tool for my enemy
+		name = EVTOPTA_HFP_11023_B # You're just a tool for my enemy
+
 		prestige = 20
 		piety = -20
-		allow_new_battle_events_effect = yes
 
-		hidden_tooltip = {
-			liege = {
-				character_event = {
-					id = HFP.11024
-				}
-			}
+		liege = {
+			character_event = { id = HFP.11024 }
 		}
+	}
+
+	after = {
+		allow_new_battle_events_effect = yes
 	}
 }
 
@@ -3705,57 +3783,54 @@ character_event = {
 	picture = GFX_evt_torture
 	border = GFX_event_normal_frame_war
 
-	war = yes
-
 	is_triggered_only = yes
 
-	trigger = {
-		NOT = { trait = incapable }
-		prisoner = no
-		is_inaccessible_trigger = no
-	}
+	only_capable = yes
+	prisoner = no
+
+	# trigger = {
+	# 	is_inaccessible_trigger = no
+	# }
 
 	immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 	}
 
 	option = {
-		name = EVTOPTB_HFP_11024 #Disapprove of his conduct
+		name = EVTOPTB_HFP_11024 # Disapprove of his conduct
+
 		opinion = {
-			modifier = opinion_disapprove
+			name = opinion_disapprove
 			who = FROM
 			years = 5
 		}
+
 		random = {
 			chance = 50
-			add_trait = kind
-			hidden_tooltip = {
-				character_event ={
-					id = 38268 #Notify Kind
-				}
-			}
+			add_trait_fully_kind_effect = yes
 		}
 	}
+
 	option = {
-		name = EVTOPTC_HFP_11024 #He's right, we should terrorise our enemy
+		name = EVTOPTC_HFP_11024 # He's right, we should terrorise our enemy
+
 		opinion = {
-			modifier = opinion_approves
+			name = opinion_approves
 			who = FROM
 			years = 5
 		}
+
 		prestige = -10
+
 		random = {
 			chance = 50
-			add_trait = cruel
-			hidden_tooltip = {
-				character_event ={
-					id = 38259 #Notify Cruel
-				}
-			}
+			add_trait_fully_cruel_effect = yes
 		}
 	}
+
 	option = {
-		name = EVTOPTA_HFP_11024 #That's the cruelty of war
+		name = EVTOPTA_HFP_11024 # That's the cruelty of war
+
 		piety = -15
 	}
 
@@ -3766,498 +3841,574 @@ character_event = {
 
 ### BATTLE EVENT: Pet Animal to the rescue! Or choose to duel! (fired from HFP.11000)
 character_event = {
-    id = HFP.11025
-    title = the_battle_at_location
+	id = HFP.11025
+	title = the_battle_at_location
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
-    is_triggered_only = yes
 
-    trigger = {
-    	is_alive = yes
-    }
-
-    desc = { #Check that these texts are all in
-    	text = EVTDESC_HFP_11025_dog
-    	trigger = { has_character_flag = desc_dog }
-    }
 	desc = {
-    	text = EVTDESC_HFP_11025_cat
-    	trigger = { has_character_flag = desc_cat }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11025_horse
-    	trigger = { has_character_flag = desc_horse }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11025_owl
-    	trigger = { has_character_flag = desc_owl }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11025_eagle
-    	trigger = { has_character_flag = desc_eagle }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11025_fallback
-    	trigger = { has_character_flag = desc_fallback }
-    }
+		text = EVTDESC_HFP_11025_dog
+		trigger = { has_character_flag = desc_dog }
+	}
+	desc = {
+		text = EVTDESC_HFP_11025_cat
+		trigger = { has_character_flag = desc_cat }
+	}
+	desc = {
+		text = EVTDESC_HFP_11025_horse
+		trigger = { has_character_flag = desc_horse }
+	}
+	desc = {
+		text = EVTDESC_HFP_11025_owl
+		trigger = { has_character_flag = desc_owl }
+	}
+	desc = {
+		text = EVTDESC_HFP_11025_eagle
+		trigger = { has_character_flag = desc_eagle }
+	}
+	desc = {
+		text = EVTDESC_HFP_11025_fallback
+		trigger = { has_character_flag = desc_fallback }
+	}
 
-    immediate = {
-		disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+	is_triggered_only = yes
+
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
 		# battle_commander_counter_negative_effect = yes
 
-		if = {
-			limit = { event_target:enemy_commander = { is_alive = yes ai = yes } }
-			disallow_new_battle_events_effect = yes #to keep the tombola from spamming your potential target...
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				disallow_new_battle_events_effect = yes # To keep the tombola from spamming your potential target...
+			}
 		}
-    	random_list = {
-    		10 = {
-    			trigger = { has_character_modifier = pet_hunting_dog }
-    			set_character_flag = desc_dog
-    			break = yes
-    		}
-    		10 = {
-    			trigger = { has_character_modifier = pet_cat }
-    			set_character_flag = desc_cat
-    			break = yes
-    		}
-    		10 = {
-    			trigger = { has_character_modifier = nomad_warhorse }
-    			set_character_flag = desc_horse
-    			break = yes
-    		}
-    		10 = {
-    			trigger = { has_character_modifier = pet_owl }
-    			set_character_flag = desc_owl
-    			break = yes
-    		}
-    		10 = {
-    			trigger = { has_character_modifier = pet_hunting_eagle }
-    			set_character_flag = desc_eagle
-    			break = yes
-    		}
-    	}
-    	set_character_flag = desc_fallback
-    }
 
-    ### Let the pet die....
-    option = {
-        name = EVTOPTA_HFP_11025_dog
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_dog }
-		remove_character_modifier = pet_hunting_dog
-		hidden_effect = {
+		random_list = {
+			20 = {
+				trigger = { has_character_modifier = pet_hunting_dog }
+				set_character_flag = desc_dog
+			}
+
+			20 = {
+				trigger = { has_character_modifier = pet_cat }
+				set_character_flag = desc_cat
+			}
+
+			20 = {
+				trigger = { has_character_modifier = nomad_warhorse }
+				set_character_flag = desc_horse
+			}
+
+			20 = {
+				trigger = { has_character_modifier = pet_owl }
+				set_character_flag = desc_owl
+			}
+
+			20 = {
+				trigger = { has_character_modifier = pet_hunting_eagle }
+				set_character_flag = desc_eagle
+			}
+
+			fallback = {
+				set_character_flag = desc_fallback
+			}
+		}
+	}
+
+	### Let the pet die....
+	option = {
+		name = EVTOPTA_HFP_11025_dog
+
+		trigger = { has_character_flag = desc_dog }
+
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_dog
+
+			remove_character_modifier = pet_hunting_dog
 			remove_character_modifier = pet_best_friends
-			if = { #To handle omens from hermetics
+
+			if = { # To handle omens from hermetics
 				limit = {
 					has_dlc = "Mystics"
+
 					OR = {
 						has_character_modifier = good_relationship_omen
 						has_character_modifier = bad_relationship_omen
 					}
 				}
+
 				set_character_flag = dog_death_omen
-				character_event = { id = MNM.1213 days = 35 random = 30 } # Scrying vision come true
+
+				character_event = {
+					id = MNM.1213 # Scrying vision come true
+					days = 35
+					random = 30
+				}
 			}
 		}
+
 		send_new_dog_event_effect = yes # Will only work for certain bloodlines...
 		clr_character_flag = about_to_challenge_enemy_commander
 		allow_new_battle_events_effect = yes
-        trigger = { has_character_flag = desc_dog }
-    }
-    option = {
-        name = EVTOPTA_HFP_11025_cat
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_cat }
-		remove_character_modifier = pet_cat
-		hidden_effect = {
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11025_cat
+
+		trigger = { has_character_flag = desc_cat }
+
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_cat
+
+			remove_character_modifier = pet_cat
 			remove_character_modifier = pet_best_friends
-			if = { #To handle omens from hermetics
+
+			if = { # To handle omens from hermetics
 				limit = {
 					has_dlc = "Mystics"
+
 					OR = {
 						has_character_modifier = good_relationship_omen
 						has_character_modifier = bad_relationship_omen
 					}
 				}
+
 				set_character_flag = cat_death_omen
-				character_event = { id = MNM.1213 days = 35 random = 30 } # Scrying vision come true
+
+				character_event = {
+					id = MNM.1213 # Scrying vision come true
+					days = 35
+					random = 30
+				}
 			}
 		}
-		clr_character_flag = about_to_challenge_enemy_commander
-		allow_new_battle_events_effect = yes
-        trigger = { has_character_flag = desc_cat }
-    }
-    option = {
-        name = EVTOPTA_HFP_11025_horse
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_horse }
-		remove_character_modifier = nomad_warhorse
-		clr_character_flag = about_to_challenge_enemy_commander
-		allow_new_battle_events_effect = yes
-        trigger = { has_character_flag = desc_horse }
-    }
-    option = {
-        name = EVTOPTA_HFP_11025_owl
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_owl }
-		remove_character_modifier = pet_owl
-		clr_character_flag = about_to_challenge_enemy_commander
-		allow_new_battle_events_effect = yes
-        trigger = { has_character_flag = desc_owl }
-    }
-    option = {
-        name = EVTOPTA_HFP_11025_eagle
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_eagle }
-		remove_character_modifier = pet_hunting_eagle
-		clr_character_flag = about_to_challenge_enemy_commander
-		allow_new_battle_events_effect = yes
-		send_new_eagle_event_effect = yes #Only for certain bloodlines...!
-
-        trigger = { has_character_flag = desc_eagle }
-    }
-    option = {
-        name = EVTOPTA_HFP_11025_fallback
-        custom_tooltip = { text = EVTOPTA_HFP_11025_TT_fallback }
-
-        add_battle_PTSD_effect = yes
 
 		clr_character_flag = about_to_challenge_enemy_commander
 		allow_new_battle_events_effect = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
 
-        trigger = { has_character_flag = desc_fallback }
-    }
+	option = {
+		name = EVTOPTA_HFP_11025_horse
 
-    ### Chase after the enemy commander (if there is one)
-    option = {
-        name = EVTOPTB_HFP_11025
-        if = {
-        	limit = { NOT = { has_character_flag = desc_fallback } }
-        	custom_tooltip = { text = EVTOPTB_HFP_11025_TT }
-        	hidden_effect = { duel_enemy_commander_effect = yes } #hides the usual tooltip for chasing down enemy commander...
-        }
-        else = {
-       		duel_enemy_commander_effect = yes #instantly sends event for a duel!
-        }
-        pacifists_lose_piety_effect = yes
-        set_character_flag = skip_blood_splatter
+		trigger = { has_character_flag = desc_horse }
 
-        ai_chance = {
-        	factor = 1
-        	modifier = {
-                factor = 0
-                event_target:enemy_commander = { ai = no } #don't do this to players
-            }
-        }
-        trigger = {
-        	event_target:enemy_commander = { # To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_horse
+			remove_character_modifier = nomad_warhorse
+		}
+
+		clr_character_flag = about_to_challenge_enemy_commander
+		allow_new_battle_events_effect = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11025_owl
+
+		trigger = { has_character_flag = desc_owl }
+
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_owl
+			remove_character_modifier = pet_owl
+		}
+
+		clr_character_flag = about_to_challenge_enemy_commander
+		allow_new_battle_events_effect = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11025_eagle
+
+		trigger = { has_character_flag = desc_eagle }
+
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_eagle
+			remove_character_modifier = pet_hunting_eagle
+		}
+
+		send_new_eagle_event_effect = yes # Only for certain bloodlines...!
+		clr_character_flag = about_to_challenge_enemy_commander
+		allow_new_battle_events_effect = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11025_fallback
+
+		trigger = { has_character_flag = desc_fallback }
+
+		custom_tooltip = {
+			text = EVTOPTA_HFP_11025_TT_fallback
+			add_battle_PTSD_effect = yes
+		}
+
+		clr_character_flag = about_to_challenge_enemy_commander
+		allow_new_battle_events_effect = yes
+		event_target:enemy_commander = {
+			if = {
+				limit = {
+					is_alive = yes
+					ai = yes
+				}
+				allow_new_battle_events_effect = yes
+			}
+		}
+	}
+
+	### Chase after the enemy commander (if there is one)
+	option = {
+		name = EVTOPTB_HFP_11025
+
+		trigger = {
+			# To ensure you do not try to duel commanders who literally *just* died (in battle, presumably)
+			event_target:enemy_commander = {
 				is_alive = yes
 				is_dying = no
 			}
-        }
-    }
+		}
 
-    after = {
-    	clr_character_flag = desc_dog
-    	clr_character_flag = desc_cat
-    	clr_character_flag = desc_horse
-    	clr_character_flag = desc_owl
-    	clr_character_flag = desc_eagle
-    	clr_character_flag = desc_fallback
-    	if = {
-    		limit = { has_character_flag = skip_blood_splatter }
-    		clr_character_flag = skip_blood_splatter
-    	}
-    	else = {
-    		add_blood_splatter_effect = yes
-    	}
-    }
+		if = {
+			limit = { NOT = { has_character_flag = desc_fallback } }
+
+			custom_tooltip = {
+				text = EVTOPTB_HFP_11025_TT
+				duel_enemy_commander_effect = yes # Hides the usual tooltip for chasing down enemy commander...
+			}
+		}
+		else = {
+			duel_enemy_commander_effect = yes # Instantly sends event for a duel!
+		}
+
+		pacifists_lose_piety_effect = yes
+		set_character_flag = skip_blood_splatter
+
+		ai_chance = {
+			factor = 1
+
+			trigger = {
+				event_target:enemy_commander = { ai = yes } # Don't do this to players
+			}
+		}
+	}
+
+	after = {
+		clr_character_flag = desc_dog
+		clr_character_flag = desc_cat
+		clr_character_flag = desc_horse
+		clr_character_flag = desc_owl
+		clr_character_flag = desc_eagle
+		clr_character_flag = desc_fallback
+
+		if = {
+			limit = { has_character_flag = skip_blood_splatter }
+			clr_character_flag = skip_blood_splatter
+		}
+		else = {
+			add_blood_splatter_effect = yes
+		}
+	}
 }
-
 
 #######################################################
 ############### Warrior Lodge members only ############
 #######################################################
 ### BATTLE EVENT: Find a weapon on the battlefield... (fired from HFP.11000)
 character_event = {
-    id = HFP.11026
-    title = the_battle_at_location
-    desc = EVTDESC_HF_11026
+	id = HFP.11026
+	title = the_battle_at_location
+	desc = EVTDESC_HF_11026
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
-    is_triggered_only = yes
+
+	is_triggered_only = yes
 	hide_from = yes
-    has_dlc = "Holy Fury"
 
-    trigger = {
-    	is_alive = yes
-    }
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+		# battle_commander_counter_positive_effect = yes
+	}
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    	# battle_commander_counter_positive_effect = yes
-    	if = {
-    		limit = {
-    			society_rank == 1
-    		}
-    		set_character_flag = rank_1
-    	}
-    	else_if = {
-    		limit = {
-    			society_rank == 2
-    		}
-    		set_character_flag = rank_2
-    	}
-    	else_if = {
-    		limit = {
-    			society_rank == 3
-    		}
-    		set_character_flag = rank_3
-    	}
-    	else_if = {
-    		limit = {
-    			society_rank == 4
-    		}
-    		set_character_flag = rank_4
-    	}
-    }
+	option = {
+		name = EVTOPTA_HFP_11026
 
-    option = {
-        name = EVTOPTA_HFP_11026
-        trigger_switch = {
-        	on_trigger = has_character_flag
-        	rank_1 = {
-        		add_artifact = sword_1_battlefield
-        		new_artifact = {
-        			set_name = weapon_battlefield_rename_1
-        			set_description = weapon_battlefield_desc_rename_1
-        		}
-        	}
-        	rank_2 = {
-        		add_artifact = sword_2_battlefield
-        		new_artifact = {
-        			set_name = weapon_battlefield_rename_2
-        			set_description = weapon_battlefield_desc_rename_2
-        		}
-        	}
-        	rank_3 = {
-        		add_artifact = sword_3_battlefield
-        		new_artifact = {
-        			set_name = weapon_battlefield_rename_3
-        			set_description = weapon_battlefield_desc_rename_3
-        		}
-        	}
-        	rank_4 = {
-        		add_artifact = sword_3_battlefield #same as rank 3
-        		new_artifact = {
-        			set_name = weapon_battlefield_rename_3
-        			set_description = weapon_battlefield_desc_rename_3
-        		}
-        	}
-        }
-        pacifists_lose_piety_effect = yes
-        add_blood_splatter_effect = yes
-    }
-    option = {
-        name = EVTOPTB_HFP_11026
-        custom_tooltip = { text = EVTOPTB_HFP_11026_TT }
-    }
-    after = {
-    	clr_character_flag = rank_1
-        clr_character_flag = rank_2
-        clr_character_flag = rank_3
-        clr_character_flag = rank_4
-        allow_new_battle_events_effect = yes
-    }
+		trigger_switch = {
+			on_trigger = society_rank
+
+			3 = { # Used for rank 3 and 4
+				add_artifact = sword_3_battlefield
+
+				new_artifact = {
+					set_name = weapon_battlefield_rename_3
+					set_description = weapon_battlefield_desc_rename_3
+				}
+			}
+
+			2 = {
+				add_artifact = sword_2_battlefield
+
+				new_artifact = {
+					set_name = weapon_battlefield_rename_2
+					set_description = weapon_battlefield_desc_rename_2
+				}
+			}
+
+			1 = {
+				add_artifact = sword_1_battlefield
+
+				new_artifact = {
+					set_name = weapon_battlefield_rename_1
+					set_description = weapon_battlefield_desc_rename_1
+				}
+			}
+		}
+
+		pacifists_lose_piety_effect = yes
+		add_blood_splatter_effect = yes
+	}
+
+	option = {
+		name = EVTOPTB_HFP_11026
+
+		custom_tooltip = { text = EVTOPTB_HFP_11026_TT }
+	}
+
+	after = {
+		allow_new_battle_events_effect = yes
+	}
 }
 
 ### BATTLE EVENT: Choose a nickname...! "Call me.." what? (fired from HFP.11000)
 character_event = {
-    id = HFP.11027
-    title = the_battle_at_location
-    desc = EVTDESC_HF_11027
+	id = HFP.11027
+	title = the_battle_at_location
+	desc = EVTDESC_HF_11027
 	picture = GFX_evt_battle
 	border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-    hide_from = yes
-    has_dlc = "Holy Fury"
 
-    trigger = {
-    	is_alive = yes
-    	has_dlc = "Holy Fury"
-    }
+	is_triggered_only = yes
+	hide_from = yes
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    	# battle_commander_counter_positive_effect = yes
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+		# battle_commander_counter_positive_effect = yes
 
-    	### Set potential nickname-flags...
-    	if = {
-    		limit = {
-    			OR = {
-    				is_learned_trigger = yes
-    				trait = mystic
-    			}
-    		}
-    		set_character_flag = the_astrologer
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				trait = hunter
-    				trait = wroth
-    				martial = 10
-    			}
-    		}
-    		set_character_flag = the_great_beast
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-	    			has_education_diplomacy_trigger = yes
-	    			has_lifestyle_diplomacy_trigger = yes
-	    			has_education_intrigue_trigger = yes
-    				has_lifestyle_intrigue_trigger = yes
-    			}
-    			OR = {
-    				has_3rd_tier_education_trait_trigger = yes
-    				has_top_tier_education_trait_trigger = yes
-    			}
-    		}
-    		set_character_flag = the_artist_ruler
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				trait = ambitious
-    				is_weak_trigger = yes
-    			}
-    		}
-    		set_character_flag = the_ambitious
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				any_kill_list_character = {
-						count = 50
+		### Set potential nickname-flags...
+		if = {
+			limit = {
+				OR = {
+					is_learned_trigger = yes
+					trait = mystic
+				}
+			}
+			set_character_flag = the_astrologer
+		}
+
+		if = {
+			limit = {
+				OR = {
+					trait = hunter
+					trait = wroth
+					martial >= 10
+				}
+			}
+			set_character_flag = the_great_beast
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_education_diplomacy_trigger = yes
+					has_lifestyle_diplomacy_trigger = yes
+					has_education_intrigue_trigger = yes
+					has_lifestyle_intrigue_trigger = yes
+					has_3rd_tier_education_trait_trigger = yes
+					has_top_tier_education_trait_trigger = yes
+				}
+			}
+			set_character_flag = the_artist_ruler
+		}
+
+		if = {
+			limit = {
+				OR = {
+					trait = ambitious
+					is_weak_trigger = yes
+				}
+			}
+			set_character_flag = the_ambitious
+		}
+
+		if = {
+			limit = {
+				OR = {
+					num_of_kill_list_characters >= 50
+					is_strong_trigger = yes
+					is_evil_trigger = yes
+					is_impious_trigger = yes
+				}
+			}
+			set_character_flag = the_bloody
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_pleasant_personality_trigger = yes
+					trait = grey_eminence
+					has_lifestyle_diplomacy_trigger = yes
+				}
+			}
+			set_character_flag = the_diplomat
+		}
+
+		if = {
+			limit = {
+				OR = {
+					has_pleasant_personality_trigger = yes
+					has_lifestyle_diplomacy_trigger = yes
+					trait = kind
+				}
+				NOT = { trait = cruel }
+			}
+			set_character_flag = the_kind_hearted
+		}
+
+		if = {
+			limit = { trait = charitable }
+			set_character_flag = the_generous
+		}
+
+		if = {
+			limit = {
+				OR = {
+					is_evil_trigger = yes
+					num_of_kill_list_characters >= 50
+				}
+			}
+			set_character_flag = the_executioner
+		}
+
+		if = {
+			limit = { trait = just }
+			set_character_flag = iron_fist
+		}
+
+		if = {
+			limit = { trait = cynical }
+			set_character_flag = stone_fist
+		}
+
+		if = {
+			limit = {
+				OR = {
+					trait = stubborn
+					trait = giant
+					is_strong_trigger = yes
+				}
+			}
+			set_character_flag = the_bulwark
+		}
+
+		if = {
+			limit = {
+				OR = {
+					trait = giant
+
+					AND = {
+						trait = just
+						trait = kind
 					}
-    				is_strong_trigger = yes
-    				is_evil_trigger = yes
-    				is_impious_trigger = yes
-    			}
-    		}
-    		set_character_flag = the_bloody
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				has_pleasant_personality_trigger = yes
-    				trait = grey_eminence
-    				has_lifestyle_diplomacy_trigger = yes
-    			}
-    		}
-    		set_character_flag = the_diplomat
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				has_pleasant_personality_trigger = yes
-    				has_lifestyle_diplomacy_trigger = yes
-    				trait = kind
-    			}
-    			NOT = { trait = cruel }
-    		}
-    		set_character_flag = the_kind_hearted
-    	}
-    	if = {
-    		limit = {
-    			trait = charitable
-    		}
-    		set_character_flag = the_generous
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-	    			is_evil_trigger = yes
-	    			any_kill_list_character = {
-						count = 50
-					}
-    			}
-    		}
-    		set_character_flag = the_executioner
-    	}
-    	if = {
-    		limit = {
-    			trait = just
-    		}
-    		set_character_flag = iron_fist
-    	}
-    	if = {
-    		limit = {
-    			trait = cynical
-    		}
-    		set_character_flag = stone_fist
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-    				trait = stubborn
-    				trait = giant
-    				is_strong_trigger = yes
-    			}
-    		}
-    		set_character_flag = the_bulwark
-    	}
-    	if = {
-    		limit = {
-    			OR = {
-	    			trait = giant
-	    			AND = {
-	    				trait = just
-	    				trait = kind
-	    			}
-	    		}
-    		}
-    		set_character_flag = the_tower
-    	}
-    	if = {
-    		limit = {
-    			event_target:enemy_commander = { is_alive = yes }
-    			event_target:enemy_commander = {
+				}
+			}
+			set_character_flag = the_tower
+		}
+
+		if = {
+			limit = {
+				event_target:enemy_commander = {
 					duelist_skill_compared_to_prev_low_group_trigger = yes
+					is_alive = yes
 				}
-    		}
-    		set_character_flag = the_wall_of_title
-    	}
-    	if = {
-    		limit = {
-    			event_target:enemy_commander = { is_alive = yes }
-    			event_target:enemy_commander = {
-					duelist_skill_compared_to_prev_high_group_trigger = yes
-				}
-    		}
-    		set_character_flag = the_underdog
-    	}
-    	random_list = {
-    		10 = {
-   				set_character_flag = the_terrain_commander
-    		}
-    		10 = {
-   				set_character_flag = the_ground_warrior
-    		}
-    		10 = {
-   				set_character_flag = lord_lady_of_the_terrain
-    		}
-    		10 = {
-   				set_character_flag = lord_lady_ground
-    		}
-    	}
-    }
+			}
+			set_character_flag = the_wall_of_title
+		}
 
-    option = {
-        name = EVTOPTA_HFP_11027
-        #custom_tooltip = { text = HFP_11027_kill_soldier }
-        give_nickname = nick_the_astrologer
-        trigger = {
+		if = {
+			limit = {
+				event_target:enemy_commander = {
+					duelist_skill_compared_to_prev_high_group_trigger = yes
+					is_alive = yes
+				}
+			}
+			set_character_flag = the_underdog
+		}
+
+		random_list = {
+			25 = { set_character_flag = the_terrain_commander }
+			25 = { set_character_flag = the_ground_warrior }
+			25 = { set_character_flag = lord_lady_of_the_terrain }
+			25 = { set_character_flag = lord_lady_ground }
+		}
+	}
+
+	option = {
+		name = EVTOPTA_HFP_11027
+
+		trigger = {
 			has_character_flag = the_astrologer 
 			can_apply_average_nickname_trigger = yes
 		}
-    }
+
+		give_nickname = nick_the_astrologer
+	}
+
     option = {
         name = EVTOPTB_HFP_11027
         #custom_tooltip = { text = HFP_11027_kill_soldier }
