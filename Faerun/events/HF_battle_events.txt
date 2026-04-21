@@ -5303,146 +5303,165 @@ character_event = {
 
 # Potential follow-up: Fellow commander gets to move a rock.
 character_event = {
-    id = HFP.11035
-    title = the_battle_at_location
-    desc = EVTDESC_HFP_11035
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-    has_dlc = "Holy Fury"
+	id = HFP.11035
+	title = the_battle_at_location
+	desc = EVTDESC_HFP_11035
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
 
-    trigger = {
+	is_triggered_only = yes
+
+	trigger = {
 		is_strong_non_congenital_trait_upgradeable_trigger = yes
 		FROM = { is_alive = yes }
-    }
+	}
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    }
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+	}
 
-    option = {
-        name = EVTOPTA_HFP_11035
-        custom_tooltip = { text = EVTOPTA_HFP_11034_TT }
-        upgrade_strong_non_congenital_trait_effect = yes
-        if = { #add friendships if appropriate...
-        	limit = {
-        		FROM = {
-        			potentially_interested_in_rivaling_root_trigger = no
-        			root_potentially_interested_in_rivaling_this_trigger = no
-        		}
-        	}
-        	if = {
-	            limit = {
-	                OR = {
-	                    reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-	                    has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-	                }
-	            }
-	            add_friend = FROM
-	        }
-	        else = {
-	            opinion = {
-	                who = FROM
-	                modifier = opinion_budding_friendship
-	                years = 10
-	            }
-	            reverse_opinion = {
-	                who = FROM
-	                modifier = opinion_budding_friendship
-	                years = 10
-	            }
-	        }
-        }
+	option = {
+		name = EVTOPTA_HFP_11035
 
-        allow_new_battle_events_effect = yes
-    }
+		custom_tooltip = { text = EVTOPTA_HFP_11034_TT }
+
+		upgrade_strong_non_congenital_trait_effect = yes
+
+		if = { # Add friendships if appropriate...
+			limit = {
+				FROM = {
+					potentially_interested_in_rivaling_root_trigger = no
+					root_potentially_interested_in_rivaling_this_trigger = no
+				}
+			}
+
+			if = {
+				limit = {
+					OR = {
+						has_opinion_modifier = {
+							name = opinion_budding_friendship
+							who = FROM
+						}
+
+						reverse_has_opinion_modifier = {
+							name = opinion_budding_friendship
+							who = FROM
+						}
+					}
+				}
+
+				add_friend = FROM
+			}
+			else = {
+				opinion = {
+					name = opinion_budding_friendship
+					who = FROM
+					years = 10
+				}
+
+				reverse_opinion = {
+					name = opinion_budding_friendship
+					who = FROM
+					years = 10
+				}
+			}
+		}
+
+		allow_new_battle_events_effect = yes
+	}
 }
 
 ### BATTLE EVENT: You are impressed by a fellow commander (fired from HFP.11000)
 character_event = {
-    id = HFP.11036
-    title = the_battle_at_location
-    desc = EVTDESC_HFP_11036
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-    has_dlc = "Holy Fury"
+	id = HFP.11036
+	title = the_battle_at_location
+	desc = EVTDESC_HFP_11036
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
 
-    hide_from = yes
+	is_triggered_only = yes
+	hide_from = yes
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    	# battle_commander_counter_positive_effect = yes
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+		# battle_commander_counter_positive_effect = yes
 
-    	any_unit_leader = {
-       		limit = {
-       			NOT = { character = ROOT }
-       			root_has_terrible_opinion_modifier_of_this_extended_trigger = no #So it's not someone you hate
-       		}
-       		score_value = { #Prioritizes selecting some kind of loved person...
-                value = 100
-                good_soldier_outcome_score = yes
-            }
-    		save_event_target_as = my_fellow_commander
-    	}
-    }
+		any_unit_leader = {
+			limit = {
+				NOT = { character = ROOT }
+				root_has_terrible_opinion_modifier_of_this_extended_trigger = no # So it's not someone you hate
+			}
 
-    option = {
-        name = EVTOPTA_HFP_11036
+			score_value = {
+				value = 100
+				good_soldier_outcome_score = yes
+			}
 
-       	if = { #if you already have an opinion in place, become friends...
-            limit = {
-                OR = {
-                    reverse_has_opinion_modifier = { who = event_target:my_fellow_commander modifier = opinion_budding_friendship }
-                    has_opinion_modifier = { who = event_target:my_fellow_commander modifier = opinion_budding_friendship }
-                }
-            }
-            tooltip = { add_friend = event_target:my_fellow_commander }
-        }
-        else = { #otherwise, add opinions... (*actually* added in follow-up)
-            tooltip = {
-                opinion = {
-                    who = event_target:my_fellow_commander
-                    modifier = opinion_impressed_me_in_battle
-                    years = 10
-                }
-                reverse_opinion = {
-                    who = event_target:my_fellow_commander
-                    modifier = opinion_was_praised
-                    years = 10
-                }
-            }
-        }
+			save_event_target_as = my_fellow_commander
+		}
+	}
 
-        #Send event to fellow commander...
-        event_target:my_fellow_commander = { character_event = { id = HFP.11039 days = 1 } }
-    }
-    option = {
-        name = EVTOPTB_HFP_11036 #It's not that hard!
-        random_list = {
-        	50 = {
-        		if = {
-        			limit = { trait = content }
-        			remove_trait = content
-        		}
-        		else = {
-        			add_trait = ambitious
-        		}
-        	}
-        	50 = {
-        	    if = {
-        			limit = { trait = kind }
-        			remove_trait = kind
-        		}
-        		else = {
-        			add_trait = envious
-        		}
-        	}
-        }
-        trigger = {
-    		NOT = { trait = ambitious }
-    		NOT = { trait = envious }
-        }
+	option = {
+		name = EVTOPTA_HFP_11036
+
+		if = { # If you already have an opinion in place, become friends...
+			limit = {
+				OR = {
+					has_opinion_modifier = {
+						name = opinion_budding_friendship
+						who = event_target:my_fellow_commander
+					}
+
+					reverse_has_opinion_modifier = {
+						name = opinion_budding_friendship
+						who = event_target:my_fellow_commander
+					}
+				}
+			}
+
+			tooltip = {
+				add_friend = event_target:my_fellow_commander
+			}
+		}
+		else = { # Otherwise, add opinions... (*actually* added in follow-up)
+			tooltip = {
+				opinion = {
+					name = opinion_impressed_me_in_battle
+					who = event_target:my_fellow_commander
+					years = 10
+				}
+
+				reverse_opinion = {
+					name = opinion_was_praised
+					who = event_target:my_fellow_commander
+					years = 10
+				}
+			}
+		}
+
+		# Send event to fellow commander...
+		event_target:my_fellow_commander = {
+			character_event = {
+				id = HFP.11039
+				days = 1
+			}
+		}
+	}
+
+	option = {
+		name = EVTOPTB_HFP_11036 # It's not that hard!
+
+		trigger = {
+			NAND = {
+				trait = ambitious
+				trait = envious
+			}
+		}
+
+		random_list = {
+			50 = { add_trait_partially_ambitious_effect = yes }
+			50 = { add_trait_partially_envious_effect = yes }
+		}
 	}
 
 	after = {
@@ -5452,368 +5471,422 @@ character_event = {
 
 # Potential follow-up: Fellow commander reacts to praise.
 character_event = {
-    id = HFP.11039
-    title = the_battle_at_location
-    desc = EVTDESC_HFP_11039
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
+	id = HFP.11039
+	title = the_battle_at_location
+	desc = EVTDESC_HFP_11039
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
 
-    trigger = {
+	is_triggered_only = yes
+
+	trigger = {
 		FROM = { is_alive = yes }
-    }
+	}
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    }
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+	}
 
-    option = {
-        name = {
-        	text = EVTOPTA_HFP_11039_default
-        	trigger = {
-        		NOR = {
-        			trait = lunatic
-	        		trait = depressed
-	        		trait = kind
-	        		trait = cannibal_trait
+	option = {
+		name = {
+			text = EVTOPTA_HFP_11039_default
+
+			trigger = {
+				is_evil_trigger = no
+
+				NOR = {
+					trait = lunatic
+					trait = depressed
+					trait = kind
+					trait = cannibal_trait
 					cannibal_race_trigger = yes
-	        		is_evil_trigger = yes
-	        		AND = {
-	        		    trait = zealous
-	        			has_religion_matching_joined_warrior_lodge_trigger = yes
-	        		}
-        		}
-        	}
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_lunatic
-        	trigger = { trait = lunatic NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_evil
-        	trigger = { is_evil_trigger = yes NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_kind
-        	trigger = { trait = kind NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_cannibal
-        	trigger = { 
+
+					trigger_if = {
+						limit = { trait = zealous }
+						has_religion_matching_joined_warrior_lodge_trigger = yes
+					}
+				}
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_lunatic
+			trigger = {
+				trait = lunatic
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_evil
+			trigger = {
+				is_evil_trigger = yes
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_kind
+			trigger = {
+				trait = kind
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_cannibal
+			trigger = {
 				OR = {
 					trait = cannibal_trait
 					cannibal_race_trigger = yes
 				}
-				NOT = { trait = depressed } 
+				NOT = { trait = depressed }
 			}
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_depressed
-        	trigger = { trait = depressed }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11039_zealous
-        	trigger = {
-        		trait = zealous
-        		has_religion_matching_joined_warrior_lodge_trigger = yes
-        		NOT = { trait = depressed }
-        	}
-        }
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_depressed
+			trigger = { trait = depressed }
+		}
+		name = {
+			text = EVTOPTA_HFP_11039_zealous
+			trigger = {
+				trait = zealous
+				has_religion_matching_joined_warrior_lodge_trigger = yes
+				NOT = { trait = depressed }
+			}
+		}
 
-        if = {
-        	limit = { trait = depressed }
-        	remove_trait = depressed
-        }
+		remove_trait_silently_depressed_effect = yes
 
-    	if = {
-            limit = { #if you already have an opinion in place, become friends...
-                OR = {
-                    reverse_has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-                    has_opinion_modifier = { who = FROM modifier = opinion_budding_friendship }
-                }
-            }
-            add_friend = FROM
-        }
-        else = {
-            opinion = {
-                who = FROM
-                modifier = opinion_was_praised
-                years = 10
-            }
-            reverse_opinion = {
-                who = FROM
-                modifier = opinion_impressed_me_in_battle
-                years = 10
-            }
-        }
-        add_blood_splatter_effect = yes
-        allow_new_battle_events_effect = yes
-    }
+		if = {
+			limit = { # If you already have an opinion in place, become friends...
+				OR = {
+					has_opinion_modifier = {
+						name = opinion_budding_friendship
+						who = FROM
+					}
+
+					reverse_has_opinion_modifier = {
+						name = opinion_budding_friendship
+						who = FROM
+					}
+				}
+			}
+
+			add_friend = FROM
+		}
+		else = {
+			opinion = {
+				name = opinion_was_praised
+				who = FROM
+				years = 10
+			}
+
+			reverse_opinion = {
+				name = opinion_impressed_me_in_battle
+				who = FROM
+				years = 10
+			}
+		}
+
+		add_blood_splatter_effect = yes
+		allow_new_battle_events_effect = yes
+	}
 }
-
 
 ### BATTLE EVENT: You reminisce about previous battles (hooked from previous events, fired from HFP.11000)
 character_event = {
-    id = HFP.11037
-    title = the_battle_at_location
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-    has_dlc = "Holy Fury"
+	id = HFP.11037
+	title = the_battle_at_location
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
+	portrait = event_target:target # Might be empty!
 
-    desc = {
-    	text = EVTDESC_HFP_11037_A_1
-    	trigger = { has_character_flag = kin_was_fallen_commander }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11037_A_2
-    	trigger = { has_character_flag = remember_fallen_commander }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11037_B_1
-    	trigger = { has_character_flag = i_was_inspiring_commander }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11037_B_2
-    	trigger = { has_character_flag = remember_inspiring_commander }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11037_C_1
-    	trigger = { has_character_flag = i_was_fearsome_commander }
-    }
-    desc = {
-    	text = EVTDESC_HFP_11037_C_2
-    	trigger = { has_character_flag = remember_fearsome_commander }
-    }
+	desc = {
+		text = EVTDESC_HFP_11037_A_1
+		trigger = { has_character_flag = kin_was_fallen_commander }
+	}
+	desc = {
+		text = EVTDESC_HFP_11037_A_2
+		trigger = { has_character_flag = remember_fallen_commander }
+	}
+	desc = {
+		text = EVTDESC_HFP_11037_B_1
+		trigger = { has_character_flag = i_was_inspiring_commander }
+	}
+	desc = {
+		text = EVTDESC_HFP_11037_B_2
+		trigger = { has_character_flag = remember_inspiring_commander }
+	}
+	desc = {
+		text = EVTDESC_HFP_11037_C_1
+		trigger = { has_character_flag = i_was_fearsome_commander }
+	}
+	desc = {
+		text = EVTDESC_HFP_11037_C_2
+		trigger = { has_character_flag = remember_fearsome_commander }
+	}
 
-    portrait = event_target:target #might be empty!
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
+	is_triggered_only = yes
+
+	immediate = {
+		disallow_new_battle_events_effect = yes # to keep the tombola from spamming you...
 		# battle_commander_counter_positive_effect = yes
 
-    	random_list = {
-    		10 = { #the least interesting choice...
-    			trigger = {
-    				event_target:home_capital_province = {
+		random_list = {
+			10 = { # The least interesting choice...
+				trigger = {
+					event_target:home_capital_province = {
 						persistent_event_target:local_dead_commander_target = { always = yes }
 					}
-    			}
-    			if = {
-    				limit = {
-    					event_target:home_capital_province = {
+				}
+				if = {
+					limit = {
+						event_target:home_capital_province = {
 							persistent_event_target:local_dead_commander_target = { dynasty = ROOT }
 						}
-    				}
-    				set_character_flag = kin_was_fallen_commander
-    			}
-    			else = { set_character_flag = remember_fallen_commander }
+					}
+
+					set_character_flag = kin_was_fallen_commander
+				}
+				else = {
+					set_character_flag = remember_fallen_commander
+				}
+
 				event_target:home_capital_province = {
 					persistent_event_target:local_dead_commander_target = { save_event_target_as = target }
 				}
-    		}
-    		50 = {
-    			trigger = {
-    				event_target:home_capital_province = {
+			}
+
+			50 = {
+				trigger = {
+					event_target:home_capital_province = {
 						persistent_event_target:local_inspiring_commander_target = { always = yes }
 					}
-    			}
-    			if = {
-    				limit = {
-    					event_target:home_capital_province = {
+				}
+
+				if = {
+					limit = {
+						event_target:home_capital_province = {
 							persistent_event_target:local_inspiring_commander_target = { character = ROOT }
 						}
-    				}
-    				set_character_flag = i_was_inspiring_commander
-    			}
-    			else = {
-    				set_character_flag = remember_inspiring_commander
+					}
+
+					set_character_flag = i_was_inspiring_commander
+				}
+				else = {
+					set_character_flag = remember_inspiring_commander
+
 					event_target:home_capital_province = {
 						persistent_event_target:local_inspiring_commander_target = { save_event_target_as = target }
 					}
 				}
-    		}
-    		100 = { #Means people remember a ruler once decapitated an enemy here...
-    			trigger = {
-    				event_target:home_capital_province = {
+			}
+
+			100 = { # Means people remember a ruler once decapitated an enemy here...
+				trigger = {
+					event_target:home_capital_province = {
 						persistent_event_target:local_fearsome_commander_target = { always = yes }
 					}
-    			}
-    			if = { #Means YOU did it and text should reflect that.
-    				limit = {
-    					event_target:home_capital_province = {
+				}
+
+				if = { # Means YOU did it and text should reflect that.
+					limit = {
+						event_target:home_capital_province = {
 							persistent_event_target:local_fearsome_commander_target = { character = ROOT }
 						}
-    				}
-    				set_character_flag = i_was_fearsome_commander
-    			}
-    			else = {
-    				set_character_flag = remember_fearsome_commander
-    				event_target:home_capital_province = {
+					}
+
+					set_character_flag = i_was_fearsome_commander
+				}
+				else = {
+					set_character_flag = remember_fearsome_commander
+
+					event_target:home_capital_province = {
 						persistent_event_target:local_fearsome_commander_target = { save_event_target_as = target }
 					}
-    			}
-    		}
-    	}
-    }
+				}
+			}
+		}
+	}
 
-    option = {
-        name = {
-        	text = EVTOPTA_HFP_11037_1
-        	trigger = { has_character_flag = kin_was_fallen_commander }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11037_2
-        	trigger = { has_character_flag = remember_fallen_commander }
-        }
-        name = {
-        	text = EVTOPTB_HFP_11037_1
-        	trigger = { has_character_flag = i_was_inspiring_commander }
-        }
-        name = {
-        	text = EVTOPTB_HFP_11037_2
-        	trigger = { has_character_flag = remember_inspiring_commander }
-        }
-        name = {
-        	text = EVTOPTC_HFP_11037_1
-        	trigger = { has_character_flag = i_was_fearsome_commander }
-        }
-        name = {
-        	text = EVTOPTC_HFP_11037_2
-        	trigger = { has_character_flag = remember_fearsome_commander }
-        }
+	option = {
+		name = {
+			text = EVTOPTA_HFP_11037_1
+			trigger = { has_character_flag = kin_was_fallen_commander }
+		}
+		name = {
+			text = EVTOPTA_HFP_11037_2
+			trigger = { has_character_flag = remember_fallen_commander }
+		}
+		name = {
+			text = EVTOPTB_HFP_11037_1
+			trigger = { has_character_flag = i_was_inspiring_commander }
+		}
+		name = {
+			text = EVTOPTB_HFP_11037_2
+			trigger = { has_character_flag = remember_inspiring_commander }
+		}
+		name = {
+			text = EVTOPTC_HFP_11037_1
+			trigger = { has_character_flag = i_was_fearsome_commander }
+		}
+		name = {
+			text = EVTOPTC_HFP_11037_2
+			trigger = { has_character_flag = remember_fearsome_commander }
+		}
 
-        show_portrait = event_target:target
+		show_portrait = event_target:target
 
-        if = {
-        	limit = {
-        		OR = { has_character_flag = kin_was_fallen_commander has_character_flag = remember_fallen_commander }
-        	}
-        	add_character_modifier = {
+		if = {
+			limit = {
+				OR = {
+					has_character_flag = kin_was_fallen_commander
+					has_character_flag = remember_fallen_commander
+				}
+			}
+
+			add_character_modifier = {
 				name = glory_days
 				years = 10
 			}
-        }
-        if = {
-        	limit = {
-        		OR = { has_character_flag = i_was_inspiring_commander has_character_flag = remember_inspiring_commander }
-        	}
-        	add_character_modifier = {
+
+			clr_character_flag = kin_was_fallen_commander
+			clr_character_flag = remember_fallen_commander
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_character_flag = i_was_inspiring_commander
+					has_character_flag = remember_inspiring_commander
+				}
+			}
+
+			add_character_modifier = {
 				name = proud_role_model
 				years = 10
 			}
-        }
-        if = {
-        	limit = {
-        		OR = { has_character_flag = i_was_fearsome_commander has_character_flag = remember_fearsome_commander }
-        	}
-        	add_character_modifier = {
+
+			clr_character_flag = i_was_inspiring_commander
+			clr_character_flag = remember_inspiring_commander
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_character_flag = i_was_fearsome_commander
+					has_character_flag = remember_fearsome_commander
+				}
+			}
+
+			add_character_modifier = {
 				name = center_of_attention
 				years = 15
 			}
-        }
-        allow_new_battle_events_effect = yes
-    }
-    after = {
-    	clr_character_flag = kin_was_fallen_commander
-    	clr_character_flag = remember_fallen_commander
-    	clr_character_flag = i_was_inspiring_commander
-    	clr_character_flag = remember_inspiring_commander
-    	clr_character_flag = i_was_fearsome_commander
-    	clr_character_flag = remember_fearsome_commander
-    }
+
+			clr_character_flag = i_was_fearsome_commander
+			clr_character_flag = remember_fearsome_commander
+		}
+
+		allow_new_battle_events_effect = yes
+	}
 }
 
 ### BATTLE EVENT: You personally kill a ton of enemies. And get a lodge specific nickname. (fired from HFP.11000)
 character_event = {
-    id = HFP.11038
-    title = the_battle_at_location
-    desc = EVTDESC_HFP_11038
-    picture = GFX_evt_battle
-    border = GFX_event_normal_frame_war
-    is_triggered_only = yes
-	has_dlc = "Holy Fury"
+	id = HFP.11038
+	title = the_battle_at_location
+	desc = EVTDESC_HFP_11038
+	picture = GFX_evt_battle
+	border = GFX_event_normal_frame_war
 	sound = win_battle
 
-    immediate = {
-    	disallow_new_battle_events_effect = yes #to keep the tombola from spamming you...
-    	# battle_commander_counter_positive_effect = yes
-    }
+	is_triggered_only = yes
 
-    option = {
-        name = {
-        	text = EVTOPTA_HFP_11038_default #I have found my purpose
-        	trigger = {
-        		NOR = {
-        			trait = lunatic
-	        		trait = depressed
-	        		trait = kind
-	        		trait = cannibal_trait
+	immediate = {
+		disallow_new_battle_events_effect = yes # To keep the tombola from spamming you...
+		# battle_commander_counter_positive_effect = yes
+	}
+
+	option = {
+		name = {
+			text = EVTOPTA_HFP_11038_default # I have found my purpose
+			trigger = {
+				is_evil_trigger = no
+
+				NOR = {
+					trait = lunatic
+					trait = depressed
+					trait = kind
+					trait = cannibal_trait
 					cannibal_race_trigger = yes
-	        		is_evil_trigger = yes
-	        		AND = {
-	        		    trait = zealous
-	        			has_religion_matching_joined_warrior_lodge_trigger = yes
-	        		}
-        		}
-        	}
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_lunatic
-        	trigger = { trait = lunatic NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_evil
-        	trigger = { is_evil_trigger = yes NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_kind
-        	trigger = { trait = kind NOT = { trait = depressed } }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_cannibal
-        	trigger = { 
+
+					trigger_if = {
+						limit = { trait = zealous }
+						has_religion_matching_joined_warrior_lodge_trigger = yes
+					}
+				}
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_lunatic
+			trigger = {
+				trait = lunatic
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_evil
+			trigger = {
+				is_evil_trigger = yes
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_kind
+			trigger = {
+				trait = kind
+				NOT = { trait = depressed }
+			}
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_cannibal
+			trigger = {
 				OR = {
 					trait = cannibal_trait
 					cannibal_race_trigger = yes
 				}
-				NOT = { trait = depressed } 
+				NOT = { trait = depressed }
 			}
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_depressed
-        	trigger = { trait = depressed }
-        }
-        name = {
-        	text = EVTOPTA_HFP_11038_zealous
-        	trigger = {
-        		trait = zealous
-        		has_religion_matching_joined_warrior_lodge_trigger = yes
-        		NOT = { trait = depressed }
-        	}
-        }
-
-        prestige = 25
-
-        add_blood_splatter_effect = yes
-
-        if = {
-        	limit = { trait = depressed }
-        	remove_trait = depressed
-        }
-        else_if = {
-        	limit = { trait = stressed }
-        	remove_trait = stressed
-        }
-        if = {
-        	limit = { 
-				can_apply_average_nickname_trigger = yes
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_depressed
+			trigger = { trait = depressed }
+		}
+		name = {
+			text = EVTOPTA_HFP_11038_zealous
+			trigger = {
+				trait = zealous
+				has_religion_matching_joined_warrior_lodge_trigger = yes
+				NOT = { trait = depressed }
 			}
-        	give_nickname = nick_warrior_lodge_spirit
-        }
+		}
 
-        allow_new_battle_events_effect = yes
-    }
+		prestige = 25
+		add_blood_splatter_effect = yes
+
+		if = {
+			limit = { trait = depressed }
+			remove_trait = depressed
+		}
+		else_if = {
+			limit = { trait = stressed }
+			remove_trait = stressed
+		}
+
+		if = {
+			limit = { can_apply_average_nickname_trigger = yes }
+			give_nickname = nick_the_warrior_lodge_spirit
+		}
+
+		allow_new_battle_events_effect = yes
+	}
 }
 
 # Potential follow-up (from battlefield duels): commander_to_the_rescue pushed you out of the way...
