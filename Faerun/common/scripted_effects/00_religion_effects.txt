@@ -218,8 +218,8 @@ reset_religion_features_effect = {
 	set_convert_same_group = 2
 	set_peace_prestige_loss = no
 	set_ai_aggression = 1
-	set_unit_modifier = {}
-	set_unit_home_modifier = {}
+	set_unit_modifier = { }
+	set_unit_home_modifier = { }
 	set_hard_to_convert = no
 	set_raised_vassal_opinion_loss = yes
 	set_piety_loss_for_attacking_same_religion = no
@@ -252,7 +252,7 @@ reset_religion_features_effect = {
 	set_ignores_defensive_attrition = no
 	set_defensive_attrition = no
 	clear_intermarry = no
-	set_character_modifier = {}
+	set_character_modifier = { }
 	clear_intermarry = yes
 	set_allows_matrilineal_marriage = yes
 }
@@ -1103,12 +1103,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1120,12 +1120,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1146,12 +1146,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1163,12 +1163,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1193,12 +1193,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1210,12 +1210,12 @@ export_reformer_to_title_effect = {
 							limit = { is_female = no }
 
 							ROOT = {
-								NOT = { has_religion_feature = religion_matriarchal }
+								is_matriarchal_religion_or_culture = no
 							}
 						}
 						trigger_else = {
 							ROOT = {
-								NOT = { has_religion_feature = religion_patriarchal }
+								is_patriarchal_religion_or_culture = no
 							}
 						}
 					}
@@ -1275,8 +1275,7 @@ rebuild_god_name_effect = {
 						religion = orc_reformed
 					}
 				}
-				has_religion_feature = religion_holy_family
-				has_religion_feature = religion_feature_nogari
+				religion_has_holy_family_trigger = yes
 				persistent_event_target:religion_title = {
 					OR = {
 						persistent_event_target:god_avatar = { always = yes }
@@ -2716,29 +2715,24 @@ rebuild_god_name_effect = {
 			}
 		}
 
-		if = {
-			limit = { # Holy Family actually becomes Holy
-				OR = {
-					has_religion_feature = religion_holy_family
-					has_religion_feature = religion_feature_nogari
-				}
-			}
+		if = { # Holy Family actually becomes Holy
+			limit = { religion_has_holy_family_trigger = yes }
 
 			# Runs in religion title scope, for persistent_event_target stored inside
 			persistent_event_target:religion_title = {
 				if = {
 					limit = { # Reformer himself, but only if he is not becoming the High God due to synergy
-						NOT = { has_religion_feature = religion_temporal_head }
-						
+						religion_has_temporal_head_trigger = no
+
 						trigger_if = {
 							limit = {
 								persistent_event_target:god_self = { is_female = no }
 							}
-							
-							NOT = { has_religion_feature = religion_matriarchal }
+
+							is_matriarchal_religion_or_culture = no
 						}
 						trigger_else = {
-							NOT = { has_religion_feature = religion_patriarchal }
+							is_patriarchal_religion_or_culture = no
 						}
 						NOT = {
 							persistent_event_target:god_self = {
@@ -2746,24 +2740,22 @@ rebuild_god_name_effect = {
 							}
 						}
 					}
-					
+
 					persistent_event_target:god_self = {
 						event_target:religion_target = { add_god_name = PREV_FNAME }
 					}
 				}
-				
+
 				if = {
 					limit = { # Father
 						persistent_event_target:god_dad = {
 							NOT = { character = event_target:god_avatar }
 						}
 					}
-					
+
 					if = {
-						limit = {
-							NOT = { has_religion_feature = religion_matriarchal }
-						}
-						
+						limit = { is_matriarchal_religion_or_culture = no }
+
 						persistent_event_target:god_dad = {
 							event_target:religion_target = { add_god_name = PREV_FNAME }
 						}
@@ -2774,19 +2766,17 @@ rebuild_god_name_effect = {
 						}
 					}
 				}
-				
+
 				if = {
 					limit = { # Mother
 						persistent_event_target:god_mom = {
 							NOT = { character = event_target:god_avatar }
 						}
 					}
-					
+
 					if = {
-						limit = {
-							NOT = { has_religion_feature = religion_patriarchal }
-						}
-						
+						limit = { is_patriarchal_religion_or_culture = no }
+
 						persistent_event_target:god_mom = {
 							event_target:religion_target = { add_god_name = PREV_FNAME }
 						}
@@ -2797,38 +2787,38 @@ rebuild_god_name_effect = {
 						}
 					}
 				}
-				
+
 				if = {
 					limit = { # Spouse
 						persistent_event_target:god_spouse = {
 							NOT = { character = event_target:god_avatar }
 						}
 					}
-					
+
 					persistent_event_target:god_spouse = {
 						event_target:religion_target = { add_god_name = PREV_FNAME }
 					}
 				}
-				
+
 				if = {
 					limit = { # Child
 						persistent_event_target:god_child = {
 							NOT = { character = event_target:god_avatar }
 						}
 					}
-					
+
 					persistent_event_target:god_child = {
 						event_target:religion_target = { add_god_name = PREV_FNAME }
 					}
 				}
-				
+
 				if = {
 					limit = { # Sibling
 						persistent_event_target:god_sibling = {
 							NOT = { character = event_target:god_avatar }
 						}
 					}
-					
+
 					persistent_event_target:god_sibling = {
 						event_target:religion_target = { add_god_name = PREV_FNAME }
 					}
